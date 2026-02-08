@@ -1,15 +1,186 @@
 {
   "orders": {
     "title": "Orders",
+    "description": "Manage customer orders, track fulfillments, and process payments",
     "orderNumber": "Order Number",
-    "customer": "Customer",
-    "status": "Status",
-    "total": "Total",
-    "items": "Items",
-    "shipping": "Shipping",
-    "payment": "Payment",
-    "fulfilled": "Fulfilled",
-    "unfulfilled": "Unfulfilled",
-    "cancelled": "Cancelled"
+    "orderPrefix": "Order #{id}",
+    "placedOn": "Placed on {date}",
+
+    "columns": {
+      "order": "Order",
+      "customer": "Customer",
+      "status": "Status",
+      "payment": "Payment",
+      "fulfillment": "Fulfillment",
+      "items": "Items",
+      "total": "Total",
+      "date": "Date"
+    },
+
+    "status": {
+      "completed": "Completed",
+      "pending": "Pending",
+      "canceled": "Canceled",
+      "archived": "Archived",
+      "requiresAction": "Action Required"
+    },
+
+    "paymentStatus": {
+      "paid": "Paid",
+      "awaiting": "Awaiting",
+      "refunded": "Refunded",
+      "partialRefund": "Partial Refund",
+      "notPaid": "Not Paid",
+      "captured": "Captured",
+      "unknown": "Unknown"
+    },
+
+    "fulfillmentStatus": {
+      "fulfilled": "Fulfilled",
+      "shipped": "Shipped",
+      "partial": "Partial",
+      "unfulfilled": "Unfulfilled",
+      "canceled": "Canceled",
+      "delivered": "Delivered",
+      "processing": "Processing",
+      "unknown": "Unknown"
+    },
+
+    "filters": {
+      "searchPlaceholder": "Search orders...",
+      "allStatus": "All Status",
+      "allPayments": "All Payments",
+      "allFulfillment": "All Fulfillment"
+    },
+
+    "table": {
+      "openMenu": "Open menu",
+      "viewDetails": "View Details",
+      "failedToLoad": "Failed to load orders: {error}",
+      "unknownError": "Unknown error",
+      "noMatchingOrders": "No orders match your search criteria.",
+      "noOrdersYet": "No orders yet.",
+      "showingPagination": "Showing {from} to {to} of {total} orders",
+      "pageOf": "Page {page} of {total}",
+      "export": "Export"
+    },
+
+    "detail": {
+      "backToOrders": "Back to Orders",
+      "orderNotFound": "Order not found or failed to load.",
+      "complete": "Complete",
+      "refund": "Refund",
+      "cancel": "Cancel",
+
+      "sections": {
+        "items": "Items",
+        "fulfillments": "Fulfillments",
+        "payment": "Payment",
+        "customer": "Customer",
+        "shippingAddress": "Shipping Address",
+        "billingAddress": "Billing Address",
+        "orderInfo": "Order Info"
+      },
+
+      "items": {
+        "noItems": "No items in this order.",
+        "variant": "Variant: {name}",
+        "sku": "SKU: {sku}",
+        "discount": "-{amount} discount"
+      },
+
+      "summary": {
+        "subtotal": "Subtotal",
+        "shipping": "Shipping",
+        "tax": "Tax",
+        "discount": "Discount",
+        "total": "Total"
+      },
+
+      "fulfillments": {
+        "noFulfillments": "No fulfillments yet. This order has not been shipped.",
+        "fulfillmentNumber": "Fulfillment #{number}",
+        "canceled": "Canceled",
+        "delivered": "Delivered",
+        "shipped": "Shipped",
+        "processing": "Processing",
+        "created": "Created: {date}",
+        "shippedDate": "Shipped: {date}",
+        "deliveredDate": "Delivered: {date}",
+        "tracking": "Tracking: {number}",
+        "track": "Track",
+        "fulfilledItems": "Fulfilled Items:"
+      },
+
+      "payment": {
+        "noPaymentInfo": "No payment information available.",
+        "collection": "Collection",
+        "amount": "Amount",
+        "payments": "Payments",
+        "provider": "Provider: {name}",
+        "captured": "Captured"
+      },
+
+      "customer": {
+        "guest": "Guest",
+        "registered": "Registered",
+        "guestCheckout": "Guest checkout",
+        "viewProfile": "View Customer Profile"
+      },
+
+      "address": {
+        "noShippingAddress": "No shipping address provided.",
+        "sameAsShipping": "Same as shipping address."
+      },
+
+      "orderMeta": {
+        "orderId": "Order ID",
+        "created": "Created",
+        "updated": "Updated",
+        "region": "Region",
+        "salesChannel": "Sales Channel",
+        "currency": "Currency"
+      }
+    },
+
+    "dialogs": {
+      "cancel": {
+        "title": "Cancel Order",
+        "description": "Are you sure you want to cancel order #{id}? This action cannot be undone.",
+        "warning": "Canceling this order will void any pending payments and prevent further fulfillment. If the payment has already been captured, you may need to issue a refund separately.",
+        "keepOrder": "Keep Order",
+        "cancelOrder": "Cancel Order",
+        "canceling": "Canceling..."
+      },
+      "complete": {
+        "title": "Complete Order",
+        "description": "Mark order #{id} as completed? This indicates the order has been fully processed and delivered.",
+        "cancel": "Cancel",
+        "completeOrder": "Complete Order",
+        "completing": "Completing..."
+      },
+      "refund": {
+        "title": "Refund Order",
+        "description": "Issue a refund for order #{id}.",
+        "paymentId": "Payment ID",
+        "maxRefundable": "Max Refundable Amount",
+        "refundAmountLabel": "Refund Amount ($)",
+        "refundAmountPlaceholder": "Enter refund amount",
+        "noPaymentFound": "No captured payment found for this order. Refund is not available.",
+        "noCapturedPayment": "No captured payment found for this order.",
+        "invalidAmount": "Please enter a valid refund amount.",
+        "exceedsMax": "Amount exceeds the maximum refundable amount of {amount}.",
+        "cancel": "Cancel",
+        "issueRefund": "Issue Refund",
+        "processing": "Processing..."
+      }
+    },
+
+    "recentOrders": {
+      "title": "Recent Orders",
+      "description": "Latest orders from your store",
+      "noOrdersYet": "No orders yet",
+      "ordersWillAppear": "Orders will appear here once customers start purchasing."
+    }
   }
 }

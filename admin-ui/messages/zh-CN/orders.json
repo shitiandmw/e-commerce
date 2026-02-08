@@ -1,15 +1,186 @@
 {
   "orders": {
     "title": "订单管理",
+    "description": "管理客户订单、跟踪物流和处理支付",
     "orderNumber": "订单号",
-    "customer": "客户",
-    "status": "状态",
-    "total": "金额",
-    "items": "商品",
-    "shipping": "配送",
-    "payment": "支付",
-    "fulfilled": "已发货",
-    "unfulfilled": "未发货",
-    "cancelled": "已取消"
+    "orderPrefix": "订单 #{id}",
+    "placedOn": "下单时间：{date}",
+
+    "columns": {
+      "order": "订单",
+      "customer": "客户",
+      "status": "状态",
+      "payment": "支付",
+      "fulfillment": "物流",
+      "items": "商品",
+      "total": "金额",
+      "date": "日期"
+    },
+
+    "status": {
+      "completed": "已完成",
+      "pending": "待处理",
+      "canceled": "已取消",
+      "archived": "已归档",
+      "requiresAction": "需处理"
+    },
+
+    "paymentStatus": {
+      "paid": "已支付",
+      "awaiting": "待支付",
+      "refunded": "已退款",
+      "partialRefund": "部分退款",
+      "notPaid": "未支付",
+      "captured": "已收款",
+      "unknown": "未知"
+    },
+
+    "fulfillmentStatus": {
+      "fulfilled": "已发货",
+      "shipped": "运输中",
+      "partial": "部分发货",
+      "unfulfilled": "未发货",
+      "canceled": "已取消",
+      "delivered": "已送达",
+      "processing": "处理中",
+      "unknown": "未知"
+    },
+
+    "filters": {
+      "searchPlaceholder": "搜索订单...",
+      "allStatus": "全部状态",
+      "allPayments": "全部支付",
+      "allFulfillment": "全部物流"
+    },
+
+    "table": {
+      "openMenu": "打开菜单",
+      "viewDetails": "查看详情",
+      "failedToLoad": "加载订单失败：{error}",
+      "unknownError": "未知错误",
+      "noMatchingOrders": "没有找到匹配的订单。",
+      "noOrdersYet": "暂无订单。",
+      "showingPagination": "显示第 {from} 到 {to} 条，共 {total} 条订单",
+      "pageOf": "第 {page} 页，共 {total} 页",
+      "export": "导出"
+    },
+
+    "detail": {
+      "backToOrders": "返回订单列表",
+      "orderNotFound": "订单不存在或加载失败。",
+      "complete": "完成",
+      "refund": "退款",
+      "cancel": "取消",
+
+      "sections": {
+        "items": "商品明细",
+        "fulfillments": "物流信息",
+        "payment": "支付信息",
+        "customer": "客户信息",
+        "shippingAddress": "收货地址",
+        "billingAddress": "账单地址",
+        "orderInfo": "订单信息"
+      },
+
+      "items": {
+        "noItems": "此订单没有商品。",
+        "variant": "规格：{name}",
+        "sku": "SKU：{sku}",
+        "discount": "-{amount} 折扣"
+      },
+
+      "summary": {
+        "subtotal": "小计",
+        "shipping": "运费",
+        "tax": "税费",
+        "discount": "折扣",
+        "total": "合计"
+      },
+
+      "fulfillments": {
+        "noFulfillments": "暂无物流信息。此订单尚未发货。",
+        "fulfillmentNumber": "物流 #{number}",
+        "canceled": "已取消",
+        "delivered": "已送达",
+        "shipped": "运输中",
+        "processing": "处理中",
+        "created": "创建时间：{date}",
+        "shippedDate": "发货时间：{date}",
+        "deliveredDate": "送达时间：{date}",
+        "tracking": "快递单号：{number}",
+        "track": "追踪",
+        "fulfilledItems": "已发货商品："
+      },
+
+      "payment": {
+        "noPaymentInfo": "暂无支付信息。",
+        "collection": "收款单",
+        "amount": "金额",
+        "payments": "支付记录",
+        "provider": "支付渠道：{name}",
+        "captured": "已收款"
+      },
+
+      "customer": {
+        "guest": "游客",
+        "registered": "注册用户",
+        "guestCheckout": "游客下单",
+        "viewProfile": "查看客户资料"
+      },
+
+      "address": {
+        "noShippingAddress": "未提供收货地址。",
+        "sameAsShipping": "与收货地址相同。"
+      },
+
+      "orderMeta": {
+        "orderId": "订单 ID",
+        "created": "创建时间",
+        "updated": "更新时间",
+        "region": "区域",
+        "salesChannel": "销售渠道",
+        "currency": "货币"
+      }
+    },
+
+    "dialogs": {
+      "cancel": {
+        "title": "取消订单",
+        "description": "确定要取消订单 #{id} 吗？此操作无法撤销。",
+        "warning": "取消此订单将作废所有待处理的支付并阻止进一步发货。如果款项已收取，您可能需要单独进行退款操作。",
+        "keepOrder": "保留订单",
+        "cancelOrder": "取消订单",
+        "canceling": "取消中..."
+      },
+      "complete": {
+        "title": "完成订单",
+        "description": "将订单 #{id} 标记为已完成？这表示订单已完全处理并交付。",
+        "cancel": "取消",
+        "completeOrder": "完成订单",
+        "completing": "处理中..."
+      },
+      "refund": {
+        "title": "订单退款",
+        "description": "为订单 #{id} 发起退款。",
+        "paymentId": "支付 ID",
+        "maxRefundable": "最大可退金额",
+        "refundAmountLabel": "退款金额（$）",
+        "refundAmountPlaceholder": "请输入退款金额",
+        "noPaymentFound": "未找到此订单的已收款支付记录，无法退款。",
+        "noCapturedPayment": "未找到此订单的已收款支付记录。",
+        "invalidAmount": "请输入有效的退款金额。",
+        "exceedsMax": "金额超过最大可退金额 {amount}。",
+        "cancel": "取消",
+        "issueRefund": "确认退款",
+        "processing": "处理中..."
+      }
+    },
+
+    "recentOrders": {
+      "title": "最近订单",
+      "description": "来自您商店的最新订单",
+      "noOrdersYet": "暂无订单",
+      "ordersWillAppear": "客户下单后订单将显示在此处。"
+    }
   }
 }

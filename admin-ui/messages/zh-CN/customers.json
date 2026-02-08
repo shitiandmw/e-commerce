@@ -1,12 +1,104 @@
 {
   "customers": {
     "title": "客户管理",
+    "description": "管理您的客户并查看详细信息",
     "addCustomer": "添加客户",
-    "firstName": "名",
-    "lastName": "姓",
-    "email": "邮箱",
-    "phone": "电话",
-    "orders": "订单",
-    "totalSpent": "消费总额"
+    "totalLabel": "共 {count} 位",
+    "searchPlaceholder": "按姓名或邮箱搜索客户...",
+
+    "columns": {
+      "customer": "客户",
+      "email": "邮箱",
+      "phone": "电话",
+      "account": "账户",
+      "registered": "注册时间",
+      "actions": "操作"
+    },
+
+    "accountStatus": {
+      "registered": "注册用户",
+      "guest": "游客"
+    },
+
+    "table": {
+      "view": "查看",
+      "failedToLoad": "加载客户失败",
+      "checkConnection": "请检查网络连接后重试。",
+      "noMatchingCustomers": "未找到匹配的客户",
+      "noCustomersYet": "暂无客户",
+      "showingPagination": "显示第 {from} 到 {to} 条，共 {total} 位客户",
+      "pageOf": "第 {page} 页，共 {total} 页",
+      "export": "导出"
+    },
+
+    "detail": {
+      "backToCustomers": "返回客户列表",
+      "customerNotFound": "客户不存在",
+      "customerNotFoundDescription": "该客户可能已被删除或不存在。",
+      "editCustomer": "编辑客户",
+
+      "tabs": {
+        "information": "基本信息",
+        "orders": "订单记录",
+        "addresses": "地址管理"
+      },
+
+      "info": {
+        "basicInformation": "基本信息",
+        "firstName": "名",
+        "lastName": "姓",
+        "email": "邮箱",
+        "phone": "电话",
+        "company": "公司",
+        "registered": "注册时间",
+        "lastUpdated": "最近更新",
+        "metadata": "元数据"
+      },
+
+      "orders": {
+        "failedToLoad": "加载订单失败",
+        "noOrders": "该客户暂无订单",
+        "orderHistory": "订单记录（{count}）",
+        "order": "订单",
+        "status": "状态",
+        "items": "商品",
+        "itemCount": "{count} 件商品",
+        "itemsCount": "{count} 件商品",
+        "total": "金额",
+        "date": "日期"
+      },
+
+      "addresses": {
+        "noAddresses": "该客户暂无地址",
+        "address": "地址",
+        "defaultShipping": "默认收货地址",
+        "defaultBilling": "默认账单地址"
+      }
+    },
+
+    "edit": {
+      "backToCustomer": "返回客户详情",
+      "title": "编辑客户",
+      "description": "更新 {email} 的客户信息",
+      "basicInformation": "基本信息",
+
+      "fields": {
+        "firstName": "名",
+        "firstNamePlaceholder": "请输入名",
+        "lastName": "姓",
+        "lastNamePlaceholder": "请输入姓",
+        "email": "邮箱",
+        "emailPlaceholder": "请输入邮箱地址",
+        "emailValidation": "请输入有效的邮箱地址",
+        "phone": "电话",
+        "phonePlaceholder": "请输入电话号码",
+        "companyName": "公司名称",
+        "companyNamePlaceholder": "请输入公司名称"
+      },
+
+      "failedToUpdate": "更新客户信息失败，请重试。",
+      "cancel": "取消",
+      "saveChanges": "保存修改"
+    }
   }
 }
