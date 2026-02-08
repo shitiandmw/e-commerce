@@ -30,8 +30,10 @@ import {
   ImageIcon,
   Save,
   Loader2,
+  FolderOpen,
 } from "lucide-react"
 import Link from "next/link"
+import { MediaPicker } from "@/components/media/media-picker"
 
 const variantSchema = z.object({
   title: z.string().min(1, "Variant title is required"),
@@ -149,6 +151,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
     handleSubmit,
     formState: { errors, isSubmitting },
     watch,
+    setValue,
   } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues,
@@ -171,6 +174,10 @@ export function ProductForm({ product, mode }: ProductFormProps) {
     append: appendVariant,
     remove: removeVariant,
   } = useFieldArray({ control, name: "variants" })
+
+  // Media Picker state
+  const [thumbnailPickerOpen, setThumbnailPickerOpen] = React.useState(false)
+  const [imagesPickerOpen, setImagesPickerOpen] = React.useState(false)
 
   const onSubmit = async (data: ProductFormData) => {
     try {
@@ -358,24 +365,47 @@ export function ProductForm({ product, mode }: ProductFormProps) {
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">Media</h2>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => appendImage({ url: "" })}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Add Image
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setImagesPickerOpen(true)}
+                >
+                  <FolderOpen className="mr-2 h-4 w-4" />
+                  Browse Media
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => appendImage({ url: "" })}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add URL
+                </Button>
+              </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="thumbnail">Thumbnail URL</Label>
-              <Input
-                id="thumbnail"
-                {...register("thumbnail")}
-                placeholder="https://example.com/image.jpg"
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="thumbnail"
+                  {...register("thumbnail")}
+                  placeholder="https://example.com/image.jpg"
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setThumbnailPickerOpen(true)}
+                  className="flex-shrink-0"
+                >
+                  <FolderOpen className="h-4 w-4" />
+                </Button>
+              </div>
               {errors.thumbnail && (
                 <p className="text-sm text-destructive">
                   {errors.thumbnail.message}
@@ -408,6 +438,35 @@ export function ProductForm({ product, mode }: ProductFormProps) {
               </div>
             )}
           </div>
+
+          {/* Thumbnail Media Picker */}
+          <MediaPicker
+            open={thumbnailPickerOpen}
+            onOpenChange={setThumbnailPickerOpen}
+            selectedUrls={watch("thumbnail") ? [watch("thumbnail") as string] : []}
+            onSelect={(urls) => {
+              if (urls.length > 0) {
+                setValue("thumbnail", urls[0], { shouldValidate: true })
+              }
+            }}
+          />
+
+          {/* Images Media Picker */}
+          <MediaPicker
+            open={imagesPickerOpen}
+            onOpenChange={setImagesPickerOpen}
+            multiple
+            selectedUrls={imageFields.map((f) => (f as any).url || "")}
+            onSelect={(urls) => {
+              // Add new image URLs that aren't already in the list
+              const existingUrls = imageFields.map((f) => (f as any).url || "")
+              urls.forEach((url) => {
+                if (!existingUrls.includes(url)) {
+                  appendImage({ url })
+                }
+              })
+            }}
+          />
 
           {/* Options */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
