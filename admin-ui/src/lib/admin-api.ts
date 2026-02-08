@@ -6,24 +6,43 @@ import { getToken } from "./auth"
 const BASE_URL =
   process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
 
-async function adminFetch<T>(path: string, params?: Record<string, string>): Promise<T> {
+/**
+ * Unified fetch wrapper for Admin API.
+ * Supports GET (with query params) and mutation methods (POST/PUT/DELETE with body).
+ * All modules should use this instead of creating their own fetch wrappers.
+ */
+export async function adminFetch<T>(
+  path: string,
+  options?: {
+    params?: Record<string, string>
+    method?: string
+    body?: unknown
+    headers?: Record<string, string>
+  }
+): Promise<T> {
   const token = getToken()
   const url = new URL(`${BASE_URL}${path}`)
-  if (params) {
-    Object.entries(params).forEach(([key, value]) => {
+  if (options?.params) {
+    Object.entries(options.params).forEach(([key, value]) => {
       url.searchParams.set(key, value)
     })
   }
 
   const res = await fetch(url.toString(), {
+    method: options?.method || "GET",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
+      ...options?.headers,
     },
+    body: options?.body ? JSON.stringify(options.body) : undefined,
   })
 
   if (!res.ok) {
-    throw new Error(`Admin API error: ${res.status} ${res.statusText}`)
+    const errorData = await res.json().catch(() => ({}))
+    throw new Error(
+      errorData.message || `Admin API error: ${res.status} ${res.statusText}`
+    )
   }
 
   return res.json()
@@ -111,31 +130,31 @@ export function useOrders(params?: { limit?: number; offset?: number; order?: st
       if (params?.offset !== undefined) query.offset = String(params.offset)
       if (params?.order) query.order = params.order
       if (params?.fields) query.fields = params.fields
-      return adminFetch<OrdersResponse>("/admin/orders", query)
+      return adminFetch<OrdersResponse>("/admin/orders", { params: query })
     },
   })
 }
 
-export function useCustomers(params?: { limit?: number; offset?: number }) {
+export function useDashboardCustomers(params?: { limit?: number; offset?: number }) {
   return useQuery({
     queryKey: ["admin-customers", params],
     queryFn: () => {
       const query: Record<string, string> = {}
       if (params?.limit) query.limit = String(params.limit)
       if (params?.offset !== undefined) query.offset = String(params.offset)
-      return adminFetch<CustomersResponse>("/admin/customers", query)
+      return adminFetch<CustomersResponse>("/admin/customers", { params: query })
     },
   })
 }
 
-export function useProducts(params?: { limit?: number; offset?: number }) {
+export function useDashboardProducts(params?: { limit?: number; offset?: number }) {
   return useQuery({
     queryKey: ["admin-products", params],
     queryFn: () => {
       const query: Record<string, string> = {}
       if (params?.limit) query.limit = String(params.limit)
       if (params?.offset !== undefined) query.offset = String(params.offset)
-      return adminFetch<ProductsResponse>("/admin/products", query)
+      return adminFetch<ProductsResponse>("/admin/products", { params: query })
     },
   })
 }
@@ -188,12 +207,10 @@ export function useDashboardStats() {
       // Fetch all data concurrently
       const [ordersData, customersData, productsData] = await Promise.all([
         adminFetch<OrdersResponse>("/admin/orders", {
-          limit: "100",
-          offset: "0",
-          order: "-created_at",
+          params: { limit: "100", offset: "0", order: "-created_at" },
         }),
-        adminFetch<CustomersResponse>("/admin/customers", { limit: "1", offset: "0" }),
-        adminFetch<ProductsResponse>("/admin/products", { limit: "1", offset: "0" }),
+        adminFetch<CustomersResponse>("/admin/customers", { params: { limit: "1", offset: "0" } }),
+        adminFetch<ProductsResponse>("/admin/products", { params: { limit: "1", offset: "0" } }),
       ])
 
       const orders = ordersData.orders || []

@@ -30,6 +30,9 @@ yarn-error.log*
 ecommerce_pg_data/
 ecommerce_redis_data/
 
+# Build artifacts
+*.tsbuildinfo
+
 # admin-ui
 admin-ui/.next/
 admin-ui/node_modules/

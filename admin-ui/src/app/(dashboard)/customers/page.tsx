@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useCustomers } from "@/hooks/use-customers"
 import { Search, ChevronLeft, ChevronRight, Users, Eye } from "lucide-react"
@@ -14,15 +14,14 @@ export default function CustomersPage() {
   const [debouncedSearch, setDebouncedSearch] = useState("")
   const [currentPage, setCurrentPage] = useState(0)
 
-  // Simple debounce using timeout
-  const handleSearchChange = useCallback((value: string) => {
-    setSearch(value)
-    setCurrentPage(0)
-    const handler = setTimeout(() => {
-      setDebouncedSearch(value)
+  // Debounce search with proper cleanup
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search)
+      setCurrentPage(0)
     }, 300)
-    return () => clearTimeout(handler)
-  }, [])
+    return () => clearTimeout(timer)
+  }, [search])
 
   const { data, isLoading, error } = useCustomers({
     q: debouncedSearch || undefined,
@@ -58,7 +57,7 @@ export default function CustomersPage() {
             type="text"
             placeholder="Search customers by name or email..."
             value={search}
-            onChange={(e) => handleSearchChange(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             className="h-10 w-full rounded-md border border-input bg-background pl-10 pr-4 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           />
         </div>

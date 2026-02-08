@@ -1,8 +1,7 @@
 "use client"
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { sdk } from "@/lib/sdk"
-import { getToken } from "@/lib/auth"
+import { adminFetch } from "@/lib/admin-api"
 
 // Types
 export interface ProductVariant {
@@ -90,29 +89,6 @@ export interface ProductsQueryParams {
   fields?: string
 }
 
-// Fetch function with auth
-async function fetchWithAuth(url: string, options: RequestInit = {}) {
-  const token = getToken()
-  const baseUrl =
-    process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
-
-  const res = await fetch(`${baseUrl}${url}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      ...options.headers,
-    },
-  })
-
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}))
-    throw new Error(errorData.message || `Request failed: ${res.status}`)
-  }
-
-  return res.json()
-}
-
 // Hooks
 export function useProducts(params: ProductsQueryParams = {}) {
   const { offset = 0, limit = 20, q, status, order, fields } = params
@@ -133,7 +109,8 @@ export function useProducts(params: ProductsQueryParams = {}) {
 
   return useQuery<ProductsResponse>({
     queryKey: ["products", { offset, limit, q, status, order }],
-    queryFn: () => fetchWithAuth(`/admin/products?${queryParams.toString()}`),
+    queryFn: () =>
+      adminFetch<ProductsResponse>(`/admin/products?${queryParams.toString()}`),
   })
 }
 
@@ -141,7 +118,7 @@ export function useProduct(id: string) {
   return useQuery<{ product: Product }>({
     queryKey: ["product", id],
     queryFn: () =>
-      fetchWithAuth(
+      adminFetch<{ product: Product }>(
         `/admin/products/${id}?fields=+variants,+variants.prices,+options,+options.values,+images,+categories`
       ),
     enabled: !!id,
@@ -153,9 +130,9 @@ export function useCreateProduct() {
 
   return useMutation({
     mutationFn: (data: Record<string, any>) =>
-      fetchWithAuth("/admin/products", {
+      adminFetch("/admin/products", {
         method: "POST",
-        body: JSON.stringify(data),
+        body: data,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] })
@@ -168,9 +145,9 @@ export function useUpdateProduct(id: string) {
 
   return useMutation({
     mutationFn: (data: Record<string, any>) =>
-      fetchWithAuth(`/admin/products/${id}`, {
+      adminFetch(`/admin/products/${id}`, {
         method: "POST",
-        body: JSON.stringify(data),
+        body: data,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] })
@@ -184,7 +161,7 @@ export function useDeleteProduct() {
 
   return useMutation({
     mutationFn: (id: string) =>
-      fetchWithAuth(`/admin/products/${id}`, {
+      adminFetch(`/admin/products/${id}`, {
         method: "DELETE",
       }),
     onSuccess: () => {
@@ -197,7 +174,10 @@ export function useCategories() {
   return useQuery<{ product_categories: ProductCategory[] }>({
     queryKey: ["product-categories"],
     queryFn: () =>
-      fetchWithAuth("/admin/product-categories?limit=100&offset=0"),
+      adminFetch<{ product_categories: ProductCategory[] }>(
+        "/admin/product-categories",
+        { params: { limit: "100", offset: "0" } }
+      ),
   })
 }
 
@@ -206,6 +186,10 @@ export function useProductTypes() {
     product_types: Array<{ id: string; value: string }>
   }>({
     queryKey: ["product-types"],
-    queryFn: () => fetchWithAuth("/admin/product-types?limit=100&offset=0"),
+    queryFn: () =>
+      adminFetch<{ product_types: Array<{ id: string; value: string }> }>(
+        "/admin/product-types",
+        { params: { limit: "100", offset: "0" } }
+      ),
   })
 }

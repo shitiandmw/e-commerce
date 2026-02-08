@@ -1,8 +1,7 @@
 "use client"
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { sdk } from "@/lib/sdk"
-import { getToken } from "@/lib/auth"
+import { adminFetch } from "@/lib/admin-api"
 
 export interface CustomerAddress {
   id: string
@@ -52,29 +51,15 @@ export function useCustomers(params: CustomerListParams = {}) {
   return useQuery({
     queryKey: ["customers", params],
     queryFn: async () => {
-      const token = getToken()
-      const query: Record<string, string | number> = {}
+      const query: Record<string, string> = {}
       if (params.q) query.q = params.q
-      if (params.offset !== undefined) query.offset = params.offset
-      if (params.limit !== undefined) query.limit = params.limit
+      if (params.offset !== undefined) query.offset = String(params.offset)
+      if (params.limit !== undefined) query.limit = String(params.limit)
       if (params.order) query.order = params.order
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"}/admin/customers?${new URLSearchParams(
-          Object.entries(query).map(([k, v]) => [k, String(v)])
-        ).toString()}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch customers")
-      }
-
-      return response.json() as Promise<CustomerListResponse>
+      return adminFetch<CustomerListResponse>("/admin/customers", {
+        params: query,
+      })
     },
   })
 }
@@ -83,22 +68,10 @@ export function useCustomer(id: string) {
   return useQuery({
     queryKey: ["customer", id],
     queryFn: async () => {
-      const token = getToken()
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"}/admin/customers/${id}?fields=*addresses`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const data = await adminFetch<{ customer: Customer }>(
+        `/admin/customers/${id}?fields=*addresses`
       )
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch customer")
-      }
-
-      const data = await response.json()
-      return data.customer as Customer
+      return data.customer
     },
     enabled: !!id,
   })
@@ -118,25 +91,14 @@ export function useUpdateCustomer(id: string) {
 
   return useMutation({
     mutationFn: async (data: UpdateCustomerData) => {
-      const token = getToken()
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"}/admin/customers/${id}`,
+      const result = await adminFetch<{ customer: Customer }>(
+        `/admin/customers/${id}`,
         {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
+          body: data,
         }
       )
-
-      if (!response.ok) {
-        throw new Error("Failed to update customer")
-      }
-
-      const result = await response.json()
-      return result.customer as Customer
+      return result.customer
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["customer", id] })
@@ -148,22 +110,8 @@ export function useUpdateCustomer(id: string) {
 export function useCustomerOrders(customerId: string) {
   return useQuery({
     queryKey: ["customer-orders", customerId],
-    queryFn: async () => {
-      const token = getToken()
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"}/admin/orders?customer_id=${customerId}&limit=20&order=-created_at`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch customer orders")
-      }
-
-      return response.json() as Promise<{
+    queryFn: () =>
+      adminFetch<{
         orders: Array<{
           id: string
           display_id: number
@@ -179,8 +127,13 @@ export function useCustomerOrders(customerId: string) {
           }>
         }>
         count: number
-      }>
-    },
+      }>("/admin/orders", {
+        params: {
+          customer_id: customerId,
+          limit: "20",
+          order: "-created_at",
+        },
+      }),
     enabled: !!customerId,
   })
 }
