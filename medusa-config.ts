@@ -6,6 +6,11 @@ module.exports = defineConfig({
   admin: {
     disable: true, // Disable built-in admin - we use custom admin-ui
   },
+  modules: [
+    {
+      resolve: "./src/modules/brand",
+    },
+  ],
   projectConfig: {
     redisUrl: process.env.REDIS_URL,
     databaseUrl: process.env.DATABASE_URL,

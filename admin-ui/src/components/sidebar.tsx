@@ -12,11 +12,13 @@ import {
   Settings,
   LogOut,
   Store,
+  Tag,
 } from "lucide-react"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Products", href: "/products", icon: Package },
+  { name: "Brands", href: "/brands", icon: Tag },
   { name: "Orders", href: "/orders", icon: ShoppingCart },
   { name: "Customers", href: "/customers", icon: Users },
   { name: "Settings", href: "/settings", icon: Settings },

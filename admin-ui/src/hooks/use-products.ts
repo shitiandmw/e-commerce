@@ -63,6 +63,10 @@ export interface Product {
   options?: ProductOption[]
   variants?: ProductVariant[]
   categories?: ProductCategory[]
+  brand?: {
+    id: string
+    name: string
+  } | null
   collection_id?: string | null
   type_id?: string | null
   weight?: number | null
@@ -104,7 +108,7 @@ export function useProducts(params: ProductsQueryParams = {}) {
   queryParams.set(
     "fields",
     fields ||
-      "+variants,+variants.prices,+options,+options.values,+images,+categories"
+      "+variants,+variants.prices,+options,+options.values,+images,+categories,+brand"
   )
 
   return useQuery<ProductsResponse>({
@@ -119,7 +123,7 @@ export function useProduct(id: string) {
     queryKey: ["product", id],
     queryFn: () =>
       adminFetch<{ product: Product }>(
-        `/admin/products/${id}?fields=+variants,+variants.prices,+options,+options.values,+images,+categories`
+        `/admin/products/${id}?fields=+variants,+variants.prices,+options,+options.values,+images,+categories,+brand`
       ),
     enabled: !!id,
   })

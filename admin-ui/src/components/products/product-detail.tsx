@@ -371,6 +371,22 @@ export function ProductDetail({ productId }: ProductDetailProps) {
             </div>
           </div>
 
+          {/* Brand */}
+          {product.brand && (
+            <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <Tag className="h-5 w-5" />
+                Brand
+              </h2>
+              <Link
+                href={`/brands/${product.brand.id}`}
+                className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium hover:bg-accent transition-colors"
+              >
+                {product.brand.name}
+              </Link>
+            </div>
+          )}
+
           {/* Categories */}
           {product.categories && product.categories.length > 0 && (
             <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
