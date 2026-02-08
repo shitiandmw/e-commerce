@@ -22,9 +22,19 @@ import {
   BarChart3,
   Calendar,
   Tag,
+  Warehouse,
+  AlertTriangle,
 } from "lucide-react"
 import Link from "next/link"
 import { format } from "date-fns"
+import {
+  useInventoryItems,
+  InventoryItem,
+  getStockStatus,
+  getTotalAvailable,
+  getTotalStocked,
+  LOW_STOCK_THRESHOLD,
+} from "@/hooks/use-inventory"
 
 function getStatusBadge(status: Product["status"]) {
   switch (status) {
@@ -46,6 +56,178 @@ function formatCurrency(amount: number, currency: string) {
     style: "currency",
     currency: currency.toUpperCase(),
   }).format(amount / 100)
+}
+
+function VariantInventoryBadge({ inventoryItem }: { inventoryItem?: InventoryItem }) {
+  if (!inventoryItem) return null
+  const status = getStockStatus(inventoryItem)
+  const available = getTotalAvailable(inventoryItem)
+  switch (status) {
+    case "in_stock":
+      return (
+        <Badge variant="success" className="text-xs">
+          {available} available
+        </Badge>
+      )
+    case "low_stock":
+      return (
+        <Badge variant="warning" className="text-xs gap-1">
+          <AlertTriangle className="h-3 w-3" />
+          {available} available
+        </Badge>
+      )
+    case "out_of_stock":
+      return (
+        <Badge variant="destructive" className="text-xs">
+          Out of stock
+        </Badge>
+      )
+  }
+}
+
+function VariantsWithInventory({ product }: { product: Product }) {
+  // Fetch inventory items matching variant SKUs
+  const variantSkus = product.variants
+    ?.map((v) => v.sku)
+    .filter((s): s is string => !!s) ?? []
+
+  const { data: inventoryData } = useInventoryItems({
+    limit: 100,
+  })
+
+  const inventoryItems = inventoryData?.inventory_items ?? []
+
+  // Build a map of SKU -> inventory item for quick lookup
+  const skuToInventory = React.useMemo(() => {
+    const map = new Map<string, InventoryItem>()
+    inventoryItems.forEach((item) => {
+      if (item.sku) {
+        map.set(item.sku, item)
+      }
+    })
+    return map
+  }, [inventoryItems])
+
+  return (
+    <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <DollarSign className="h-5 w-5" />
+          Variants & Inventory
+          {product.variants && (
+            <Badge variant="secondary">{product.variants.length}</Badge>
+          )}
+        </h2>
+        <Link href="/inventory">
+          <Button variant="ghost" size="sm" className="text-muted-foreground">
+            <Warehouse className="mr-1.5 h-4 w-4" />
+            Manage Inventory
+          </Button>
+        </Link>
+      </div>
+
+      {!product.variants || product.variants.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          No variants defined.
+        </p>
+      ) : (
+        <div className="space-y-3">
+          {product.variants.map((variant) => {
+            const inventoryItem = variant.sku
+              ? skuToInventory.get(variant.sku)
+              : undefined
+            const totalStocked = inventoryItem ? getTotalStocked(inventoryItem) : undefined
+            const totalAvailable = inventoryItem ? getTotalAvailable(inventoryItem) : undefined
+
+            return (
+              <div
+                key={variant.id}
+                className="rounded-md border p-4 space-y-3"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium">{variant.title}</p>
+                      <VariantInventoryBadge inventoryItem={inventoryItem} />
+                    </div>
+                    {variant.sku && (
+                      <p className="text-xs text-muted-foreground font-mono">
+                        SKU: {variant.sku}
+                      </p>
+                    )}
+                    {variant.options && variant.options.length > 0 && (
+                      <div className="flex gap-1.5 mt-1">
+                        {variant.options.map((opt, i) => (
+                          <Badge key={i} variant="outline" className="text-xs">
+                            {opt.value}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-right space-y-1">
+                    {variant.prices?.map((price, i) => (
+                      <p key={i} className="font-semibold">
+                        {formatCurrency(price.amount, price.currency_code)}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Inventory details for this variant */}
+                {inventoryItem && inventoryItem.location_levels && inventoryItem.location_levels.length > 0 && (
+                  <div className="border-t pt-3 mt-2">
+                    <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1.5">
+                      <Warehouse className="h-3 w-3" />
+                      Stock by Location
+                    </p>
+                    <div className="grid gap-2">
+                      {inventoryItem.location_levels.map((level) => {
+                        const isLow = level.available_quantity > 0 && level.available_quantity <= LOW_STOCK_THRESHOLD
+                        const isOut = level.available_quantity <= 0
+                        return (
+                          <div key={level.id} className="flex items-center justify-between text-xs bg-muted/50 rounded px-3 py-1.5">
+                            <span className="text-muted-foreground">
+                              {level.location_id.substring(0, 12)}...
+                            </span>
+                            <div className="flex items-center gap-3">
+                              <span className="text-muted-foreground">
+                                Stocked: <span className="font-medium text-foreground">{level.stocked_quantity}</span>
+                              </span>
+                              <span className="text-muted-foreground">
+                                Available:{" "}
+                                <span className={`font-medium ${isOut ? "text-destructive" : isLow ? "text-yellow-600" : "text-green-600"}`}>
+                                  {level.available_quantity}
+                                </span>
+                              </span>
+                              {level.incoming_quantity > 0 && (
+                                <span className="text-muted-foreground">
+                                  Incoming: <span className="font-medium">+{level.incoming_quantity}</span>
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Fallback to basic inventory_quantity if no inventory item found */}
+                {!inventoryItem && variant.inventory_quantity !== undefined && (
+                  <div className="border-t pt-2 mt-2">
+                    <p className="text-xs text-muted-foreground">
+                      Stock: {variant.inventory_quantity}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
 }
 
 interface ProductDetailProps {
@@ -259,61 +441,8 @@ export function ProductDetail({ productId }: ProductDetailProps) {
             </div>
           )}
 
-          {/* Variants */}
-          <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <DollarSign className="h-5 w-5" />
-              Variants
-              {product.variants && (
-                <Badge variant="secondary">{product.variants.length}</Badge>
-              )}
-            </h2>
-
-            {!product.variants || product.variants.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No variants defined.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {product.variants.map((variant) => (
-                  <div
-                    key={variant.id}
-                    className="flex items-center justify-between rounded-md border p-4"
-                  >
-                    <div className="space-y-1">
-                      <p className="font-medium">{variant.title}</p>
-                      {variant.sku && (
-                        <p className="text-xs text-muted-foreground">
-                          SKU: {variant.sku}
-                        </p>
-                      )}
-                      {variant.options && variant.options.length > 0 && (
-                        <div className="flex gap-1.5 mt-1">
-                          {variant.options.map((opt, i) => (
-                            <Badge key={i} variant="outline" className="text-xs">
-                              {opt.value}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-right space-y-1">
-                      {variant.prices?.map((price, i) => (
-                        <p key={i} className="font-semibold">
-                          {formatCurrency(price.amount, price.currency_code)}
-                        </p>
-                      ))}
-                      {variant.inventory_quantity !== undefined && (
-                        <p className="text-xs text-muted-foreground">
-                          Stock: {variant.inventory_quantity}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* Variants & Inventory */}
+          <VariantsWithInventory product={product} />
 
           {/* Options */}
           {product.options && product.options.length > 0 && (
