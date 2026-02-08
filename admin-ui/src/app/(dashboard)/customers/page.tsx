@@ -6,6 +6,8 @@ import { useCustomers } from "@/hooks/use-customers"
 import { Search, ChevronLeft, ChevronRight, Users, Eye } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
+import { ExportButton } from "@/components/import-export/export-button"
+import { useCustomerExport } from "@/hooks/use-import-export"
 
 const PAGE_SIZE = 10
 
@@ -32,6 +34,7 @@ export default function CustomersPage() {
 
   const totalPages = data ? Math.ceil(data.count / PAGE_SIZE) : 0
   const customers = data?.customers || []
+  const { exportCustomers } = useCustomerExport()
 
   return (
     <div className="space-y-6">
@@ -43,9 +46,12 @@ export default function CustomersPage() {
             Manage your customers and view their details
           </p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Users className="h-4 w-4" />
-          <span>{data?.count ?? 0} total</span>
+        <div className="flex items-center gap-3">
+          <ExportButton onExport={exportCustomers} label="Export" size="sm" />
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Users className="h-4 w-4" />
+            <span>{data?.count ?? 0} total</span>
+          </div>
         </div>
       </div>
 

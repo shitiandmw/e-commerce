@@ -33,8 +33,15 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Plus,
+  Upload,
 } from "lucide-react"
 import Link from "next/link"
+import { ExportButton } from "@/components/import-export/export-button"
+import { ImportDialog } from "@/components/import-export/import-dialog"
+import {
+  useProductImportExport,
+  PRODUCT_CSV_HEADERS,
+} from "@/hooks/use-import-export"
 
 export function ProductTable() {
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -79,6 +86,8 @@ export function ProductTable() {
   const deleteProduct = useDeleteProduct()
   const [productToDelete, setProductToDelete] =
     React.useState<Product | null>(null)
+  const [importOpen, setImportOpen] = React.useState(false)
+  const { exportProducts, importProducts } = useProductImportExport()
 
   const handleDeleteConfirm = async () => {
     if (!productToDelete) return
@@ -141,12 +150,23 @@ export function ProductTable() {
             <option value="rejected">Rejected</option>
           </Select>
         </div>
-        <Link href="/products/new">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Product
+        <div className="flex items-center gap-2">
+          <ExportButton onExport={exportProducts} label="Export" size="sm" />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setImportOpen(true)}
+          >
+            <Upload className="mr-2 h-4 w-4" />
+            Import
           </Button>
-        </Link>
+          <Link href="/products/new">
+            <Button size="sm">
+              <Plus className="mr-2 h-4 w-4" />
+              Add Product
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Table */}
@@ -297,6 +317,17 @@ export function ProductTable() {
           </div>
         )}
       </div>
+
+      {/* Import Dialog */}
+      <ImportDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        title="Import Products"
+        description="Upload a CSV file to bulk create products. Download the template to see the required format."
+        templateHeaders={PRODUCT_CSV_HEADERS}
+        templateFilename="products-import-template.csv"
+        onImport={importProducts}
+      />
 
       {/* Delete Dialog */}
       <DeleteProductDialog
