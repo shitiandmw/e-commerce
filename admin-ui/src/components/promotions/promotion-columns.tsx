@@ -15,26 +15,26 @@ import {
 import Link from "next/link"
 import { format } from "date-fns"
 
-function getTypeBadge(type: Promotion["type"]) {
+function getTypeBadge(type: Promotion["type"], t: (key: string) => string) {
   switch (type) {
     case "standard":
-      return <Badge variant="secondary">Standard</Badge>
+      return <Badge variant="secondary">{t("type.standard")}</Badge>
     case "buyget":
-      return <Badge variant="warning">Buy X Get Y</Badge>
+      return <Badge variant="warning">{t("type.buyget")}</Badge>
     default:
       return <Badge variant="outline">{type}</Badge>
   }
 }
 
-function getStatusInfo(promotion: Promotion) {
+function getStatusInfo(promotion: Promotion, t: (key: string) => string) {
   const now = new Date()
   if (promotion.ends_at && new Date(promotion.ends_at) < now) {
-    return <Badge variant="destructive">Expired</Badge>
+    return <Badge variant="destructive">{t("status.expired")}</Badge>
   }
   if (promotion.starts_at && new Date(promotion.starts_at) > now) {
-    return <Badge variant="warning">Scheduled</Badge>
+    return <Badge variant="warning">{t("status.scheduled")}</Badge>
   }
-  return <Badge variant="success">Active</Badge>
+  return <Badge variant="success">{t("status.active")}</Badge>
 }
 
 function formatDiscount(promotion: Promotion) {
@@ -51,7 +51,8 @@ function formatDiscount(promotion: Promotion) {
 }
 
 export function getPromotionColumns(
-  onDelete: (promotion: Promotion) => void
+  onDelete: (promotion: Promotion) => void,
+  t: (key: string) => string
 ): ColumnDef<Promotion>[] {
   return [
     {
@@ -62,7 +63,7 @@ export function getPromotionColumns(
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="-ml-4"
         >
-          Code
+          {t("columns.code")}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -77,27 +78,27 @@ export function getPromotionColumns(
     },
     {
       accessorKey: "type",
-      header: "Type",
-      cell: ({ row }) => getTypeBadge(row.original.type),
+      header: t("columns.type"),
+      cell: ({ row }) => getTypeBadge(row.original.type, t),
     },
     {
       id: "discount",
-      header: "Discount",
+      header: t("columns.discount"),
       cell: ({ row }) => (
         <span className="text-sm">{formatDiscount(row.original)}</span>
       ),
     },
     {
       id: "status",
-      header: "Status",
-      cell: ({ row }) => getStatusInfo(row.original),
+      header: t("columns.status"),
+      cell: ({ row }) => getStatusInfo(row.original, t),
     },
     {
       id: "automatic",
-      header: "Automatic",
+      header: t("columns.automatic"),
       cell: ({ row }) => (
         <span className="text-sm text-muted-foreground">
-          {row.original.is_automatic ? "Yes" : "No"}
+          {row.original.is_automatic ? t("detail.yes") : t("detail.no")}
         </span>
       ),
     },
@@ -109,7 +110,7 @@ export function getPromotionColumns(
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="-ml-4"
         >
-          Created
+          {t("columns.created")}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -128,20 +129,20 @@ export function getPromotionColumns(
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">Open menu</span>
+                <span className="sr-only">{t("actions.openMenu")}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <Link href={`/promotions/${promotion.id}`}>
                 <DropdownMenuItem>
                   <Eye className="mr-2 h-4 w-4" />
-                  View
+                  {t("actions.view")}
                 </DropdownMenuItem>
               </Link>
               <Link href={`/promotions/${promotion.id}/edit`}>
                 <DropdownMenuItem>
                   <Pencil className="mr-2 h-4 w-4" />
-                  Edit
+                  {t("actions.edit")}
                 </DropdownMenuItem>
               </Link>
               <DropdownMenuSeparator />
@@ -150,7 +151,7 @@ export function getPromotionColumns(
                 onClick={() => onDelete(promotion)}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
-                Delete
+                {t("actions.delete")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

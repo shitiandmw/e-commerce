@@ -44,6 +44,7 @@
 
     "profiles": {
       "title": "Shipping Profiles",
+      "description": "Shipping profiles group products that share the same shipping requirements.",
       "addProfile": "Add Profile",
       "noProfiles": "No shipping profiles yet.",
       "deleteConfirm": "Are you sure you want to delete this shipping profile?",
@@ -68,6 +69,7 @@
 
     "providers": {
       "title": "Fulfillment Providers",
+      "description": "Available fulfillment providers for handling shipments.",
       "noProviders": "No fulfillment providers available.",
       "enabled": "Enabled",
       "disabled": "Disabled",

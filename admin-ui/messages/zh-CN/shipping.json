@@ -44,6 +44,7 @@
 
     "profiles": {
       "title": "配送配置文件",
+      "description": "配送配置文件将具有相同配送要求的商品分组管理。",
       "addProfile": "添加配置文件",
       "noProfiles": "暂无配送配置文件。",
       "deleteConfirm": "确定要删除此配送配置文件吗？",
@@ -68,6 +69,7 @@
 
     "providers": {
       "title": "物流提供商",
+      "description": "可用于处理配送的物流提供商。",
       "noProviders": "暂无物流提供商。",
       "enabled": "已启用",
       "disabled": "已禁用",

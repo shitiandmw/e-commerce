@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import {
   useShippingOptions,
   useDeleteShippingOption,
@@ -29,6 +30,7 @@ import { Plus, MoreHorizontal, Pencil, Trash2, ChevronLeft, ChevronRight } from 
 const PAGE_SIZE = 20
 
 export function ShippingOptionsTable() {
+  const t = useTranslations("shipping")
   const [page, setPage] = useState(0)
   const [formOpen, setFormOpen] = useState(false)
   const [editOption, setEditOption] = useState<ShippingOption | null>(null)
@@ -49,7 +51,7 @@ export function ShippingOptionsTable() {
   }
 
   const handleDelete = (id: string) => {
-    if (!confirm("Are you sure you want to delete this shipping option?")) return
+    if (!confirm(t("options.deleteConfirm"))) return
     deleteOption.mutate(id)
   }
 
@@ -60,7 +62,7 @@ export function ShippingOptionsTable() {
 
   const formatPrice = (option: ShippingOption) => {
     if (!option.prices || option.prices.length === 0) {
-      return option.price_type === "calculated" ? "Calculated" : "—"
+      return option.price_type === "calculated" ? t("options.priceType.calculated") : "—"
     }
     return option.prices
       .map(
@@ -91,18 +93,18 @@ export function ShippingOptionsTable() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">
-          Shipping Options{" "}
+          {t("options.title")}{" "}
           <span className="text-muted-foreground font-normal">({count})</span>
         </h2>
         <Button size="sm" onClick={() => setFormOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Option
+          {t("options.addOption")}
         </Button>
       </div>
 
       {options.length === 0 ? (
         <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
-          No shipping options configured. Click &quot;Add Option&quot; to create one.
+          {t("options.noOptions")}
         </div>
       ) : (
         <>
@@ -110,11 +112,11 @@ export function ShippingOptionsTable() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Price Type</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Provider</TableHead>
-                  <TableHead>Profile</TableHead>
+                  <TableHead>{t("options.columns.name")}</TableHead>
+                  <TableHead>{t("options.columns.priceType")}</TableHead>
+                  <TableHead>{t("options.columns.price")}</TableHead>
+                  <TableHead>{t("options.columns.provider")}</TableHead>
+                  <TableHead>{t("options.columns.profile")}</TableHead>
                   <TableHead className="w-[50px]" />
                 </TableRow>
               </TableHeader>
@@ -154,14 +156,14 @@ export function ShippingOptionsTable() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => handleEdit(option)}>
                             <Pencil className="mr-2 h-4 w-4" />
-                            Edit
+                            {t("actions.edit")}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleDelete(option.id)}
                             className="text-destructive"
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
+                            {t("actions.delete")}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -175,8 +177,7 @@ export function ShippingOptionsTable() {
           {totalPages > 1 && (
             <div className="flex items-center justify-between">
               <p className="text-sm text-muted-foreground">
-                Showing {page * PAGE_SIZE + 1}–
-                {Math.min((page + 1) * PAGE_SIZE, count)} of {count}
+                {t("table.showing", { from: page * PAGE_SIZE + 1, to: Math.min((page + 1) * PAGE_SIZE, count), total: count })}
               </p>
               <div className="flex items-center gap-2">
                 <Button
@@ -189,7 +190,7 @@ export function ShippingOptionsTable() {
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
                 <span className="text-sm">
-                  {page + 1} / {totalPages}
+                  {t("table.page", { current: page + 1, total: totalPages })}
                 </span>
                 <Button
                   variant="outline"

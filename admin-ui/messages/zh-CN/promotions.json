@@ -25,6 +25,7 @@
       "discount": "折扣",
       "status": "状态",
       "automatic": "自动",
+      "created": "创建时间",
       "actions": "操作"
     },
 
@@ -111,7 +112,8 @@
       "page": "第 {current} 页，共 {total} 页",
       "search": "搜索促销码...",
       "allTypes": "所有类型",
-      "filterByType": "按类型筛选"
+      "filterByType": "按类型筛选",
+      "noResults": "没有匹配的促销活动。"
     },
 
     "actions": {

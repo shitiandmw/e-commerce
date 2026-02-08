@@ -41,8 +41,10 @@ import {
   Loader2,
 } from "lucide-react"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 
 export function PromotionTable() {
+  const t = useTranslations("promotions")
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [search, setSearch] = React.useState("")
   const [debouncedSearch, setDebouncedSearch] = React.useState("")
@@ -97,8 +99,8 @@ export function PromotionTable() {
   }
 
   const columns = React.useMemo(
-    () => getPromotionColumns((promotion) => setPromotionToDelete(promotion)),
-    []
+    () => getPromotionColumns((promotion) => setPromotionToDelete(promotion), t),
+    [t]
   )
 
   const promotions = data?.promotions ?? []
@@ -129,7 +131,7 @@ export function PromotionTable() {
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Search promotions..."
+              placeholder={t("table.search")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-9"
@@ -140,16 +142,16 @@ export function PromotionTable() {
             onChange={(e) => setTypeFilter(e.target.value)}
             className="w-[150px]"
           >
-            <option value="all">All Types</option>
-            <option value="standard">Standard</option>
-            <option value="buyget">Buy X Get Y</option>
+            <option value="all">{t("table.allTypes")}</option>
+            <option value="standard">{t("type.standard")}</option>
+            <option value="buyget">{t("type.buyget")}</option>
           </Select>
         </div>
         <div className="flex items-center gap-2">
           <Link href="/promotions/new">
             <Button size="sm">
               <Plus className="mr-2 h-4 w-4" />
-              Add Promotion
+              {t("addPromotion")}
             </Button>
           </Link>
         </div>
@@ -216,8 +218,8 @@ export function PromotionTable() {
                   className="h-24 text-center"
                 >
                   <div className="text-destructive">
-                    Failed to load promotions:{" "}
-                    {error instanceof Error ? error.message : "Unknown error"}
+                    {t("table.errorLoading")}:{" "}
+                    {error instanceof Error ? error.message : t("unknownError")}
                   </div>
                 </TableCell>
               </TableRow>
@@ -229,8 +231,8 @@ export function PromotionTable() {
                 >
                   <div className="text-muted-foreground">
                     {debouncedSearch || typeFilter !== "all"
-                      ? "No promotions match your search criteria."
-                      : "No promotions yet. Create your first promotion to get started."}
+                      ? t("table.noResults")
+                      : t("table.noPromotions")}
                   </div>
                 </TableCell>
               </TableRow>
@@ -255,17 +257,17 @@ export function PromotionTable() {
         {!isLoading && totalCount > 0 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
             <p className="text-sm text-muted-foreground">
-              Showing{" "}
-              {Math.min(
-                pagination.pageIndex * pagination.pageSize + 1,
-                totalCount
-              )}{" "}
-              to{" "}
-              {Math.min(
-                (pagination.pageIndex + 1) * pagination.pageSize,
-                totalCount
-              )}{" "}
-              of {totalCount} promotions
+              {t("table.showing", {
+                from: Math.min(
+                  pagination.pageIndex * pagination.pageSize + 1,
+                  totalCount
+                ),
+                to: Math.min(
+                  (pagination.pageIndex + 1) * pagination.pageSize,
+                  totalCount
+                ),
+                total: totalCount,
+              })}
             </p>
             <div className="flex items-center gap-2">
               <Button
@@ -287,7 +289,7 @@ export function PromotionTable() {
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <span className="text-sm text-muted-foreground">
-                Page {pagination.pageIndex + 1} of {pageCount}
+                {t("table.page", { current: pagination.pageIndex + 1, total: pageCount })}
               </span>
               <Button
                 variant="outline"
@@ -321,11 +323,9 @@ export function PromotionTable() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Promotion</DialogTitle>
+            <DialogTitle>{t("deleteTitle")}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete the promotion{" "}
-              <strong>{promotionToDelete?.code}</strong>? This action cannot be
-              undone.
+              {t("deleteConfirm", { code: promotionToDelete?.code ?? "" })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -333,7 +333,7 @@ export function PromotionTable() {
               variant="outline"
               onClick={() => setPromotionToDelete(null)}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               variant="destructive"
@@ -343,10 +343,10 @@ export function PromotionTable() {
               {deletePromotion.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
+                  {t("deleting")}
                 </>
               ) : (
-                "Delete"
+                t("delete")
               )}
             </Button>
           </DialogFooter>
