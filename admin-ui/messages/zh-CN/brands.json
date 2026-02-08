@@ -1,8 +1,64 @@
 {
   "brands": {
     "title": "品牌管理",
+    "subtitle": "管理您的商品品牌",
     "addBrand": "添加品牌",
+    "createBrand": "创建品牌",
     "editBrand": "编辑品牌",
+    "createSubtitle": "向您的目录中添加新品牌",
+    "editSubtitle": "正在编辑 {name}",
+    "saveChanges": "保存更改",
+    "saving": "保存中...",
+    "errorOccurred": "发生错误",
+    "backToBrands": "返回品牌列表",
+    "brandNotFound": "未找到品牌或加载失败。",
+    "columns": {
+      "name": "名称",
+      "products": "商品数",
+      "created": "创建时间"
+    },
+    "actions": {
+      "view": "查看",
+      "edit": "编辑",
+      "delete": "删除",
+      "openMenu": "打开菜单"
+    },
+    "table": {
+      "errorLoading": "加载品牌失败",
+      "unknownError": "未知错误",
+      "noBrands": "暂无品牌。创建您的第一个品牌开始使用。",
+      "showing": "显示第 {from} 至 {to} 条，共 {total} 条品牌",
+      "page": "第 {current} 页，共 {total} 页"
+    },
+    "deleteDialog": {
+      "title": "删除品牌",
+      "description": "确定要删除 {name} 吗？此操作无法撤销。所有商品关联将被移除。",
+      "cancel": "取消",
+      "delete": "删除",
+      "deleting": "删除中..."
+    },
+    "form": {
+      "basicInfo": "基本信息",
+      "nameLabel": "名称 *",
+      "namePlaceholder": "品牌名称",
+      "descriptionLabel": "描述",
+      "descriptionPlaceholder": "描述该品牌...",
+      "logo": "Logo",
+      "logoUrlLabel": "Logo 链接",
+      "logoUrlPlaceholder": "https://example.com/logo.png"
+    },
+    "detail": {
+      "brandDetails": "品牌详情",
+      "description": "描述",
+      "noDescription": "未提供描述。",
+      "products": "关联商品",
+      "noProducts": "暂无关联此品牌的商品。",
+      "quickInfo": "概要信息",
+      "productCount": "商品数",
+      "created": "创建时间",
+      "updated": "更新时间",
+      "brandId": "品牌 ID"
+    },
     "brandName": "品牌名称",
     "brandDescription": "品牌描述",
     "productCount": "商品数量"

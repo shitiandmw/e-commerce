@@ -1,11 +1,44 @@
 {
   "dashboard": {
     "title": "Dashboard",
+    "subtitle": "Overview of your store performance",
+    "refresh": "Refresh",
     "totalRevenue": "Total Revenue",
-    "totalOrders": "Total Orders",
-    "totalCustomers": "Total Customers",
-    "totalProducts": "Total Products",
-    "recentOrders": "Recent Orders",
+    "totalOrders": "Orders",
+    "totalCustomers": "Customers",
+    "totalProducts": "Products",
+    "fromLastMonth": "{change}% from last month",
+    "error": {
+      "title": "Failed to load dashboard data",
+      "fallbackMessage": "Please check your connection and try again."
+    },
+    "salesChart": {
+      "title": "Sales Trend",
+      "subtitle": "Revenue and order volume over the last 6 months",
+      "noData": "No sales data available yet. Data will appear here once orders are placed.",
+      "revenue": "Revenue ($)",
+      "orders": "Orders",
+      "revenueLabel": "Revenue",
+      "ordersLabel": "Orders"
+    },
+    "ordersChart": {
+      "title": "Order Volume",
+      "subtitle": "Number of orders per month",
+      "noData": "No order data available yet."
+    },
+    "recentOrders": {
+      "title": "Recent Orders",
+      "subtitle": "Latest orders from your store",
+      "columns": {
+        "order": "Order",
+        "customer": "Customer",
+        "status": "Status",
+        "total": "Total",
+        "date": "Date"
+      },
+      "noOrders": "No orders yet",
+      "noOrdersDescription": "Orders will appear here once customers start purchasing."
+    },
     "salesOverview": "Sales Overview"
   }
 }
