@@ -1,0 +1,124 @@
+{
+  "promotions": {
+    "title": "Promotions",
+    "description": "Manage discount promotions and campaigns",
+    "addPromotion": "Add Promotion",
+    "createPromotion": "Create Promotion",
+    "editPromotion": "Edit Promotion",
+    "createSubtitle": "Set up a new discount promotion",
+    "editing": "Editing {code}",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "errorOccurred": "An error occurred",
+    "backToPromotions": "Back to Promotions",
+    "promotionNotFound": "Promotion not found or failed to load.",
+    "deleteTitle": "Delete Promotion",
+    "deleteConfirm": "Are you sure you want to delete promotion {code}? This action cannot be undone.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "unknownError": "Unknown error",
+
+    "columns": {
+      "code": "Code",
+      "type": "Type",
+      "discount": "Discount",
+      "status": "Status",
+      "automatic": "Automatic",
+      "actions": "Actions"
+    },
+
+    "type": {
+      "standard": "Standard",
+      "buyget": "Buy X Get Y"
+    },
+
+    "status": {
+      "active": "Active",
+      "expired": "Expired",
+      "scheduled": "Scheduled"
+    },
+
+    "application": {
+      "manual": "Manual (code required)",
+      "automatic": "Automatic",
+      "automaticPromotion": "Automatic promotion",
+      "manualCode": "Manual code"
+    },
+
+    "form": {
+      "basicInfo": "Basic Information",
+      "code": "Promotion Code *",
+      "codePlaceholder": "e.g. SUMMER20",
+      "codeRequired": "Code is required",
+      "codeFormat": "Code must be alphanumeric (dashes/underscores allowed)",
+      "promotionType": "Promotion Type",
+      "applicationMode": "Application",
+      "discountConfig": "Discount Configuration",
+      "discountType": "Discount Type",
+      "percentage": "Percentage",
+      "fixedAmount": "Fixed Amount",
+      "discountValue": "Discount Value *",
+      "valueMustBeNonNegative": "Value must be non-negative",
+      "currency": "Currency",
+      "appliesTo": "Applies To",
+      "entireOrder": "Entire Order",
+      "specificItems": "Specific Items",
+      "shippingMethods": "Shipping Methods",
+      "allocation": "Allocation",
+      "none": "None",
+      "eachItem": "Each Item",
+      "acrossItems": "Across Items"
+    },
+
+    "schedule": {
+      "title": "Schedule",
+      "startDate": "Start Date",
+      "endDate": "End Date"
+    },
+
+    "detail": {
+      "promotionDetails": "Promotion Details",
+      "discountValue": "Discount Value",
+      "promotionType": "Promotion Type",
+      "appliesTo": "Applies To",
+      "allocation": "Allocation",
+      "automatic": "Automatic",
+      "yes": "Yes",
+      "no": "No",
+      "campaign": "Campaign",
+      "noCampaign": "No campaign",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "notSet": "Not set",
+      "created": "Created",
+      "updated": "Updated",
+      "promotionId": "Promotion ID",
+      "quickInfo": "Quick Info",
+      "rules": "Rules",
+      "noRules": "No rules configured.",
+      "targetRules": "Target Rules",
+      "noTargetRules": "No target rules.",
+      "attribute": "Attribute",
+      "operator": "Operator",
+      "values": "Values"
+    },
+
+    "table": {
+      "errorLoading": "Failed to load promotions",
+      "noPromotions": "No promotions yet. Create your first promotion to get started.",
+      "showing": "Showing {from} to {to} of {total} promotions",
+      "page": "Page {current} of {total}",
+      "search": "Search promotion codes...",
+      "allTypes": "All Types",
+      "filterByType": "Filter by type"
+    },
+
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete",
+      "openMenu": "Open menu"
+    }
+  }
+}

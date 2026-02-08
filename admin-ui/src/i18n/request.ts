@@ -21,6 +21,8 @@ const namespaces = [
   "media",
   "analytics",
   "importExport",
+  "promotions",
+  "shipping",
 ] as const
 
 async function loadMessages(locale: string) {

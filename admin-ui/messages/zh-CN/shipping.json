@@ -1,0 +1,87 @@
+{
+  "shipping": {
+    "title": "配送管理",
+    "description": "管理配送方案、配送配置文件和物流提供商",
+
+    "options": {
+      "title": "配送方案",
+      "addOption": "添加配送方案",
+      "createOption": "创建配送方案",
+      "editOption": "编辑配送方案",
+      "noOptions": "暂无配送方案。",
+      "deleteConfirm": "确定要删除此配送方案吗？",
+      "columns": {
+        "name": "名称",
+        "priceType": "价格类型",
+        "price": "价格",
+        "provider": "提供商",
+        "profile": "配置文件",
+        "actions": "操作"
+      },
+      "priceType": {
+        "flat": "固定价格",
+        "calculated": "计算价格"
+      },
+      "form": {
+        "name": "名称 *",
+        "namePlaceholder": "例如：标准配送",
+        "priceType": "价格类型",
+        "flatRate": "固定价格",
+        "calculated": "计算价格",
+        "amount": "金额",
+        "currencyCode": "货币代码",
+        "shippingProfile": "配送配置文件",
+        "selectProfile": "选择配置文件",
+        "provider": "物流提供商",
+        "selectProvider": "选择提供商",
+        "cancel": "取消",
+        "create": "创建",
+        "creating": "创建中...",
+        "update": "更新",
+        "updating": "更新中..."
+      }
+    },
+
+    "profiles": {
+      "title": "配送配置文件",
+      "addProfile": "添加配置文件",
+      "noProfiles": "暂无配送配置文件。",
+      "deleteConfirm": "确定要删除此配送配置文件吗？",
+      "columns": {
+        "name": "名称",
+        "type": "类型",
+        "created": "创建时间",
+        "actions": "操作"
+      },
+      "form": {
+        "name": "名称",
+        "namePlaceholder": "例如：标准配送",
+        "type": "类型",
+        "default": "默认",
+        "giftCard": "礼品卡",
+        "custom": "自定义",
+        "cancel": "取消",
+        "create": "创建",
+        "creating": "创建中..."
+      }
+    },
+
+    "providers": {
+      "title": "物流提供商",
+      "noProviders": "暂无物流提供商。",
+      "enabled": "已启用",
+      "disabled": "已禁用",
+      "providerId": "提供商 ID"
+    },
+
+    "table": {
+      "showing": "显示第 {from} 至 {to} 条，共 {total} 条",
+      "page": "第 {current} 页，共 {total} 页"
+    },
+
+    "actions": {
+      "edit": "编辑",
+      "delete": "删除"
+    }
+  }
+}

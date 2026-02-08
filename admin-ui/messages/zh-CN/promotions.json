@@ -1,0 +1,124 @@
+{
+  "promotions": {
+    "title": "促销管理",
+    "description": "管理促销折扣和优惠活动",
+    "addPromotion": "添加促销",
+    "createPromotion": "创建促销",
+    "editPromotion": "编辑促销",
+    "createSubtitle": "设置新的折扣促销",
+    "editing": "正在编辑 {code}",
+    "saveChanges": "保存更改",
+    "saving": "保存中...",
+    "errorOccurred": "发生错误",
+    "backToPromotions": "返回促销列表",
+    "promotionNotFound": "未找到促销或加载失败。",
+    "deleteTitle": "删除促销",
+    "deleteConfirm": "确定要删除促销 {code} 吗？此操作无法撤销。",
+    "cancel": "取消",
+    "delete": "删除",
+    "deleting": "删除中...",
+    "unknownError": "未知错误",
+
+    "columns": {
+      "code": "促销码",
+      "type": "类型",
+      "discount": "折扣",
+      "status": "状态",
+      "automatic": "自动",
+      "actions": "操作"
+    },
+
+    "type": {
+      "standard": "标准",
+      "buyget": "买X送Y"
+    },
+
+    "status": {
+      "active": "生效中",
+      "expired": "已过期",
+      "scheduled": "待生效"
+    },
+
+    "application": {
+      "manual": "手动（需输入码）",
+      "automatic": "自动",
+      "automaticPromotion": "自动促销",
+      "manualCode": "手动促销码"
+    },
+
+    "form": {
+      "basicInfo": "基本信息",
+      "code": "促销码 *",
+      "codePlaceholder": "例如 SUMMER20",
+      "codeRequired": "促销码为必填项",
+      "codeFormat": "促销码只能包含字母、数字、短横线和下划线",
+      "promotionType": "促销类型",
+      "applicationMode": "应用方式",
+      "discountConfig": "折扣配置",
+      "discountType": "折扣类型",
+      "percentage": "百分比",
+      "fixedAmount": "固定金额",
+      "discountValue": "折扣值 *",
+      "valueMustBeNonNegative": "值不能为负数",
+      "currency": "货币",
+      "appliesTo": "适用范围",
+      "entireOrder": "整单",
+      "specificItems": "指定商品",
+      "shippingMethods": "配送方式",
+      "allocation": "分配方式",
+      "none": "无",
+      "eachItem": "每件商品",
+      "acrossItems": "按比例分摊"
+    },
+
+    "schedule": {
+      "title": "时间设置",
+      "startDate": "开始日期",
+      "endDate": "结束日期"
+    },
+
+    "detail": {
+      "promotionDetails": "促销详情",
+      "discountValue": "折扣值",
+      "promotionType": "促销类型",
+      "appliesTo": "适用范围",
+      "allocation": "分配方式",
+      "automatic": "是否自动",
+      "yes": "是",
+      "no": "否",
+      "campaign": "活动",
+      "noCampaign": "无关联活动",
+      "startDate": "开始日期",
+      "endDate": "结束日期",
+      "notSet": "未设置",
+      "created": "创建时间",
+      "updated": "更新时间",
+      "promotionId": "促销 ID",
+      "quickInfo": "概要信息",
+      "rules": "规则",
+      "noRules": "暂无规则。",
+      "targetRules": "目标规则",
+      "noTargetRules": "暂无目标规则。",
+      "attribute": "属性",
+      "operator": "运算符",
+      "values": "值"
+    },
+
+    "table": {
+      "errorLoading": "加载促销失败",
+      "noPromotions": "暂无促销活动。创建您的第一个促销开始使用。",
+      "showing": "显示第 {from} 至 {to} 条，共 {total} 条促销",
+      "page": "第 {current} 页，共 {total} 页",
+      "search": "搜索促销码...",
+      "allTypes": "所有类型",
+      "filterByType": "按类型筛选"
+    },
+
+    "actions": {
+      "view": "查看",
+      "edit": "编辑",
+      "delete": "删除",
+      "openMenu": "打开菜单"
+    }
+  }
+}
