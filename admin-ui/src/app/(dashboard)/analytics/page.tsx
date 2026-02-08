@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { subDays } from "date-fns"
 import {
   DollarSign,
@@ -20,6 +21,7 @@ import { CustomerAnalysisChart } from "@/components/analytics/customer-analysis-
 import { RevenueDistributionChart } from "@/components/analytics/revenue-distribution-chart"
 
 export default function AnalyticsPage() {
+  const t = useTranslations("analytics")
   const queryClient = useQueryClient()
 
   // Date range state
@@ -44,9 +46,9 @@ export default function AnalyticsPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
           <p className="text-muted-foreground">
-            Advanced reporting and business insights
+            {t("subtitle")}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -83,7 +85,7 @@ export default function AnalyticsPage() {
             <RefreshCw
               className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
             />
-            Refresh
+            {t("refresh")}
           </button>
         </div>
       </div>
@@ -100,11 +102,11 @@ export default function AnalyticsPage() {
       {/* Error Banner */}
       {isError && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-          <p className="font-medium">Failed to load analytics data</p>
+          <p className="font-medium">{t("loadFailed")}</p>
           <p className="mt-1 text-red-600">
             {error instanceof Error
               ? error.message
-              : "Please check your connection and try again."}
+              : t("checkConnection")}
           </p>
         </div>
       )}
@@ -112,7 +114,7 @@ export default function AnalyticsPage() {
       {/* KPI Summary */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title="Total Revenue"
+          title={t("totalRevenue")}
           value={
             data
               ? data.totalRevenue.toLocaleString("en-US", {
@@ -126,14 +128,14 @@ export default function AnalyticsPage() {
           prefix="$"
         />
         <StatCard
-          title="Orders"
+          title={t("totalOrders")}
           value={data ? data.totalOrders.toLocaleString() : "0"}
           icon={ShoppingCart}
           change={data?.ordersChange}
           loading={isLoading}
         />
         <StatCard
-          title="Avg. Order Value"
+          title={t("avgOrderValue")}
           value={
             data
               ? data.avgOrderValue.toLocaleString("en-US", {
@@ -146,7 +148,7 @@ export default function AnalyticsPage() {
           prefix="$"
         />
         <StatCard
-          title="Customers"
+          title={t("customers")}
           value={data ? data.totalCustomers.toLocaleString() : "0"}
           icon={DollarSign}
           loading={isLoading}
@@ -180,14 +182,14 @@ export default function AnalyticsPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <RevenueDistributionChart
           data={data?.revenueByBrand || []}
-          title="Revenue by Brand"
-          subtitle="Revenue distribution across product brands"
+          title={t("revenueByBrand")}
+          subtitle={t("revenueByBrandSubtitle")}
           loading={isLoading}
         />
         <RevenueDistributionChart
           data={data?.revenueByCategory || []}
-          title="Revenue by Category"
-          subtitle="Revenue distribution across product categories"
+          title={t("revenueByCategory")}
+          subtitle={t("revenueByCategorySubtitle")}
           loading={isLoading}
         />
       </div>

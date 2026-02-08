@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import {
   PieChart,
   Pie,
@@ -33,6 +34,7 @@ const COLORS = [
 function CustomTooltip({
   active,
   payload,
+  t,
 }: {
   active?: boolean
   payload?: Array<{
@@ -40,6 +42,7 @@ function CustomTooltip({
     value: number
     payload: { name: string; revenue: number; percent?: number }
   }>
+  t: (key: string) => string
 }) {
   if (!active || !payload || payload.length === 0) return null
   const item = payload[0].payload
@@ -48,7 +51,7 @@ function CustomTooltip({
     <div className="rounded-lg border bg-card p-3 shadow-lg">
       <p className="text-sm font-medium text-foreground">{item.name}</p>
       <p className="text-xs text-muted-foreground">
-        Revenue: ${item.revenue.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+        {t("revenueDistribution.revenue")}: ${item.revenue.toLocaleString("en-US", { minimumFractionDigits: 2 })}
       </p>
     </div>
   )
@@ -60,6 +63,8 @@ export function RevenueDistributionChart({
   subtitle,
   loading = false,
 }: RevenueDistributionChartProps) {
+  const t = useTranslations("analytics")
+
   if (loading) {
     return (
       <div className="rounded-lg border bg-card p-6 shadow-sm">
@@ -75,7 +80,7 @@ export function RevenueDistributionChart({
         <h2 className="mb-1 text-lg font-semibold">{title}</h2>
         <p className="mb-4 text-sm text-muted-foreground">{subtitle}</p>
         <div className="flex h-[350px] items-center justify-center text-sm text-muted-foreground">
-          No data available for this period.
+          {t("revenueDistribution.noData")}
         </div>
       </div>
     )
@@ -110,7 +115,7 @@ export function RevenueDistributionChart({
                   />
                 ))}
               </Pie>
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip t={t} />} />
               <Legend
                 wrapperStyle={{ fontSize: 11, paddingTop: 8 }}
                 formatter={(value) => (
@@ -149,7 +154,7 @@ export function RevenueDistributionChart({
           </div>
           <div className="mt-4 border-t pt-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Total</span>
+              <span className="text-sm font-medium">{t("revenueDistribution.total")}</span>
               <span className="text-sm font-bold">
                 ${total.toLocaleString("en-US", { minimumFractionDigits: 2 })}
               </span>

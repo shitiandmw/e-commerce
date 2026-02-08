@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import {
   Dialog,
   DialogContent,
@@ -44,6 +45,7 @@ export function ImportDialog({
   templateFilename,
   onImport,
 }: ImportDialogProps) {
+  const t = useTranslations("importExport")
   const [state, setState] = React.useState<ImportState>("idle")
   const [file, setFile] = React.useState<File | null>(null)
   const [progress, setProgress] = React.useState({ current: 0, total: 0 })
@@ -71,7 +73,7 @@ export function ImportDialog({
     const selected = e.target.files?.[0]
     if (selected) {
       if (!selected.name.endsWith(".csv")) {
-        setParseError("Please select a CSV file")
+        setParseError(t("importDialog.pleaseSelectCsv"))
         return
       }
       setFile(selected)
@@ -93,7 +95,7 @@ export function ImportDialog({
       const rows = parseCSV(text)
 
       if (rows.length === 0) {
-        setParseError("CSV file is empty or has no data rows")
+        setParseError(t("importDialog.csvEmpty"))
         setState("idle")
         return
       }
@@ -105,7 +107,7 @@ export function ImportDialog({
       )
       if (missingHeaders.length > 0) {
         setParseError(
-          `Missing required columns: ${missingHeaders.join(", ")}`
+          t("importDialog.missingColumns", { columns: missingHeaders.join(", ") })
         )
         setState("idle")
         return
@@ -122,7 +124,7 @@ export function ImportDialog({
       setState("done")
     } catch (err) {
       setParseError(
-        err instanceof Error ? err.message : "An error occurred during import"
+        err instanceof Error ? err.message : t("importDialog.errorOccurred")
       )
       setState("idle")
     }
@@ -151,9 +153,9 @@ export function ImportDialog({
               >
                 <Download className="h-5 w-5" />
                 <div className="text-left">
-                  <p className="font-medium">Download Template</p>
+                  <p className="font-medium">{t("importDialog.downloadTemplate")}</p>
                   <p className="text-xs">
-                    Get the CSV template with required columns
+                    {t("importDialog.templateDescription")}
                   </p>
                 </div>
               </button>
@@ -175,10 +177,10 @@ export function ImportDialog({
                 ) : (
                   <>
                     <p className="text-sm font-medium">
-                      Click to select CSV file
+                      {t("importDialog.clickToSelect")}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Only .csv files are accepted
+                      {t("importDialog.onlyCsv")}
                     </p>
                   </>
                 )}
@@ -207,8 +209,8 @@ export function ImportDialog({
                 <Loader2 className="h-5 w-5 animate-spin text-primary" />
                 <p className="text-sm font-medium">
                   {state === "parsing"
-                    ? "Parsing CSV file..."
-                    : `Importing... ${progress.current} / ${progress.total}`}
+                    ? t("importDialog.parsingCsv")
+                    : t("importDialog.importingProgress", { current: progress.current, total: progress.total })}
                 </p>
               </div>
               {state === "importing" && (
@@ -235,32 +237,32 @@ export function ImportDialog({
                 ) : (
                   <AlertTriangle className="h-5 w-5 text-yellow-600" />
                 )}
-                <p className="text-sm font-medium">Import Complete</p>
+                <p className="text-sm font-medium">{t("importDialog.importComplete")}</p>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
                 <div className="rounded-lg bg-muted p-3 text-center">
                   <p className="text-2xl font-bold">{result.total}</p>
-                  <p className="text-xs text-muted-foreground">Total</p>
+                  <p className="text-xs text-muted-foreground">{t("importDialog.total")}</p>
                 </div>
                 <div className="rounded-lg bg-green-50 p-3 text-center">
                   <p className="text-2xl font-bold text-green-700">
                     {result.success}
                   </p>
-                  <p className="text-xs text-green-600">Success</p>
+                  <p className="text-xs text-green-600">{t("importDialog.success")}</p>
                 </div>
                 <div className="rounded-lg bg-red-50 p-3 text-center">
                   <p className="text-2xl font-bold text-red-700">
                     {result.failed}
                   </p>
-                  <p className="text-xs text-red-600">Failed</p>
+                  <p className="text-xs text-red-600">{t("importDialog.failed")}</p>
                 </div>
               </div>
 
               {result.errors.length > 0 && (
                 <div className="max-h-32 overflow-y-auto rounded-md bg-destructive/5 p-3">
                   <p className="text-xs font-medium text-destructive mb-1">
-                    Errors:
+                    {t("importDialog.errors")}
                   </p>
                   <ul className="space-y-1">
                     {result.errors.slice(0, 20).map((error, idx) => (
@@ -274,7 +276,7 @@ export function ImportDialog({
                     ))}
                     {result.errors.length > 20 && (
                       <li className="text-xs text-muted-foreground">
-                        ...and {result.errors.length - 20} more errors
+                        {t("importDialog.moreErrors", { count: result.errors.length - 20 })}
                       </li>
                     )}
                   </ul>
@@ -291,16 +293,16 @@ export function ImportDialog({
                 variant="outline"
                 onClick={() => handleOpenChange(false)}
               >
-                Cancel
+                {t("importDialog.cancel")}
               </Button>
               <Button onClick={handleImport} disabled={!file}>
                 <Upload className="mr-2 h-4 w-4" />
-                Import
+                {t("importDialog.import")}
               </Button>
             </>
           )}
           {state === "done" && (
-            <Button onClick={() => handleOpenChange(false)}>Close</Button>
+            <Button onClick={() => handleOpenChange(false)}>{t("importDialog.close")}</Button>
           )}
         </DialogFooter>
       </DialogContent>

@@ -1,11 +1,18 @@
 {
   "analytics": {
     "title": "数据报表",
+    "subtitle": "高级报表与业务洞察",
+    "refresh": "刷新",
+    "loadFailed": "加载分析数据失败",
+    "checkConnection": "请检查您的网络连接并重试。",
+    "customers": "客户数",
     "salesTrend": "销售趋势",
     "topProducts": "热销商品 Top 10",
     "customerAnalysis": "客户分析",
     "revenueByBrand": "品牌收入分布",
+    "revenueByBrandSubtitle": "各品牌的收入分布",
     "revenueByCategory": "分类收入分布",
+    "revenueByCategorySubtitle": "各分类的收入分布",
     "totalRevenue": "总收入",
     "totalOrders": "总订单",
     "avgOrderValue": "平均客单价",

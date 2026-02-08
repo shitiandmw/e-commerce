@@ -2,6 +2,8 @@
   "media": {
     "title": "Media",
     "upload": "Upload Files",
+    "uploadAndManage": "Upload and manage your media files",
+    "mediaLibrary": "Media Library",
     "delete": "Delete File",
     "dragDrop": "Click or drag files to upload",
     "noFiles": "No media files",
@@ -40,7 +42,7 @@
 
     "deleteDialog": {
       "title": "Delete Media",
-      "confirmMessage": "Are you sure you want to delete {fileName}? This action cannot be undone. Any references to this file will be broken.",
+      "confirmMessage": "Are you sure you want to delete <strong>{fileName}</strong>? This action cannot be undone. Any references to this file will be broken.",
       "deleteFailed": "Failed to delete file",
       "cancel": "Cancel",
       "deleting": "Deleting...",

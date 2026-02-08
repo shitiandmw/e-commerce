@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Download, Loader2 } from "lucide-react"
 
@@ -13,10 +14,11 @@ interface ExportButtonProps {
 
 export function ExportButton({
   onExport,
-  label = "Export CSV",
+  label,
   variant = "outline",
   size = "default",
 }: ExportButtonProps) {
+  const t = useTranslations("importExport")
   const [isExporting, setIsExporting] = React.useState(false)
 
   const handleExport = async () => {
@@ -43,7 +45,7 @@ export function ExportButton({
       ) : (
         <Download className="mr-2 h-4 w-4" />
       )}
-      {label}
+      {label ?? t("exportButton.defaultLabel")}
     </Button>
   )
 }

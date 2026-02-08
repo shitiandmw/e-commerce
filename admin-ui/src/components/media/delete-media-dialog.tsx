@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { MediaFile, useDeleteMedia } from "@/hooks/use-media"
 import {
   Dialog,
@@ -23,6 +24,7 @@ export function DeleteMediaDialog({
   open,
   onOpenChange,
 }: DeleteMediaDialogProps) {
+  const t = useTranslations("media")
   const deleteMedia = useDeleteMedia()
 
   const handleDelete = async () => {
@@ -45,10 +47,12 @@ export function DeleteMediaDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent onClose={() => onOpenChange(false)}>
         <DialogHeader>
-          <DialogTitle>Delete Media</DialogTitle>
+          <DialogTitle>{t("deleteDialog.title")}</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete <strong>{fileName}</strong>? This
-            action cannot be undone. Any references to this file will be broken.
+            {t.rich("deleteDialog.confirmMessage", {
+              fileName,
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })}
           </DialogDescription>
         </DialogHeader>
 
@@ -56,7 +60,7 @@ export function DeleteMediaDialog({
           <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
             {deleteMedia.error instanceof Error
               ? deleteMedia.error.message
-              : "Failed to delete file"}
+              : t("deleteDialog.deleteFailed")}
           </div>
         )}
 
@@ -66,7 +70,7 @@ export function DeleteMediaDialog({
             onClick={() => onOpenChange(false)}
             disabled={deleteMedia.isPending}
           >
-            Cancel
+            {t("deleteDialog.cancel")}
           </Button>
           <Button
             variant="destructive"
@@ -76,10 +80,10 @@ export function DeleteMediaDialog({
             {deleteMedia.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Deleting...
+                {t("deleteDialog.deleting")}
               </>
             ) : (
-              "Delete"
+              t("deleteDialog.delete")
             )}
           </Button>
         </DialogFooter>

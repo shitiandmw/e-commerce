@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import {
   AreaChart,
   Area,
@@ -24,10 +25,12 @@ function CustomTooltip({
   active,
   payload,
   label,
+  t,
 }: {
   active?: boolean
   payload?: { value: number; name: string; color: string }[]
   label?: string
+  t: (key: string) => string
 }) {
   if (!active || !payload || payload.length === 0) return null
 
@@ -37,8 +40,8 @@ function CustomTooltip({
       {payload.map((entry, index) => (
         <p key={index} className="text-xs" style={{ color: entry.color }}>
           {entry.name === "revenue"
-            ? `Revenue: $${entry.value.toLocaleString("en-US", { minimumFractionDigits: 2 })}`
-            : `Orders: ${entry.value}`}
+            ? `${t("salesTrendChart.revenue")}: $${entry.value.toLocaleString("en-US", { minimumFractionDigits: 2 })}`
+            : `${t("salesTrendChart.orders")}: ${entry.value}`}
         </p>
       ))}
     </div>
@@ -50,6 +53,8 @@ export function SalesTrendChart({
   loading = false,
   chartType = "area",
 }: SalesTrendChartProps) {
+  const t = useTranslations("analytics")
+
   if (loading) {
     return (
       <div className="rounded-lg border bg-card p-6 shadow-sm">
@@ -63,14 +68,14 @@ export function SalesTrendChart({
 
   return (
     <div className="rounded-lg border bg-card p-6 shadow-sm">
-      <h2 className="mb-1 text-lg font-semibold">Sales Trend</h2>
+      <h2 className="mb-1 text-lg font-semibold">{t("salesTrendChart.title")}</h2>
       <p className="mb-4 text-sm text-muted-foreground">
-        Revenue and order volume over selected period
+        {t("salesTrendChart.subtitle")}
       </p>
 
       {!hasData ? (
         <div className="flex h-[350px] items-center justify-center text-sm text-muted-foreground">
-          No sales data available for this period.
+          {t("salesTrendChart.noData")}
         </div>
       ) : chartType === "area" ? (
         <div className="h-[350px]">
@@ -111,10 +116,10 @@ export function SalesTrendChart({
                 tickLine={false}
                 allowDecimals={false}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip t={t} />} />
               <Legend
                 wrapperStyle={{ fontSize: 12, paddingTop: 16 }}
-                formatter={(value) => (value === "revenue" ? "Revenue ($)" : "Orders")}
+                formatter={(value) => (value === "revenue" ? t("salesTrendChart.revenueWithUnit") : t("salesTrendChart.orders"))}
               />
               <Area
                 yAxisId="left"
@@ -155,10 +160,10 @@ export function SalesTrendChart({
                 tickLine={false}
                 tickFormatter={(v) => `$${v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}`}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip t={t} />} />
               <Legend
                 wrapperStyle={{ fontSize: 12, paddingTop: 16 }}
-                formatter={(value) => (value === "revenue" ? "Revenue ($)" : "Orders")}
+                formatter={(value) => (value === "revenue" ? t("salesTrendChart.revenueWithUnit") : t("salesTrendChart.orders"))}
               />
               <Bar dataKey="revenue" fill="hsl(221.2, 83.2%, 53.3%)" radius={[4, 4, 0, 0]} maxBarSize={40} />
               <Bar dataKey="orders" fill="hsl(142, 71%, 45%)" radius={[4, 4, 0, 0]} maxBarSize={40} />

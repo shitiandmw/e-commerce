@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import {
   BarChart,
   Bar,
@@ -33,9 +34,11 @@ const COLORS = [
 function CustomTooltip({
   active,
   payload,
+  t,
 }: {
   active?: boolean
   payload?: Array<{ payload: TopProduct }>
+  t: (key: string) => string
 }) {
   if (!active || !payload || payload.length === 0) return null
   const product = payload[0].payload
@@ -44,16 +47,18 @@ function CustomTooltip({
     <div className="rounded-lg border bg-card p-3 shadow-lg">
       <p className="mb-1 text-sm font-medium text-foreground">{product.title}</p>
       <p className="text-xs text-muted-foreground">
-        Revenue: ${product.totalRevenue.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+        {t("topProductsChart.revenue")}: ${product.totalRevenue.toLocaleString("en-US", { minimumFractionDigits: 2 })}
       </p>
       <p className="text-xs text-muted-foreground">
-        Quantity Sold: {product.totalQuantity}
+        {t("topProductsChart.quantitySold")}: {product.totalQuantity}
       </p>
     </div>
   )
 }
 
 export function TopProductsChart({ data, loading = false }: TopProductsChartProps) {
+  const t = useTranslations("analytics")
+
   if (loading) {
     return (
       <div className="rounded-lg border bg-card p-6 shadow-sm">
@@ -66,10 +71,10 @@ export function TopProductsChart({ data, loading = false }: TopProductsChartProp
   if (data.length === 0) {
     return (
       <div className="rounded-lg border bg-card p-6 shadow-sm">
-        <h2 className="mb-1 text-lg font-semibold">Top 10 Products</h2>
-        <p className="mb-4 text-sm text-muted-foreground">Best selling products by revenue</p>
+        <h2 className="mb-1 text-lg font-semibold">{t("topProductsChart.title")}</h2>
+        <p className="mb-4 text-sm text-muted-foreground">{t("topProductsChart.subtitle")}</p>
         <div className="flex h-[400px] items-center justify-center text-sm text-muted-foreground">
-          No product data available for this period.
+          {t("topProductsChart.noData")}
         </div>
       </div>
     )
@@ -83,8 +88,8 @@ export function TopProductsChart({ data, loading = false }: TopProductsChartProp
 
   return (
     <div className="rounded-lg border bg-card p-6 shadow-sm">
-      <h2 className="mb-1 text-lg font-semibold">Top 10 Products</h2>
-      <p className="mb-4 text-sm text-muted-foreground">Best selling products by revenue</p>
+      <h2 className="mb-1 text-lg font-semibold">{t("topProductsChart.title")}</h2>
+      <p className="mb-4 text-sm text-muted-foreground">{t("topProductsChart.subtitle")}</p>
 
       <div className="h-[400px]">
         <ResponsiveContainer width="100%" height="100%">
@@ -109,7 +114,7 @@ export function TopProductsChart({ data, loading = false }: TopProductsChartProp
               tickLine={false}
               width={130}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip t={t} />} />
             <Bar dataKey="totalRevenue" radius={[0, 4, 4, 0]} maxBarSize={28}>
               {chartData.map((_, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
