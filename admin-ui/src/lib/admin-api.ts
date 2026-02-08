@@ -50,38 +50,120 @@ export async function adminFetch<T>(
 
 // ---- Types ----
 
+export interface AdminOrderAddress {
+  id?: string
+  first_name?: string | null
+  last_name?: string | null
+  phone?: string | null
+  company?: string | null
+  address_1?: string | null
+  address_2?: string | null
+  city?: string | null
+  province?: string | null
+  postal_code?: string | null
+  country_code?: string | null
+}
+
+export interface AdminOrderItem {
+  id: string
+  title: string
+  subtitle?: string | null
+  thumbnail?: string | null
+  variant_title?: string | null
+  variant_sku?: string | null
+  product_title?: string | null
+  quantity: number
+  unit_price: number
+  total: number
+  subtotal?: number
+  tax_total?: number
+  discount_total?: number
+  original_total?: number
+}
+
+export interface AdminOrderFulfillment {
+  id: string
+  created_at: string
+  canceled_at?: string | null
+  shipped_at?: string | null
+  delivered_at?: string | null
+  packed_at?: string | null
+  items?: Array<{
+    title?: string
+    quantity: number
+    line_item_id?: string
+  }>
+  labels?: Array<{
+    tracking_number?: string
+    tracking_url?: string
+  }>
+}
+
+export interface AdminPaymentCollection {
+  id: string
+  status: string
+  amount: number
+  currency_code?: string
+  payments?: Array<{
+    id: string
+    amount: number
+    currency_code: string
+    provider_id?: string
+    captured_at?: string | null
+    canceled_at?: string | null
+    created_at: string
+  }>
+}
+
 export interface AdminOrder {
   id: string
   display_id: number
   status: string
   created_at: string
   updated_at: string
-  email: string
+  email?: string | null
   currency_code: string
   total: number
   subtotal: number
   tax_total: number
   shipping_total: number
   discount_total: number
+  item_total?: number
+  item_subtotal?: number
+  item_tax_total?: number
+  shipping_subtotal?: number
+  shipping_tax_total?: number
+  original_total?: number
+  payment_status?: string
+  fulfillment_status?: string
   items?: AdminOrderItem[]
   customer?: {
     id: string
-    first_name: string
-    last_name: string
+    first_name?: string | null
+    last_name?: string | null
     email: string
-  }
-  shipping_address?: {
-    city: string
-    country_code: string
-  }
-}
-
-export interface AdminOrderItem {
-  id: string
-  title: string
-  quantity: number
-  unit_price: number
-  total: number
+    phone?: string | null
+    has_account?: boolean
+  } | null
+  shipping_address?: AdminOrderAddress | null
+  billing_address?: AdminOrderAddress | null
+  shipping_methods?: Array<{
+    id: string
+    name?: string
+    amount: number
+    tax_total?: number
+  }>
+  fulfillments?: AdminOrderFulfillment[]
+  payment_collections?: AdminPaymentCollection[]
+  region?: {
+    id: string
+    name?: string
+  } | null
+  sales_channel?: {
+    id: string
+    name?: string
+  } | null
+  summary?: Record<string, unknown>
 }
 
 export interface AdminCustomer {
