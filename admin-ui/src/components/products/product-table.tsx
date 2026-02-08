@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import {
   useReactTable,
   getCoreRowModel,
@@ -44,6 +45,7 @@ import {
 } from "@/hooks/use-import-export"
 
 export function ProductTable() {
+  const t = useTranslations("products")
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [search, setSearch] = React.useState("")
   const [debouncedSearch, setDebouncedSearch] = React.useState("")
@@ -100,8 +102,8 @@ export function ProductTable() {
   }
 
   const columns = React.useMemo(
-    () => getProductColumns((product) => setProductToDelete(product)),
-    []
+    () => getProductColumns((product) => setProductToDelete(product), t),
+    [t]
   )
 
   const products = data?.products ?? []
@@ -132,7 +134,7 @@ export function ProductTable() {
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Search products..."
+              placeholder={t("search")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-9"
@@ -143,27 +145,27 @@ export function ProductTable() {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="w-[150px]"
           >
-            <option value="all">All Status</option>
-            <option value="published">Published</option>
-            <option value="draft">Draft</option>
-            <option value="proposed">Proposed</option>
-            <option value="rejected">Rejected</option>
+            <option value="all">{t("statusOptions.all")}</option>
+            <option value="published">{t("statusOptions.published")}</option>
+            <option value="draft">{t("statusOptions.draft")}</option>
+            <option value="proposed">{t("statusOptions.proposed")}</option>
+            <option value="rejected">{t("statusOptions.rejected")}</option>
           </Select>
         </div>
         <div className="flex items-center gap-2">
-          <ExportButton onExport={exportProducts} label="Export" size="sm" />
+          <ExportButton onExport={exportProducts} label={t("actions.export")} size="sm" />
           <Button
             variant="outline"
             size="sm"
             onClick={() => setImportOpen(true)}
           >
             <Upload className="mr-2 h-4 w-4" />
-            Import
+            {t("actions.import")}
           </Button>
           <Link href="/products/new">
             <Button size="sm">
               <Plus className="mr-2 h-4 w-4" />
-              Add Product
+              {t("addProduct")}
             </Button>
           </Link>
         </div>
@@ -222,8 +224,8 @@ export function ProductTable() {
                   className="h-24 text-center"
                 >
                   <div className="text-destructive">
-                    Failed to load products:{" "}
-                    {error instanceof Error ? error.message : "Unknown error"}
+                    {t("table.errorLoading")}:{" "}
+                    {error instanceof Error ? error.message : t("table.unknownError")}
                   </div>
                 </TableCell>
               </TableRow>
@@ -235,8 +237,8 @@ export function ProductTable() {
                 >
                   <div className="text-muted-foreground">
                     {debouncedSearch || statusFilter !== "all"
-                      ? "No products match your search criteria."
-                      : "No products yet. Create your first product to get started."}
+                      ? t("table.noMatchingProducts")
+                      : t("table.noProducts")}
                   </div>
                 </TableCell>
               </TableRow>
@@ -261,17 +263,17 @@ export function ProductTable() {
         {!isLoading && totalCount > 0 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
             <p className="text-sm text-muted-foreground">
-              Showing{" "}
-              {Math.min(
-                pagination.pageIndex * pagination.pageSize + 1,
-                totalCount
-              )}{" "}
-              to{" "}
-              {Math.min(
-                (pagination.pageIndex + 1) * pagination.pageSize,
-                totalCount
-              )}{" "}
-              of {totalCount} products
+              {t("table.showing", {
+                from: Math.min(
+                  pagination.pageIndex * pagination.pageSize + 1,
+                  totalCount
+                ),
+                to: Math.min(
+                  (pagination.pageIndex + 1) * pagination.pageSize,
+                  totalCount
+                ),
+                total: totalCount,
+              })}
             </p>
             <div className="flex items-center gap-2">
               <Button
@@ -293,7 +295,10 @@ export function ProductTable() {
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <span className="text-sm text-muted-foreground">
-                Page {pagination.pageIndex + 1} of {pageCount}
+                {t("table.page", {
+                  current: pagination.pageIndex + 1,
+                  total: pageCount,
+                })}
               </span>
               <Button
                 variant="outline"
@@ -322,8 +327,8 @@ export function ProductTable() {
       <ImportDialog
         open={importOpen}
         onOpenChange={setImportOpen}
-        title="Import Products"
-        description="Upload a CSV file to bulk create products. Download the template to see the required format."
+        title={t("importDialog.title")}
+        description={t("importDialog.description")}
         templateHeaders={PRODUCT_CSV_HEADERS}
         templateFilename="products-import-template.csv"
         onImport={importProducts}

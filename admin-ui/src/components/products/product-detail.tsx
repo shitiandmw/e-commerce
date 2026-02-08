@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import {
   Product,
   useProduct,
@@ -36,16 +37,16 @@ import {
   LOW_STOCK_THRESHOLD,
 } from "@/hooks/use-inventory"
 
-function getStatusBadge(status: Product["status"]) {
+function getStatusBadge(status: Product["status"], t: (key: string) => string) {
   switch (status) {
     case "published":
-      return <Badge variant="success">Published</Badge>
+      return <Badge variant="success">{t("statusOptions.published")}</Badge>
     case "draft":
-      return <Badge variant="secondary">Draft</Badge>
+      return <Badge variant="secondary">{t("statusOptions.draft")}</Badge>
     case "proposed":
-      return <Badge variant="warning">Proposed</Badge>
+      return <Badge variant="warning">{t("statusOptions.proposed")}</Badge>
     case "rejected":
-      return <Badge variant="destructive">Rejected</Badge>
+      return <Badge variant="destructive">{t("statusOptions.rejected")}</Badge>
     default:
       return <Badge variant="outline">{status}</Badge>
   }
@@ -59,6 +60,7 @@ function formatCurrency(amount: number, currency: string) {
 }
 
 function VariantInventoryBadge({ inventoryItem }: { inventoryItem?: InventoryItem }) {
+  const t = useTranslations("products")
   if (!inventoryItem) return null
   const status = getStockStatus(inventoryItem)
   const available = getTotalAvailable(inventoryItem)
@@ -66,26 +68,27 @@ function VariantInventoryBadge({ inventoryItem }: { inventoryItem?: InventoryIte
     case "in_stock":
       return (
         <Badge variant="success" className="text-xs">
-          {available} available
+          {t("detail.available", { count: available })}
         </Badge>
       )
     case "low_stock":
       return (
         <Badge variant="warning" className="text-xs gap-1">
           <AlertTriangle className="h-3 w-3" />
-          {available} available
+          {t("detail.available", { count: available })}
         </Badge>
       )
     case "out_of_stock":
       return (
         <Badge variant="destructive" className="text-xs">
-          Out of stock
+          {t("detail.outOfStock")}
         </Badge>
       )
   }
 }
 
 function VariantsWithInventory({ product }: { product: Product }) {
+  const t = useTranslations("products")
   // Fetch inventory items matching variant SKUs
   const variantSkus = product.variants
     ?.map((v) => v.sku)
@@ -113,7 +116,7 @@ function VariantsWithInventory({ product }: { product: Product }) {
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <DollarSign className="h-5 w-5" />
-          Variants & Inventory
+          {t("detail.variantsInventory")}
           {product.variants && (
             <Badge variant="secondary">{product.variants.length}</Badge>
           )}
@@ -121,14 +124,14 @@ function VariantsWithInventory({ product }: { product: Product }) {
         <Link href="/inventory">
           <Button variant="ghost" size="sm" className="text-muted-foreground">
             <Warehouse className="mr-1.5 h-4 w-4" />
-            Manage Inventory
+            {t("detail.manageInventory")}
           </Button>
         </Link>
       </div>
 
       {!product.variants || product.variants.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          No variants defined.
+          {t("detail.noVariants")}
         </p>
       ) : (
         <div className="space-y-3">
@@ -179,7 +182,7 @@ function VariantsWithInventory({ product }: { product: Product }) {
                   <div className="border-t pt-3 mt-2">
                     <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1.5">
                       <Warehouse className="h-3 w-3" />
-                      Stock by Location
+                      {t("detail.stockByLocation")}
                     </p>
                     <div className="grid gap-2">
                       {inventoryItem.location_levels.map((level) => {
@@ -192,17 +195,17 @@ function VariantsWithInventory({ product }: { product: Product }) {
                             </span>
                             <div className="flex items-center gap-3">
                               <span className="text-muted-foreground">
-                                Stocked: <span className="font-medium text-foreground">{level.stocked_quantity}</span>
+                                {t("detail.stocked")}: <span className="font-medium text-foreground">{level.stocked_quantity}</span>
                               </span>
                               <span className="text-muted-foreground">
-                                Available:{" "}
+                                {t("detail.availableLabel")}:{" "}
                                 <span className={`font-medium ${isOut ? "text-destructive" : isLow ? "text-yellow-600" : "text-green-600"}`}>
                                   {level.available_quantity}
                                 </span>
                               </span>
                               {level.incoming_quantity > 0 && (
                                 <span className="text-muted-foreground">
-                                  Incoming: <span className="font-medium">+{level.incoming_quantity}</span>
+                                  {t("detail.incoming")}: <span className="font-medium">+{level.incoming_quantity}</span>
                                 </span>
                               )}
                             </div>
@@ -217,7 +220,7 @@ function VariantsWithInventory({ product }: { product: Product }) {
                 {!inventoryItem && variant.inventory_quantity !== undefined && (
                   <div className="border-t pt-2 mt-2">
                     <p className="text-xs text-muted-foreground">
-                      Stock: {variant.inventory_quantity}
+                      {t("detail.stock")}: {variant.inventory_quantity}
                     </p>
                   </div>
                 )}
@@ -235,6 +238,7 @@ interface ProductDetailProps {
 }
 
 export function ProductDetail({ productId }: ProductDetailProps) {
+  const t = useTranslations("products")
   const router = useRouter()
   const { data, isLoading, isError, error } = useProduct(productId)
   const deleteProduct = useDeleteProduct()
@@ -281,14 +285,14 @@ export function ProductDetail({ productId }: ProductDetailProps) {
         <Link href="/products">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Products
+            {t("backToProducts")}
           </Button>
         </Link>
         <div className="rounded-lg border bg-card p-8 text-center">
           <p className="text-destructive">
             {error instanceof Error
               ? error.message
-              : "Product not found or failed to load."}
+              : t("productNotFound")}
           </p>
         </div>
       </div>
@@ -310,7 +314,7 @@ export function ProductDetail({ productId }: ProductDetailProps) {
               <h1 className="text-3xl font-bold tracking-tight">
                 {product.title}
               </h1>
-              {getStatusBadge(product.status)}
+              {getStatusBadge(product.status, t)}
             </div>
             {product.subtitle && (
               <p className="text-muted-foreground mt-1">{product.subtitle}</p>
@@ -321,7 +325,7 @@ export function ProductDetail({ productId }: ProductDetailProps) {
           <Link href={`/products/${productId}/edit`}>
             <Button variant="outline">
               <Pencil className="mr-2 h-4 w-4" />
-              Edit
+              {t("actions.edit")}
             </Button>
           </Link>
           <Button
@@ -329,7 +333,7 @@ export function ProductDetail({ productId }: ProductDetailProps) {
             onClick={() => setShowDeleteDialog(true)}
           >
             <Trash2 className="mr-2 h-4 w-4" />
-            Delete
+            {t("actions.delete")}
           </Button>
         </div>
       </div>
@@ -341,13 +345,13 @@ export function ProductDetail({ productId }: ProductDetailProps) {
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Package className="h-5 w-5" />
-              Product Details
+              {t("detail.productDetails")}
             </h2>
 
             {product.description ? (
               <div>
                 <p className="text-sm font-medium text-muted-foreground mb-1">
-                  Description
+                  {t("detail.description")}
                 </p>
                 <p className="text-sm whitespace-pre-wrap">
                   {product.description}
@@ -355,14 +359,14 @@ export function ProductDetail({ productId }: ProductDetailProps) {
               </div>
             ) : (
               <p className="text-sm text-muted-foreground italic">
-                No description provided.
+                {t("detail.noDescription")}
               </p>
             )}
 
             {product.handle && (
               <div>
                 <p className="text-sm font-medium text-muted-foreground mb-1">
-                  Handle
+                  {t("detail.handle")}
                 </p>
                 <code className="text-sm bg-muted px-2 py-0.5 rounded">
                   {product.handle}
@@ -376,30 +380,30 @@ export function ProductDetail({ productId }: ProductDetailProps) {
               product.height) && (
               <div>
                 <p className="text-sm font-medium text-muted-foreground mb-2">
-                  Dimensions
+                  {t("detail.dimensions")}
                 </p>
                 <div className="grid grid-cols-4 gap-4">
                   {product.weight && (
                     <div className="text-center rounded-md bg-muted p-3">
-                      <p className="text-xs text-muted-foreground">Weight</p>
+                      <p className="text-xs text-muted-foreground">{t("detail.weight")}</p>
                       <p className="font-medium">{product.weight}g</p>
                     </div>
                   )}
                   {product.length && (
                     <div className="text-center rounded-md bg-muted p-3">
-                      <p className="text-xs text-muted-foreground">Length</p>
+                      <p className="text-xs text-muted-foreground">{t("detail.length")}</p>
                       <p className="font-medium">{product.length}mm</p>
                     </div>
                   )}
                   {product.width && (
                     <div className="text-center rounded-md bg-muted p-3">
-                      <p className="text-xs text-muted-foreground">Width</p>
+                      <p className="text-xs text-muted-foreground">{t("detail.width")}</p>
                       <p className="font-medium">{product.width}mm</p>
                     </div>
                   )}
                   {product.height && (
                     <div className="text-center rounded-md bg-muted p-3">
-                      <p className="text-xs text-muted-foreground">Height</p>
+                      <p className="text-xs text-muted-foreground">{t("detail.height")}</p>
                       <p className="font-medium">{product.height}mm</p>
                     </div>
                   )}
@@ -411,17 +415,17 @@ export function ProductDetail({ productId }: ProductDetailProps) {
           {/* Media */}
           {(product.thumbnail || (product.images && product.images.length > 0)) && (
             <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
-              <h2 className="text-lg font-semibold">Media</h2>
+              <h2 className="text-lg font-semibold">{t("detail.media")}</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {product.thumbnail && (
                   <div className="relative aspect-square rounded-lg overflow-hidden border bg-muted">
                     <img
                       src={product.thumbnail}
-                      alt="Thumbnail"
+                      alt={t("detail.thumbnail")}
                       className="w-full h-full object-cover"
                     />
                     <Badge className="absolute top-2 left-2" variant="secondary">
-                      Thumbnail
+                      {t("detail.thumbnail")}
                     </Badge>
                   </div>
                 )}
@@ -449,7 +453,7 @@ export function ProductDetail({ productId }: ProductDetailProps) {
             <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <BarChart3 className="h-5 w-5" />
-                Options
+                {t("detail.options")}
               </h2>
               <div className="space-y-3">
                 {product.options.map((option) => (
@@ -473,26 +477,26 @@ export function ProductDetail({ productId }: ProductDetailProps) {
         <div className="space-y-6">
           {/* Quick Info */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
-            <h2 className="text-lg font-semibold">Quick Info</h2>
+            <h2 className="text-lg font-semibold">{t("detail.quickInfo")}</h2>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Status</span>
-                {getStatusBadge(product.status)}
+                <span className="text-sm text-muted-foreground">{t("detail.status")}</span>
+                {getStatusBadge(product.status, t)}
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Variants</span>
+                <span className="text-sm text-muted-foreground">{t("detail.variants")}</span>
                 <span className="text-sm font-medium">
                   {product.variants?.length || 0}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Created</span>
+                <span className="text-sm text-muted-foreground">{t("detail.created")}</span>
                 <span className="text-sm">
                   {format(new Date(product.created_at), "MMM d, yyyy")}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Updated</span>
+                <span className="text-sm text-muted-foreground">{t("detail.updated")}</span>
                 <span className="text-sm">
                   {format(new Date(product.updated_at), "MMM d, yyyy")}
                 </span>
@@ -505,7 +509,7 @@ export function ProductDetail({ productId }: ProductDetailProps) {
             <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <Tag className="h-5 w-5" />
-                Brand
+                {t("detail.brand")}
               </h2>
               <Link
                 href={`/brands/${product.brand.id}`}
@@ -521,7 +525,7 @@ export function ProductDetail({ productId }: ProductDetailProps) {
             <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <Tag className="h-5 w-5" />
-                Categories
+                {t("detail.categories")}
               </h2>
               <div className="flex flex-wrap gap-1.5">
                 {product.categories.map((cat) => (
@@ -536,7 +540,7 @@ export function ProductDetail({ productId }: ProductDetailProps) {
           {/* Product ID */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-2">
             <p className="text-sm font-medium text-muted-foreground">
-              Product ID
+              {t("detail.productId")}
             </p>
             <code className="text-xs bg-muted px-2 py-1 rounded block break-all">
               {product.id}

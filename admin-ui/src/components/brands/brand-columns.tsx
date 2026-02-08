@@ -16,7 +16,8 @@ import Link from "next/link"
 import { format } from "date-fns"
 
 export function getBrandColumns(
-  onDelete: (brand: Brand) => void
+  onDelete: (brand: Brand) => void,
+  t: (key: string) => string
 ): ColumnDef<Brand>[] {
   return [
     {
@@ -51,7 +52,7 @@ export function getBrandColumns(
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="-ml-4"
         >
-          Name
+          {t("columns.name")}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -73,7 +74,7 @@ export function getBrandColumns(
     },
     {
       id: "products",
-      header: "Products",
+      header: t("columns.products"),
       cell: ({ row }) => (
         <Badge variant="secondary">
           {row.original.products?.length || 0}
@@ -88,7 +89,7 @@ export function getBrandColumns(
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="-ml-4"
         >
-          Created
+          {t("columns.created")}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -107,20 +108,20 @@ export function getBrandColumns(
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">Open menu</span>
+                <span className="sr-only">{t("actions.openMenu")}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <Link href={`/brands/${brand.id}`}>
                 <DropdownMenuItem>
                   <Eye className="mr-2 h-4 w-4" />
-                  View
+                  {t("actions.view")}
                 </DropdownMenuItem>
               </Link>
               <Link href={`/brands/${brand.id}/edit`}>
                 <DropdownMenuItem>
                   <Pencil className="mr-2 h-4 w-4" />
-                  Edit
+                  {t("actions.edit")}
                 </DropdownMenuItem>
               </Link>
               <DropdownMenuSeparator />
@@ -129,7 +130,7 @@ export function getBrandColumns(
                 onClick={() => onDelete(brand)}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
-                Delete
+                {t("actions.delete")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

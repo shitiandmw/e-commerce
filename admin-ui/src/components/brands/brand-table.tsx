@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import {
   useReactTable,
   getCoreRowModel,
@@ -32,6 +33,7 @@ import {
 import Link from "next/link"
 
 export function BrandTable() {
+  const t = useTranslations("brands")
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
@@ -57,8 +59,8 @@ export function BrandTable() {
   }
 
   const columns = React.useMemo(
-    () => getBrandColumns((brand) => setBrandToDelete(brand)),
-    []
+    () => getBrandColumns((brand) => setBrandToDelete(brand), t),
+    [t]
   )
 
   const brands = data?.brands ?? []
@@ -89,7 +91,7 @@ export function BrandTable() {
         <Link href="/brands/new">
           <Button>
             <Plus className="mr-2 h-4 w-4" />
-            Add Brand
+            {t("addBrand")}
           </Button>
         </Link>
       </div>
@@ -149,8 +151,8 @@ export function BrandTable() {
                   className="h-24 text-center"
                 >
                   <div className="text-destructive">
-                    Failed to load brands:{" "}
-                    {error instanceof Error ? error.message : "Unknown error"}
+                    {t("table.errorLoading")}:{" "}
+                    {error instanceof Error ? error.message : t("table.unknownError")}
                   </div>
                 </TableCell>
               </TableRow>
@@ -161,7 +163,7 @@ export function BrandTable() {
                   className="h-24 text-center"
                 >
                   <div className="text-muted-foreground">
-                    No brands yet. Create your first brand to get started.
+                    {t("table.noBrands")}
                   </div>
                 </TableCell>
               </TableRow>
@@ -186,17 +188,17 @@ export function BrandTable() {
         {!isLoading && totalCount > 0 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
             <p className="text-sm text-muted-foreground">
-              Showing{" "}
-              {Math.min(
-                pagination.pageIndex * pagination.pageSize + 1,
-                totalCount
-              )}{" "}
-              to{" "}
-              {Math.min(
-                (pagination.pageIndex + 1) * pagination.pageSize,
-                totalCount
-              )}{" "}
-              of {totalCount} brands
+              {t("table.showing", {
+                from: Math.min(
+                  pagination.pageIndex * pagination.pageSize + 1,
+                  totalCount
+                ),
+                to: Math.min(
+                  (pagination.pageIndex + 1) * pagination.pageSize,
+                  totalCount
+                ),
+                total: totalCount,
+              })}
             </p>
             <div className="flex items-center gap-2">
               <Button
@@ -218,7 +220,10 @@ export function BrandTable() {
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <span className="text-sm text-muted-foreground">
-                Page {pagination.pageIndex + 1} of {pageCount}
+                {t("table.page", {
+                  current: pagination.pageIndex + 1,
+                  total: pageCount,
+                })}
               </span>
               <Button
                 variant="outline"
