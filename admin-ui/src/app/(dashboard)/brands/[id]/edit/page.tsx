@@ -1,6 +1,7 @@
 "use client"
 
 import { useParams } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { useBrand } from "@/hooks/use-brands"
 import { BrandForm } from "@/components/brands/brand-form"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -9,6 +10,7 @@ import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
 export default function EditBrandPage() {
+  const t = useTranslations("brands")
   const params = useParams()
   const brandId = params.id as string
   const { data, isLoading, isError, error } = useBrand(brandId)
@@ -39,14 +41,14 @@ export default function EditBrandPage() {
         <Link href="/brands">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Brands
+            {t("backToBrands")}
           </Button>
         </Link>
         <div className="rounded-lg border bg-card p-8 text-center">
           <p className="text-destructive">
             {error instanceof Error
               ? error.message
-              : "Brand not found or failed to load."}
+              : t("brandNotFound")}
           </p>
         </div>
       </div>

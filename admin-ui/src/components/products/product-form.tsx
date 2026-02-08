@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { useForm, useFieldArray, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -75,6 +76,7 @@ interface ProductFormProps {
 }
 
 export function ProductForm({ product, mode }: ProductFormProps) {
+  const t = useTranslations("products")
   const router = useRouter()
   const createProduct = useCreateProduct()
   const updateProduct = useUpdateProduct(product?.id || "")
@@ -278,12 +280,12 @@ export function ProductForm({ product, mode }: ProductFormProps) {
           </Link>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
-              {mode === "create" ? "Create Product" : "Edit Product"}
+              {mode === "create" ? t("createProduct") : t("editProduct")}
             </h1>
             <p className="text-muted-foreground">
               {mode === "create"
-                ? "Add a new product to your catalog"
-                : `Editing ${product?.title}`}
+                ? t("createSubtitle")
+                : t("editSubtitle", { name: product?.title })}
             </p>
           </div>
         </div>
@@ -291,12 +293,12 @@ export function ProductForm({ product, mode }: ProductFormProps) {
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Saving...
+              {t("saving")}
             </>
           ) : (
             <>
               <Save className="mr-2 h-4 w-4" />
-              {mode === "create" ? "Create Product" : "Save Changes"}
+              {mode === "create" ? t("createProduct") : t("saveChanges")}
             </>
           )}
         </Button>
@@ -307,7 +309,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
         <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">
           {mutationError instanceof Error
             ? mutationError.message
-            : "An error occurred"}
+            : t("errorOccurred")}
         </div>
       )}
 
@@ -316,14 +318,14 @@ export function ProductForm({ product, mode }: ProductFormProps) {
         <div className="space-y-6 lg:col-span-2">
           {/* Basic Info */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
-            <h2 className="text-lg font-semibold">Basic Information</h2>
+            <h2 className="text-lg font-semibold">{t("form.basicInfo")}</h2>
 
             <div className="space-y-2">
-              <Label htmlFor="title">Title *</Label>
+              <Label htmlFor="title">{t("form.titleLabel")}</Label>
               <Input
                 id="title"
                 {...register("title")}
-                placeholder="Product title"
+                placeholder={t("form.titlePlaceholder")}
               />
               {errors.title && (
                 <p className="text-sm text-destructive">
@@ -333,30 +335,30 @@ export function ProductForm({ product, mode }: ProductFormProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="subtitle">Subtitle</Label>
+              <Label htmlFor="subtitle">{t("form.subtitleLabel")}</Label>
               <Input
                 id="subtitle"
                 {...register("subtitle")}
-                placeholder="Optional subtitle"
+                placeholder={t("form.subtitlePlaceholder")}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">{t("form.descriptionLabel")}</Label>
               <Textarea
                 id="description"
                 {...register("description")}
-                placeholder="Describe your product..."
+                placeholder={t("form.descriptionPlaceholder")}
                 rows={5}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="handle">Handle</Label>
+              <Label htmlFor="handle">{t("form.handleLabel")}</Label>
               <Input
                 id="handle"
                 {...register("handle")}
-                placeholder="product-handle (auto-generated if empty)"
+                placeholder={t("form.handlePlaceholder")}
               />
             </div>
           </div>
@@ -364,7 +366,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
           {/* Media */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Media</h2>
+              <h2 className="text-lg font-semibold">{t("form.media")}</h2>
               <div className="flex gap-2">
                 <Button
                   type="button"
@@ -373,7 +375,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                   onClick={() => setImagesPickerOpen(true)}
                 >
                   <FolderOpen className="mr-2 h-4 w-4" />
-                  Browse Media
+                  {t("form.browseMedia")}
                 </Button>
                 <Button
                   type="button"
@@ -382,18 +384,18 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                   onClick={() => appendImage({ url: "" })}
                 >
                   <Plus className="mr-2 h-4 w-4" />
-                  Add URL
+                  {t("form.addUrl")}
                 </Button>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="thumbnail">Thumbnail URL</Label>
+              <Label htmlFor="thumbnail">{t("form.thumbnailUrl")}</Label>
               <div className="flex gap-2">
                 <Input
                   id="thumbnail"
                   {...register("thumbnail")}
-                  placeholder="https://example.com/image.jpg"
+                  placeholder={t("form.thumbnailPlaceholder")}
                   className="flex-1"
                 />
                 <Button
@@ -415,13 +417,13 @@ export function ProductForm({ product, mode }: ProductFormProps) {
 
             {imageFields.length > 0 && (
               <div className="space-y-3">
-                <Label>Additional Images</Label>
+                <Label>{t("form.additionalImages")}</Label>
                 {imageFields.map((field, index) => (
                   <div key={field.id} className="flex items-center gap-2">
                     <ImageIcon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                     <Input
                       {...register(`images.${index}.url`)}
-                      placeholder="Image URL"
+                      placeholder={t("form.imageUrlPlaceholder")}
                       className="flex-1"
                     />
                     <Button
@@ -472,9 +474,9 @@ export function ProductForm({ product, mode }: ProductFormProps) {
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold">Options</h2>
+                <h2 className="text-lg font-semibold">{t("form.options")}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Define product options like size, color, material
+                  {t("form.optionsDescription")}
                 </p>
               </div>
               <Button
@@ -484,13 +486,13 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                 onClick={() => appendOption({ title: "", values: "" })}
               >
                 <Plus className="mr-2 h-4 w-4" />
-                Add Option
+                {t("form.addOption")}
               </Button>
             </div>
 
             {optionFields.length === 0 ? (
               <p className="text-sm text-muted-foreground py-4 text-center">
-                No options defined. Add options like Size, Color, etc.
+                {t("form.noOptions")}
               </p>
             ) : (
               <div className="space-y-4">
@@ -501,10 +503,10 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                   >
                     <div className="flex-1 grid gap-3 sm:grid-cols-2">
                       <div className="space-y-2">
-                        <Label>Option Name</Label>
+                        <Label>{t("form.optionName")}</Label>
                         <Input
                           {...register(`options.${index}.title`)}
-                          placeholder="e.g. Size, Color"
+                          placeholder={t("form.optionNamePlaceholder")}
                         />
                         {errors.options?.[index]?.title && (
                           <p className="text-sm text-destructive">
@@ -513,10 +515,10 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                         )}
                       </div>
                       <div className="space-y-2">
-                        <Label>Values (comma separated)</Label>
+                        <Label>{t("form.optionValues")}</Label>
                         <Input
                           {...register(`options.${index}.values`)}
-                          placeholder="e.g. S, M, L, XL"
+                          placeholder={t("form.optionValuesPlaceholder")}
                         />
                         {errors.options?.[index]?.values && (
                           <p className="text-sm text-destructive">
@@ -544,9 +546,9 @@ export function ProductForm({ product, mode }: ProductFormProps) {
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold">Variants</h2>
+                <h2 className="text-lg font-semibold">{t("form.variants")}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Define pricing and inventory for each variant
+                  {t("form.variantsDescription")}
                 </p>
               </div>
               <Button
@@ -565,7 +567,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                 }
               >
                 <Plus className="mr-2 h-4 w-4" />
-                Add Variant
+                {t("form.addVariant")}
               </Button>
             </div>
 
@@ -576,7 +578,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
               >
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-medium">
-                    Variant {index + 1}
+                    {t("form.variantNumber", { number: index + 1 })}
                   </h3>
                   {variantFields.length > 1 && (
                     <Button
@@ -592,10 +594,10 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   <div className="space-y-2">
-                    <Label>Title *</Label>
+                    <Label>{t("form.variantTitle")}</Label>
                     <Input
                       {...register(`variants.${index}.title`)}
-                      placeholder="e.g. Small / Red"
+                      placeholder={t("form.variantTitlePlaceholder")}
                     />
                     {errors.variants?.[index]?.title && (
                       <p className="text-sm text-destructive">
@@ -604,19 +606,19 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label>SKU</Label>
+                    <Label>{t("form.variantSku")}</Label>
                     <Input
                       {...register(`variants.${index}.sku`)}
-                      placeholder="SKU-001"
+                      placeholder={t("form.variantSkuPlaceholder")}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Price *</Label>
+                    <Label>{t("form.variantPrice")}</Label>
                     <Input
                       type="number"
                       step="0.01"
                       {...register(`variants.${index}.price`)}
-                      placeholder="0.00"
+                      placeholder={t("form.variantPricePlaceholder")}
                     />
                     {errors.variants?.[index]?.price && (
                       <p className="text-sm text-destructive">
@@ -625,7 +627,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label>Currency</Label>
+                    <Label>{t("form.variantCurrency")}</Label>
                     <Select {...register(`variants.${index}.currency_code`)}>
                       <option value="usd">USD</option>
                       <option value="eur">EUR</option>
@@ -635,7 +637,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Inventory</Label>
+                    <Label>{t("form.variantInventory")}</Label>
                     <Input
                       type="number"
                       {...register(`variants.${index}.inventory_quantity`)}
@@ -653,7 +655,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                       htmlFor={`manage-inv-${index}`}
                       className="cursor-pointer"
                     >
-                      Manage inventory
+                      {t("form.manageInventory")}
                     </Label>
                   </div>
                 </div>
@@ -666,20 +668,20 @@ export function ProductForm({ product, mode }: ProductFormProps) {
         <div className="space-y-6">
           {/* Status */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
-            <h2 className="text-lg font-semibold">Status</h2>
+            <h2 className="text-lg font-semibold">{t("form.status")}</h2>
             <Select {...register("status")}>
-              <option value="draft">Draft</option>
-              <option value="proposed">Proposed</option>
-              <option value="published">Published</option>
-              <option value="rejected">Rejected</option>
+              <option value="draft">{t("statusOptions.draft")}</option>
+              <option value="proposed">{t("statusOptions.proposed")}</option>
+              <option value="published">{t("statusOptions.published")}</option>
+              <option value="rejected">{t("statusOptions.rejected")}</option>
             </Select>
           </div>
 
           {/* Brand */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
-            <h2 className="text-lg font-semibold">Brand</h2>
+            <h2 className="text-lg font-semibold">{t("form.brand")}</h2>
             <Select {...register("brand_id")}>
-              <option value="">No brand</option>
+              <option value="">{t("form.noBrand")}</option>
               {brands.map((brand) => (
                 <option key={brand.id} value={brand.id}>
                   {brand.name}
@@ -690,10 +692,10 @@ export function ProductForm({ product, mode }: ProductFormProps) {
 
           {/* Categories */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
-            <h2 className="text-lg font-semibold">Categories</h2>
+            <h2 className="text-lg font-semibold">{t("form.categories")}</h2>
             {categories.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                No categories available.
+                {t("form.noCategories")}
               </p>
             ) : (
               <Controller
@@ -732,7 +734,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                         }
                       }}
                     >
-                      <option value="">Select a category...</option>
+                      <option value="">{t("form.selectCategory")}</option>
                       {categories
                         .filter((c) => !field.value.includes(c.id))
                         .map((cat) => (
@@ -749,10 +751,10 @@ export function ProductForm({ product, mode }: ProductFormProps) {
 
           {/* Dimensions */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
-            <h2 className="text-lg font-semibold">Dimensions</h2>
+            <h2 className="text-lg font-semibold">{t("form.dimensions")}</h2>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <Label htmlFor="weight">Weight (g)</Label>
+                <Label htmlFor="weight">{t("form.weight")}</Label>
                 <Input
                   id="weight"
                   type="number"
@@ -761,7 +763,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="length">Length (mm)</Label>
+                <Label htmlFor="length">{t("form.length")}</Label>
                 <Input
                   id="length"
                   type="number"
@@ -770,7 +772,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="width">Width (mm)</Label>
+                <Label htmlFor="width">{t("form.width")}</Label>
                 <Input
                   id="width"
                   type="number"
@@ -779,7 +781,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="height">Height (mm)</Label>
+                <Label htmlFor="height">{t("form.height")}</Label>
                 <Input
                   id="height"
                   type="number"

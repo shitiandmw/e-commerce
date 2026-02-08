@@ -1,6 +1,7 @@
 "use client"
 
 import { useParams } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { useProduct } from "@/hooks/use-products"
 import { ProductForm } from "@/components/products/product-form"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -9,6 +10,7 @@ import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
 export default function EditProductPage() {
+  const t = useTranslations("products")
   const params = useParams()
   const productId = params.id as string
   const { data, isLoading, isError, error } = useProduct(productId)
@@ -42,14 +44,14 @@ export default function EditProductPage() {
         <Link href="/products">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Products
+            {t("backToProducts")}
           </Button>
         </Link>
         <div className="rounded-lg border bg-card p-8 text-center">
           <p className="text-destructive">
             {error instanceof Error
               ? error.message
-              : "Product not found or failed to load."}
+              : t("productNotFound")}
           </p>
         </div>
       </div>

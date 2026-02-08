@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { Brand, useBrand, useDeleteBrand } from "@/hooks/use-brands"
 import { DeleteBrandDialog } from "./delete-brand-dialog"
 import { Button } from "@/components/ui/button"
@@ -23,6 +24,7 @@ interface BrandDetailProps {
 }
 
 export function BrandDetail({ brandId }: BrandDetailProps) {
+  const t = useTranslations("brands")
   const router = useRouter()
   const { data, isLoading, isError, error } = useBrand(brandId)
   const deleteBrand = useDeleteBrand()
@@ -67,14 +69,14 @@ export function BrandDetail({ brandId }: BrandDetailProps) {
         <Link href="/brands">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Brands
+            {t("backToBrands")}
           </Button>
         </Link>
         <div className="rounded-lg border bg-card p-8 text-center">
           <p className="text-destructive">
             {error instanceof Error
               ? error.message
-              : "Brand not found or failed to load."}
+              : t("brandNotFound")}
           </p>
         </div>
       </div>
@@ -118,7 +120,7 @@ export function BrandDetail({ brandId }: BrandDetailProps) {
           <Link href={`/brands/${brandId}/edit`}>
             <Button variant="outline">
               <Pencil className="mr-2 h-4 w-4" />
-              Edit
+              {t("actions.edit")}
             </Button>
           </Link>
           <Button
@@ -126,7 +128,7 @@ export function BrandDetail({ brandId }: BrandDetailProps) {
             onClick={() => setShowDeleteDialog(true)}
           >
             <Trash2 className="mr-2 h-4 w-4" />
-            Delete
+            {t("actions.delete")}
           </Button>
         </div>
       </div>
@@ -138,13 +140,13 @@ export function BrandDetail({ brandId }: BrandDetailProps) {
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Tag className="h-5 w-5" />
-              Brand Details
+              {t("detail.brandDetails")}
             </h2>
 
             {brand.description ? (
               <div>
                 <p className="text-sm font-medium text-muted-foreground mb-1">
-                  Description
+                  {t("detail.description")}
                 </p>
                 <p className="text-sm whitespace-pre-wrap">
                   {brand.description}
@@ -152,7 +154,7 @@ export function BrandDetail({ brandId }: BrandDetailProps) {
               </div>
             ) : (
               <p className="text-sm text-muted-foreground italic">
-                No description provided.
+                {t("detail.noDescription")}
               </p>
             )}
           </div>
@@ -161,7 +163,7 @@ export function BrandDetail({ brandId }: BrandDetailProps) {
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Package className="h-5 w-5" />
-              Products
+              {t("detail.products")}
               {brand.products && (
                 <Badge variant="secondary">{brand.products.length}</Badge>
               )}
@@ -169,7 +171,7 @@ export function BrandDetail({ brandId }: BrandDetailProps) {
 
             {!brand.products || brand.products.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                No products associated with this brand.
+                {t("detail.noProducts")}
               </p>
             ) : (
               <div className="space-y-3">
@@ -217,22 +219,22 @@ export function BrandDetail({ brandId }: BrandDetailProps) {
         <div className="space-y-6">
           {/* Quick Info */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
-            <h2 className="text-lg font-semibold">Quick Info</h2>
+            <h2 className="text-lg font-semibold">{t("detail.quickInfo")}</h2>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Products</span>
+                <span className="text-sm text-muted-foreground">{t("detail.productCount")}</span>
                 <span className="text-sm font-medium">
                   {brand.products?.length || 0}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Created</span>
+                <span className="text-sm text-muted-foreground">{t("detail.created")}</span>
                 <span className="text-sm">
                   {format(new Date(brand.created_at), "MMM d, yyyy")}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Updated</span>
+                <span className="text-sm text-muted-foreground">{t("detail.updated")}</span>
                 <span className="text-sm">
                   {format(new Date(brand.updated_at), "MMM d, yyyy")}
                 </span>
@@ -243,7 +245,7 @@ export function BrandDetail({ brandId }: BrandDetailProps) {
           {/* Brand ID */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-2">
             <p className="text-sm font-medium text-muted-foreground">
-              Brand ID
+              {t("detail.brandId")}
             </p>
             <code className="text-xs bg-muted px-2 py-1 rounded block break-all">
               {brand.id}

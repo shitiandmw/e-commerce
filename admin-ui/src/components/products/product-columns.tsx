@@ -15,16 +15,16 @@ import {
 import Link from "next/link"
 import { format } from "date-fns"
 
-function getStatusBadge(status: Product["status"]) {
+function getStatusBadge(status: Product["status"], t: (key: string) => string) {
   switch (status) {
     case "published":
-      return <Badge variant="success">Published</Badge>
+      return <Badge variant="success">{t("statusOptions.published")}</Badge>
     case "draft":
-      return <Badge variant="secondary">Draft</Badge>
+      return <Badge variant="secondary">{t("statusOptions.draft")}</Badge>
     case "proposed":
-      return <Badge variant="warning">Proposed</Badge>
+      return <Badge variant="warning">{t("statusOptions.proposed")}</Badge>
     case "rejected":
-      return <Badge variant="destructive">Rejected</Badge>
+      return <Badge variant="destructive">{t("statusOptions.rejected")}</Badge>
     default:
       return <Badge variant="outline">{status}</Badge>
   }
@@ -43,7 +43,8 @@ function formatPrice(variants: Product["variants"]) {
 }
 
 export function getProductColumns(
-  onDelete: (product: Product) => void
+  onDelete: (product: Product) => void,
+  t: (key: string) => string
 ): ColumnDef<Product>[] {
   return [
     {
@@ -76,7 +77,7 @@ export function getProductColumns(
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="-ml-4"
         >
-          Title
+          {t("columns.title")}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -98,22 +99,22 @@ export function getProductColumns(
     },
     {
       accessorKey: "status",
-      header: "Status",
-      cell: ({ row }) => getStatusBadge(row.original.status),
+      header: t("columns.status"),
+      cell: ({ row }) => getStatusBadge(row.original.status, t),
       filterFn: (row, id, value) => {
         return value.includes(row.getValue(id))
       },
     },
     {
       id: "price",
-      header: "Price",
+      header: t("columns.price"),
       cell: ({ row }) => (
         <span className="text-sm">{formatPrice(row.original.variants)}</span>
       ),
     },
     {
       id: "variants",
-      header: "Variants",
+      header: t("columns.variants"),
       cell: ({ row }) => (
         <span className="text-sm text-muted-foreground">
           {row.original.variants?.length || 0}
@@ -128,7 +129,7 @@ export function getProductColumns(
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="-ml-4"
         >
-          Created
+          {t("columns.created")}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -147,20 +148,20 @@ export function getProductColumns(
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">Open menu</span>
+                <span className="sr-only">{t("actions.openMenu")}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <Link href={`/products/${product.id}`}>
                 <DropdownMenuItem>
                   <Eye className="mr-2 h-4 w-4" />
-                  View
+                  {t("actions.view")}
                 </DropdownMenuItem>
               </Link>
               <Link href={`/products/${product.id}/edit`}>
                 <DropdownMenuItem>
                   <Pencil className="mr-2 h-4 w-4" />
-                  Edit
+                  {t("actions.edit")}
                 </DropdownMenuItem>
               </Link>
               <DropdownMenuSeparator />
@@ -169,7 +170,7 @@ export function getProductColumns(
                 onClick={() => onDelete(product)}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
-                Delete
+                {t("actions.delete")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

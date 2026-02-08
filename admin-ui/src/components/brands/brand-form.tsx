@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -31,6 +32,7 @@ interface BrandFormProps {
 }
 
 export function BrandForm({ brand, mode }: BrandFormProps) {
+  const t = useTranslations("brands")
   const router = useRouter()
   const createBrand = useCreateBrand()
   const updateBrand = useUpdateBrand(brand?.id || "")
@@ -91,12 +93,12 @@ export function BrandForm({ brand, mode }: BrandFormProps) {
           </Link>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
-              {mode === "create" ? "Create Brand" : "Edit Brand"}
+              {mode === "create" ? t("createBrand") : t("editBrand")}
             </h1>
             <p className="text-muted-foreground">
               {mode === "create"
-                ? "Add a new brand to your catalog"
-                : `Editing ${brand?.name}`}
+                ? t("createSubtitle")
+                : t("editSubtitle", { name: brand?.name })}
             </p>
           </div>
         </div>
@@ -104,12 +106,12 @@ export function BrandForm({ brand, mode }: BrandFormProps) {
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Saving...
+              {t("saving")}
             </>
           ) : (
             <>
               <Save className="mr-2 h-4 w-4" />
-              {mode === "create" ? "Create Brand" : "Save Changes"}
+              {mode === "create" ? t("createBrand") : t("saveChanges")}
             </>
           )}
         </Button>
@@ -120,7 +122,7 @@ export function BrandForm({ brand, mode }: BrandFormProps) {
         <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">
           {mutationError instanceof Error
             ? mutationError.message
-            : "An error occurred"}
+            : t("errorOccurred")}
         </div>
       )}
 
@@ -129,14 +131,14 @@ export function BrandForm({ brand, mode }: BrandFormProps) {
         <div className="space-y-6 lg:col-span-2">
           {/* Basic Info */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
-            <h2 className="text-lg font-semibold">Basic Information</h2>
+            <h2 className="text-lg font-semibold">{t("form.basicInfo")}</h2>
 
             <div className="space-y-2">
-              <Label htmlFor="name">Name *</Label>
+              <Label htmlFor="name">{t("form.nameLabel")}</Label>
               <Input
                 id="name"
                 {...register("name")}
-                placeholder="Brand name"
+                placeholder={t("form.namePlaceholder")}
               />
               {errors.name && (
                 <p className="text-sm text-destructive">
@@ -146,11 +148,11 @@ export function BrandForm({ brand, mode }: BrandFormProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">{t("form.descriptionLabel")}</Label>
               <Textarea
                 id="description"
                 {...register("description")}
-                placeholder="Describe the brand..."
+                placeholder={t("form.descriptionPlaceholder")}
                 rows={4}
               />
             </div>
@@ -161,13 +163,13 @@ export function BrandForm({ brand, mode }: BrandFormProps) {
         <div className="space-y-6">
           {/* Logo */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
-            <h2 className="text-lg font-semibold">Logo</h2>
+            <h2 className="text-lg font-semibold">{t("form.logo")}</h2>
             <div className="space-y-2">
-              <Label htmlFor="logo_url">Logo URL</Label>
+              <Label htmlFor="logo_url">{t("form.logoUrlLabel")}</Label>
               <Input
                 id="logo_url"
                 {...register("logo_url")}
-                placeholder="https://example.com/logo.png"
+                placeholder={t("form.logoUrlPlaceholder")}
               />
               {errors.logo_url && (
                 <p className="text-sm text-destructive">
