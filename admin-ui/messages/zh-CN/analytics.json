@@ -11,6 +11,53 @@
     "avgOrderValue": "平均客单价",
     "newCustomers": "新客户",
     "returningCustomers": "老客户",
-    "avgLTV": "平均客户价值"
+    "avgLTV": "平均客户价值",
+
+    "salesTrendChart": {
+      "title": "销售趋势",
+      "subtitle": "所选时段的收入和订单量",
+      "noData": "该时段暂无销售数据。",
+      "revenue": "收入",
+      "revenueWithUnit": "收入 ($)",
+      "orders": "订单"
+    },
+
+    "topProductsChart": {
+      "title": "热销商品 Top 10",
+      "subtitle": "按收入排名的畅销商品",
+      "noData": "该时段暂无商品数据。",
+      "revenue": "收入",
+      "quantitySold": "销售数量"
+    },
+
+    "revenueDistribution": {
+      "revenue": "收入",
+      "noData": "该时段暂无数据。",
+      "total": "合计"
+    },
+
+    "customerAnalysisChart": {
+      "title": "客户分析",
+      "subtitle": "客户细分与生命周期价值",
+      "noData": "该时段暂无客户数据。",
+      "customers": "位客户",
+      "totalCustomers": "客户总数",
+      "new": "新客户",
+      "returning": "老客户",
+      "avgLifetimeValue": "平均客户生命周期价值"
+    },
+
+    "dateRangePicker": {
+      "last7Days": "最近 7 天",
+      "last30Days": "最近 30 天",
+      "last3Months": "最近 3 个月",
+      "last6Months": "最近 6 个月",
+      "last12Months": "最近 12 个月",
+      "thisMonth": "本月",
+      "yearToDate": "今年至今",
+      "day": "日",
+      "week": "周",
+      "month": "月"
+    }
   }
 }

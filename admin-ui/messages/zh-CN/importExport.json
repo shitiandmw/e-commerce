@@ -12,6 +12,32 @@
     "importComplete": "导入完成",
     "successCount": "成功",
     "failedCount": "失败",
-    "totalCount": "总计"
+    "totalCount": "总计",
+
+    "exportButton": {
+      "defaultLabel": "导出 CSV"
+    },
+
+    "importDialog": {
+      "downloadTemplate": "下载模板",
+      "templateDescription": "获取包含必填列的 CSV 模板",
+      "clickToSelect": "点击选择 CSV 文件",
+      "onlyCsv": "仅接受 .csv 文件",
+      "pleaseSelectCsv": "请选择 CSV 文件",
+      "csvEmpty": "CSV 文件为空或没有数据行",
+      "missingColumns": "缺少必填列：{columns}",
+      "parsingCsv": "正在解析 CSV 文件...",
+      "importingProgress": "导入中... {current} / {total}",
+      "importComplete": "导入完成",
+      "total": "总计",
+      "success": "成功",
+      "failed": "失败",
+      "errors": "错误：",
+      "moreErrors": "...以及其他 {count} 个错误",
+      "errorOccurred": "导入过程中发生错误",
+      "cancel": "取消",
+      "import": "导入",
+      "close": "关闭"
+    }
   }
 }
