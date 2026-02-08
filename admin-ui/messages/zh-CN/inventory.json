@@ -1,12 +1,146 @@
 {
   "inventory": {
     "title": "库存管理",
-    "sku": "SKU",
-    "product": "商品",
-    "quantity": "数量",
-    "adjust": "调整库存",
-    "inStock": "有货",
-    "outOfStock": "缺货",
-    "lowStock": "低库存"
+    "description": "管理库存数量、跟踪各仓库库存并监控低库存预警。",
+
+    "columns": {
+      "sku": "SKU",
+      "title": "名称",
+      "status": "状态",
+      "stocked": "库存量",
+      "reserved": "预留量",
+      "available": "可用量",
+      "incoming": "入库中",
+      "locations": "仓库"
+    },
+
+    "status": {
+      "inStock": "有货",
+      "lowStock": "低库存",
+      "outOfStock": "缺货"
+    },
+
+    "stats": {
+      "totalItems": "商品总数",
+      "inStock": "有货",
+      "lowStock": "低库存",
+      "outOfStock": "缺货"
+    },
+
+    "filters": {
+      "searchPlaceholder": "按 SKU、名称搜索...",
+      "allStatus": "全部状态",
+      "inStock": "有货",
+      "lowStock": "低库存",
+      "outOfStock": "缺货",
+      "clearFilter": "清除筛选"
+    },
+
+    "table": {
+      "openMenu": "打开菜单",
+      "viewDetails": "查看详情",
+      "adjustStock": "调整库存",
+      "untitled": "未命名",
+      "failedToLoad": "加载库存失败：{error}",
+      "unknownError": "未知错误",
+      "noMatchingItems": "没有找到匹配的库存项。",
+      "noItemsFound": "暂无库存项。",
+      "showingPagination": "显示第 {from} 到 {to} 条，共 {total} 条",
+      "pageOf": "第 {page} 页，共 {total} 页",
+      "locationsCount": "{count} 个仓库"
+    },
+
+    "detail": {
+      "backToInventory": "返回库存列表",
+      "itemNotFound": "库存项不存在或加载失败。",
+      "inventoryItem": "库存项",
+      "adjustStock": "调整库存",
+
+      "summary": {
+        "totalStocked": "总库存",
+        "reserved": "预留",
+        "available": "可用",
+        "incoming": "入库中"
+      },
+
+      "stockByLocation": "各仓库库存",
+      "noStockLocations": "未分配库存仓库。",
+      "adjust": "调整",
+      "low": "低",
+
+      "locationLevels": {
+        "stocked": "库存量",
+        "reserved": "预留量",
+        "available": "可用量",
+        "incoming": "入库中"
+      },
+
+      "alert": {
+        "title": "库存预警",
+        "outOfStock": "已缺货",
+        "unitsAvailable": "仅剩 {count} 件可用（阈值：{threshold}）",
+        "restock": "补货"
+      },
+
+      "itemDetails": {
+        "title": "商品详情",
+        "sku": "SKU",
+        "itemTitle": "名称",
+        "requiresShipping": "需要配送",
+        "yes": "是",
+        "no": "否",
+        "originCountry": "原产国",
+        "material": "材质",
+        "hsCode": "HS 编码"
+      },
+
+      "dimensions": {
+        "title": "尺寸信息",
+        "weight": "重量",
+        "length": "长度",
+        "width": "宽度",
+        "height": "高度"
+      },
+
+      "inventoryItemId": "库存项 ID"
+    },
+
+    "adjustDialog": {
+      "title": "调整库存",
+      "description": "更新 {name} 的库存数量",
+      "stockLocation": "库存仓库",
+      "selectLocation": "请选择仓库...",
+      "noLocations": "此库存项未分配仓库。",
+      "currentLabel": "当前：{count}",
+      "currentLevels": "{location} 的当前库存",
+      "stocked": "库存量",
+      "reserved": "预留量",
+      "available": "可用量",
+
+      "adjustmentType": "调整方式",
+      "setTo": "设为",
+      "add": "增加",
+      "remove": "减少",
+
+      "quantityLabels": {
+        "set": "新库存数量",
+        "add": "增加数量",
+        "remove": "减少数量"
+      },
+
+      "incomingQuantity": "入库数量",
+      "optional": "（可选）",
+      "preview": "预览",
+
+      "errors": {
+        "selectLocation": "请选择仓库。",
+        "invalidQuantity": "请输入有效的数量。",
+        "updateFailed": "更新库存失败。"
+      },
+
+      "cancel": "取消",
+      "updateStock": "更新库存",
+      "updating": "更新中..."
+    }
   }
 }

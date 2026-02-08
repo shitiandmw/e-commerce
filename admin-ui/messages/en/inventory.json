@@ -1,12 +1,146 @@
 {
   "inventory": {
     "title": "Inventory",
-    "sku": "SKU",
-    "product": "Product",
-    "quantity": "Quantity",
-    "adjust": "Adjust Inventory",
-    "inStock": "In Stock",
-    "outOfStock": "Out of Stock",
-    "lowStock": "Low Stock"
+    "description": "Manage stock levels, track inventory across locations, and monitor low stock alerts.",
+
+    "columns": {
+      "sku": "SKU",
+      "title": "Title",
+      "status": "Status",
+      "stocked": "Stocked",
+      "reserved": "Reserved",
+      "available": "Available",
+      "incoming": "Incoming",
+      "locations": "Locations"
+    },
+
+    "status": {
+      "inStock": "In Stock",
+      "lowStock": "Low Stock",
+      "outOfStock": "Out of Stock"
+    },
+
+    "stats": {
+      "totalItems": "Total Items",
+      "inStock": "In Stock",
+      "lowStock": "Low Stock",
+      "outOfStock": "Out of Stock"
+    },
+
+    "filters": {
+      "searchPlaceholder": "Search by SKU, title...",
+      "allStatus": "All Status",
+      "inStock": "In Stock",
+      "lowStock": "Low Stock",
+      "outOfStock": "Out of Stock",
+      "clearFilter": "Clear Filter"
+    },
+
+    "table": {
+      "openMenu": "Open menu",
+      "viewDetails": "View Details",
+      "adjustStock": "Adjust Stock",
+      "untitled": "Untitled",
+      "failedToLoad": "Failed to load inventory: {error}",
+      "unknownError": "Unknown error",
+      "noMatchingItems": "No inventory items match your search criteria.",
+      "noItemsFound": "No inventory items found.",
+      "showingPagination": "Showing {from} to {to} of {total} items",
+      "pageOf": "Page {page} of {total}",
+      "locationsCount": "{count} locations"
+    },
+
+    "detail": {
+      "backToInventory": "Back to Inventory",
+      "itemNotFound": "Inventory item not found or failed to load.",
+      "inventoryItem": "Inventory Item",
+      "adjustStock": "Adjust Stock",
+
+      "summary": {
+        "totalStocked": "Total Stocked",
+        "reserved": "Reserved",
+        "available": "Available",
+        "incoming": "Incoming"
+      },
+
+      "stockByLocation": "Stock by Location",
+      "noStockLocations": "No stock locations assigned.",
+      "adjust": "Adjust",
+      "low": "Low",
+
+      "locationLevels": {
+        "stocked": "Stocked",
+        "reserved": "Reserved",
+        "available": "Available",
+        "incoming": "Incoming"
+      },
+
+      "alert": {
+        "title": "Inventory Alert",
+        "outOfStock": "Out of stock",
+        "unitsAvailable": "Only {count} units available (threshold: {threshold})",
+        "restock": "Restock"
+      },
+
+      "itemDetails": {
+        "title": "Item Details",
+        "sku": "SKU",
+        "itemTitle": "Title",
+        "requiresShipping": "Requires Shipping",
+        "yes": "Yes",
+        "no": "No",
+        "originCountry": "Origin Country",
+        "material": "Material",
+        "hsCode": "HS Code"
+      },
+
+      "dimensions": {
+        "title": "Dimensions",
+        "weight": "Weight",
+        "length": "Length",
+        "width": "Width",
+        "height": "Height"
+      },
+
+      "inventoryItemId": "Inventory Item ID"
+    },
+
+    "adjustDialog": {
+      "title": "Adjust Inventory",
+      "description": "Update stock levels for {name}",
+      "stockLocation": "Stock Location",
+      "selectLocation": "Select a location...",
+      "noLocations": "No locations assigned to this inventory item.",
+      "currentLabel": "Current: {count}",
+      "currentLevels": "Current Levels at {location}",
+      "stocked": "Stocked",
+      "reserved": "Reserved",
+      "available": "Available",
+
+      "adjustmentType": "Adjustment Type",
+      "setTo": "Set To",
+      "add": "Add",
+      "remove": "Remove",
+
+      "quantityLabels": {
+        "set": "New Stocked Quantity",
+        "add": "Quantity to Add",
+        "remove": "Quantity to Remove"
+      },
+
+      "incomingQuantity": "Incoming Quantity",
+      "optional": "(optional)",
+      "preview": "Preview",
+
+      "errors": {
+        "selectLocation": "Please select a location.",
+        "invalidQuantity": "Please enter a valid quantity.",
+        "updateFailed": "Failed to update inventory level."
+      },
+
+      "cancel": "Cancel",
+      "updateStock": "Update Stock",
+      "updating": "Updating..."
+    }
   }
 }

@@ -1,12 +1,104 @@
 {
   "customers": {
     "title": "Customers",
+    "description": "Manage your customers and view their details",
     "addCustomer": "Add Customer",
-    "firstName": "First Name",
-    "lastName": "Last Name",
-    "email": "Email",
-    "phone": "Phone",
-    "orders": "Orders",
-    "totalSpent": "Total Spent"
+    "totalLabel": "{count} total",
+    "searchPlaceholder": "Search customers by name or email...",
+
+    "columns": {
+      "customer": "Customer",
+      "email": "Email",
+      "phone": "Phone",
+      "account": "Account",
+      "registered": "Registered",
+      "actions": "Actions"
+    },
+
+    "accountStatus": {
+      "registered": "Registered",
+      "guest": "Guest"
+    },
+
+    "table": {
+      "view": "View",
+      "failedToLoad": "Failed to load customers",
+      "checkConnection": "Please check your connection and try again.",
+      "noMatchingCustomers": "No customers found matching your search",
+      "noCustomersYet": "No customers yet",
+      "showingPagination": "Showing {from} to {to} of {total} customers",
+      "pageOf": "Page {page} of {total}",
+      "export": "Export"
+    },
+
+    "detail": {
+      "backToCustomers": "Back to Customers",
+      "customerNotFound": "Customer not found",
+      "customerNotFoundDescription": "The customer may have been deleted or does not exist.",
+      "editCustomer": "Edit Customer",
+
+      "tabs": {
+        "information": "Information",
+        "orders": "Orders",
+        "addresses": "Addresses"
+      },
+
+      "info": {
+        "basicInformation": "Basic Information",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "email": "Email",
+        "phone": "Phone",
+        "company": "Company",
+        "registered": "Registered",
+        "lastUpdated": "Last Updated",
+        "metadata": "Metadata"
+      },
+
+      "orders": {
+        "failedToLoad": "Failed to load orders",
+        "noOrders": "This customer has no orders yet",
+        "orderHistory": "Order History ({count})",
+        "order": "Order",
+        "status": "Status",
+        "items": "Items",
+        "itemCount": "{count} item",
+        "itemsCount": "{count} items",
+        "total": "Total",
+        "date": "Date"
+      },
+
+      "addresses": {
+        "noAddresses": "This customer has no addresses",
+        "address": "Address",
+        "defaultShipping": "Default Shipping",
+        "defaultBilling": "Default Billing"
+      }
+    },
+
+    "edit": {
+      "backToCustomer": "Back to Customer",
+      "title": "Edit Customer",
+      "description": "Update customer information for {email}",
+      "basicInformation": "Basic Information",
+
+      "fields": {
+        "firstName": "First Name",
+        "firstNamePlaceholder": "Enter first name",
+        "lastName": "Last Name",
+        "lastNamePlaceholder": "Enter last name",
+        "email": "Email",
+        "emailPlaceholder": "Enter email address",
+        "emailValidation": "Please enter a valid email address",
+        "phone": "Phone",
+        "phonePlaceholder": "Enter phone number",
+        "companyName": "Company Name",
+        "companyNamePlaceholder": "Enter company name"
+      },
+
+      "failedToUpdate": "Failed to update customer. Please try again.",
+      "cancel": "Cancel",
+      "saveChanges": "Save Changes"
+    }
   }
 }
