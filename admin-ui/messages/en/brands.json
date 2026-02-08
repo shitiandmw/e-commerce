@@ -1,8 +1,64 @@
 {
   "brands": {
     "title": "Brands",
+    "subtitle": "Manage your product brands",
     "addBrand": "Add Brand",
+    "createBrand": "Create Brand",
     "editBrand": "Edit Brand",
+    "createSubtitle": "Add a new brand to your catalog",
+    "editSubtitle": "Editing {name}",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "errorOccurred": "An error occurred",
+    "backToBrands": "Back to Brands",
+    "brandNotFound": "Brand not found or failed to load.",
+    "columns": {
+      "name": "Name",
+      "products": "Products",
+      "created": "Created"
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete",
+      "openMenu": "Open menu"
+    },
+    "table": {
+      "errorLoading": "Failed to load brands",
+      "unknownError": "Unknown error",
+      "noBrands": "No brands yet. Create your first brand to get started.",
+      "showing": "Showing {from} to {to} of {total} brands",
+      "page": "Page {current} of {total}"
+    },
+    "deleteDialog": {
+      "title": "Delete Brand",
+      "description": "Are you sure you want to delete {name}? This action cannot be undone. All product associations will be removed.",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting..."
+    },
+    "form": {
+      "basicInfo": "Basic Information",
+      "nameLabel": "Name *",
+      "namePlaceholder": "Brand name",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Describe the brand...",
+      "logo": "Logo",
+      "logoUrlLabel": "Logo URL",
+      "logoUrlPlaceholder": "https://example.com/logo.png"
+    },
+    "detail": {
+      "brandDetails": "Brand Details",
+      "description": "Description",
+      "noDescription": "No description provided.",
+      "products": "Products",
+      "noProducts": "No products associated with this brand.",
+      "quickInfo": "Quick Info",
+      "productCount": "Products",
+      "created": "Created",
+      "updated": "Updated",
+      "brandId": "Brand ID"
+    },
     "brandName": "Brand Name",
     "brandDescription": "Brand Description",
     "productCount": "Product Count"

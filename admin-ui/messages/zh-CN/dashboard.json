@@ -1,11 +1,44 @@
 {
   "dashboard": {
     "title": "仪表盘",
+    "subtitle": "店铺运营数据概览",
+    "refresh": "刷新",
     "totalRevenue": "总收入",
-    "totalOrders": "总订单",
-    "totalCustomers": "总客户",
-    "totalProducts": "总商品",
-    "recentOrders": "最近订单",
+    "totalOrders": "订单数",
+    "totalCustomers": "客户数",
+    "totalProducts": "商品数",
+    "fromLastMonth": "较上月 {change}%",
+    "error": {
+      "title": "加载仪表盘数据失败",
+      "fallbackMessage": "请检查网络连接后重试。"
+    },
+    "salesChart": {
+      "title": "销售趋势",
+      "subtitle": "近 6 个月的收入与订单量",
+      "noData": "暂无销售数据，下单后数据将在此显示。",
+      "revenue": "收入 ($)",
+      "orders": "订单",
+      "revenueLabel": "收入",
+      "ordersLabel": "订单"
+    },
+    "ordersChart": {
+      "title": "订单量",
+      "subtitle": "每月订单数量",
+      "noData": "暂无订单数据。"
+    },
+    "recentOrders": {
+      "title": "最近订单",
+      "subtitle": "店铺最新订单",
+      "columns": {
+        "order": "订单",
+        "customer": "客户",
+        "status": "状态",
+        "total": "金额",
+        "date": "日期"
+      },
+      "noOrders": "暂无订单",
+      "noOrdersDescription": "客户下单后，订单将在此显示。"
+    },
     "salesOverview": "销售概览"
   }
 }
