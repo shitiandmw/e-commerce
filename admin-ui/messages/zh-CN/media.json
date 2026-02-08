@@ -8,6 +8,43 @@
     "preview": "预览",
     "selectFile": "选择文件",
     "fileSize": "文件大小",
-    "uploadedAt": "上传时间"
+    "uploadedAt": "上传时间",
+
+    "uploader": {
+      "dropHere": "将文件拖放到此处",
+      "clickOrDrag": "点击或拖拽文件上传",
+      "supportedFormats": "支持图片、视频和 PDF 文件",
+      "uploadFailed": "上传失败"
+    },
+
+    "grid": {
+      "noFiles": "暂无媒体文件",
+      "uploadToStart": "上传文件以开始使用",
+      "fileCount": "{count} 个文件",
+      "copyUrl": "复制链接",
+      "openInNewTab": "在新标签页中打开",
+      "open": "打开",
+      "delete": "删除"
+    },
+
+    "picker": {
+      "title": "选择媒体",
+      "descriptionMultiple": "从媒体库中选择一个或多个文件",
+      "descriptionSingle": "从媒体库中选择一个文件",
+      "filesSelected": "已选择 {count} 个文件",
+      "noFilesSelected": "未选择文件",
+      "addSelected": "添加所选",
+      "select": "选择",
+      "cancel": "取消"
+    },
+
+    "deleteDialog": {
+      "title": "删除媒体",
+      "confirmMessage": "确定要删除 {fileName} 吗？此操作无法撤销。所有引用此文件的地方将会失效。",
+      "deleteFailed": "删除文件失败",
+      "cancel": "取消",
+      "deleting": "删除中...",
+      "delete": "删除"
+    }
   }
 }

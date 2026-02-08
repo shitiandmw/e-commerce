@@ -11,6 +11,53 @@
     "avgOrderValue": "Avg Order Value",
     "newCustomers": "New Customers",
     "returningCustomers": "Returning Customers",
-    "avgLTV": "Avg Customer LTV"
+    "avgLTV": "Avg Customer LTV",
+
+    "salesTrendChart": {
+      "title": "Sales Trend",
+      "subtitle": "Revenue and order volume over selected period",
+      "noData": "No sales data available for this period.",
+      "revenue": "Revenue",
+      "revenueWithUnit": "Revenue ($)",
+      "orders": "Orders"
+    },
+
+    "topProductsChart": {
+      "title": "Top 10 Products",
+      "subtitle": "Best selling products by revenue",
+      "noData": "No product data available for this period.",
+      "revenue": "Revenue",
+      "quantitySold": "Quantity Sold"
+    },
+
+    "revenueDistribution": {
+      "revenue": "Revenue",
+      "noData": "No data available for this period.",
+      "total": "Total"
+    },
+
+    "customerAnalysisChart": {
+      "title": "Customer Analysis",
+      "subtitle": "Customer segmentation and lifetime value",
+      "noData": "No customer data available for this period.",
+      "customers": "customers",
+      "totalCustomers": "Total Customers",
+      "new": "New",
+      "returning": "Returning",
+      "avgLifetimeValue": "Avg. Customer Lifetime Value"
+    },
+
+    "dateRangePicker": {
+      "last7Days": "Last 7 days",
+      "last30Days": "Last 30 days",
+      "last3Months": "Last 3 months",
+      "last6Months": "Last 6 months",
+      "last12Months": "Last 12 months",
+      "thisMonth": "This month",
+      "yearToDate": "Year to date",
+      "day": "day",
+      "week": "week",
+      "month": "month"
+    }
   }
 }

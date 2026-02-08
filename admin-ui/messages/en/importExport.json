@@ -12,6 +12,32 @@
     "importComplete": "Import Complete",
     "successCount": "Success",
     "failedCount": "Failed",
-    "totalCount": "Total"
+    "totalCount": "Total",
+
+    "exportButton": {
+      "defaultLabel": "Export CSV"
+    },
+
+    "importDialog": {
+      "downloadTemplate": "Download Template",
+      "templateDescription": "Get the CSV template with required columns",
+      "clickToSelect": "Click to select CSV file",
+      "onlyCsv": "Only .csv files are accepted",
+      "pleaseSelectCsv": "Please select a CSV file",
+      "csvEmpty": "CSV file is empty or has no data rows",
+      "missingColumns": "Missing required columns: {columns}",
+      "parsingCsv": "Parsing CSV file...",
+      "importingProgress": "Importing... {current} / {total}",
+      "importComplete": "Import Complete",
+      "total": "Total",
+      "success": "Success",
+      "failed": "Failed",
+      "errors": "Errors:",
+      "moreErrors": "...and {count} more errors",
+      "errorOccurred": "An error occurred during import",
+      "cancel": "Cancel",
+      "import": "Import",
+      "close": "Close"
+    }
   }
 }

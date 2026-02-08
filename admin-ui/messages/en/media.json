@@ -8,6 +8,43 @@
     "preview": "Preview",
     "selectFile": "Select File",
     "fileSize": "File Size",
-    "uploadedAt": "Uploaded At"
+    "uploadedAt": "Uploaded At",
+
+    "uploader": {
+      "dropHere": "Drop files here",
+      "clickOrDrag": "Click or drag files to upload",
+      "supportedFormats": "Supports images, videos, and PDFs",
+      "uploadFailed": "Upload failed"
+    },
+
+    "grid": {
+      "noFiles": "No media files",
+      "uploadToStart": "Upload files to get started",
+      "fileCount": "{count} file(s)",
+      "copyUrl": "Copy URL",
+      "openInNewTab": "Open in new tab",
+      "open": "Open",
+      "delete": "Delete"
+    },
+
+    "picker": {
+      "title": "Select Media",
+      "descriptionMultiple": "Select one or more files from your media library",
+      "descriptionSingle": "Select a file from your media library",
+      "filesSelected": "{count} file(s) selected",
+      "noFilesSelected": "No files selected",
+      "addSelected": "Add Selected",
+      "select": "Select",
+      "cancel": "Cancel"
+    },
+
+    "deleteDialog": {
+      "title": "Delete Media",
+      "confirmMessage": "Are you sure you want to delete {fileName}? This action cannot be undone. Any references to this file will be broken.",
+      "deleteFailed": "Failed to delete file",
+      "cancel": "Cancel",
+      "deleting": "Deleting...",
+      "delete": "Delete"
+    }
   }
 }
