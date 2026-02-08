@@ -1,0 +1,29 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "confirm": "Confirm",
+    "back": "Back",
+    "actions": "Actions",
+    "noData": "No data",
+    "error": "Something went wrong",
+    "success": "Operation successful",
+    "status": "Status",
+    "name": "Name",
+    "description": "Description",
+    "price": "Price",
+    "total": "Total",
+    "date": "Date",
+    "id": "ID"
+  },
+  "languageSwitcher": {
+    "label": "Language",
+    "zhCN": "中文",
+    "en": "English"
+  }
+}

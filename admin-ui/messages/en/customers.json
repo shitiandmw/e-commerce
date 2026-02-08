@@ -1,0 +1,12 @@
+{
+  "customers": {
+    "title": "Customers",
+    "addCustomer": "Add Customer",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "orders": "Orders",
+    "totalSpent": "Total Spent"
+  }
+}

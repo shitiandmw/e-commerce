@@ -1,0 +1,12 @@
+{
+  "inventory": {
+    "title": "库存管理",
+    "sku": "SKU",
+    "product": "商品",
+    "quantity": "数量",
+    "adjust": "调整库存",
+    "inStock": "有货",
+    "outOfStock": "缺货",
+    "lowStock": "低库存"
+  }
+}

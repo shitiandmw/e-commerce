@@ -1,0 +1,11 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "totalRevenue": "Total Revenue",
+    "totalOrders": "Total Orders",
+    "totalCustomers": "Total Customers",
+    "totalProducts": "Total Products",
+    "recentOrders": "Recent Orders",
+    "salesOverview": "Sales Overview"
+  }
+}

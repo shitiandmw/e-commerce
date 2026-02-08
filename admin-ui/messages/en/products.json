@@ -1,0 +1,14 @@
+{
+  "products": {
+    "title": "Products",
+    "addProduct": "Add Product",
+    "editProduct": "Edit Product",
+    "productName": "Product Name",
+    "productDescription": "Product Description",
+    "sku": "SKU",
+    "category": "Category",
+    "collection": "Collection",
+    "variants": "Variants",
+    "thumbnail": "Thumbnail"
+  }
+}

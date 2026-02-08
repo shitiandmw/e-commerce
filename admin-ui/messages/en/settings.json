@@ -1,0 +1,10 @@
+{
+  "settings": {
+    "title": "Settings",
+    "general": "General",
+    "store": "Store Information",
+    "regions": "Regions",
+    "currencies": "Currencies",
+    "language": "Language"
+  }
+}

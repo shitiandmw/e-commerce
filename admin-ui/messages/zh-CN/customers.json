@@ -1,0 +1,12 @@
+{
+  "customers": {
+    "title": "客户管理",
+    "addCustomer": "添加客户",
+    "firstName": "名",
+    "lastName": "姓",
+    "email": "邮箱",
+    "phone": "电话",
+    "orders": "订单",
+    "totalSpent": "消费总额"
+  }
+}

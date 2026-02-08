@@ -1,0 +1,11 @@
+{
+  "dashboard": {
+    "title": "仪表盘",
+    "totalRevenue": "总收入",
+    "totalOrders": "总订单",
+    "totalCustomers": "总客户",
+    "totalProducts": "总商品",
+    "recentOrders": "最近订单",
+    "salesOverview": "销售概览"
+  }
+}

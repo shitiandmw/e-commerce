@@ -1,0 +1,13 @@
+{
+  "media": {
+    "title": "Media",
+    "upload": "Upload Files",
+    "delete": "Delete File",
+    "dragDrop": "Click or drag files to upload",
+    "noFiles": "No media files",
+    "preview": "Preview",
+    "selectFile": "Select File",
+    "fileSize": "File Size",
+    "uploadedAt": "Uploaded At"
+  }
+}

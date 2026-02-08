@@ -1,0 +1,16 @@
+{
+  "analytics": {
+    "title": "Analytics",
+    "salesTrend": "Sales Trend",
+    "topProducts": "Top 10 Products",
+    "customerAnalysis": "Customer Analysis",
+    "revenueByBrand": "Revenue by Brand",
+    "revenueByCategory": "Revenue by Category",
+    "totalRevenue": "Total Revenue",
+    "totalOrders": "Total Orders",
+    "avgOrderValue": "Avg Order Value",
+    "newCustomers": "New Customers",
+    "returningCustomers": "Returning Customers",
+    "avgLTV": "Avg Customer LTV"
+  }
+}

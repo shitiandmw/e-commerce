@@ -1,0 +1,17 @@
+{
+  "importExport": {
+    "import": "Import",
+    "export": "Export",
+    "importProducts": "Import Products",
+    "exportProducts": "Export Products",
+    "exportOrders": "Export Orders",
+    "exportCustomers": "Export Customers",
+    "downloadTemplate": "Download Template",
+    "selectFile": "Select CSV File",
+    "importing": "Importing...",
+    "importComplete": "Import Complete",
+    "successCount": "Success",
+    "failedCount": "Failed",
+    "totalCount": "Total"
+  }
+}

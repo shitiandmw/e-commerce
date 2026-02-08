@@ -1,0 +1,15 @@
+{
+  "sidebar": {
+    "brand": "E-Commerce",
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "brands": "Brands",
+    "inventory": "Inventory",
+    "orders": "Orders",
+    "customers": "Customers",
+    "media": "Media",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "signOut": "Sign out"
+  }
+}

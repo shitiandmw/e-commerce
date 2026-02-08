@@ -1,0 +1,15 @@
+{
+  "sidebar": {
+    "brand": "E-Commerce",
+    "dashboard": "仪表盘",
+    "products": "商品管理",
+    "brands": "品牌管理",
+    "inventory": "库存管理",
+    "orders": "订单管理",
+    "customers": "客户管理",
+    "media": "媒体资源",
+    "analytics": "数据报表",
+    "settings": "系统设置",
+    "signOut": "退出登录"
+  }
+}

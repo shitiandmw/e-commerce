@@ -6,6 +6,38 @@ export const defaultLocale = "zh-CN"
 
 export type Locale = (typeof locales)[number]
 
+// All namespace modules - each corresponds to a JSON file in messages/<locale>/
+const namespaces = [
+  "common",
+  "sidebar",
+  "auth",
+  "dashboard",
+  "products",
+  "orders",
+  "customers",
+  "brands",
+  "inventory",
+  "settings",
+  "media",
+  "analytics",
+  "importExport",
+] as const
+
+async function loadMessages(locale: string) {
+  const messages: Record<string, unknown> = {}
+
+  for (const ns of namespaces) {
+    try {
+      const mod = await import(`../../messages/${locale}/${ns}.json`)
+      Object.assign(messages, mod.default)
+    } catch {
+      // Namespace file not found, skip silently
+    }
+  }
+
+  return messages
+}
+
 export default getRequestConfig(async () => {
   const store = await cookies()
   const cookieLocale = store.get("locale")?.value
@@ -16,6 +48,6 @@ export default getRequestConfig(async () => {
 
   return {
     locale,
-    messages: (await import(`../../messages/${locale}.json`)).default,
+    messages: await loadMessages(locale),
   }
 })

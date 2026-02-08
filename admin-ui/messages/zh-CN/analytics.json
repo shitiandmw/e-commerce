@@ -1,0 +1,16 @@
+{
+  "analytics": {
+    "title": "数据报表",
+    "salesTrend": "销售趋势",
+    "topProducts": "热销商品 Top 10",
+    "customerAnalysis": "客户分析",
+    "revenueByBrand": "品牌收入分布",
+    "revenueByCategory": "分类收入分布",
+    "totalRevenue": "总收入",
+    "totalOrders": "总订单",
+    "avgOrderValue": "平均客单价",
+    "newCustomers": "新客户",
+    "returningCustomers": "老客户",
+    "avgLTV": "平均客户价值"
+  }
+}

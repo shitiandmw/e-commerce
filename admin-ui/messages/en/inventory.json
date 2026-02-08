@@ -1,0 +1,12 @@
+{
+  "inventory": {
+    "title": "Inventory",
+    "sku": "SKU",
+    "product": "Product",
+    "quantity": "Quantity",
+    "adjust": "Adjust Inventory",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "lowStock": "Low Stock"
+  }
+}

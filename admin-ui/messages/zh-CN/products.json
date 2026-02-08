@@ -1,0 +1,14 @@
+{
+  "products": {
+    "title": "商品管理",
+    "addProduct": "添加商品",
+    "editProduct": "编辑商品",
+    "productName": "商品名称",
+    "productDescription": "商品描述",
+    "sku": "SKU",
+    "category": "分类",
+    "collection": "系列",
+    "variants": "规格",
+    "thumbnail": "缩略图"
+  }
+}

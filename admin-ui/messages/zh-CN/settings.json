@@ -1,0 +1,10 @@
+{
+  "settings": {
+    "title": "系统设置",
+    "general": "通用设置",
+    "store": "店铺信息",
+    "regions": "区域管理",
+    "currencies": "货币设置",
+    "language": "语言设置"
+  }
+}

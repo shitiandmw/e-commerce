@@ -1,0 +1,10 @@
+{
+  "brands": {
+    "title": "Brands",
+    "addBrand": "Add Brand",
+    "editBrand": "Edit Brand",
+    "brandName": "Brand Name",
+    "brandDescription": "Brand Description",
+    "productCount": "Product Count"
+  }
+}

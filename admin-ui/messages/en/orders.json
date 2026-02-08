@@ -1,0 +1,15 @@
+{
+  "orders": {
+    "title": "Orders",
+    "orderNumber": "Order Number",
+    "customer": "Customer",
+    "status": "Status",
+    "total": "Total",
+    "items": "Items",
+    "shipping": "Shipping",
+    "payment": "Payment",
+    "fulfilled": "Fulfilled",
+    "unfulfilled": "Unfulfilled",
+    "cancelled": "Cancelled"
+  }
+}
