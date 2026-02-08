@@ -10,6 +10,9 @@
     "media": "媒体资源",
     "analytics": "数据报表",
     "settings": "系统设置",
-    "signOut": "退出登录"
+    "signOut": "退出登录",
+    "navigation": "导航菜单",
+    "collapse": "收起侧栏",
+    "expand": "展开侧栏"
   }
 }

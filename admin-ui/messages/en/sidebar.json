@@ -10,6 +10,9 @@
     "media": "Media",
     "analytics": "Analytics",
     "settings": "Settings",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "navigation": "Navigation",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar"
   }
 }
