@@ -54,16 +54,14 @@ async function deleteFile(fileId: string): Promise<void> {
 }
 
 // Fetch all uploaded files
+// Note: Medusa v2 does NOT provide a GET /admin/uploads listing endpoint.
+// The upload API only supports POST (upload) and DELETE (remove).
+// To avoid CORS errors from requesting a non-existent route, we maintain
+// an in-memory list populated by successful uploads in this session.
+// TODO: Replace with a custom backend endpoint when persistent media
+//       listing is needed (e.g. POST /admin/custom/media-list).
 async function fetchFiles(): Promise<{ files: MediaFile[] }> {
-  try {
-    return await adminFetch<{ files: MediaFile[] }>("/admin/uploads")
-  } catch (error) {
-    // If the list endpoint doesn't exist, return empty
-    if (error instanceof Error && error.message.includes("404")) {
-      return { files: [] }
-    }
-    throw error
-  }
+  return { files: [] }
 }
 
 // Hooks
@@ -72,6 +70,7 @@ export function useMediaFiles() {
     queryKey: ["media-files"],
     queryFn: fetchFiles,
     staleTime: 30 * 1000,
+    retry: false, // Don't retry — endpoint may not exist in Medusa v2
   })
 }
 
