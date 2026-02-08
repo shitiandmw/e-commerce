@@ -1,6 +1,7 @@
 "use client"
 
 import { formatDistanceToNow } from "date-fns"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { AdminOrder } from "@/lib/admin-api"
 
@@ -63,12 +64,14 @@ function SkeletonRow() {
 }
 
 export function RecentOrders({ orders, loading = false }: RecentOrdersProps) {
+  const t = useTranslations("dashboard.recentOrders")
+
   return (
     <div className="rounded-lg border bg-card shadow-sm">
       <div className="border-b p-6 pb-4">
-        <h2 className="text-lg font-semibold">Recent Orders</h2>
+        <h2 className="text-lg font-semibold">{t("title")}</h2>
         <p className="text-sm text-muted-foreground">
-          Latest orders from your store
+          {t("subtitle")}
         </p>
       </div>
 
@@ -77,11 +80,11 @@ export function RecentOrders({ orders, loading = false }: RecentOrdersProps) {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b bg-muted/50 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                <th className="py-3 px-4">Order</th>
-                <th className="py-3 px-4">Customer</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4">Total</th>
-                <th className="py-3 px-4">Date</th>
+                <th className="py-3 px-4">{t("columns.order")}</th>
+                <th className="py-3 px-4">{t("columns.customer")}</th>
+                <th className="py-3 px-4">{t("columns.status")}</th>
+                <th className="py-3 px-4">{t("columns.total")}</th>
+                <th className="py-3 px-4">{t("columns.date")}</th>
               </tr>
             </thead>
             <tbody>
@@ -110,10 +113,10 @@ export function RecentOrders({ orders, loading = false }: RecentOrdersProps) {
             </svg>
           </div>
           <p className="text-sm font-medium text-muted-foreground">
-            No orders yet
+            {t("noOrders")}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Orders will appear here once customers start purchasing.
+            {t("noOrdersDescription")}
           </p>
         </div>
       ) : (
@@ -121,11 +124,11 @@ export function RecentOrders({ orders, loading = false }: RecentOrdersProps) {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b bg-muted/50 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                <th className="py-3 px-4">Order</th>
-                <th className="py-3 px-4">Customer</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4 text-right">Total</th>
-                <th className="py-3 px-4">Date</th>
+                <th className="py-3 px-4">{t("columns.order")}</th>
+                <th className="py-3 px-4">{t("columns.customer")}</th>
+                <th className="py-3 px-4">{t("columns.status")}</th>
+                <th className="py-3 px-4 text-right">{t("columns.total")}</th>
+                <th className="py-3 px-4">{t("columns.date")}</th>
               </tr>
             </thead>
             <tbody>

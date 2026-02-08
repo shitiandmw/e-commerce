@@ -7,6 +7,7 @@ import {
   DollarSign,
   RefreshCw,
 } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { useDashboardStats } from "@/lib/admin-api"
 import { StatCard } from "@/components/stat-card"
 import { SalesChart, OrdersBarChart } from "@/components/sales-chart"
@@ -27,6 +28,7 @@ function formatNumber(num: number): string {
 }
 
 export default function DashboardPage() {
+  const t = useTranslations("dashboard")
   const { data: stats, isLoading, isError, error } = useDashboardStats()
   const queryClient = useQueryClient()
 
@@ -39,9 +41,9 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
           <p className="text-muted-foreground">
-            Overview of your store performance
+            {t("subtitle")}
           </p>
         </div>
         <button
@@ -52,18 +54,18 @@ export default function DashboardPage() {
           <RefreshCw
             className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
           />
-          Refresh
+          {t("refresh")}
         </button>
       </div>
 
       {/* Error Banner */}
       {isError && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-          <p className="font-medium">Failed to load dashboard data</p>
+          <p className="font-medium">{t("error.title")}</p>
           <p className="mt-1 text-red-600">
             {error instanceof Error
               ? error.message
-              : "Please check your connection and try again."}
+              : t("error.fallbackMessage")}
           </p>
         </div>
       )}
@@ -71,7 +73,7 @@ export default function DashboardPage() {
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title="Total Revenue"
+          title={t("totalRevenue")}
           value={stats ? formatCurrency(stats.totalRevenue) : "0.00"}
           icon={DollarSign}
           change={stats?.revenueChange}
@@ -79,21 +81,21 @@ export default function DashboardPage() {
           prefix="$"
         />
         <StatCard
-          title="Orders"
+          title={t("totalOrders")}
           value={stats ? formatNumber(stats.totalOrders) : "0"}
           icon={ShoppingCart}
           change={stats?.ordersChange}
           loading={isLoading}
         />
         <StatCard
-          title="Customers"
+          title={t("totalCustomers")}
           value={stats ? formatNumber(stats.totalCustomers) : "0"}
           icon={Users}
           change={stats?.customersChange}
           loading={isLoading}
         />
         <StatCard
-          title="Products"
+          title={t("totalProducts")}
           value={stats ? formatNumber(stats.totalProducts) : "0"}
           icon={Package}
           loading={isLoading}
