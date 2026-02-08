@@ -14,6 +14,7 @@ import {
   Store,
   Tag,
   Warehouse,
+  BarChart3,
 } from "lucide-react"
 
 const navigation = [
@@ -23,6 +24,7 @@ const navigation = [
   { name: "Inventory", href: "/inventory", icon: Warehouse },
   { name: "Orders", href: "/orders", icon: ShoppingCart },
   { name: "Customers", href: "/customers", icon: Users },
+  { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Settings", href: "/settings", icon: Settings },
 ]
 
