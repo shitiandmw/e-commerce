@@ -11,7 +11,7 @@ type ViewMode = "grid" | "list"
 
 export default function MediaPage() {
   const t = useTranslations("media")
-  const { data, isLoading, refetch } = useMediaFiles()
+  const { data, isLoading } = useMediaFiles()
   const [viewMode, setViewMode] = React.useState<ViewMode>("grid")
   const [deleteFile, setDeleteFile] = React.useState<MediaFile | null>(null)
 
@@ -30,7 +30,7 @@ export default function MediaPage() {
       {/* Upload Area */}
       <div className="rounded-lg border bg-card p-6 shadow-sm">
         <h2 className="text-lg font-semibold mb-4">{t("upload")}</h2>
-        <MediaUploader onUploadComplete={() => refetch()} />
+        <MediaUploader />
       </div>
 
       {/* Media Library */}

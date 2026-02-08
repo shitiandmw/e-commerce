@@ -33,6 +33,9 @@ ecommerce_redis_data/
 # Build artifacts
 *.tsbuildinfo
 
+# Medusa uploaded files
+static/
+
 # admin-ui
 admin-ui/.next/
 admin-ui/node_modules/

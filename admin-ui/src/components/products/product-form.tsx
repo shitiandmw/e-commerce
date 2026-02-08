@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { RichTextEditor } from "@/components/ui/rich-text-editor"
 import { Select } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -345,11 +346,16 @@ export function ProductForm({ product, mode }: ProductFormProps) {
 
             <div className="space-y-2">
               <Label htmlFor="description">{t("form.descriptionLabel")}</Label>
-              <Textarea
-                id="description"
-                {...register("description")}
-                placeholder={t("form.descriptionPlaceholder")}
-                rows={5}
+              <Controller
+                name="description"
+                control={control}
+                render={({ field }) => (
+                  <RichTextEditor
+                    content={field.value || ""}
+                    onChange={field.onChange}
+                    placeholder={t("form.descriptionPlaceholder")}
+                  />
+                )}
               />
             </div>
 

@@ -53,24 +53,19 @@ async function deleteFile(fileId: string): Promise<void> {
   })
 }
 
-// Fetch all uploaded files
-// Note: Medusa v2 does NOT provide a GET /admin/uploads listing endpoint.
-// The upload API only supports POST (upload) and DELETE (remove).
-// To avoid CORS errors from requesting a non-existent route, we maintain
-// an in-memory list populated by successful uploads in this session.
-// TODO: Replace with a custom backend endpoint when persistent media
-//       listing is needed (e.g. POST /admin/custom/media-list).
-async function fetchFiles(): Promise<{ files: MediaFile[] }> {
-  return { files: [] }
-}
+// Medusa v2 does NOT provide a GET /admin/uploads listing endpoint.
+// We maintain a client-side (session-level) cache inside React Query.
+// Uploaded files are added to the cache on success; deleted files are
+// removed from it.  The cache starts empty on every page load.
 
 // Hooks
 export function useMediaFiles() {
   return useQuery<{ files: MediaFile[] }>({
     queryKey: ["media-files"],
-    queryFn: fetchFiles,
-    staleTime: 30 * 1000,
-    retry: false, // Don't retry — endpoint may not exist in Medusa v2
+    queryFn: () => ({ files: [] }),
+    staleTime: Infinity,       // never refetch — we manage the cache manually
+    gcTime: Infinity,          // keep it alive for the whole session
+    retry: false,
   })
 }
 
@@ -79,8 +74,14 @@ export function useUploadMedia() {
 
   return useMutation({
     mutationFn: (files: File[]) => uploadFiles(files),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["media-files"] })
+    onSuccess: (data) => {
+      // Append newly uploaded files into the query cache
+      queryClient.setQueryData<{ files: MediaFile[] }>(
+        ["media-files"],
+        (old) => ({
+          files: [...(old?.files ?? []), ...data.files],
+        })
+      )
     },
   })
 }
@@ -90,8 +91,14 @@ export function useDeleteMedia() {
 
   return useMutation({
     mutationFn: (fileId: string) => deleteFile(fileId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["media-files"] })
+    onSuccess: (_data, fileId) => {
+      // Remove deleted file from the query cache
+      queryClient.setQueryData<{ files: MediaFile[] }>(
+        ["media-files"],
+        (old) => ({
+          files: (old?.files ?? []).filter((f) => f.id !== fileId),
+        })
+      )
     },
   })
 }
