@@ -12,6 +12,7 @@ import {
   Bar,
   BarChart,
 } from "recharts"
+import { useTranslations } from "next-intl"
 
 interface SalesChartProps {
   data: { month: string; revenue: number; orders: number }[]
@@ -27,6 +28,7 @@ function CustomTooltip({
   payload?: { value: number; name: string; color: string }[]
   label?: string
 }) {
+  const t = useTranslations("dashboard.salesChart")
   if (!active || !payload || payload.length === 0) return null
 
   return (
@@ -39,8 +41,8 @@ function CustomTooltip({
           style={{ color: entry.color }}
         >
           {entry.name === "revenue"
-            ? `Revenue: $${entry.value.toLocaleString("en-US", { minimumFractionDigits: 2 })}`
-            : `Orders: ${entry.value}`}
+            ? `${t("revenueLabel")}: $${entry.value.toLocaleString("en-US", { minimumFractionDigits: 2 })}`
+            : `${t("ordersLabel")}: ${entry.value}`}
         </p>
       ))}
     </div>
@@ -48,6 +50,8 @@ function CustomTooltip({
 }
 
 export function SalesChart({ data, loading = false }: SalesChartProps) {
+  const t = useTranslations("dashboard.salesChart")
+
   if (loading) {
     return (
       <div className="rounded-lg border bg-card p-6 shadow-sm">
@@ -61,14 +65,14 @@ export function SalesChart({ data, loading = false }: SalesChartProps) {
 
   return (
     <div className="rounded-lg border bg-card p-6 shadow-sm">
-      <h2 className="mb-1 text-lg font-semibold">Sales Trend</h2>
+      <h2 className="mb-1 text-lg font-semibold">{t("title")}</h2>
       <p className="mb-4 text-sm text-muted-foreground">
-        Revenue and order volume over the last 6 months
+        {t("subtitle")}
       </p>
 
       {!hasData ? (
         <div className="flex h-[300px] items-center justify-center text-sm text-muted-foreground">
-          No sales data available yet. Data will appear here once orders are placed.
+          {t("noData")}
         </div>
       ) : (
         <div className="h-[300px]">
@@ -116,7 +120,7 @@ export function SalesChart({ data, loading = false }: SalesChartProps) {
               <Legend
                 wrapperStyle={{ fontSize: 12, paddingTop: 16 }}
                 formatter={(value) =>
-                  value === "revenue" ? "Revenue ($)" : "Orders"
+                  value === "revenue" ? t("revenue") : t("orders")
                 }
               />
               <Area
@@ -135,6 +139,8 @@ export function SalesChart({ data, loading = false }: SalesChartProps) {
 }
 
 export function OrdersBarChart({ data, loading = false }: SalesChartProps) {
+  const t = useTranslations("dashboard.ordersChart")
+
   if (loading) {
     return (
       <div className="rounded-lg border bg-card p-6 shadow-sm">
@@ -148,14 +154,14 @@ export function OrdersBarChart({ data, loading = false }: SalesChartProps) {
 
   return (
     <div className="rounded-lg border bg-card p-6 shadow-sm">
-      <h2 className="mb-1 text-lg font-semibold">Order Volume</h2>
+      <h2 className="mb-1 text-lg font-semibold">{t("title")}</h2>
       <p className="mb-4 text-sm text-muted-foreground">
-        Number of orders per month
+        {t("subtitle")}
       </p>
 
       {!hasData ? (
         <div className="flex h-[300px] items-center justify-center text-sm text-muted-foreground">
-          No order data available yet.
+          {t("noData")}
         </div>
       ) : (
         <div className="h-[300px]">

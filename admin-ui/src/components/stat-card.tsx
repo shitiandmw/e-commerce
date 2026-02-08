@@ -1,6 +1,7 @@
 "use client"
 
 import { type LucideIcon } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 
 interface StatCardProps {
@@ -20,6 +21,7 @@ export function StatCard({
   loading = false,
   prefix,
 }: StatCardProps) {
+  const t = useTranslations("dashboard")
   const isPositive = (change ?? 0) >= 0
 
   return (
@@ -49,8 +51,7 @@ export function StatCard({
                   isPositive ? "text-emerald-600" : "text-red-600"
                 )}
               >
-                {isPositive ? "+" : ""}
-                {change}% from last month
+                {t("fromLastMonth", { change: `${isPositive ? "+" : ""}${change}` })}
               </p>
             )}
           </>
