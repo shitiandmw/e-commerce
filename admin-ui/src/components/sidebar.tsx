@@ -17,6 +17,7 @@ import {
   ImageIcon,
   BarChart3,
   Percent,
+  Truck,
 } from "lucide-react"
 import { LanguageSwitcher } from "@/components/language-switcher"
 
@@ -27,6 +28,7 @@ const navigation = [
   { name: "Inventory", href: "/inventory", icon: Warehouse },
   { name: "Orders", href: "/orders", icon: ShoppingCart },
   { name: "Promotions", href: "/promotions", icon: Percent },
+  { name: "Shipping", href: "/shipping", icon: Truck },
   { name: "Customers", href: "/customers", icon: Users },
   { name: "Media", href: "/media", icon: ImageIcon },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
