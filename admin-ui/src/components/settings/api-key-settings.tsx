@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import {
   useApiKeys,
   useCreateApiKey,
@@ -29,6 +30,7 @@ import {
 } from "lucide-react"
 
 export function ApiKeySettings() {
+  const t = useTranslations("settings")
   const { data, isLoading } = useApiKeys()
   const createApiKey = useCreateApiKey()
   const revokeApiKey = useRevokeApiKey()
@@ -82,20 +84,20 @@ export function ApiKeySettings() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Key className="h-5 w-5 text-muted-foreground" />
-            <h2 className="text-lg font-semibold">API Keys</h2>
+            <h2 className="text-lg font-semibold">{t("apiKeys.title")}</h2>
           </div>
           <Button size="sm" onClick={() => setShowCreate(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Create Key
+            {t("apiKeys.createKey")}
           </Button>
         </div>
         <p className="text-sm text-muted-foreground">
-          Manage publishable API keys for your storefront and integrations.
+          {t("apiKeys.description")}
         </p>
 
         {keys.length === 0 ? (
           <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
-            No API keys created yet.
+            {t("apiKeys.noKeys")}
           </div>
         ) : (
           <div className="space-y-3">
@@ -109,9 +111,9 @@ export function ApiKeySettings() {
                     <span className="font-medium">{key.title}</span>
                     <Badge variant="outline">{key.type}</Badge>
                     {key.revoked_at ? (
-                      <Badge variant="destructive">Revoked</Badge>
+                      <Badge variant="destructive">{t("apiKeys.revoked")}</Badge>
                     ) : (
-                      <Badge variant="success">Active</Badge>
+                      <Badge variant="success">{t("apiKeys.active")}</Badge>
                     )}
                   </div>
                   <p className="text-sm font-mono text-muted-foreground truncate">
@@ -119,11 +121,11 @@ export function ApiKeySettings() {
                   </p>
                   <div className="flex gap-4 text-xs text-muted-foreground">
                     <span>
-                      Created {new Date(key.created_at).toLocaleDateString()}
+                      {t("apiKeys.created")} {new Date(key.created_at).toLocaleDateString()}
                     </span>
                     {key.last_used_at && (
                       <span>
-                        Last used{" "}
+                        {t("apiKeys.lastUsed")}{" "}
                         {new Date(key.last_used_at).toLocaleDateString()}
                       </span>
                     )}
@@ -134,7 +136,7 @@ export function ApiKeySettings() {
                     variant="ghost"
                     size="icon"
                     onClick={() => copyToken(key)}
-                    title="Copy key"
+                    title={t("apiKeys.copyKey")}
                   >
                     {copiedId === key.id ? (
                       <Check className="h-4 w-4 text-green-600" />
@@ -147,7 +149,7 @@ export function ApiKeySettings() {
                       variant="ghost"
                       size="icon"
                       onClick={() => setRevokeId(key.id)}
-                      title="Revoke key"
+                      title={t("apiKeys.revokeKey")}
                     >
                       <ShieldOff className="h-4 w-4 text-destructive" />
                     </Button>
@@ -163,29 +165,29 @@ export function ApiKeySettings() {
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
         <DialogContent onClose={() => setShowCreate(false)}>
           <DialogHeader>
-            <DialogTitle>Create API Key</DialogTitle>
+            <DialogTitle>{t("apiKeys.createTitle")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="key-title">Title</Label>
+              <Label htmlFor="key-title">{t("apiKeys.titleLabel")}</Label>
               <Input
                 id="key-title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Storefront Key"
+                placeholder={t("apiKeys.titlePlaceholder")}
               />
             </div>
             {createApiKey.error && (
               <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
                 {createApiKey.error instanceof Error
                   ? createApiKey.error.message
-                  : "Failed to create API key"}
+                  : t("apiKeys.createFailed")}
               </div>
             )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowCreate(false)}>
-              Cancel
+              {t("apiKeys.cancel")}
             </Button>
             <Button
               onClick={handleCreate}
@@ -194,7 +196,7 @@ export function ApiKeySettings() {
               {createApiKey.isPending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : null}
-              Create
+              {t("apiKeys.create")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -204,21 +206,21 @@ export function ApiKeySettings() {
       <Dialog open={!!revokeId} onOpenChange={(open) => !open && setRevokeId(null)}>
         <DialogContent onClose={() => setRevokeId(null)}>
           <DialogHeader>
-            <DialogTitle>Revoke API Key</DialogTitle>
+            <DialogTitle>{t("apiKeys.revokeTitle")}</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground py-4">
-            Are you sure you want to revoke this API key? Any applications using it will lose access immediately.
+            {t("apiKeys.revokeConfirm")}
           </p>
           {revokeApiKey.error && (
             <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
               {revokeApiKey.error instanceof Error
                 ? revokeApiKey.error.message
-                : "Failed to revoke API key"}
+                : t("apiKeys.revokeFailed")}
             </div>
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setRevokeId(null)}>
-              Cancel
+              {t("apiKeys.cancel")}
             </Button>
             <Button
               variant="destructive"
@@ -228,7 +230,7 @@ export function ApiKeySettings() {
               {revokeApiKey.isPending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : null}
-              Revoke
+              {t("apiKeys.revoke")}
             </Button>
           </DialogFooter>
         </DialogContent>
