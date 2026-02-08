@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { format, subDays, subMonths, startOfMonth, endOfMonth, startOfYear } from "date-fns"
 import type { DateGranularity } from "@/hooks/use-analytics"
 
@@ -12,15 +13,23 @@ interface DateRangePickerProps {
   onGranularityChange: (g: DateGranularity) => void
 }
 
-const presets = [
-  { label: "Last 7 days", value: "7d" },
-  { label: "Last 30 days", value: "30d" },
-  { label: "Last 3 months", value: "3m" },
-  { label: "Last 6 months", value: "6m" },
-  { label: "Last 12 months", value: "12m" },
-  { label: "This month", value: "this_month" },
-  { label: "Year to date", value: "ytd" },
-] as const
+const presetKeys: Record<string, string> = {
+  "7d": "dateRangePicker.last7Days",
+  "30d": "dateRangePicker.last30Days",
+  "3m": "dateRangePicker.last3Months",
+  "6m": "dateRangePicker.last6Months",
+  "12m": "dateRangePicker.last12Months",
+  "this_month": "dateRangePicker.thisMonth",
+  "ytd": "dateRangePicker.yearToDate",
+}
+
+const presetValues = ["7d", "30d", "3m", "6m", "12m", "this_month", "ytd"] as const
+
+const granularityKeys: Record<string, string> = {
+  day: "dateRangePicker.day",
+  week: "dateRangePicker.week",
+  month: "dateRangePicker.month",
+}
 
 export function DateRangePicker({
   from,
@@ -29,6 +38,7 @@ export function DateRangePicker({
   onRangeChange,
   onGranularityChange,
 }: DateRangePickerProps) {
+  const t = useTranslations("analytics")
   const [activePreset, setActivePreset] = useState("30d")
 
   const handlePreset = (preset: string) => {
@@ -80,17 +90,17 @@ export function DateRangePicker({
     <div className="flex flex-wrap items-center gap-3">
       {/* Presets */}
       <div className="flex flex-wrap gap-1">
-        {presets.map((p) => (
+        {presetValues.map((value) => (
           <button
-            key={p.value}
-            onClick={() => handlePreset(p.value)}
+            key={value}
+            onClick={() => handlePreset(value)}
             className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-              activePreset === p.value
+              activePreset === value
                 ? "bg-primary text-primary-foreground"
                 : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             }`}
           >
-            {p.label}
+            {t(presetKeys[value])}
           </button>
         ))}
       </div>
@@ -107,7 +117,7 @@ export function DateRangePicker({
                 : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             }`}
           >
-            {g}
+            {t(granularityKeys[g])}
           </button>
         ))}
       </div>

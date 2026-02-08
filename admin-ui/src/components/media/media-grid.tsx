@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { MediaFile } from "@/hooks/use-media"
 import { cn } from "@/lib/utils"
 import {
@@ -40,6 +41,7 @@ export function MediaGrid({
   selectable,
   selectedUrls = [],
 }: MediaGridProps) {
+  const t = useTranslations("media")
   const [copiedId, setCopiedId] = React.useState<string | null>(null)
 
   const copyToClipboard = async (url: string, id: string) => {
@@ -82,9 +84,9 @@ export function MediaGrid({
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <ImageIcon className="h-12 w-12 text-muted-foreground/50 mb-4" />
-        <h3 className="text-lg font-medium">No media files</h3>
+        <h3 className="text-lg font-medium">{t("grid.noFiles")}</h3>
         <p className="text-sm text-muted-foreground mt-1">
-          Upload files to get started
+          {t("grid.uploadToStart")}
         </p>
       </div>
     )
@@ -95,7 +97,7 @@ export function MediaGrid({
       {onViewModeChange && (
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-muted-foreground">
-            {files.length} file{files.length !== 1 ? "s" : ""}
+            {t("grid.fileCount", { count: files.length })}
           </p>
           <ViewModeToggle mode={viewMode} onChange={onViewModeChange} />
         </div>
@@ -230,6 +232,7 @@ function GridItem({
   onCopy,
   copied,
 }: ItemProps) {
+  const t = useTranslations("media")
   const Icon = getFileIcon(file.url)
   const showImage = isImage(file.url)
 
@@ -276,7 +279,7 @@ function GridItem({
                 onCopy(file.url, file.id)
               }}
               className="flex h-7 w-7 items-center justify-center rounded-md bg-white/20 text-white hover:bg-white/30 transition-colors"
-              title="Copy URL"
+              title={t("grid.copyUrl")}
             >
               {copied ? (
                 <Check className="h-3.5 w-3.5" />
@@ -290,7 +293,7 @@ function GridItem({
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
               className="flex h-7 w-7 items-center justify-center rounded-md bg-white/20 text-white hover:bg-white/30 transition-colors"
-              title="Open in new tab"
+              title={t("grid.openInNewTab")}
             >
               <ExternalLink className="h-3.5 w-3.5" />
             </a>
@@ -301,7 +304,7 @@ function GridItem({
                   onDelete(file)
                 }}
                 className="flex h-7 w-7 items-center justify-center rounded-md bg-destructive/80 text-white hover:bg-destructive transition-colors"
-                title="Delete"
+                title={t("grid.delete")}
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
@@ -322,6 +325,7 @@ function ListItem({
   onCopy,
   copied,
 }: ItemProps) {
+  const t = useTranslations("media")
   const Icon = getFileIcon(file.url)
   const showImage = isImage(file.url)
 
@@ -371,7 +375,7 @@ function ListItem({
             e.stopPropagation()
             onCopy(file.url, file.id)
           }}
-          title="Copy URL"
+          title={t("grid.copyUrl")}
         >
           {copied ? (
             <Check className="h-4 w-4 text-green-500" />
@@ -385,7 +389,7 @@ function ListItem({
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
         >
-          <Button variant="ghost" size="icon" className="h-8 w-8" title="Open">
+          <Button variant="ghost" size="icon" className="h-8 w-8" title={t("grid.open")}>
             <ExternalLink className="h-4 w-4" />
           </Button>
         </a>
@@ -398,7 +402,7 @@ function ListItem({
               e.stopPropagation()
               onDelete(file)
             }}
-            title="Delete"
+            title={t("grid.delete")}
           >
             <Trash2 className="h-4 w-4" />
           </Button>

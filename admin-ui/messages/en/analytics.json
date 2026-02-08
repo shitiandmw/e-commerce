@@ -1,11 +1,18 @@
 {
   "analytics": {
     "title": "Analytics",
+    "subtitle": "Advanced reporting and business insights",
+    "refresh": "Refresh",
+    "loadFailed": "Failed to load analytics data",
+    "checkConnection": "Please check your connection and try again.",
+    "customers": "Customers",
     "salesTrend": "Sales Trend",
     "topProducts": "Top 10 Products",
     "customerAnalysis": "Customer Analysis",
     "revenueByBrand": "Revenue by Brand",
+    "revenueByBrandSubtitle": "Revenue distribution across product brands",
     "revenueByCategory": "Revenue by Category",
+    "revenueByCategorySubtitle": "Revenue distribution across product categories",
     "totalRevenue": "Total Revenue",
     "totalOrders": "Total Orders",
     "avgOrderValue": "Avg Order Value",

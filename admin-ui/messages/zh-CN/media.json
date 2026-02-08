@@ -2,6 +2,8 @@
   "media": {
     "title": "媒体资源",
     "upload": "上传文件",
+    "uploadAndManage": "上传和管理您的媒体文件",
+    "mediaLibrary": "媒体库",
     "delete": "删除文件",
     "dragDrop": "点击或拖拽文件上传",
     "noFiles": "暂无媒体文件",
@@ -40,7 +42,7 @@
 
     "deleteDialog": {
       "title": "删除媒体",
-      "confirmMessage": "确定要删除 {fileName} 吗？此操作无法撤销。所有引用此文件的地方将会失效。",
+      "confirmMessage": "确定要删除 <strong>{fileName}</strong> 吗？此操作无法撤销。所有引用此文件的地方将会失效。",
       "deleteFailed": "删除文件失败",
       "cancel": "取消",
       "deleting": "删除中...",

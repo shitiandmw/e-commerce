@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import {
   PieChart,
   Pie,
@@ -24,9 +25,11 @@ const COLORS = ["hsl(221.2, 83.2%, 53.3%)", "hsl(142, 71%, 45%)"]
 function CustomTooltip({
   active,
   payload,
+  t,
 }: {
   active?: boolean
   payload?: Array<{ name: string; value: number; payload: { percent: number } }>
+  t: (key: string) => string
 }) {
   if (!active || !payload || payload.length === 0) return null
   const { name, value } = payload[0]
@@ -34,7 +37,7 @@ function CustomTooltip({
   return (
     <div className="rounded-lg border bg-card p-3 shadow-lg">
       <p className="text-sm font-medium text-foreground">{name}</p>
-      <p className="text-xs text-muted-foreground">{value} customers</p>
+      <p className="text-xs text-muted-foreground">{value} {t("customerAnalysisChart.customers")}</p>
     </div>
   )
 }
@@ -47,6 +50,8 @@ export function CustomerAnalysisChart({
   avgLTV,
   loading = false,
 }: CustomerAnalysisChartProps) {
+  const t = useTranslations("analytics")
+
   if (loading) {
     return (
       <div className="rounded-lg border bg-card p-6 shadow-sm">
@@ -60,14 +65,14 @@ export function CustomerAnalysisChart({
 
   return (
     <div className="rounded-lg border bg-card p-6 shadow-sm">
-      <h2 className="mb-1 text-lg font-semibold">Customer Analysis</h2>
+      <h2 className="mb-1 text-lg font-semibold">{t("customerAnalysisChart.title")}</h2>
       <p className="mb-4 text-sm text-muted-foreground">
-        Customer segmentation and lifetime value
+        {t("customerAnalysisChart.subtitle")}
       </p>
 
       {!hasData ? (
         <div className="flex h-[350px] items-center justify-center text-sm text-muted-foreground">
-          No customer data available for this period.
+          {t("customerAnalysisChart.noData")}
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -93,7 +98,7 @@ export function CustomerAnalysisChart({
                     />
                   ))}
                 </Pie>
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<CustomTooltip t={t} />} />
                 <Legend
                   wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
                   formatter={(value) => (
@@ -107,22 +112,22 @@ export function CustomerAnalysisChart({
           {/* KPI cards */}
           <div className="flex flex-col justify-center space-y-4">
             <div className="rounded-md border p-4">
-              <p className="text-xs font-medium text-muted-foreground">Total Customers</p>
+              <p className="text-xs font-medium text-muted-foreground">{t("customerAnalysisChart.totalCustomers")}</p>
               <p className="mt-1 text-2xl font-bold">{totalCustomers.toLocaleString()}</p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="rounded-md border p-4">
-                <p className="text-xs font-medium text-muted-foreground">New</p>
+                <p className="text-xs font-medium text-muted-foreground">{t("customerAnalysisChart.new")}</p>
                 <p className="mt-1 text-xl font-bold text-blue-600">{newCustomers}</p>
               </div>
               <div className="rounded-md border p-4">
-                <p className="text-xs font-medium text-muted-foreground">Returning</p>
+                <p className="text-xs font-medium text-muted-foreground">{t("customerAnalysisChart.returning")}</p>
                 <p className="mt-1 text-xl font-bold text-emerald-600">{returningCustomers}</p>
               </div>
             </div>
             <div className="rounded-md border p-4">
               <p className="text-xs font-medium text-muted-foreground">
-                Avg. Customer Lifetime Value
+                {t("customerAnalysisChart.avgLifetimeValue")}
               </p>
               <p className="mt-1 text-2xl font-bold">
                 ${avgLTV.toLocaleString("en-US", { minimumFractionDigits: 2 })}

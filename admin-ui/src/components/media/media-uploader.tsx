@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { useUploadMedia } from "@/hooks/use-media"
 import { cn } from "@/lib/utils"
 import { Upload, Loader2, CheckCircle2, AlertCircle, X } from "lucide-react"
@@ -19,6 +20,7 @@ interface MediaUploaderProps {
 }
 
 export function MediaUploader({ onUploadComplete, compact }: MediaUploaderProps) {
+  const t = useTranslations("media")
   const [dragOver, setDragOver] = React.useState(false)
   const [uploadingFiles, setUploadingFiles] = React.useState<UploadingFile[]>([])
   const fileInputRef = React.useRef<HTMLInputElement>(null)
@@ -61,7 +63,7 @@ export function MediaUploader({ onUploadComplete, compact }: MediaUploaderProps)
               ? {
                   ...f,
                   status: "error" as const,
-                  error: err instanceof Error ? err.message : "Upload failed",
+                  error: err instanceof Error ? err.message : t("uploader.uploadFailed"),
                 }
               : f
           )
@@ -129,11 +131,11 @@ export function MediaUploader({ onUploadComplete, compact }: MediaUploaderProps)
           )}
         />
         <p className={cn("font-medium", compact ? "text-xs" : "text-sm")}>
-          {dragOver ? "Drop files here" : "Click or drag files to upload"}
+          {dragOver ? t("uploader.dropHere") : t("uploader.clickOrDrag")}
         </p>
         {!compact && (
           <p className="mt-1 text-xs text-muted-foreground">
-            Supports images, videos, and PDFs
+            {t("uploader.supportedFormats")}
           </p>
         )}
       </div>

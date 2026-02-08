@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { useMediaFiles, MediaFile } from "@/hooks/use-media"
 import {
   Dialog,
@@ -30,6 +31,7 @@ export function MediaPicker({
   multiple = false,
   selectedUrls: initialSelectedUrls = [],
 }: MediaPickerProps) {
+  const t = useTranslations("media")
   const { data, isLoading, refetch } = useMediaFiles()
   const [selectedUrls, setSelectedUrls] = React.useState<string[]>(initialSelectedUrls)
 
@@ -69,13 +71,13 @@ export function MediaPicker({
           <DialogTitle>
             <div className="flex items-center gap-2">
               <ImageIcon className="h-5 w-5" />
-              Select Media
+              {t("picker.title")}
             </div>
           </DialogTitle>
           <DialogDescription>
             {multiple
-              ? "Select one or more files from your media library"
-              : "Select a file from your media library"}
+              ? t("picker.descriptionMultiple")
+              : t("picker.descriptionSingle")}
           </DialogDescription>
         </DialogHeader>
 
@@ -98,18 +100,18 @@ export function MediaPicker({
           <div className="flex items-center justify-between w-full">
             <p className="text-sm text-muted-foreground">
               {selectedUrls.length > 0
-                ? `${selectedUrls.length} file${selectedUrls.length !== 1 ? "s" : ""} selected`
-                : "No files selected"}
+                ? t("picker.filesSelected", { count: selectedUrls.length })
+                : t("picker.noFilesSelected")}
             </p>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
+                {t("picker.cancel")}
               </Button>
               <Button
                 onClick={handleConfirm}
                 disabled={selectedUrls.length === 0}
               >
-                {multiple ? "Add Selected" : "Select"}
+                {multiple ? t("picker.addSelected") : t("picker.select")}
               </Button>
             </div>
           </div>
