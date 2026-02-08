@@ -39,7 +39,7 @@ export function DeleteProductDialog({
           <DialogTitle className="mt-4">{t("deleteDialog.title")}</DialogTitle>
           <DialogDescription>
             {t("deleteDialog.description", {
-              name: product?.title,
+              name: product?.title ?? "",
             })}
           </DialogDescription>
         </DialogHeader>

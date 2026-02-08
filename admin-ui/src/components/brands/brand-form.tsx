@@ -98,7 +98,7 @@ export function BrandForm({ brand, mode }: BrandFormProps) {
             <p className="text-muted-foreground">
               {mode === "create"
                 ? t("createSubtitle")
-                : t("editSubtitle", { name: brand?.name })}
+                : t("editSubtitle", { name: brand?.name ?? "" })}
             </p>
           </div>
         </div>

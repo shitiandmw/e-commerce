@@ -38,7 +38,7 @@ export function DeleteBrandDialog({
           </div>
           <DialogTitle className="mt-4">{t("deleteDialog.title")}</DialogTitle>
           <DialogDescription>
-            {t("deleteDialog.description", { name: brand?.name })}
+            {t("deleteDialog.description", { name: brand?.name ?? "" })}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mt-6">

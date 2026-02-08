@@ -285,7 +285,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
             <p className="text-muted-foreground">
               {mode === "create"
                 ? t("createSubtitle")
-                : t("editSubtitle", { name: product?.title })}
+                : t("editSubtitle", { name: product?.title ?? "" })}
             </p>
           </div>
         </div>
