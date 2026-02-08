@@ -25,6 +25,7 @@
       "discount": "Discount",
       "status": "Status",
       "automatic": "Automatic",
+      "created": "Created",
       "actions": "Actions"
     },
 
@@ -111,7 +112,8 @@
       "page": "Page {current} of {total}",
       "search": "Search promotion codes...",
       "allTypes": "All Types",
-      "filterByType": "Filter by type"
+      "filterByType": "Filter by type",
+      "noResults": "No promotions match your search criteria."
     },
 
     "actions": {

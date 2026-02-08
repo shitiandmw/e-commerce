@@ -1,6 +1,7 @@
 "use client"
 
 import { useParams } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { usePromotion } from "@/hooks/use-promotions"
 import { PromotionForm } from "@/components/promotions/promotion-form"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -9,6 +10,7 @@ import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
 export default function EditPromotionPage() {
+  const t = useTranslations("promotions")
   const params = useParams()
   const promotionId = params.id as string
   const { data, isLoading, isError, error } = usePromotion(promotionId)
@@ -42,14 +44,14 @@ export default function EditPromotionPage() {
         <Link href="/promotions">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Promotions
+            {t("backToPromotions")}
           </Button>
         </Link>
         <div className="rounded-lg border bg-card p-8 text-center">
           <p className="text-destructive">
             {error instanceof Error
               ? error.message
-              : "Promotion not found or failed to load."}
+              : t("promotionNotFound")}
           </p>
         </div>
       </div>

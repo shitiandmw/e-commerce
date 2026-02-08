@@ -1,11 +1,13 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useFulfillmentProviders } from "@/hooks/use-shipping"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Truck } from "lucide-react"
 
 export function FulfillmentProviders() {
+  const t = useTranslations("shipping")
   const { data, isLoading } = useFulfillmentProviders()
 
   if (isLoading) {
@@ -24,15 +26,15 @@ export function FulfillmentProviders() {
     <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
       <div className="flex items-center gap-2">
         <Truck className="h-5 w-5 text-muted-foreground" />
-        <h2 className="text-lg font-semibold">Fulfillment Providers</h2>
+        <h2 className="text-lg font-semibold">{t("providers.title")}</h2>
       </div>
       <p className="text-sm text-muted-foreground">
-        Available fulfillment providers for handling shipments.
+        {t("providers.description")}
       </p>
 
       {providers.length === 0 ? (
         <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
-          No fulfillment providers configured.
+          {t("providers.noProviders")}
         </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -46,7 +48,7 @@ export function FulfillmentProviders() {
                 <span className="font-medium text-sm">{provider.id}</span>
               </div>
               <Badge variant={provider.is_enabled !== false ? "default" : "secondary"}>
-                {provider.is_enabled !== false ? "Enabled" : "Disabled"}
+                {provider.is_enabled !== false ? t("providers.enabled") : t("providers.disabled")}
               </Badge>
             </div>
           ))}

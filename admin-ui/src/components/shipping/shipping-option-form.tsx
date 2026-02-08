@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslations } from "next-intl"
 import {
   useCreateShippingOption,
   useUpdateShippingOption,
@@ -32,6 +33,7 @@ export function ShippingOptionForm({
   onOpenChange,
   editOption,
 }: ShippingOptionFormProps) {
+  const t = useTranslations("shipping")
   const createOption = useCreateShippingOption()
   const updateOption = useUpdateShippingOption(editOption?.id || "")
   const { data: profilesData } = useShippingProfiles()
@@ -117,36 +119,36 @@ export function ShippingOptionForm({
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {editOption ? "Edit Shipping Option" : "Create Shipping Option"}
+            {editOption ? t("options.editOption") : t("options.createOption")}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4 pt-4">
           <div className="space-y-2">
-            <Label htmlFor="option-name">Name</Label>
+            <Label htmlFor="option-name">{t("options.form.name")}</Label>
             <Input
               id="option-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Standard Shipping"
+              placeholder={t("options.form.namePlaceholder")}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="price-type">Price Type</Label>
+            <Label htmlFor="price-type">{t("options.form.priceType")}</Label>
             <Select
               id="price-type"
               value={priceType}
               onChange={(e) => setPriceType(e.target.value)}
             >
-              <option value="flat">Flat Rate</option>
-              <option value="calculated">Calculated</option>
+              <option value="flat">{t("options.form.flatRate")}</option>
+              <option value="calculated">{t("options.form.calculated")}</option>
             </Select>
           </div>
 
           {priceType === "flat" && (
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="amount">Price</Label>
+                <Label htmlFor="amount">{t("options.form.amount")}</Label>
                 <Input
                   id="amount"
                   type="number"
@@ -158,7 +160,7 @@ export function ShippingOptionForm({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="currency">Currency</Label>
+                <Label htmlFor="currency">{t("options.form.currencyCode")}</Label>
                 <Select
                   id="currency"
                   value={currencyCode}
@@ -176,13 +178,13 @@ export function ShippingOptionForm({
 
           {profiles.length > 0 && (
             <div className="space-y-2">
-              <Label htmlFor="shipping-profile">Shipping Profile</Label>
+              <Label htmlFor="shipping-profile">{t("options.form.shippingProfile")}</Label>
               <Select
                 id="shipping-profile"
                 value={shippingProfileId}
                 onChange={(e) => setShippingProfileId(e.target.value)}
               >
-                <option value="">Select a profile</option>
+                <option value="">{t("options.form.selectProfile")}</option>
                 {profiles.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}
@@ -194,13 +196,13 @@ export function ShippingOptionForm({
 
           {providers.length > 0 && (
             <div className="space-y-2">
-              <Label htmlFor="provider">Fulfillment Provider</Label>
+              <Label htmlFor="provider">{t("options.form.provider")}</Label>
               <Select
                 id="provider"
                 value={providerId}
                 onChange={(e) => setProviderId(e.target.value)}
               >
-                <option value="">Select a provider</option>
+                <option value="">{t("options.form.selectProvider")}</option>
                 {providers.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.id}
@@ -212,14 +214,16 @@ export function ShippingOptionForm({
 
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              {t("options.form.cancel")}
             </Button>
             <Button onClick={handleSubmit} disabled={!name.trim() || isPending}>
               {isPending
-                ? "Saving..."
+                ? editOption
+                  ? t("options.form.updating")
+                  : t("options.form.creating")
                 : editOption
-                  ? "Update"
-                  : "Create"}
+                  ? t("options.form.update")
+                  : t("options.form.create")}
             </Button>
           </div>
         </div>

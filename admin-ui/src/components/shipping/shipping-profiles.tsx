@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import {
   useShippingProfiles,
   useCreateShippingProfile,
@@ -21,6 +22,7 @@ import { Select } from "@/components/ui/select"
 import { Plus, Trash2, BoxIcon } from "lucide-react"
 
 export function ShippingProfiles() {
+  const t = useTranslations("shipping")
   const { data, isLoading } = useShippingProfiles()
   const createProfile = useCreateShippingProfile()
   const deleteProfile = useDeleteShippingProfile()
@@ -44,7 +46,7 @@ export function ShippingProfiles() {
   }
 
   const handleDelete = (id: string) => {
-    if (!confirm("Are you sure you want to delete this shipping profile?")) return
+    if (!confirm(t("profiles.deleteConfirm"))) return
     deleteProfile.mutate(id)
   }
 
@@ -64,50 +66,50 @@ export function ShippingProfiles() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <BoxIcon className="h-5 w-5 text-muted-foreground" />
-          <h2 className="text-lg font-semibold">Shipping Profiles</h2>
+          <h2 className="text-lg font-semibold">{t("profiles.title")}</h2>
         </div>
         <Button size="sm" onClick={() => setOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Profile
+          {t("profiles.addProfile")}
         </Button>
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create Shipping Profile</DialogTitle>
+            <DialogTitle>{t("profiles.addProfile")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div className="space-y-2">
-              <Label htmlFor="profile-name">Name</Label>
+              <Label htmlFor="profile-name">{t("profiles.form.name")}</Label>
               <Input
                 id="profile-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Default Shipping"
+                placeholder={t("profiles.form.namePlaceholder")}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="profile-type">Type</Label>
+              <Label htmlFor="profile-type">{t("profiles.form.type")}</Label>
               <Select
                 id="profile-type"
                 value={type}
                 onChange={(e) => setType(e.target.value)}
               >
-                <option value="default">Default</option>
-                <option value="gift_card">Gift Card</option>
-                <option value="custom">Custom</option>
+                <option value="default">{t("profiles.form.default")}</option>
+                <option value="gift_card">{t("profiles.form.giftCard")}</option>
+                <option value="custom">{t("profiles.form.custom")}</option>
               </Select>
             </div>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setOpen(false)}>
-                Cancel
+                {t("profiles.form.cancel")}
               </Button>
               <Button
                 onClick={handleCreate}
                 disabled={!name.trim() || createProfile.isPending}
               >
-                {createProfile.isPending ? "Creating..." : "Create"}
+                {createProfile.isPending ? t("profiles.form.creating") : t("profiles.form.create")}
               </Button>
             </div>
           </div>
@@ -115,12 +117,12 @@ export function ShippingProfiles() {
       </Dialog>
 
       <p className="text-sm text-muted-foreground">
-        Shipping profiles group products that share the same shipping requirements.
+        {t("profiles.description")}
       </p>
 
       {profiles.length === 0 ? (
         <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
-          No shipping profiles configured.
+          {t("profiles.noProfiles")}
         </div>
       ) : (
         <div className="space-y-3">

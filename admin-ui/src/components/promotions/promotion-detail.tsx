@@ -29,25 +29,26 @@ import {
   Loader2,
 } from "lucide-react"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { format } from "date-fns"
 
-function getStatusInfo(promotion: Promotion) {
+function getStatusInfo(promotion: Promotion, t: (key: string) => string) {
   const now = new Date()
   if (promotion.ends_at && new Date(promotion.ends_at) < now) {
-    return <Badge variant="destructive">Expired</Badge>
+    return <Badge variant="destructive">{t("status.expired")}</Badge>
   }
   if (promotion.starts_at && new Date(promotion.starts_at) > now) {
-    return <Badge variant="warning">Scheduled</Badge>
+    return <Badge variant="warning">{t("status.scheduled")}</Badge>
   }
-  return <Badge variant="success">Active</Badge>
+  return <Badge variant="success">{t("status.active")}</Badge>
 }
 
-function getTypeBadge(type: Promotion["type"]) {
+function getTypeBadge(type: Promotion["type"], t: (key: string) => string) {
   switch (type) {
     case "standard":
-      return <Badge variant="secondary">Standard</Badge>
+      return <Badge variant="secondary">{t("type.standard")}</Badge>
     case "buyget":
-      return <Badge variant="warning">Buy X Get Y</Badge>
+      return <Badge variant="warning">{t("type.buyget")}</Badge>
     default:
       return <Badge variant="outline">{type}</Badge>
   }
@@ -66,14 +67,14 @@ function formatDiscountValue(promotion: Promotion) {
   }).format(method.value)
 }
 
-function formatTargetType(target: string) {
+function formatTargetType(target: string, t: (key: string) => string) {
   switch (target) {
     case "order":
-      return "Entire Order"
+      return t("form.entireOrder")
     case "items":
-      return "Specific Items"
+      return t("form.specificItems")
     case "shipping_methods":
-      return "Shipping Methods"
+      return t("form.shippingMethods")
     default:
       return target
   }
@@ -84,6 +85,7 @@ interface PromotionDetailProps {
 }
 
 export function PromotionDetail({ promotionId }: PromotionDetailProps) {
+  const t = useTranslations("promotions")
   const router = useRouter()
   const { data, isLoading, isError, error } = usePromotion(promotionId)
   const deletePromotion = useDeletePromotion()
@@ -130,14 +132,14 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
         <Link href="/promotions">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Promotions
+            {t("backToPromotions")}
           </Button>
         </Link>
         <div className="rounded-lg border bg-card p-8 text-center">
           <p className="text-destructive">
             {error instanceof Error
               ? error.message
-              : "Promotion not found or failed to load."}
+              : t("promotionNotFound")}
           </p>
         </div>
       </div>
@@ -159,11 +161,11 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
               <h1 className="text-3xl font-bold tracking-tight font-mono">
                 {promotion.code}
               </h1>
-              {getStatusInfo(promotion)}
-              {getTypeBadge(promotion.type)}
+              {getStatusInfo(promotion, t)}
+              {getTypeBadge(promotion.type, t)}
             </div>
             <p className="text-muted-foreground mt-1">
-              {promotion.is_automatic ? "Automatic promotion" : "Manual code"}
+              {promotion.is_automatic ? t("application.automaticPromotion") : t("application.manualCode")}
             </p>
           </div>
         </div>
@@ -171,7 +173,7 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
           <Link href={`/promotions/${promotionId}/edit`}>
             <Button variant="outline">
               <Pencil className="mr-2 h-4 w-4" />
-              Edit
+              {t("actions.edit")}
             </Button>
           </Link>
           <Button
@@ -179,7 +181,7 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
             onClick={() => setShowDeleteDialog(true)}
           >
             <Trash2 className="mr-2 h-4 w-4" />
-            Delete
+            {t("actions.delete")}
           </Button>
         </div>
       </div>
@@ -191,13 +193,13 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Percent className="h-5 w-5" />
-              Discount Details
+              {t("detail.promotionDetails")}
             </h2>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <p className="text-sm font-medium text-muted-foreground mb-1">
-                  Discount Type
+                  {t("detail.promotionType")}
                 </p>
                 <p className="text-sm capitalize">
                   {promotion.application_method?.type || "-"}
@@ -205,7 +207,7 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground mb-1">
-                  Discount Value
+                  {t("detail.discountValue")}
                 </p>
                 <p className="text-lg font-semibold">
                   {formatDiscountValue(promotion)}
@@ -213,18 +215,19 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground mb-1">
-                  Applies To
+                  {t("detail.appliesTo")}
                 </p>
                 <p className="text-sm">
                   {formatTargetType(
-                    promotion.application_method?.target_type || "-"
+                    promotion.application_method?.target_type || "-",
+                    t
                   )}
                 </p>
               </div>
               {promotion.application_method?.allocation && (
                 <div>
                   <p className="text-sm font-medium text-muted-foreground mb-1">
-                    Allocation
+                    {t("detail.allocation")}
                   </p>
                   <p className="text-sm capitalize">
                     {promotion.application_method.allocation}
@@ -239,7 +242,7 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
             <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <Zap className="h-5 w-5" />
-                Rules
+                {t("detail.rules")}
               </h2>
               <div className="space-y-3">
                 {promotion.rules.map((rule, i) => (
@@ -262,32 +265,32 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
         <div className="space-y-6">
           {/* Quick Info */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
-            <h2 className="text-lg font-semibold">Quick Info</h2>
+            <h2 className="text-lg font-semibold">{t("detail.quickInfo")}</h2>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Status</span>
-                {getStatusInfo(promotion)}
+                <span className="text-sm text-muted-foreground">{t("columns.status")}</span>
+                {getStatusInfo(promotion, t)}
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Type</span>
-                {getTypeBadge(promotion.type)}
+                <span className="text-sm text-muted-foreground">{t("columns.type")}</span>
+                {getTypeBadge(promotion.type, t)}
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">
-                  Automatic
+                  {t("detail.automatic")}
                 </span>
                 <span className="text-sm font-medium">
-                  {promotion.is_automatic ? "Yes" : "No"}
+                  {promotion.is_automatic ? t("detail.yes") : t("detail.no")}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Created</span>
+                <span className="text-sm text-muted-foreground">{t("detail.created")}</span>
                 <span className="text-sm">
                   {format(new Date(promotion.created_at), "MMM d, yyyy")}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Updated</span>
+                <span className="text-sm text-muted-foreground">{t("detail.updated")}</span>
                 <span className="text-sm">
                   {format(new Date(promotion.updated_at), "MMM d, yyyy")}
                 </span>
@@ -299,12 +302,12 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              Schedule
+              {t("schedule.title")}
             </h2>
             <div className="space-y-3">
               <div>
                 <p className="text-sm font-medium text-muted-foreground mb-1">
-                  Start Date
+                  {t("schedule.startDate")}
                 </p>
                 <p className="text-sm">
                   {promotion.starts_at
@@ -312,12 +315,12 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
                         new Date(promotion.starts_at),
                         "MMM d, yyyy HH:mm"
                       )
-                    : "No start date (active immediately)"}
+                    : t("detail.notSet")}
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground mb-1">
-                  End Date
+                  {t("schedule.endDate")}
                 </p>
                 <p className="text-sm">
                   {promotion.ends_at
@@ -325,7 +328,7 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
                         new Date(promotion.ends_at),
                         "MMM d, yyyy HH:mm"
                       )
-                    : "No end date (runs indefinitely)"}
+                    : t("detail.notSet")}
                 </p>
               </div>
             </div>
@@ -336,7 +339,7 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
             <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <Tag className="h-5 w-5" />
-                Campaign
+                {t("detail.campaign")}
               </h2>
               <p className="text-sm font-medium">{promotion.campaign.name}</p>
             </div>
@@ -345,7 +348,7 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
           {/* Promotion ID */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-2">
             <p className="text-sm font-medium text-muted-foreground">
-              Promotion ID
+              {t("detail.promotionId")}
             </p>
             <code className="text-xs bg-muted px-2 py-1 rounded block break-all">
               {promotion.id}
@@ -358,10 +361,9 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Promotion</DialogTitle>
+            <DialogTitle>{t("deleteTitle")}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete the promotion{" "}
-              <strong>{promotion.code}</strong>? This action cannot be undone.
+              {t("deleteConfirm", { code: promotion.code })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -369,7 +371,7 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
               variant="outline"
               onClick={() => setShowDeleteDialog(false)}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               variant="destructive"
@@ -379,10 +381,10 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
               {deletePromotion.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
+                  {t("deleting")}
                 </>
               ) : (
-                "Delete"
+                t("delete")
               )}
             </Button>
           </DialogFooter>

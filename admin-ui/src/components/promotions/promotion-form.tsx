@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -49,6 +50,7 @@ function toDatetimeLocal(isoString?: string | null): string {
 
 export function PromotionForm({ promotion, mode }: PromotionFormProps) {
   const router = useRouter()
+  const t = useTranslations("promotions")
   const createPromotion = useCreatePromotion()
   const updatePromotion = useUpdatePromotion(promotion?.id || "")
 
@@ -142,12 +144,12 @@ export function PromotionForm({ promotion, mode }: PromotionFormProps) {
           </Link>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
-              {mode === "create" ? "Create Promotion" : "Edit Promotion"}
+              {mode === "create" ? t("createPromotion") : t("editPromotion")}
             </h1>
             <p className="text-muted-foreground">
               {mode === "create"
-                ? "Set up a new discount promotion"
-                : `Editing ${promotion?.code}`}
+                ? t("createSubtitle")
+                : t("editing", { code: promotion?.code ?? "" })}
             </p>
           </div>
         </div>
@@ -155,12 +157,12 @@ export function PromotionForm({ promotion, mode }: PromotionFormProps) {
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Saving...
+              {t("saving")}
             </>
           ) : (
             <>
               <Save className="mr-2 h-4 w-4" />
-              {mode === "create" ? "Create Promotion" : "Save Changes"}
+              {mode === "create" ? t("createPromotion") : t("saveChanges")}
             </>
           )}
         </Button>
@@ -171,7 +173,7 @@ export function PromotionForm({ promotion, mode }: PromotionFormProps) {
         <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">
           {mutationError instanceof Error
             ? mutationError.message
-            : "An error occurred"}
+            : t("errorOccurred")}
         </div>
       )}
 
@@ -180,14 +182,14 @@ export function PromotionForm({ promotion, mode }: PromotionFormProps) {
         <div className="space-y-6 lg:col-span-2">
           {/* Basic Info */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
-            <h2 className="text-lg font-semibold">Basic Information</h2>
+            <h2 className="text-lg font-semibold">{t("form.basicInfo")}</h2>
 
             <div className="space-y-2">
-              <Label htmlFor="code">Promotion Code *</Label>
+              <Label htmlFor="code">{t("form.code")}</Label>
               <Input
                 id="code"
                 {...register("code")}
-                placeholder="e.g. SUMMER20"
+                placeholder={t("form.codePlaceholder")}
                 className="uppercase"
               />
               {errors.code && (
@@ -199,23 +201,23 @@ export function PromotionForm({ promotion, mode }: PromotionFormProps) {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="type">Promotion Type</Label>
+                <Label htmlFor="type">{t("form.promotionType")}</Label>
                 <Select id="type" {...register("type")}>
-                  <option value="standard">Standard</option>
-                  <option value="buyget">Buy X Get Y</option>
+                  <option value="standard">{t("type.standard")}</option>
+                  <option value="buyget">{t("type.buyget")}</option>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="is_automatic">Application</Label>
+                <Label htmlFor="is_automatic">{t("form.applicationMode")}</Label>
                 <Select
                   id="is_automatic"
                   {...register("is_automatic", {
                     setValueAs: (v) => v === "true",
                   })}
                 >
-                  <option value="false">Manual (code required)</option>
-                  <option value="true">Automatic</option>
+                  <option value="false">{t("application.manual")}</option>
+                  <option value="true">{t("application.automatic")}</option>
                 </Select>
               </div>
             </div>
@@ -223,20 +225,20 @@ export function PromotionForm({ promotion, mode }: PromotionFormProps) {
 
           {/* Discount Configuration */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
-            <h2 className="text-lg font-semibold">Discount Configuration</h2>
+            <h2 className="text-lg font-semibold">{t("form.discountConfig")}</h2>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="discount_type">Discount Type</Label>
+                <Label htmlFor="discount_type">{t("form.discountType")}</Label>
                 <Select id="discount_type" {...register("discount_type")}>
-                  <option value="percentage">Percentage</option>
-                  <option value="fixed">Fixed Amount</option>
+                  <option value="percentage">{t("form.percentage")}</option>
+                  <option value="fixed">{t("form.fixedAmount")}</option>
                 </Select>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="discount_value">
-                  Discount Value *{" "}
+                  {t("form.discountValue")}{" "}
                   {discountType === "percentage" ? "(%)" : ""}
                 </Label>
                 <Input
@@ -256,7 +258,7 @@ export function PromotionForm({ promotion, mode }: PromotionFormProps) {
 
             {discountType === "fixed" && (
               <div className="space-y-2">
-                <Label htmlFor="currency_code">Currency</Label>
+                <Label htmlFor="currency_code">{t("form.currency")}</Label>
                 <Select id="currency_code" {...register("currency_code")}>
                   <option value="usd">USD</option>
                   <option value="eur">EUR</option>
@@ -269,20 +271,20 @@ export function PromotionForm({ promotion, mode }: PromotionFormProps) {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="target_type">Applies To</Label>
+                <Label htmlFor="target_type">{t("form.appliesTo")}</Label>
                 <Select id="target_type" {...register("target_type")}>
-                  <option value="order">Entire Order</option>
-                  <option value="items">Specific Items</option>
-                  <option value="shipping_methods">Shipping Methods</option>
+                  <option value="order">{t("form.entireOrder")}</option>
+                  <option value="items">{t("form.specificItems")}</option>
+                  <option value="shipping_methods">{t("form.shippingMethods")}</option>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="allocation">Allocation</Label>
+                <Label htmlFor="allocation">{t("form.allocation")}</Label>
                 <Select id="allocation" {...register("allocation")}>
-                  <option value="">None</option>
-                  <option value="each">Each Item</option>
-                  <option value="across">Across Items</option>
+                  <option value="">{t("form.none")}</option>
+                  <option value="each">{t("form.eachItem")}</option>
+                  <option value="across">{t("form.acrossItems")}</option>
                 </Select>
               </div>
             </div>
@@ -293,10 +295,10 @@ export function PromotionForm({ promotion, mode }: PromotionFormProps) {
         <div className="space-y-6">
           {/* Schedule */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
-            <h2 className="text-lg font-semibold">Schedule</h2>
+            <h2 className="text-lg font-semibold">{t("schedule.title")}</h2>
 
             <div className="space-y-2">
-              <Label htmlFor="starts_at">Start Date</Label>
+              <Label htmlFor="starts_at">{t("schedule.startDate")}</Label>
               <Input
                 id="starts_at"
                 type="datetime-local"
@@ -305,7 +307,7 @@ export function PromotionForm({ promotion, mode }: PromotionFormProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="ends_at">End Date</Label>
+              <Label htmlFor="ends_at">{t("schedule.endDate")}</Label>
               <Input
                 id="ends_at"
                 type="datetime-local"
