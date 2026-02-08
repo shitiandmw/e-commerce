@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { useCustomers } from "@/hooks/use-customers"
 import { Search, ChevronLeft, ChevronRight, Users, Eye } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -12,6 +13,7 @@ import { useCustomerExport } from "@/hooks/use-import-export"
 const PAGE_SIZE = 10
 
 export default function CustomersPage() {
+  const t = useTranslations("customers")
   const [search, setSearch] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
   const [currentPage, setCurrentPage] = useState(0)
@@ -41,16 +43,16 @@ export default function CustomersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
           <p className="text-muted-foreground">
-            Manage your customers and view their details
+            {t("description")}
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <ExportButton onExport={exportCustomers} label="Export" size="sm" />
+          <ExportButton onExport={exportCustomers} label={t("table.export")} size="sm" />
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Users className="h-4 w-4" />
-            <span>{data?.count ?? 0} total</span>
+            <span>{t("totalLabel", { count: data?.count ?? 0 })}</span>
           </div>
         </div>
       </div>
@@ -61,7 +63,7 @@ export default function CustomersPage() {
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
-            placeholder="Search customers by name or email..."
+            placeholder={t("searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="h-10 w-full rounded-md border border-input bg-background pl-10 pr-4 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
@@ -77,16 +79,16 @@ export default function CustomersPage() {
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <p className="text-sm text-destructive">Failed to load customers</p>
+            <p className="text-sm text-destructive">{t("table.failedToLoad")}</p>
             <p className="text-xs text-muted-foreground mt-1">
-              Please check your connection and try again.
+              {t("table.checkConnection")}
             </p>
           </div>
         ) : customers.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <Users className="h-10 w-10 text-muted-foreground/50 mb-3" />
             <p className="text-sm text-muted-foreground">
-              {debouncedSearch ? "No customers found matching your search" : "No customers yet"}
+              {debouncedSearch ? t("table.noMatchingCustomers") : t("table.noCustomersYet")}
             </p>
           </div>
         ) : (
@@ -96,22 +98,22 @@ export default function CustomersPage() {
                 <thead>
                   <tr className="border-b bg-muted/50">
                     <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Customer
+                      {t("columns.customer")}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Email
+                      {t("columns.email")}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Phone
+                      {t("columns.phone")}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Account
+                      {t("columns.account")}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Registered
+                      {t("columns.registered")}
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Actions
+                      {t("columns.actions")}
                     </th>
                   </tr>
                 </thead>
@@ -162,7 +164,7 @@ export default function CustomersPage() {
                                 : "bg-gray-50 text-gray-600 ring-1 ring-inset ring-gray-500/10"
                             )}
                           >
-                            {customer.has_account ? "Registered" : "Guest"}
+                            {customer.has_account ? t("accountStatus.registered") : t("accountStatus.guest")}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
@@ -174,7 +176,7 @@ export default function CustomersPage() {
                             className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"
                           >
                             <Eye className="h-4 w-4" />
-                            View
+                            {t("table.view")}
                           </Link>
                         </td>
                       </tr>
@@ -188,9 +190,11 @@ export default function CustomersPage() {
             {totalPages > 1 && (
               <div className="flex items-center justify-between border-t px-6 py-3">
                 <p className="text-sm text-muted-foreground">
-                  Showing {currentPage * PAGE_SIZE + 1} to{" "}
-                  {Math.min((currentPage + 1) * PAGE_SIZE, data!.count)} of{" "}
-                  {data!.count} customers
+                  {t("table.showingPagination", {
+                    from: currentPage * PAGE_SIZE + 1,
+                    to: Math.min((currentPage + 1) * PAGE_SIZE, data!.count),
+                    total: data!.count,
+                  })}
                 </p>
                 <div className="flex items-center gap-2">
                   <button
@@ -201,7 +205,10 @@ export default function CustomersPage() {
                     <ChevronLeft className="h-4 w-4" />
                   </button>
                   <span className="text-sm text-muted-foreground">
-                    Page {currentPage + 1} of {totalPages}
+                    {t("table.pageOf", {
+                      page: currentPage + 1,
+                      total: totalPages,
+                    })}
                   </span>
                   <button
                     onClick={() =>

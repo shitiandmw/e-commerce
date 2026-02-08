@@ -13,7 +13,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { AdminOrder } from "@/hooks/use-orders"
-import { AlertTriangle, Ban, CheckCircle, Truck, RotateCcw } from "lucide-react"
+import { AlertTriangle, Ban, CheckCircle, RotateCcw } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 // ---- Cancel Order Dialog ----
 
@@ -32,27 +33,24 @@ export function CancelOrderDialog({
   onConfirm,
   isLoading,
 }: CancelOrderDialogProps) {
+  const t = useTranslations("orders")
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent onClose={() => onOpenChange(false)}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Ban className="h-5 w-5 text-destructive" />
-            Cancel Order
+            {t("dialogs.cancel.title")}
           </DialogTitle>
           <DialogDescription>
-            Are you sure you want to cancel order{" "}
-            <strong>#{order?.display_id}</strong>? This action cannot be undone.
+            {t("dialogs.cancel.description", { id: String(order?.display_id) })}
           </DialogDescription>
         </DialogHeader>
         <div className="rounded-md bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive">
           <div className="flex items-start gap-2">
             <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
-            <p>
-              Canceling this order will void any pending payments and prevent
-              further fulfillment. If the payment has already been captured, you
-              may need to issue a refund separately.
-            </p>
+            <p>{t("dialogs.cancel.warning")}</p>
           </div>
         </div>
         <DialogFooter className="mt-4">
@@ -61,14 +59,14 @@ export function CancelOrderDialog({
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
           >
-            Keep Order
+            {t("dialogs.cancel.keepOrder")}
           </Button>
           <Button
             variant="destructive"
             onClick={onConfirm}
             disabled={isLoading}
           >
-            {isLoading ? "Canceling..." : "Cancel Order"}
+            {isLoading ? t("dialogs.cancel.canceling") : t("dialogs.cancel.cancelOrder")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -93,17 +91,18 @@ export function CompleteOrderDialog({
   onConfirm,
   isLoading,
 }: CompleteOrderDialogProps) {
+  const t = useTranslations("orders")
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent onClose={() => onOpenChange(false)}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CheckCircle className="h-5 w-5 text-green-600" />
-            Complete Order
+            {t("dialogs.complete.title")}
           </DialogTitle>
           <DialogDescription>
-            Mark order <strong>#{order?.display_id}</strong> as completed? This
-            indicates the order has been fully processed and delivered.
+            {t("dialogs.complete.description", { id: String(order?.display_id) })}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mt-4">
@@ -112,10 +111,10 @@ export function CompleteOrderDialog({
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
           >
-            Cancel
+            {t("dialogs.complete.cancel")}
           </Button>
           <Button onClick={onConfirm} disabled={isLoading}>
-            {isLoading ? "Completing..." : "Complete Order"}
+            {isLoading ? t("dialogs.complete.completing") : t("dialogs.complete.completeOrder")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -147,6 +146,7 @@ export function RefundDialog({
   onConfirm,
   isLoading,
 }: RefundDialogProps) {
+  const t = useTranslations("orders")
   const [amount, setAmount] = React.useState("")
   const [error, setError] = React.useState("")
 
@@ -178,17 +178,19 @@ export function RefundDialog({
   const handleSubmit = async () => {
     const numAmount = parseFloat(amount)
     if (isNaN(numAmount) || numAmount <= 0) {
-      setError("Please enter a valid refund amount.")
+      setError(t("dialogs.refund.invalidAmount"))
       return
     }
     if (numAmount > maxRefundAmount) {
       setError(
-        `Amount exceeds the maximum refundable amount of ${formatCurrency(maxRefundAmount * 100, order?.currency_code || "usd")}.`
+        t("dialogs.refund.exceedsMax", {
+          amount: formatCurrency(maxRefundAmount * 100, order?.currency_code || "usd"),
+        })
       )
       return
     }
     if (!capturedPayment) {
-      setError("No captured payment found for this order.")
+      setError(t("dialogs.refund.noCapturedPayment"))
       return
     }
     setError("")
@@ -201,10 +203,10 @@ export function RefundDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <RotateCcw className="h-5 w-5 text-orange-600" />
-            Refund Order
+            {t("dialogs.refund.title")}
           </DialogTitle>
           <DialogDescription>
-            Issue a refund for order <strong>#{order?.display_id}</strong>.
+            {t("dialogs.refund.description", { id: String(order?.display_id) })}
           </DialogDescription>
         </DialogHeader>
 
@@ -212,14 +214,14 @@ export function RefundDialog({
           {capturedPayment ? (
             <>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Payment ID</span>
+                <span className="text-muted-foreground">{t("dialogs.refund.paymentId")}</span>
                 <code className="bg-muted px-2 py-0.5 rounded text-xs">
                   {capturedPayment.id.slice(0, 20)}...
                 </code>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">
-                  Max Refundable Amount
+                  {t("dialogs.refund.maxRefundable")}
                 </span>
                 <span className="font-medium">
                   {formatCurrency(
@@ -229,7 +231,7 @@ export function RefundDialog({
                 </span>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="refund-amount">Refund Amount ($)</Label>
+                <Label htmlFor="refund-amount">{t("dialogs.refund.refundAmountLabel")}</Label>
                 <Input
                   id="refund-amount"
                   type="number"
@@ -241,7 +243,7 @@ export function RefundDialog({
                     setAmount(e.target.value)
                     setError("")
                   }}
-                  placeholder="Enter refund amount"
+                  placeholder={t("dialogs.refund.refundAmountPlaceholder")}
                 />
               </div>
             </>
@@ -249,10 +251,7 @@ export function RefundDialog({
             <div className="rounded-md bg-yellow-50 border border-yellow-200 p-3 text-sm text-yellow-800">
               <div className="flex items-start gap-2">
                 <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
-                <p>
-                  No captured payment found for this order. Refund is not
-                  available.
-                </p>
+                <p>{t("dialogs.refund.noPaymentFound")}</p>
               </div>
             </div>
           )}
@@ -268,14 +267,14 @@ export function RefundDialog({
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
           >
-            Cancel
+            {t("dialogs.refund.cancel")}
           </Button>
           <Button
             variant="destructive"
             onClick={handleSubmit}
             disabled={isLoading || !capturedPayment}
           >
-            {isLoading ? "Processing..." : "Issue Refund"}
+            {isLoading ? t("dialogs.refund.processing") : t("dialogs.refund.issueRefund")}
           </Button>
         </DialogFooter>
       </DialogContent>

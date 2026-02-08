@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { useCustomer, useCustomerOrders } from "@/hooks/use-customers"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
@@ -25,6 +26,7 @@ type Tab = "info" | "orders" | "addresses"
 export default function CustomerDetailPage() {
   const params = useParams()
   const router = useRouter()
+  const t = useTranslations("customers")
   const customerId = params.id as string
   const [activeTab, setActiveTab] = useState<Tab>("info")
 
@@ -46,12 +48,12 @@ export default function CustomerDetailPage() {
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Customers
+          {t("detail.backToCustomers")}
         </button>
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <p className="text-sm text-destructive">Customer not found</p>
+          <p className="text-sm text-destructive">{t("detail.customerNotFound")}</p>
           <p className="text-xs text-muted-foreground mt-1">
-            The customer may have been deleted or does not exist.
+            {t("detail.customerNotFoundDescription")}
           </p>
         </div>
       </div>
@@ -71,9 +73,9 @@ export default function CustomerDetailPage() {
     : customer.email[0].toUpperCase()
 
   const tabs: { key: Tab; label: string; icon: typeof User }[] = [
-    { key: "info", label: "Information", icon: User },
-    { key: "orders", label: "Orders", icon: ShoppingCart },
-    { key: "addresses", label: "Addresses", icon: MapPin },
+    { key: "info", label: t("detail.tabs.information"), icon: User },
+    { key: "orders", label: t("detail.tabs.orders"), icon: ShoppingCart },
+    { key: "addresses", label: t("detail.tabs.addresses"), icon: MapPin },
   ]
 
   return (
@@ -84,7 +86,7 @@ export default function CustomerDetailPage() {
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to Customers
+        {t("detail.backToCustomers")}
       </button>
 
       {/* Header */}
@@ -109,7 +111,7 @@ export default function CustomerDetailPage() {
                     : "bg-gray-50 text-gray-600 ring-1 ring-inset ring-gray-500/10"
                 )}
               >
-                {customer.has_account ? "Registered" : "Guest"}
+                {customer.has_account ? t("accountStatus.registered") : t("accountStatus.guest")}
               </span>
             </div>
           </div>
@@ -119,7 +121,7 @@ export default function CustomerDetailPage() {
           className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
         >
           <Pencil className="h-4 w-4" />
-          Edit Customer
+          {t("detail.editCustomer")}
         </Link>
       </div>
 
@@ -146,10 +148,10 @@ export default function CustomerDetailPage() {
 
       {/* Tab Content */}
       <div>
-        {activeTab === "info" && <CustomerInfoTab customer={customer} />}
-        {activeTab === "orders" && <CustomerOrdersTab customerId={customerId} />}
+        {activeTab === "info" && <CustomerInfoTab customer={customer} t={t} />}
+        {activeTab === "orders" && <CustomerOrdersTab customerId={customerId} t={t} />}
         {activeTab === "addresses" && (
-          <CustomerAddressesTab customer={customer} />
+          <CustomerAddressesTab customer={customer} t={t} />
         )}
       </div>
     </div>
@@ -160,45 +162,49 @@ export default function CustomerDetailPage() {
 /*  Info Tab                                                          */
 /* ------------------------------------------------------------------ */
 
+type TranslationFn = ReturnType<typeof useTranslations<"customers">>
+
 function CustomerInfoTab({
   customer,
+  t,
 }: {
   customer: NonNullable<ReturnType<typeof useCustomer>["data"]>
+  t: TranslationFn
 }) {
   const infoFields = [
     {
       icon: User,
-      label: "First Name",
+      label: t("detail.info.firstName"),
       value: customer.first_name,
     },
     {
       icon: User,
-      label: "Last Name",
+      label: t("detail.info.lastName"),
       value: customer.last_name,
     },
     {
       icon: Mail,
-      label: "Email",
+      label: t("detail.info.email"),
       value: customer.email,
     },
     {
       icon: Phone,
-      label: "Phone",
+      label: t("detail.info.phone"),
       value: customer.phone,
     },
     {
       icon: Building2,
-      label: "Company",
+      label: t("detail.info.company"),
       value: customer.company_name,
     },
     {
       icon: Calendar,
-      label: "Registered",
+      label: t("detail.info.registered"),
       value: format(new Date(customer.created_at), "PPP 'at' p"),
     },
     {
       icon: Calendar,
-      label: "Last Updated",
+      label: t("detail.info.lastUpdated"),
       value: format(new Date(customer.updated_at), "PPP 'at' p"),
     },
   ]
@@ -206,7 +212,7 @@ function CustomerInfoTab({
   return (
     <div className="rounded-lg border bg-card shadow-sm">
       <div className="px-6 py-4 border-b">
-        <h2 className="text-base font-semibold">Basic Information</h2>
+        <h2 className="text-base font-semibold">{t("detail.info.basicInformation")}</h2>
       </div>
       <div className="divide-y">
         {infoFields.map((field) => (
@@ -224,7 +230,7 @@ function CustomerInfoTab({
       {customer.metadata && Object.keys(customer.metadata).length > 0 && (
         <>
           <div className="px-6 py-4 border-t border-b">
-            <h2 className="text-base font-semibold">Metadata</h2>
+            <h2 className="text-base font-semibold">{t("detail.info.metadata")}</h2>
           </div>
           <div className="divide-y">
             {Object.entries(customer.metadata).map(([key, value]) => (
@@ -249,7 +255,7 @@ function CustomerInfoTab({
 /*  Orders Tab                                                        */
 /* ------------------------------------------------------------------ */
 
-function CustomerOrdersTab({ customerId }: { customerId: string }) {
+function CustomerOrdersTab({ customerId, t }: { customerId: string; t: TranslationFn }) {
   const { data, isLoading, error } = useCustomerOrders(customerId)
 
   if (isLoading) {
@@ -263,7 +269,7 @@ function CustomerOrdersTab({ customerId }: { customerId: string }) {
   if (error) {
     return (
       <div className="rounded-lg border bg-card p-6 shadow-sm text-center">
-        <p className="text-sm text-destructive">Failed to load orders</p>
+        <p className="text-sm text-destructive">{t("detail.orders.failedToLoad")}</p>
       </div>
     )
   }
@@ -276,7 +282,7 @@ function CustomerOrdersTab({ customerId }: { customerId: string }) {
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <ShoppingCart className="h-10 w-10 text-muted-foreground/50 mb-3" />
           <p className="text-sm text-muted-foreground">
-            This customer has no orders yet
+            {t("detail.orders.noOrders")}
           </p>
         </div>
       </div>
@@ -287,7 +293,7 @@ function CustomerOrdersTab({ customerId }: { customerId: string }) {
     <div className="rounded-lg border bg-card shadow-sm">
       <div className="px-6 py-4 border-b">
         <h2 className="text-base font-semibold">
-          Order History ({data?.count ?? orders.length})
+          {t("detail.orders.orderHistory", { count: data?.count ?? orders.length })}
         </h2>
       </div>
       <div className="overflow-x-auto">
@@ -295,19 +301,19 @@ function CustomerOrdersTab({ customerId }: { customerId: string }) {
           <thead>
             <tr className="border-b bg-muted/50">
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Order
+                {t("detail.orders.order")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Status
+                {t("detail.orders.status")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Items
+                {t("detail.orders.items")}
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Total
+                {t("detail.orders.total")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Date
+                {t("detail.orders.date")}
               </th>
             </tr>
           </thead>
@@ -329,8 +335,9 @@ function CustomerOrdersTab({ customerId }: { customerId: string }) {
                   <OrderStatusBadge status={order.status} />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                  {order.items?.length ?? 0} item
-                  {(order.items?.length ?? 0) !== 1 ? "s" : ""}
+                  {(order.items?.length ?? 0) === 1
+                    ? t("detail.orders.itemCount", { count: 1 })
+                    : t("detail.orders.itemsCount", { count: order.items?.length ?? 0 })}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">
                   {formatCurrency(order.total, order.currency_code)}
@@ -389,8 +396,10 @@ function formatCurrency(amount: number, currencyCode: string): string {
 
 function CustomerAddressesTab({
   customer,
+  t,
 }: {
   customer: NonNullable<ReturnType<typeof useCustomer>["data"]>
+  t: TranslationFn
 }) {
   const addresses = customer.addresses || []
 
@@ -400,7 +409,7 @@ function CustomerAddressesTab({
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <MapPin className="h-10 w-10 text-muted-foreground/50 mb-3" />
           <p className="text-sm text-muted-foreground">
-            This customer has no addresses
+            {t("detail.addresses.noAddresses")}
           </p>
         </div>
       </div>
@@ -432,18 +441,18 @@ function CustomerAddressesTab({
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-semibold">
-                  {name || "Address"}
+                  {name || t("detail.addresses.address")}
                 </span>
               </div>
               <div className="flex gap-1.5">
                 {address.is_default_shipping && (
                   <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                    Default Shipping
+                    {t("detail.addresses.defaultShipping")}
                   </span>
                 )}
                 {address.is_default_billing && (
                   <span className="inline-flex items-center rounded-full bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10">
-                    Default Billing
+                    {t("detail.addresses.defaultBilling")}
                   </span>
                 )}
               </div>

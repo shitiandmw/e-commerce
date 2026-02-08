@@ -9,69 +9,70 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { ArrowUpDown, MoreHorizontal, Eye } from "lucide-react"
 import Link from "next/link"
 import { format } from "date-fns"
 
-export function getOrderStatusBadge(status: string) {
-  switch (status) {
-    case "completed":
-      return <Badge variant="success">Completed</Badge>
-    case "pending":
-      return <Badge variant="warning">Pending</Badge>
-    case "canceled":
-      return <Badge variant="destructive">Canceled</Badge>
-    case "archived":
-      return <Badge variant="secondary">Archived</Badge>
-    case "requires_action":
-      return <Badge variant="warning">Action Required</Badge>
-    default:
-      return <Badge variant="outline">{status}</Badge>
+type TranslationFn = (key: string, values?: Record<string, string | number | Date>) => string
+
+export function getOrderStatusBadge(status: string, t?: TranslationFn) {
+  const labels: Record<string, { label: string; variant: string }> = {
+    completed: { label: t ? t("status.completed") : "Completed", variant: "success" },
+    pending: { label: t ? t("status.pending") : "Pending", variant: "warning" },
+    canceled: { label: t ? t("status.canceled") : "Canceled", variant: "destructive" },
+    archived: { label: t ? t("status.archived") : "Archived", variant: "secondary" },
+    requires_action: { label: t ? t("status.requiresAction") : "Action Required", variant: "warning" },
   }
+
+  const info = labels[status]
+  if (info) {
+    return <Badge variant={info.variant as "success" | "warning" | "destructive" | "secondary"}>{info.label}</Badge>
+  }
+  return <Badge variant="outline">{status}</Badge>
 }
 
-export function getPaymentStatusBadge(status?: string) {
-  switch (status) {
-    case "captured":
-    case "paid":
-      return <Badge variant="success">Paid</Badge>
-    case "awaiting":
-    case "authorized":
-      return <Badge variant="warning">Awaiting</Badge>
-    case "refunded":
-      return <Badge variant="secondary">Refunded</Badge>
-    case "partially_refunded":
-      return <Badge variant="outline">Partial Refund</Badge>
-    case "canceled":
-    case "not_paid":
-      return <Badge variant="destructive">Not Paid</Badge>
-    default:
-      return status ? <Badge variant="outline">{status}</Badge> : null
+export function getPaymentStatusBadge(status?: string, t?: TranslationFn) {
+  if (!status) return null
+  const labels: Record<string, { label: string; variant: string }> = {
+    captured: { label: t ? t("paymentStatus.paid") : "Paid", variant: "success" },
+    paid: { label: t ? t("paymentStatus.paid") : "Paid", variant: "success" },
+    awaiting: { label: t ? t("paymentStatus.awaiting") : "Awaiting", variant: "warning" },
+    authorized: { label: t ? t("paymentStatus.awaiting") : "Awaiting", variant: "warning" },
+    refunded: { label: t ? t("paymentStatus.refunded") : "Refunded", variant: "secondary" },
+    partially_refunded: { label: t ? t("paymentStatus.partialRefund") : "Partial Refund", variant: "outline" },
+    canceled: { label: t ? t("paymentStatus.notPaid") : "Not Paid", variant: "destructive" },
+    not_paid: { label: t ? t("paymentStatus.notPaid") : "Not Paid", variant: "destructive" },
   }
+
+  const info = labels[status]
+  if (info) {
+    return <Badge variant={info.variant as "success" | "warning" | "secondary" | "outline" | "destructive"}>{info.label}</Badge>
+  }
+  return <Badge variant="outline">{status}</Badge>
 }
 
-export function getFulfillmentStatusBadge(status?: string) {
+export function getFulfillmentStatusBadge(status?: string, t?: TranslationFn) {
+  if (!status) return null
   switch (status) {
     case "fulfilled":
     case "delivered":
-      return <Badge variant="success">Fulfilled</Badge>
+      return <Badge variant="success">{t ? t("fulfillmentStatus.fulfilled") : "Fulfilled"}</Badge>
     case "shipped":
       return (
         <Badge className="border-transparent bg-blue-100 text-blue-800">
-          Shipped
+          {t ? t("fulfillmentStatus.shipped") : "Shipped"}
         </Badge>
       )
     case "partially_fulfilled":
     case "partially_shipped":
-      return <Badge variant="warning">Partial</Badge>
+      return <Badge variant="warning">{t ? t("fulfillmentStatus.partial") : "Partial"}</Badge>
     case "not_fulfilled":
-      return <Badge variant="secondary">Unfulfilled</Badge>
+      return <Badge variant="secondary">{t ? t("fulfillmentStatus.unfulfilled") : "Unfulfilled"}</Badge>
     case "canceled":
-      return <Badge variant="destructive">Canceled</Badge>
+      return <Badge variant="destructive">{t ? t("fulfillmentStatus.canceled") : "Canceled"}</Badge>
     default:
-      return status ? <Badge variant="outline">{status}</Badge> : null
+      return <Badge variant="outline">{status}</Badge>
   }
 }
 
@@ -82,7 +83,7 @@ function formatCurrency(amount: number, currency: string) {
   }).format(amount / 100)
 }
 
-export function getOrderColumns(): ColumnDef<AdminOrder>[] {
+export function getOrderColumns(t: TranslationFn): ColumnDef<AdminOrder>[] {
   return [
     {
       accessorKey: "display_id",
@@ -92,7 +93,7 @@ export function getOrderColumns(): ColumnDef<AdminOrder>[] {
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="-ml-4"
         >
-          Order
+          {t("columns.order")}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -108,7 +109,7 @@ export function getOrderColumns(): ColumnDef<AdminOrder>[] {
     },
     {
       id: "customer",
-      header: "Customer",
+      header: t("columns.customer"),
       cell: ({ row }) => {
         const order = row.original
         const name = order.customer
@@ -128,31 +129,31 @@ export function getOrderColumns(): ColumnDef<AdminOrder>[] {
     },
     {
       accessorKey: "status",
-      header: "Status",
-      cell: ({ row }) => getOrderStatusBadge(row.original.status),
+      header: t("columns.status"),
+      cell: ({ row }) => getOrderStatusBadge(row.original.status, t),
       size: 130,
     },
     {
       id: "payment",
-      header: "Payment",
+      header: t("columns.payment"),
       cell: ({ row }) =>
-        getPaymentStatusBadge(row.original.payment_status) || (
+        getPaymentStatusBadge(row.original.payment_status, t) || (
           <span className="text-sm text-muted-foreground">-</span>
         ),
       size: 130,
     },
     {
       id: "fulfillment",
-      header: "Fulfillment",
+      header: t("columns.fulfillment"),
       cell: ({ row }) =>
-        getFulfillmentStatusBadge(row.original.fulfillment_status) || (
+        getFulfillmentStatusBadge(row.original.fulfillment_status, t) || (
           <span className="text-sm text-muted-foreground">-</span>
         ),
       size: 130,
     },
     {
       id: "items",
-      header: "Items",
+      header: t("columns.items"),
       cell: ({ row }) => (
         <span className="text-sm text-muted-foreground">
           {row.original.items?.reduce((acc, item) => acc + item.quantity, 0) ||
@@ -169,7 +170,7 @@ export function getOrderColumns(): ColumnDef<AdminOrder>[] {
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="-ml-4"
         >
-          Total
+          {t("columns.total")}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -188,7 +189,7 @@ export function getOrderColumns(): ColumnDef<AdminOrder>[] {
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="-ml-4"
         >
-          Date
+          {t("columns.date")}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -208,14 +209,14 @@ export function getOrderColumns(): ColumnDef<AdminOrder>[] {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">Open menu</span>
+                <span className="sr-only">{t("table.openMenu")}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <Link href={`/orders/${order.id}`}>
                 <DropdownMenuItem>
                   <Eye className="mr-2 h-4 w-4" />
-                  View Details
+                  {t("table.viewDetails")}
                 </DropdownMenuItem>
               </Link>
             </DropdownMenuContent>

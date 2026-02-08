@@ -9,6 +9,7 @@ import {
   SortingState,
   PaginationState,
 } from "@tanstack/react-table"
+import { useTranslations } from "next-intl"
 import { useOrders } from "@/hooks/use-orders"
 import { getOrderColumns } from "./order-columns"
 import {
@@ -33,33 +34,8 @@ import {
 import { ExportButton } from "@/components/import-export/export-button"
 import { useOrderExport } from "@/hooks/use-import-export"
 
-const ORDER_STATUSES = [
-  { value: "all", label: "All Status" },
-  { value: "pending", label: "Pending" },
-  { value: "completed", label: "Completed" },
-  { value: "canceled", label: "Canceled" },
-  { value: "archived", label: "Archived" },
-  { value: "requires_action", label: "Action Required" },
-]
-
-const PAYMENT_STATUSES = [
-  { value: "all", label: "All Payments" },
-  { value: "captured", label: "Paid" },
-  { value: "awaiting", label: "Awaiting" },
-  { value: "refunded", label: "Refunded" },
-  { value: "not_paid", label: "Not Paid" },
-]
-
-const FULFILLMENT_STATUSES = [
-  { value: "all", label: "All Fulfillment" },
-  { value: "not_fulfilled", label: "Unfulfilled" },
-  { value: "fulfilled", label: "Fulfilled" },
-  { value: "shipped", label: "Shipped" },
-  { value: "partially_fulfilled", label: "Partial" },
-  { value: "canceled", label: "Canceled" },
-]
-
 export function OrderTable() {
+  const t = useTranslations("orders")
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [search, setSearch] = React.useState("")
   const [debouncedSearch, setDebouncedSearch] = React.useState("")
@@ -71,6 +47,32 @@ export function OrderTable() {
     pageIndex: 0,
     pageSize: 20,
   })
+
+  const ORDER_STATUSES = [
+    { value: "all", label: t("filters.allStatus") },
+    { value: "pending", label: t("status.pending") },
+    { value: "completed", label: t("status.completed") },
+    { value: "canceled", label: t("status.canceled") },
+    { value: "archived", label: t("status.archived") },
+    { value: "requires_action", label: t("status.requiresAction") },
+  ]
+
+  const PAYMENT_STATUSES = [
+    { value: "all", label: t("filters.allPayments") },
+    { value: "captured", label: t("paymentStatus.paid") },
+    { value: "awaiting", label: t("paymentStatus.awaiting") },
+    { value: "refunded", label: t("paymentStatus.refunded") },
+    { value: "not_paid", label: t("paymentStatus.notPaid") },
+  ]
+
+  const FULFILLMENT_STATUSES = [
+    { value: "all", label: t("filters.allFulfillment") },
+    { value: "not_fulfilled", label: t("fulfillmentStatus.unfulfilled") },
+    { value: "fulfilled", label: t("fulfillmentStatus.fulfilled") },
+    { value: "shipped", label: t("fulfillmentStatus.shipped") },
+    { value: "partially_fulfilled", label: t("fulfillmentStatus.partial") },
+    { value: "canceled", label: t("fulfillmentStatus.canceled") },
+  ]
 
   // Debounce search
   React.useEffect(() => {
@@ -102,7 +104,7 @@ export function OrderTable() {
     status: statusArray,
   })
 
-  const columns = React.useMemo(() => getOrderColumns(), [])
+  const columns = React.useMemo(() => getOrderColumns(t), [t])
 
   const orders = data?.orders ?? []
   const totalCount = data?.count ?? 0
@@ -139,14 +141,14 @@ export function OrderTable() {
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search orders..."
+                placeholder={t("filters.searchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-9"
               />
             </div>
           </div>
-          <ExportButton onExport={exportOrders} label="Export" size="sm" />
+          <ExportButton onExport={exportOrders} label={t("table.export")} size="sm" />
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Select
@@ -255,8 +257,9 @@ export function OrderTable() {
                   className="h-24 text-center"
                 >
                   <div className="text-destructive">
-                    Failed to load orders:{" "}
-                    {error instanceof Error ? error.message : "Unknown error"}
+                    {t("table.failedToLoad", {
+                      error: error instanceof Error ? error.message : t("table.unknownError"),
+                    })}
                   </div>
                 </TableCell>
               </TableRow>
@@ -268,8 +271,8 @@ export function OrderTable() {
                 >
                   <div className="text-muted-foreground">
                     {hasActiveFilters
-                      ? "No orders match your search criteria."
-                      : "No orders yet."}
+                      ? t("table.noMatchingOrders")
+                      : t("table.noOrdersYet")}
                   </div>
                 </TableCell>
               </TableRow>
@@ -294,17 +297,17 @@ export function OrderTable() {
         {!isLoading && totalCount > 0 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
             <p className="text-sm text-muted-foreground">
-              Showing{" "}
-              {Math.min(
-                pagination.pageIndex * pagination.pageSize + 1,
-                totalCount
-              )}{" "}
-              to{" "}
-              {Math.min(
-                (pagination.pageIndex + 1) * pagination.pageSize,
-                totalCount
-              )}{" "}
-              of {totalCount} orders
+              {t("table.showingPagination", {
+                from: Math.min(
+                  pagination.pageIndex * pagination.pageSize + 1,
+                  totalCount
+                ),
+                to: Math.min(
+                  (pagination.pageIndex + 1) * pagination.pageSize,
+                  totalCount
+                ),
+                total: totalCount,
+              })}
             </p>
             <div className="flex items-center gap-2">
               <Button
@@ -326,7 +329,10 @@ export function OrderTable() {
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <span className="text-sm text-muted-foreground">
-                Page {pagination.pageIndex + 1} of {pageCount}
+                {t("table.pageOf", {
+                  page: pagination.pageIndex + 1,
+                  total: pageCount,
+                })}
               </span>
               <Button
                 variant="outline"
