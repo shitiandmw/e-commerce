@@ -2,10 +2,12 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { login } from "@/lib/auth"
 
 export default function LoginPage() {
   const router = useRouter()
+  const t = useTranslations("auth")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
@@ -20,7 +22,7 @@ export default function LoginPage() {
       await login(email, password)
       router.push("/dashboard")
     } catch (err) {
-      setError("Invalid email or password")
+      setError(t("invalidCredentials"))
     } finally {
       setLoading(false)
     }
@@ -30,9 +32,9 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted">
       <div className="w-full max-w-sm space-y-6 rounded-lg border bg-card p-8 shadow-lg">
         <div className="space-y-2 text-center">
-          <h1 className="text-2xl font-bold tracking-tight">Admin Login</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{t("adminLogin")}</h1>
           <p className="text-sm text-muted-foreground">
-            Sign in to your admin dashboard
+            {t("signInDescription")}
           </p>
         </div>
 
@@ -45,14 +47,14 @@ export default function LoginPage() {
 
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium">
-              Email
+              {t("email")}
             </label>
             <input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@example.com"
+              placeholder={t("emailPlaceholder")}
               required
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
@@ -60,14 +62,14 @@ export default function LoginPage() {
 
           <div className="space-y-2">
             <label htmlFor="password" className="text-sm font-medium">
-              Password
+              {t("password")}
             </label>
             <input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
+              placeholder={t("passwordPlaceholder")}
               required
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
@@ -78,7 +80,7 @@ export default function LoginPage() {
             disabled={loading}
             className="inline-flex h-10 w-full items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
           >
-            {loading ? "Signing in..." : "Sign in"}
+            {loading ? t("signingIn") : t("signIn")}
           </button>
         </form>
       </div>

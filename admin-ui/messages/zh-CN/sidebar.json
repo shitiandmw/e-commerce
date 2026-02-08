@@ -6,6 +6,8 @@
     "brands": "品牌管理",
     "inventory": "库存管理",
     "orders": "订单管理",
+    "promotions": "促销活动",
+    "shipping": "物流管理",
     "customers": "客户管理",
     "media": "媒体资源",
     "analytics": "数据报表",
