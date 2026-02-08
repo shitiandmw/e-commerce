@@ -30,6 +30,8 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react"
+import { ExportButton } from "@/components/import-export/export-button"
+import { useOrderExport } from "@/hooks/use-import-export"
 
 const ORDER_STATUSES = [
   { value: "all", label: "All Status" },
@@ -64,6 +66,7 @@ export function OrderTable() {
   const [statusFilter, setStatusFilter] = React.useState("all")
   const [paymentFilter, setPaymentFilter] = React.useState("all")
   const [fulfillmentFilter, setFulfillmentFilter] = React.useState("all")
+  const { exportOrders } = useOrderExport()
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: 20,
@@ -131,51 +134,54 @@ export function OrderTable() {
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search orders..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9"
-            />
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-1 items-center gap-3">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search orders..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9"
+              />
+            </div>
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <Select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-[150px]"
-            >
-              {ORDER_STATUSES.map((s) => (
-                <option key={s.value} value={s.value}>
-                  {s.label}
-                </option>
-              ))}
-            </Select>
-            <Select
-              value={paymentFilter}
-              onChange={(e) => setPaymentFilter(e.target.value)}
-              className="w-[150px]"
-            >
-              {PAYMENT_STATUSES.map((s) => (
-                <option key={s.value} value={s.value}>
-                  {s.label}
-                </option>
-              ))}
-            </Select>
-            <Select
-              value={fulfillmentFilter}
-              onChange={(e) => setFulfillmentFilter(e.target.value)}
-              className="w-[160px]"
-            >
-              {FULFILLMENT_STATUSES.map((s) => (
-                <option key={s.value} value={s.value}>
-                  {s.label}
-                </option>
-              ))}
-            </Select>
-          </div>
+          <ExportButton onExport={exportOrders} label="Export" size="sm" />
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="w-[150px]"
+          >
+            {ORDER_STATUSES.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
+          </Select>
+          <Select
+            value={paymentFilter}
+            onChange={(e) => setPaymentFilter(e.target.value)}
+            className="w-[150px]"
+          >
+            {PAYMENT_STATUSES.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
+          </Select>
+          <Select
+            value={fulfillmentFilter}
+            onChange={(e) => setFulfillmentFilter(e.target.value)}
+            className="w-[160px]"
+          >
+            {FULFILLMENT_STATUSES.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
+          </Select>
         </div>
       </div>
 
