@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import {
   useReactTable,
   getCoreRowModel,
@@ -45,6 +46,7 @@ import {
 type StockFilter = "all" | "in_stock" | "low_stock" | "out_of_stock"
 
 export function InventoryTable() {
+  const t = useTranslations("inventory")
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [search, setSearch] = React.useState("")
   const [debouncedSearch, setDebouncedSearch] = React.useState("")
@@ -82,8 +84,8 @@ export function InventoryTable() {
   })
 
   const columns = React.useMemo(
-    () => getInventoryColumns((item) => setItemToAdjust(item)),
-    []
+    () => getInventoryColumns((item) => setItemToAdjust(item), t),
+    [t]
   )
 
   // Client-side stock status filtering (since API doesn't support it natively)
@@ -133,7 +135,7 @@ export function InventoryTable() {
         >
           <div className="flex items-center gap-2">
             <Warehouse className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">Total Items</span>
+            <span className="text-sm text-muted-foreground">{t("stats.totalItems")}</span>
           </div>
           <p className="mt-2 text-2xl font-bold tabular-nums">
             {isLoading ? "—" : data?.count ?? 0}
@@ -147,7 +149,7 @@ export function InventoryTable() {
         >
           <div className="flex items-center gap-2">
             <Package className="h-4 w-4 text-green-600" />
-            <span className="text-sm text-muted-foreground">In Stock</span>
+            <span className="text-sm text-muted-foreground">{t("stats.inStock")}</span>
           </div>
           <p className="mt-2 text-2xl font-bold tabular-nums text-green-600">
             {isLoading ? "—" : stats.inStock}
@@ -161,7 +163,7 @@ export function InventoryTable() {
         >
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-yellow-600" />
-            <span className="text-sm text-muted-foreground">Low Stock</span>
+            <span className="text-sm text-muted-foreground">{t("stats.lowStock")}</span>
           </div>
           <p className="mt-2 text-2xl font-bold tabular-nums text-yellow-600">
             {isLoading ? "—" : stats.lowStock}
@@ -175,7 +177,7 @@ export function InventoryTable() {
         >
           <div className="flex items-center gap-2">
             <PackageX className="h-4 w-4 text-destructive" />
-            <span className="text-sm text-muted-foreground">Out of Stock</span>
+            <span className="text-sm text-muted-foreground">{t("stats.outOfStock")}</span>
           </div>
           <p className="mt-2 text-2xl font-bold tabular-nums text-destructive">
             {isLoading ? "—" : stats.outOfStock}
@@ -189,7 +191,7 @@ export function InventoryTable() {
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Search by SKU, title..."
+              placeholder={t("filters.searchPlaceholder")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-9"
@@ -200,10 +202,10 @@ export function InventoryTable() {
             onChange={(e) => setStockFilter(e.target.value as StockFilter)}
             className="w-[160px]"
           >
-            <option value="all">All Status</option>
-            <option value="in_stock">In Stock</option>
-            <option value="low_stock">Low Stock</option>
-            <option value="out_of_stock">Out of Stock</option>
+            <option value="all">{t("filters.allStatus")}</option>
+            <option value="in_stock">{t("filters.inStock")}</option>
+            <option value="low_stock">{t("filters.lowStock")}</option>
+            <option value="out_of_stock">{t("filters.outOfStock")}</option>
           </Select>
         </div>
         {stockFilter !== "all" && (
@@ -212,7 +214,7 @@ export function InventoryTable() {
             size="sm"
             onClick={() => setStockFilter("all")}
           >
-            Clear Filter
+            {t("filters.clearFilter")}
           </Button>
         )}
       </div>
@@ -261,8 +263,7 @@ export function InventoryTable() {
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   <div className="text-destructive">
-                    Failed to load inventory:{" "}
-                    {error instanceof Error ? error.message : "Unknown error"}
+                    {t("table.failedToLoad", { error: error instanceof Error ? error.message : t("table.unknownError") })}
                   </div>
                 </TableCell>
               </TableRow>
@@ -271,8 +272,8 @@ export function InventoryTable() {
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   <div className="text-muted-foreground">
                     {debouncedSearch || stockFilter !== "all"
-                      ? "No inventory items match your search criteria."
-                      : "No inventory items found."}
+                      ? t("table.noMatchingItems")
+                      : t("table.noItemsFound")}
                   </div>
                 </TableCell>
               </TableRow>
@@ -297,17 +298,17 @@ export function InventoryTable() {
         {!isLoading && totalCount > 0 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
             <p className="text-sm text-muted-foreground">
-              Showing{" "}
-              {Math.min(
-                pagination.pageIndex * pagination.pageSize + 1,
-                totalCount
-              )}{" "}
-              to{" "}
-              {Math.min(
-                (pagination.pageIndex + 1) * pagination.pageSize,
-                totalCount
-              )}{" "}
-              of {totalCount} items
+              {t("table.showingPagination", {
+                from: Math.min(
+                  pagination.pageIndex * pagination.pageSize + 1,
+                  totalCount
+                ),
+                to: Math.min(
+                  (pagination.pageIndex + 1) * pagination.pageSize,
+                  totalCount
+                ),
+                total: totalCount,
+              })}
             </p>
             <div className="flex items-center gap-2">
               <Button
@@ -329,7 +330,7 @@ export function InventoryTable() {
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <span className="text-sm text-muted-foreground">
-                Page {pagination.pageIndex + 1} of {pageCount || 1}
+                {t("table.pageOf", { page: pagination.pageIndex + 1, total: pageCount || 1 })}
               </span>
               <Button
                 variant="outline"

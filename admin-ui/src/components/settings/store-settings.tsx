@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { useStore, useUpdateStore } from "@/hooks/use-settings"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Save, Loader2, Store } from "lucide-react"
 
 export function StoreSettings() {
+  const t = useTranslations("settings")
   const { data, isLoading } = useStore()
   const updateStore = useUpdateStore()
   const [name, setName] = React.useState("")
@@ -47,31 +49,31 @@ export function StoreSettings() {
       <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
         <div className="flex items-center gap-2">
           <Store className="h-5 w-5 text-muted-foreground" />
-          <h2 className="text-lg font-semibold">Store Information</h2>
+          <h2 className="text-lg font-semibold">{t("storeInfo.title")}</h2>
         </div>
         <p className="text-sm text-muted-foreground">
-          Configure your store&apos;s basic information.
+          {t("storeInfo.description")}
         </p>
 
         <div className="max-w-md space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="store-name">Store Name</Label>
+            <Label htmlFor="store-name">{t("storeInfo.storeName")}</Label>
             <Input
               id="store-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="My Store"
+              placeholder={t("storeInfo.storeNamePlaceholder")}
             />
           </div>
 
           {store && (
             <div className="grid grid-cols-2 gap-4 pt-2 text-sm">
               <div>
-                <span className="text-muted-foreground">Store ID</span>
+                <span className="text-muted-foreground">{t("storeInfo.storeId")}</span>
                 <p className="font-mono text-xs mt-1 break-all">{store.id}</p>
               </div>
               <div>
-                <span className="text-muted-foreground">Created</span>
+                <span className="text-muted-foreground">{t("storeInfo.created")}</span>
                 <p className="mt-1">
                   {new Date(store.created_at).toLocaleDateString()}
                 </p>
@@ -83,13 +85,13 @@ export function StoreSettings() {
             <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
               {updateStore.error instanceof Error
                 ? updateStore.error.message
-                : "Failed to update store"}
+                : t("storeInfo.failedUpdate")}
             </div>
           )}
 
           {saved && (
             <div className="rounded-md bg-green-50 p-3 text-sm text-green-700">
-              Store settings saved successfully.
+              {t("storeInfo.savedSuccess")}
             </div>
           )}
 
@@ -100,12 +102,12 @@ export function StoreSettings() {
             {updateStore.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
+                {t("storeInfo.saving")}
               </>
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />
-                Save Changes
+                {t("storeInfo.saveChanges")}
               </>
             )}
           </Button>
@@ -115,9 +117,9 @@ export function StoreSettings() {
       {/* Supported Currencies */}
       {store?.supported_currencies && store.supported_currencies.length > 0 && (
         <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
-          <h2 className="text-lg font-semibold">Supported Currencies</h2>
+          <h2 className="text-lg font-semibold">{t("storeInfo.supportedCurrencies")}</h2>
           <p className="text-sm text-muted-foreground">
-            Currencies available in your store.
+            {t("storeInfo.currenciesDescription")}
           </p>
           <div className="flex flex-wrap gap-2">
             {store.supported_currencies.map((c) => (
@@ -128,7 +130,7 @@ export function StoreSettings() {
                 {c.currency_code.toUpperCase()}
                 {c.is_default && (
                   <span className="ml-1 text-xs bg-primary/10 text-primary rounded-full px-1.5 py-0.5">
-                    Default
+                    {t("storeInfo.default")}
                   </span>
                 )}
               </span>

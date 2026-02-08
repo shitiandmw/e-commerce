@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import {
   useRegions,
   useCreateRegion,
@@ -31,6 +32,7 @@ import {
 } from "lucide-react"
 
 export function RegionSettings() {
+  const t = useTranslations("settings")
   const { data, isLoading } = useRegions()
   const { data: currenciesData } = useCurrencies()
   const createRegion = useCreateRegion()
@@ -69,20 +71,20 @@ export function RegionSettings() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Globe className="h-5 w-5 text-muted-foreground" />
-            <h2 className="text-lg font-semibold">Sales Regions</h2>
+            <h2 className="text-lg font-semibold">{t("regionSettings.title")}</h2>
           </div>
           <Button size="sm" onClick={() => setShowCreate(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Region
+            {t("regionSettings.addRegion")}
           </Button>
         </div>
         <p className="text-sm text-muted-foreground">
-          Manage the regions where your store operates. Each region defines a currency and applicable countries.
+          {t("regionSettings.description")}
         </p>
 
         {regions.length === 0 ? (
           <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
-            No regions configured yet. Add your first region to start selling.
+            {t("regionSettings.noRegions")}
           </div>
         ) : (
           <div className="space-y-3">
@@ -98,7 +100,7 @@ export function RegionSettings() {
                       {region.currency_code.toUpperCase()}
                     </Badge>
                     {region.automatic_taxes && (
-                      <Badge variant="outline">Auto Tax</Badge>
+                      <Badge variant="outline">{t("regionSettings.autoTax")}</Badge>
                     )}
                   </div>
                   {region.countries && region.countries.length > 0 && (
@@ -115,8 +117,8 @@ export function RegionSettings() {
                   )}
                   <p className="text-xs text-muted-foreground">
                     {region.payment_providers && region.payment_providers.length > 0
-                      ? `${region.payment_providers.length} payment provider(s)`
-                      : "No payment providers"}
+                      ? t("regionSettings.paymentProviders", { count: region.payment_providers.length })
+                      : t("regionSettings.noPaymentProviders")}
                   </p>
                 </div>
                 <div className="flex items-center gap-1">
@@ -164,21 +166,21 @@ export function RegionSettings() {
       <Dialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <DialogContent onClose={() => setDeleteId(null)}>
           <DialogHeader>
-            <DialogTitle>Delete Region</DialogTitle>
+            <DialogTitle>{t("regionSettings.deleteTitle")}</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground py-4">
-            Are you sure you want to delete this region? This action cannot be undone.
+            {t("regionSettings.deleteConfirm")}
           </p>
           {deleteRegion.error && (
             <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
               {deleteRegion.error instanceof Error
                 ? deleteRegion.error.message
-                : "Failed to delete region"}
+                : t("regionSettings.deleteFailed")}
             </div>
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteId(null)}>
-              Cancel
+              {t("regionSettings.cancel")}
             </Button>
             <Button
               variant="destructive"
@@ -188,7 +190,7 @@ export function RegionSettings() {
               {deleteRegion.isPending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : null}
-              Delete
+              {t("regionSettings.delete")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -214,6 +216,7 @@ function RegionFormDialog({
   mode,
   region,
 }: RegionFormDialogProps) {
+  const t = useTranslations("settings")
   const createRegion = useCreateRegion()
   const updateRegion = useUpdateRegion(region?.id || "")
 
@@ -272,21 +275,21 @@ function RegionFormDialog({
       <DialogContent onClose={() => onOpenChange(false)}>
         <DialogHeader>
           <DialogTitle>
-            {mode === "create" ? "Create Region" : "Edit Region"}
+            {mode === "create" ? t("regionSettings.createTitle") : t("regionSettings.editTitle")}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="region-name">Name</Label>
+            <Label htmlFor="region-name">{t("regionSettings.name")}</Label>
             <Input
               id="region-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. North America"
+              placeholder={t("regionSettings.namePlaceholder")}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="region-currency">Currency</Label>
+            <Label htmlFor="region-currency">{t("regionSettings.currency")}</Label>
             <Select
               id="region-currency"
               value={currencyCode}
@@ -311,33 +314,33 @@ function RegionFormDialog({
           </div>
           <div className="space-y-2">
             <Label htmlFor="region-countries">
-              Countries{" "}
+              {t("regionSettings.countries")}{" "}
               <span className="text-muted-foreground font-normal">
-                (comma-separated ISO codes)
+                {t("regionSettings.countriesHint")}
               </span>
             </Label>
             <Input
               id="region-countries"
               value={countriesInput}
               onChange={(e) => setCountriesInput(e.target.value)}
-              placeholder="e.g. us, ca, mx"
+              placeholder={t("regionSettings.countriesPlaceholder")}
             />
           </div>
           {error && (
             <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-              {error instanceof Error ? error.message : "An error occurred"}
+              {error instanceof Error ? error.message : t("regionSettings.errorOccurred")}
             </div>
           )}
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t("regionSettings.cancel")}
           </Button>
           <Button onClick={handleSubmit} disabled={isPending || !name}>
             {isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : null}
-            {mode === "create" ? "Create" : "Save"}
+            {mode === "create" ? t("regionSettings.create") : t("regionSettings.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

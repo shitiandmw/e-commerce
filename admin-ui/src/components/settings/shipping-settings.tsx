@@ -1,11 +1,13 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useShippingOptions } from "@/hooks/use-settings"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Truck } from "lucide-react"
 
 export function ShippingSettings() {
+  const t = useTranslations("settings")
   const { data, isLoading } = useShippingOptions()
 
   if (isLoading) {
@@ -24,15 +26,15 @@ export function ShippingSettings() {
       <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
         <div className="flex items-center gap-2">
           <Truck className="h-5 w-5 text-muted-foreground" />
-          <h2 className="text-lg font-semibold">Shipping Options</h2>
+          <h2 className="text-lg font-semibold">{t("shipping.title")}</h2>
         </div>
         <p className="text-sm text-muted-foreground">
-          View configured shipping options. Shipping options are managed through fulfillment providers and regions.
+          {t("shipping.description")}
         </p>
 
         {options.length === 0 ? (
           <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
-            No shipping options configured. Shipping options are created when you set up fulfillment providers for your regions.
+            {t("shipping.noOptions")}
           </div>
         ) : (
           <div className="space-y-3">
@@ -64,7 +66,7 @@ export function ShippingSettings() {
                   )}
                   {opt.type && (
                     <p className="text-xs text-muted-foreground">
-                      Type: {opt.type.label} ({opt.type.code})
+                      {t("shipping.type")} {opt.type.label} ({opt.type.code})
                     </p>
                   )}
                 </div>
