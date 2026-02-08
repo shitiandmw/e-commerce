@@ -204,12 +204,20 @@ export function ProductForm({ product, mode }: ProductFormProps) {
       }
 
       if (mode === "create") {
-        // Include options and variants for creation
-        if (data.options.length > 0) {
+        // Medusa v2 requires every variant to reference valid option values.
+        // When the user hasn't defined custom options we create a default one
+        // so that the API call succeeds.
+        const hasCustomOptions = data.options.length > 0
+
+        if (hasCustomOptions) {
           payload.options = data.options.map((opt) => ({
             title: opt.title,
             values: opt.values.split(",").map((v) => v.trim()),
           }))
+        } else {
+          payload.options = [
+            { title: "Default option", values: ["Default"] },
+          ]
         }
 
         payload.variants = data.variants.map((v) => ({
@@ -222,7 +230,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
             },
           ],
           manage_inventory: v.manage_inventory,
-          options: {},
+          options: hasCustomOptions ? {} : { "Default option": "Default" },
         }))
 
         const result = await createProduct.mutateAsync(payload) as any
@@ -271,38 +279,40 @@ export function ProductForm({ product, mode }: ProductFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/products">
-            <Button variant="ghost" size="icon" type="button">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              {mode === "create" ? t("createProduct") : t("editProduct")}
-            </h1>
-            <p className="text-muted-foreground">
-              {mode === "create"
-                ? t("createSubtitle")
-                : t("editSubtitle", { name: product?.title ?? "" })}
-            </p>
+      {/* Header — sticky so the save button is always reachable */}
+      <div className="sticky top-0 z-20 -mx-6 -mt-6 px-6 pt-6 pb-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link href="/products">
+              <Button variant="ghost" size="icon" type="button">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">
+                {mode === "create" ? t("createProduct") : t("editProduct")}
+              </h1>
+              <p className="text-muted-foreground">
+                {mode === "create"
+                  ? t("createSubtitle")
+                  : t("editSubtitle", { name: product?.title ?? "" })}
+              </p>
+            </div>
           </div>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {t("saving")}
+              </>
+            ) : (
+              <>
+                <Save className="mr-2 h-4 w-4" />
+                {mode === "create" ? t("createProduct") : t("saveChanges")}
+              </>
+            )}
+          </Button>
         </div>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {t("saving")}
-            </>
-          ) : (
-            <>
-              <Save className="mr-2 h-4 w-4" />
-              {mode === "create" ? t("createProduct") : t("saveChanges")}
-            </>
-          )}
-        </Button>
       </div>
 
       {/* Error */}

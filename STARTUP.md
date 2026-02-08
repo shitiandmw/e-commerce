@@ -98,15 +98,21 @@ npm run dev
 
 管理端运行在 `http://localhost:3002`。
 
-## 创建管理员账号
+## 管理员账号
 
-首次使用需创建管理员：
+默认管理员账号（开发环境）：
+
+| 项目 | 值 |
+|------|------|
+| 登录地址 | `http://localhost:3002` |
+| 邮箱 | `admin@test.com` |
+| 密码 | `admin123456` |
+
+如需创建新管理员：
 
 ```bash
-npx medusa user -e admin@example.com -p your-password
+npx medusa user -e your@email.com -p your-password
 ```
-
-然后在 `http://localhost:3002` 登录。
 
 ## 常用命令
 
