@@ -11,6 +11,11 @@ import {
   useUpdateProduct,
   useCategories,
 } from "@/hooks/use-products"
+import {
+  useBrands,
+  useLinkProductBrand,
+  useUnlinkProductBrand,
+} from "@/hooks/use-brands"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -57,6 +62,7 @@ const productSchema = z.object({
   options: z.array(optionSchema),
   variants: z.array(variantSchema),
   category_ids: z.array(z.string()),
+  brand_id: z.string().optional(),
 })
 
 type ProductFormData = z.infer<typeof productSchema>
@@ -71,8 +77,12 @@ export function ProductForm({ product, mode }: ProductFormProps) {
   const createProduct = useCreateProduct()
   const updateProduct = useUpdateProduct(product?.id || "")
   const { data: categoriesData } = useCategories()
+  const { data: brandsData } = useBrands({ limit: 100 })
+  const linkProductBrand = useLinkProductBrand()
+  const unlinkProductBrand = useUnlinkProductBrand()
 
   const categories = categoriesData?.product_categories ?? []
+  const brands = brandsData?.brands ?? []
 
   const defaultValues: ProductFormData = product
     ? {
@@ -104,6 +114,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
             manage_inventory: v.manage_inventory ?? true,
           })) || [],
         category_ids: product.categories?.map((c) => c.id) || [],
+        brand_id: product.brand?.id || "",
       }
     : {
         title: "",
@@ -129,6 +140,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
           },
         ],
         category_ids: [],
+        brand_id: "",
       }
 
   const {
@@ -203,9 +215,39 @@ export function ProductForm({ product, mode }: ProductFormProps) {
           options: {},
         }))
 
-        await createProduct.mutateAsync(payload)
+        const result = await createProduct.mutateAsync(payload) as any
+        const newProductId = result?.product?.id
+
+        // Link brand to product if selected
+        if (data.brand_id && newProductId) {
+          await linkProductBrand.mutateAsync({
+            product_id: newProductId,
+            brand_id: data.brand_id,
+          })
+        }
       } else {
         await updateProduct.mutateAsync(payload)
+
+        // Handle brand link changes
+        const oldBrandId = product?.brand?.id
+        const newBrandId = data.brand_id || undefined
+
+        if (oldBrandId !== newBrandId) {
+          // Unlink old brand
+          if (oldBrandId && product?.id) {
+            await unlinkProductBrand.mutateAsync({
+              product_id: product.id,
+              brand_id: oldBrandId,
+            })
+          }
+          // Link new brand
+          if (newBrandId && product?.id) {
+            await linkProductBrand.mutateAsync({
+              product_id: product.id,
+              brand_id: newBrandId,
+            })
+          }
+        }
       }
 
       router.push("/products")
@@ -571,6 +613,19 @@ export function ProductForm({ product, mode }: ProductFormProps) {
               <option value="proposed">Proposed</option>
               <option value="published">Published</option>
               <option value="rejected">Rejected</option>
+            </Select>
+          </div>
+
+          {/* Brand */}
+          <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
+            <h2 className="text-lg font-semibold">Brand</h2>
+            <Select {...register("brand_id")}>
+              <option value="">No brand</option>
+              {brands.map((brand) => (
+                <option key={brand.id} value={brand.id}>
+                  {brand.name}
+                </option>
+              ))}
             </Select>
           </div>
 
