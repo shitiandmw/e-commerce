@@ -1,10 +1,8 @@
 "use client"
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { adminFetch } from "@/lib/admin-api"
 import { getToken } from "@/lib/auth"
-
-const BASE_URL =
-  process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
 
 // Types
 export interface MediaFile {
@@ -19,15 +17,18 @@ export interface UploadResponse {
   files: MediaFile[]
 }
 
-// Upload files using FormData (not JSON)
+// Upload files using FormData (not JSON) — cannot use adminFetch because it
+// always sets Content-Type to application/json and JSON-stringifies the body.
 async function uploadFiles(files: File[]): Promise<UploadResponse> {
   const token = getToken()
+  const baseUrl =
+    process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
   const formData = new FormData()
   files.forEach((file) => {
     formData.append("files", file)
   })
 
-  const res = await fetch(`${BASE_URL}/admin/uploads`, {
+  const res = await fetch(`${baseUrl}/admin/uploads`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -47,48 +48,22 @@ async function uploadFiles(files: File[]): Promise<UploadResponse> {
 
 // Delete a file by ID
 async function deleteFile(fileId: string): Promise<void> {
-  const token = getToken()
-
-  const res = await fetch(`${BASE_URL}/admin/uploads/${fileId}`, {
+  await adminFetch<Record<string, unknown>>(`/admin/uploads/${fileId}`, {
     method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
   })
-
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}))
-    throw new Error(
-      errorData.message || `Delete failed: ${res.status} ${res.statusText}`
-    )
-  }
 }
 
 // Fetch all uploaded files
 async function fetchFiles(): Promise<{ files: MediaFile[] }> {
-  const token = getToken()
-
-  const res = await fetch(`${BASE_URL}/admin/uploads`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  })
-
-  if (!res.ok) {
+  try {
+    return await adminFetch<{ files: MediaFile[] }>("/admin/uploads")
+  } catch (error) {
     // If the list endpoint doesn't exist, return empty
-    if (res.status === 404) {
+    if (error instanceof Error && error.message.includes("404")) {
       return { files: [] }
     }
-    const errorData = await res.json().catch(() => ({}))
-    throw new Error(
-      errorData.message || `Fetch failed: ${res.status} ${res.statusText}`
-    )
+    throw error
   }
-
-  return res.json()
 }
 
 // Hooks
