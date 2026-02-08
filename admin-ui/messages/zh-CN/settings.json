@@ -1,11 +1,22 @@
 {
   "settings": {
     "title": "系统设置",
+    "description": "管理店铺配置、区域、支付和团队。",
     "general": "通用设置",
     "store": "店铺信息",
     "regions": "区域管理",
     "currencies": "货币设置",
     "language": "语言设置",
+
+    "tabs": {
+      "store": "店铺",
+      "regions": "区域",
+      "channels": "销售渠道",
+      "shipping": "配送",
+      "payments": "支付",
+      "team": "团队",
+      "apiKeys": "API 密钥"
+    },
 
     "storeInfo": {
       "title": "店铺信息",

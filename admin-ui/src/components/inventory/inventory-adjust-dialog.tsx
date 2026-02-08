@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import {
   Dialog,
   DialogContent,
@@ -37,6 +38,7 @@ export function InventoryAdjustDialog({
   onOpenChange,
   preselectedLocationId,
 }: InventoryAdjustDialogProps) {
+  const t = useTranslations("inventory")
   const { data: locationsData } = useStockLocations()
   const updateLevel = useUpdateInventoryLevel(item?.id || "")
 
@@ -78,13 +80,13 @@ export function InventoryAdjustDialog({
     setError(null)
 
     if (!selectedLocationId) {
-      setError("Please select a location.")
+      setError(t("adjustDialog.errors.selectLocation"))
       return
     }
 
     const qty = parseInt(quantity, 10)
     if (isNaN(qty) || qty < 0) {
-      setError("Please enter a valid quantity.")
+      setError(t("adjustDialog.errors.invalidQuantity"))
       return
     }
 
@@ -120,7 +122,7 @@ export function InventoryAdjustDialog({
       onOpenChange(false)
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to update inventory level."
+        err instanceof Error ? err.message : t("adjustDialog.errors.updateFailed")
       )
     }
   }
@@ -130,35 +132,34 @@ export function InventoryAdjustDialog({
       <DialogContent onClose={() => onOpenChange(false)}>
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Adjust Inventory</DialogTitle>
+            <DialogTitle>{t("adjustDialog.title")}</DialogTitle>
             <DialogDescription>
-              Update stock levels for{" "}
-              <span className="font-medium">{item.sku || item.title || item.id}</span>
+              {t("adjustDialog.description", { name: item.sku || item.title || item.id })}
             </DialogDescription>
           </DialogHeader>
 
           <div className="mt-4 space-y-4">
             {/* Location selector */}
             <div className="space-y-2">
-              <Label>Stock Location</Label>
+              <Label>{t("adjustDialog.stockLocation")}</Label>
               {item.location_levels && item.location_levels.length > 0 ? (
                 <Select
                   value={selectedLocationId}
                   onChange={(e) => setSelectedLocationId(e.target.value)}
                 >
-                  <option value="">Select a location...</option>
+                  <option value="">{t("adjustDialog.selectLocation")}</option>
                   {item.location_levels.map((level) => {
                     const loc = locations.find((l) => l.id === level.location_id)
                     return (
                       <option key={level.location_id} value={level.location_id}>
-                        {loc?.name || level.location_id} (Current: {level.stocked_quantity})
+                        {loc?.name || level.location_id} ({t("adjustDialog.currentLabel", { count: level.stocked_quantity })})
                       </option>
                     )
                   })}
                 </Select>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  No locations assigned to this inventory item.
+                  {t("adjustDialog.noLocations")}
                 </p>
               )}
             </div>
@@ -167,23 +168,23 @@ export function InventoryAdjustDialog({
             {selectedLevel && (
               <div className="rounded-md bg-muted p-3 space-y-1.5">
                 <p className="text-sm font-medium">
-                  Current Levels at {selectedLocation?.name || selectedLocationId}
+                  {t("adjustDialog.currentLevels", { location: selectedLocation?.name || selectedLocationId })}
                 </p>
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div>
-                    <p className="text-xs text-muted-foreground">Stocked</p>
+                    <p className="text-xs text-muted-foreground">{t("adjustDialog.stocked")}</p>
                     <p className="text-sm font-semibold tabular-nums">
                       {selectedLevel.stocked_quantity}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Reserved</p>
+                    <p className="text-xs text-muted-foreground">{t("adjustDialog.reserved")}</p>
                     <p className="text-sm font-semibold tabular-nums">
                       {selectedLevel.reserved_quantity}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Available</p>
+                    <p className="text-xs text-muted-foreground">{t("adjustDialog.available")}</p>
                     <p className="text-sm font-semibold tabular-nums">
                       {selectedLevel.available_quantity}
                     </p>
@@ -194,7 +195,7 @@ export function InventoryAdjustDialog({
 
             {/* Adjustment type */}
             <div className="space-y-2">
-              <Label>Adjustment Type</Label>
+              <Label>{t("adjustDialog.adjustmentType")}</Label>
               <div className="flex gap-2">
                 <Button
                   type="button"
@@ -202,7 +203,7 @@ export function InventoryAdjustDialog({
                   size="sm"
                   onClick={() => setAdjustmentType("set")}
                 >
-                  Set To
+                  {t("adjustDialog.setTo")}
                 </Button>
                 <Button
                   type="button"
@@ -212,7 +213,7 @@ export function InventoryAdjustDialog({
                   className="gap-1"
                 >
                   <Plus className="h-3 w-3" />
-                  Add
+                  {t("adjustDialog.add")}
                 </Button>
                 <Button
                   type="button"
@@ -222,7 +223,7 @@ export function InventoryAdjustDialog({
                   className="gap-1"
                 >
                   <Minus className="h-3 w-3" />
-                  Remove
+                  {t("adjustDialog.remove")}
                 </Button>
               </div>
             </div>
@@ -231,10 +232,10 @@ export function InventoryAdjustDialog({
             <div className="space-y-2">
               <Label htmlFor="adjust-quantity">
                 {adjustmentType === "set"
-                  ? "New Stocked Quantity"
+                  ? t("adjustDialog.quantityLabels.set")
                   : adjustmentType === "add"
-                  ? "Quantity to Add"
-                  : "Quantity to Remove"}
+                  ? t("adjustDialog.quantityLabels.add")
+                  : t("adjustDialog.quantityLabels.remove")}
               </Label>
               <Input
                 id="adjust-quantity"
@@ -249,8 +250,8 @@ export function InventoryAdjustDialog({
             {/* Incoming quantity */}
             <div className="space-y-2">
               <Label htmlFor="incoming-quantity">
-                Incoming Quantity{" "}
-                <span className="text-muted-foreground font-normal">(optional)</span>
+                {t("adjustDialog.incomingQuantity")}{" "}
+                <span className="text-muted-foreground font-normal">{t("adjustDialog.optional")}</span>
               </Label>
               <Input
                 id="incoming-quantity"
@@ -269,7 +270,7 @@ export function InventoryAdjustDialog({
             {/* Preview */}
             {selectedLevel && quantity !== "" && (
               <div className="rounded-md border p-3">
-                <p className="text-xs text-muted-foreground mb-1">Preview</p>
+                <p className="text-xs text-muted-foreground mb-1">{t("adjustDialog.preview")}</p>
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="tabular-nums">
                     {selectedLevel.stocked_quantity}
@@ -300,7 +301,7 @@ export function InventoryAdjustDialog({
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t("adjustDialog.cancel")}
             </Button>
             <Button
               type="submit"
@@ -309,10 +310,10 @@ export function InventoryAdjustDialog({
               {updateLevel.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Updating...
+                  {t("adjustDialog.updating")}
                 </>
               ) : (
-                "Update Stock"
+                t("adjustDialog.updateStock")
               )}
             </Button>
           </DialogFooter>

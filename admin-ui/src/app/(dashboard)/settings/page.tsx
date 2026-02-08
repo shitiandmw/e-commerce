@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { StoreSettings } from "@/components/settings/store-settings"
 import { RegionSettings } from "@/components/settings/region-settings"
@@ -19,27 +20,39 @@ import {
   Key,
 } from "lucide-react"
 
-const tabs = [
-  { id: "store", label: "Store", icon: Store },
-  { id: "regions", label: "Regions", icon: Globe },
-  { id: "channels", label: "Sales Channels", icon: ShoppingBag },
-  { id: "shipping", label: "Shipping", icon: Truck },
-  { id: "payments", label: "Payments", icon: CreditCard },
-  { id: "team", label: "Team", icon: Users },
-  { id: "api-keys", label: "API Keys", icon: Key },
-] as const
+const tabIds = ["store", "regions", "channels", "shipping", "payments", "team", "api-keys"] as const
+type TabId = (typeof tabIds)[number]
 
-type TabId = (typeof tabs)[number]["id"]
+const tabIcons: Record<TabId, typeof Store> = {
+  store: Store,
+  regions: Globe,
+  channels: ShoppingBag,
+  shipping: Truck,
+  payments: CreditCard,
+  team: Users,
+  "api-keys": Key,
+}
+
+const tabLabelKeys: Record<TabId, string> = {
+  store: "tabs.store",
+  regions: "tabs.regions",
+  channels: "tabs.channels",
+  shipping: "tabs.shipping",
+  payments: "tabs.payments",
+  team: "tabs.team",
+  "api-keys": "tabs.apiKeys",
+}
 
 export default function SettingsPage() {
+  const t = useTranslations("settings")
   const [activeTab, setActiveTab] = React.useState<TabId>("store")
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
         <p className="text-muted-foreground">
-          Manage your store configuration, regions, payments, and team.
+          {t("description")}
         </p>
       </div>
 
@@ -47,12 +60,13 @@ export default function SettingsPage() {
         {/* Sidebar Navigation */}
         <nav className="flex lg:w-56 lg:flex-col lg:shrink-0">
           <div className="flex gap-1 overflow-x-auto pb-2 lg:flex-col lg:gap-0.5 lg:pb-0">
-            {tabs.map((tab) => {
-              const isActive = activeTab === tab.id
+            {tabIds.map((tabId) => {
+              const isActive = activeTab === tabId
+              const Icon = tabIcons[tabId]
               return (
                 <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  key={tabId}
+                  onClick={() => setActiveTab(tabId)}
                   className={cn(
                     "flex items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium transition-colors",
                     isActive
@@ -60,8 +74,8 @@ export default function SettingsPage() {
                       : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                   )}
                 >
-                  <tab.icon className="h-4 w-4" />
-                  {tab.label}
+                  <Icon className="h-4 w-4" />
+                  {t(tabLabelKeys[tabId])}
                 </button>
               )
             })}

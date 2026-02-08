@@ -27,25 +27,26 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 
-function getStockBadge(item: InventoryItem) {
+function getStockBadge(item: InventoryItem, t: (key: string) => string) {
   const status = getStockStatus(item)
   switch (status) {
     case "in_stock":
-      return <Badge variant="success">In Stock</Badge>
+      return <Badge variant="success">{t("status.inStock")}</Badge>
     case "low_stock":
       return (
         <Badge variant="warning" className="gap-1">
           <AlertTriangle className="h-3 w-3" />
-          Low Stock
+          {t("status.lowStock")}
         </Badge>
       )
     case "out_of_stock":
-      return <Badge variant="destructive">Out of Stock</Badge>
+      return <Badge variant="destructive">{t("status.outOfStock")}</Badge>
   }
 }
 
 export function getInventoryColumns(
-  onAdjust: (item: InventoryItem) => void
+  onAdjust: (item: InventoryItem) => void,
+  t: (key: string) => string
 ): ColumnDef<InventoryItem>[] {
   return [
     {
@@ -56,7 +57,7 @@ export function getInventoryColumns(
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="-ml-4"
         >
-          SKU
+          {t("columns.sku")}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -77,26 +78,26 @@ export function getInventoryColumns(
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="-ml-4"
         >
-          Title
+          {t("columns.title")}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
       cell: ({ row }) => (
         <div className="max-w-[200px]">
           <p className="text-sm truncate">
-            {row.original.title || "Untitled"}
+            {row.original.title || t("table.untitled")}
           </p>
         </div>
       ),
     },
     {
       id: "status",
-      header: "Status",
-      cell: ({ row }) => getStockBadge(row.original),
+      header: t("columns.status"),
+      cell: ({ row }) => getStockBadge(row.original, t),
     },
     {
       id: "stocked",
-      header: "Stocked",
+      header: t("columns.stocked"),
       cell: ({ row }) => (
         <span className="text-sm tabular-nums">
           {getTotalStocked(row.original)}
@@ -105,7 +106,7 @@ export function getInventoryColumns(
     },
     {
       id: "reserved",
-      header: "Reserved",
+      header: t("columns.reserved"),
       cell: ({ row }) => (
         <span className="text-sm tabular-nums text-muted-foreground">
           {getTotalReserved(row.original)}
@@ -114,7 +115,7 @@ export function getInventoryColumns(
     },
     {
       id: "available",
-      header: "Available",
+      header: t("columns.available"),
       cell: ({ row }) => {
         const available = getTotalAvailable(row.original)
         return (
@@ -134,7 +135,7 @@ export function getInventoryColumns(
     },
     {
       id: "incoming",
-      header: "Incoming",
+      header: t("columns.incoming"),
       cell: ({ row }) => {
         const incoming = getTotalIncoming(row.original)
         return (
@@ -146,7 +147,7 @@ export function getInventoryColumns(
     },
     {
       id: "locations",
-      header: "Locations",
+      header: t("columns.locations"),
       cell: ({ row }) => (
         <span className="text-sm text-muted-foreground">
           {row.original.location_levels?.length || 0}
@@ -162,20 +163,20 @@ export function getInventoryColumns(
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">Open menu</span>
+                <span className="sr-only">{t("table.openMenu")}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <Link href={`/inventory/${item.id}`}>
                 <DropdownMenuItem>
                   <Eye className="mr-2 h-4 w-4" />
-                  View Details
+                  {t("table.viewDetails")}
                 </DropdownMenuItem>
               </Link>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => onAdjust(item)}>
                 <PenLine className="mr-2 h-4 w-4" />
-                Adjust Stock
+                {t("table.adjustStock")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

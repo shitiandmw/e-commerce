@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import {
   useSalesChannels,
   useCreateSalesChannel,
@@ -30,6 +31,7 @@ import {
 } from "lucide-react"
 
 export function SalesChannelSettings() {
+  const t = useTranslations("settings")
   const { data, isLoading } = useSalesChannels()
   const deleteSalesChannel = useDeleteSalesChannel()
 
@@ -64,20 +66,20 @@ export function SalesChannelSettings() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ShoppingBag className="h-5 w-5 text-muted-foreground" />
-            <h2 className="text-lg font-semibold">Sales Channels</h2>
+            <h2 className="text-lg font-semibold">{t("salesChannels.title")}</h2>
           </div>
           <Button size="sm" onClick={() => setShowCreate(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Channel
+            {t("salesChannels.addChannel")}
           </Button>
         </div>
         <p className="text-sm text-muted-foreground">
-          Sales channels represent different storefronts or platforms where you sell products.
+          {t("salesChannels.description")}
         </p>
 
         {channels.length === 0 ? (
           <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
-            No sales channels configured.
+            {t("salesChannels.noChannels")}
           </div>
         ) : (
           <div className="space-y-3">
@@ -90,7 +92,7 @@ export function SalesChannelSettings() {
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{ch.name}</span>
                     <Badge variant={ch.is_disabled ? "secondary" : "success"}>
-                      {ch.is_disabled ? "Disabled" : "Active"}
+                      {ch.is_disabled ? t("salesChannels.disabled") : t("salesChannels.active")}
                     </Badge>
                   </div>
                   {ch.description && (
@@ -99,7 +101,7 @@ export function SalesChannelSettings() {
                     </p>
                   )}
                   <p className="text-xs text-muted-foreground">
-                    Created {new Date(ch.created_at).toLocaleDateString()}
+                    {t("salesChannels.created")} {new Date(ch.created_at).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="flex items-center gap-1">
@@ -145,21 +147,21 @@ export function SalesChannelSettings() {
       <Dialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <DialogContent onClose={() => setDeleteId(null)}>
           <DialogHeader>
-            <DialogTitle>Delete Sales Channel</DialogTitle>
+            <DialogTitle>{t("salesChannels.deleteTitle")}</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground py-4">
-            Are you sure you want to delete this sales channel? Products will no longer be available through it.
+            {t("salesChannels.deleteConfirm")}
           </p>
           {deleteSalesChannel.error && (
             <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
               {deleteSalesChannel.error instanceof Error
                 ? deleteSalesChannel.error.message
-                : "Failed to delete sales channel"}
+                : t("salesChannels.deleteFailed")}
             </div>
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteId(null)}>
-              Cancel
+              {t("salesChannels.cancel")}
             </Button>
             <Button
               variant="destructive"
@@ -169,7 +171,7 @@ export function SalesChannelSettings() {
               {deleteSalesChannel.isPending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : null}
-              Delete
+              {t("salesChannels.delete")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -193,6 +195,7 @@ function SalesChannelFormDialog({
   mode,
   channel,
 }: SalesChannelFormDialogProps) {
+  const t = useTranslations("settings")
   const createChannel = useCreateSalesChannel()
   const updateChannel = useUpdateSalesChannel(channel?.id || "")
 
@@ -242,26 +245,26 @@ function SalesChannelFormDialog({
       <DialogContent onClose={() => onOpenChange(false)}>
         <DialogHeader>
           <DialogTitle>
-            {mode === "create" ? "Create Sales Channel" : "Edit Sales Channel"}
+            {mode === "create" ? t("salesChannels.createTitle") : t("salesChannels.editTitle")}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="sc-name">Name</Label>
+            <Label htmlFor="sc-name">{t("salesChannels.name")}</Label>
             <Input
               id="sc-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Web Store"
+              placeholder={t("salesChannels.namePlaceholder")}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="sc-description">Description</Label>
+            <Label htmlFor="sc-description">{t("salesChannels.descriptionLabel")}</Label>
             <Textarea
               id="sc-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe this sales channel..."
+              placeholder={t("salesChannels.descriptionPlaceholder")}
               rows={3}
             />
           </div>
@@ -274,24 +277,24 @@ function SalesChannelFormDialog({
               className="h-4 w-4 rounded border-gray-300"
             />
             <Label htmlFor="sc-disabled" className="cursor-pointer">
-              Disabled
+              {t("salesChannels.disabled")}
             </Label>
           </div>
           {error && (
             <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-              {error instanceof Error ? error.message : "An error occurred"}
+              {error instanceof Error ? error.message : t("salesChannels.errorOccurred")}
             </div>
           )}
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t("salesChannels.cancel")}
           </Button>
           <Button onClick={handleSubmit} disabled={isPending || !name}>
             {isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : null}
-            {mode === "create" ? "Create" : "Save"}
+            {mode === "create" ? t("salesChannels.create") : t("salesChannels.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

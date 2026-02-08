@@ -1,11 +1,22 @@
 {
   "settings": {
     "title": "Settings",
+    "description": "Manage your store configuration, regions, payments, and team.",
     "general": "General",
     "store": "Store Information",
     "regions": "Regions",
     "currencies": "Currencies",
     "language": "Language",
+
+    "tabs": {
+      "store": "Store",
+      "regions": "Regions",
+      "channels": "Sales Channels",
+      "shipping": "Shipping",
+      "payments": "Payments",
+      "team": "Team",
+      "apiKeys": "API Keys"
+    },
 
     "storeInfo": {
       "title": "Store Information",
