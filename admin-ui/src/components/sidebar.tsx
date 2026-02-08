@@ -17,6 +17,7 @@ import {
   ImageIcon,
   BarChart3,
 } from "lucide-react"
+import { LanguageSwitcher } from "@/components/language-switcher"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -69,8 +70,9 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Logout */}
-      <div className="border-t px-3 py-4">
+      {/* Language Switcher & Logout */}
+      <div className="border-t px-3 py-4 space-y-1">
+        <LanguageSwitcher />
         <button
           onClick={handleLogout}
           className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
