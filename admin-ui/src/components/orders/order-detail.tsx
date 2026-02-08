@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import {
   useOrder,
   useCancelOrder,
@@ -67,6 +68,7 @@ interface OrderDetailProps {
 
 export function OrderDetail({ orderId }: OrderDetailProps) {
   const router = useRouter()
+  const t = useTranslations("orders")
   const { data, isLoading, isError, error } = useOrder(orderId)
   const cancelOrder = useCancelOrder()
   const completeOrder = useCompleteOrder()
@@ -142,14 +144,14 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
         <Link href="/orders">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Orders
+            {t("detail.backToOrders")}
           </Button>
         </Link>
         <div className="rounded-lg border bg-card p-8 text-center">
           <p className="text-destructive">
             {error instanceof Error
               ? error.message
-              : "Order not found or failed to load."}
+              : t("detail.orderNotFound")}
           </p>
         </div>
       </div>
@@ -173,13 +175,14 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           <div>
             <div className="flex items-center gap-3 flex-wrap">
               <h1 className="text-3xl font-bold tracking-tight">
-                Order #{order.display_id}
+                {t("orderPrefix", { id: order.display_id })}
               </h1>
-              {getOrderStatusBadge(order.status)}
+              {getOrderStatusBadge(order.status, t)}
             </div>
             <p className="text-muted-foreground mt-1">
-              Placed on{" "}
-              {format(new Date(order.created_at), "MMMM d, yyyy 'at' h:mm a")}
+              {t("placedOn", {
+                date: format(new Date(order.created_at), "MMMM d, yyyy 'at' h:mm a"),
+              })}
             </p>
           </div>
         </div>
@@ -190,7 +193,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
               onClick={() => setShowCompleteDialog(true)}
             >
               <CheckCircle className="mr-2 h-4 w-4" />
-              Complete
+              {t("detail.complete")}
             </Button>
           )}
           {canRefund && (
@@ -199,7 +202,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
               onClick={() => setShowRefundDialog(true)}
             >
               <RotateCcw className="mr-2 h-4 w-4" />
-              Refund
+              {t("detail.refund")}
             </Button>
           )}
           {canCancel && (
@@ -208,7 +211,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
               onClick={() => setShowCancelDialog(true)}
             >
               <Ban className="mr-2 h-4 w-4" />
-              Cancel
+              {t("detail.cancel")}
             </Button>
           )}
         </div>
@@ -217,15 +220,15 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
       {/* Status Badges Row */}
       <div className="flex items-center gap-4 flex-wrap">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Payment:</span>
-          {getPaymentStatusBadge(order.payment_status) || (
-            <Badge variant="outline">Unknown</Badge>
+          <span className="text-sm text-muted-foreground">{t("columns.payment")}:</span>
+          {getPaymentStatusBadge(order.payment_status, t) || (
+            <Badge variant="outline">{t("paymentStatus.unknown")}</Badge>
           )}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Fulfillment:</span>
-          {getFulfillmentStatusBadge(order.fulfillment_status) || (
-            <Badge variant="outline">Unknown</Badge>
+          <span className="text-sm text-muted-foreground">{t("columns.fulfillment")}:</span>
+          {getFulfillmentStatusBadge(order.fulfillment_status, t) || (
+            <Badge variant="outline">{t("fulfillmentStatus.unknown")}</Badge>
           )}
         </div>
       </div>
@@ -237,7 +240,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Package className="h-5 w-5" />
-              Items
+              {t("detail.sections.items")}
               {order.items && (
                 <Badge variant="secondary">{order.items.length}</Badge>
               )}
@@ -245,7 +248,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
 
             {!order.items || order.items.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                No items in this order.
+                {t("detail.items.noItems")}
               </p>
             ) : (
               <div className="space-y-3">
@@ -273,12 +276,12 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                       </p>
                       {item.variant_title && (
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          Variant: {item.variant_title}
+                          {t("detail.items.variant", { name: item.variant_title })}
                         </p>
                       )}
                       {item.variant_sku && (
                         <p className="text-xs text-muted-foreground">
-                          SKU: {item.variant_sku}
+                          {t("detail.items.sku", { sku: item.variant_sku })}
                         </p>
                       )}
                       <p className="text-sm text-muted-foreground mt-1">
@@ -293,7 +296,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                       </p>
                       {item.discount_total && item.discount_total > 0 ? (
                         <p className="text-xs text-green-600">
-                          -{formatCurrency(item.discount_total, order.currency_code)} discount
+                          {t("detail.items.discount", { amount: formatCurrency(item.discount_total, order.currency_code) })}
                         </p>
                       ) : null}
                     </div>
@@ -303,14 +306,14 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                 {/* Order Summary */}
                 <div className="border-t pt-4 space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Subtotal</span>
+                    <span className="text-muted-foreground">{t("detail.summary.subtotal")}</span>
                     <span>
                       {formatCurrency(order.subtotal, order.currency_code)}
                     </span>
                   </div>
                   {order.shipping_total > 0 && (
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Shipping</span>
+                      <span className="text-muted-foreground">{t("detail.summary.shipping")}</span>
                       <span>
                         {formatCurrency(
                           order.shipping_total,
@@ -321,7 +324,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                   )}
                   {order.tax_total > 0 && (
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Tax</span>
+                      <span className="text-muted-foreground">{t("detail.summary.tax")}</span>
                       <span>
                         {formatCurrency(order.tax_total, order.currency_code)}
                       </span>
@@ -329,7 +332,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                   )}
                   {order.discount_total > 0 && (
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Discount</span>
+                      <span className="text-muted-foreground">{t("detail.summary.discount")}</span>
                       <span className="text-green-600">
                         -{formatCurrency(
                           order.discount_total,
@@ -339,7 +342,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                     </div>
                   )}
                   <div className="flex items-center justify-between font-semibold text-base border-t pt-2">
-                    <span>Total</span>
+                    <span>{t("detail.summary.total")}</span>
                     <span>
                       {formatCurrency(order.total, order.currency_code)}
                     </span>
@@ -353,7 +356,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Truck className="h-5 w-5" />
-              Fulfillments
+              {t("detail.sections.fulfillments")}
               {order.fulfillments && order.fulfillments.length > 0 && (
                 <Badge variant="secondary">{order.fulfillments.length}</Badge>
               )}
@@ -363,7 +366,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
               <div className="flex items-center gap-3 rounded-md bg-muted/50 p-4">
                 <Truck className="h-5 w-5 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">
-                  No fulfillments yet. This order has not been shipped.
+                  {t("detail.fulfillments.noFulfillments")}
                 </p>
               </div>
             ) : (
@@ -372,41 +375,38 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                   <div key={ful.id} className="rounded-md border p-4 space-y-3">
                     <div className="flex items-center justify-between">
                       <p className="font-medium text-sm">
-                        Fulfillment #{idx + 1}
+                        {t("detail.fulfillments.fulfillmentNumber", { number: idx + 1 })}
                       </p>
                       {ful.canceled_at ? (
-                        <Badge variant="destructive">Canceled</Badge>
+                        <Badge variant="destructive">{t("detail.fulfillments.canceled")}</Badge>
                       ) : ful.delivered_at ? (
-                        <Badge variant="success">Delivered</Badge>
+                        <Badge variant="success">{t("detail.fulfillments.delivered")}</Badge>
                       ) : ful.shipped_at ? (
                         <Badge className="border-transparent bg-blue-100 text-blue-800">
-                          Shipped
+                          {t("detail.fulfillments.shipped")}
                         </Badge>
                       ) : (
-                        <Badge variant="warning">Processing</Badge>
+                        <Badge variant="warning">{t("detail.fulfillments.processing")}</Badge>
                       )}
                     </div>
                     <div className="text-xs text-muted-foreground space-y-1">
                       <p>
-                        Created:{" "}
-                        {format(new Date(ful.created_at), "MMM d, yyyy h:mm a")}
+                        {t("detail.fulfillments.created", {
+                          date: format(new Date(ful.created_at), "MMM d, yyyy h:mm a"),
+                        })}
                       </p>
                       {ful.shipped_at && (
                         <p>
-                          Shipped:{" "}
-                          {format(
-                            new Date(ful.shipped_at),
-                            "MMM d, yyyy h:mm a"
-                          )}
+                          {t("detail.fulfillments.shippedDate", {
+                            date: format(new Date(ful.shipped_at), "MMM d, yyyy h:mm a"),
+                          })}
                         </p>
                       )}
                       {ful.delivered_at && (
                         <p>
-                          Delivered:{" "}
-                          {format(
-                            new Date(ful.delivered_at),
-                            "MMM d, yyyy h:mm a"
-                          )}
+                          {t("detail.fulfillments.deliveredDate", {
+                            date: format(new Date(ful.delivered_at), "MMM d, yyyy h:mm a"),
+                          })}
                         </p>
                       )}
                     </div>
@@ -417,7 +417,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                           <div key={li} className="text-xs">
                             {label.tracking_number && (
                               <span className="text-muted-foreground">
-                                Tracking: {label.tracking_number}
+                                {t("detail.fulfillments.tracking", { number: label.tracking_number })}
                               </span>
                             )}
                             {label.tracking_url && (
@@ -427,7 +427,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                                 rel="noopener noreferrer"
                                 className="text-primary hover:underline ml-2"
                               >
-                                Track
+                                {t("detail.fulfillments.track")}
                               </a>
                             )}
                           </div>
@@ -438,7 +438,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                     {ful.items && ful.items.length > 0 && (
                       <div className="text-xs text-muted-foreground">
                         <p className="font-medium text-foreground mb-1">
-                          Fulfilled Items:
+                          {t("detail.fulfillments.fulfilledItems")}
                         </p>
                         {ful.items.map((fi, fii) => (
                           <p key={fii}>
@@ -457,13 +457,13 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <CreditCard className="h-5 w-5" />
-              Payment
+              {t("detail.sections.payment")}
             </h2>
 
             {!order.payment_collections ||
             order.payment_collections.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                No payment information available.
+                {t("detail.payment.noPaymentInfo")}
               </p>
             ) : (
               <div className="space-y-3">
@@ -471,7 +471,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                   <div key={pc.id} className="rounded-md border p-4 space-y-3">
                     <div className="flex items-center justify-between">
                       <p className="text-sm font-medium">
-                        Collection{" "}
+                        {t("detail.payment.collection")}{" "}
                         <code className="text-xs bg-muted px-1.5 py-0.5 rounded ml-1">
                           {pc.id.slice(0, 16)}...
                         </code>
@@ -489,7 +489,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Amount</span>
+                      <span className="text-muted-foreground">{t("detail.payment.amount")}</span>
                       <span className="font-medium">
                         {formatCurrency(
                           pc.amount,
@@ -501,7 +501,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                     {pc.payments && pc.payments.length > 0 && (
                       <div className="space-y-2 border-t pt-2">
                         <p className="text-xs font-medium text-muted-foreground">
-                          Payments
+                          {t("detail.payment.payments")}
                         </p>
                         {pc.payments.map((payment) => (
                           <div
@@ -511,7 +511,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                             <div className="space-y-0.5">
                               {payment.provider_id && (
                                 <p className="text-muted-foreground">
-                                  Provider: {payment.provider_id}
+                                  {t("detail.payment.provider", { name: payment.provider_id })}
                                 </p>
                               )}
                               <p className="text-muted-foreground">
@@ -530,7 +530,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                               </p>
                               {payment.captured_at && (
                                 <Badge variant="success" className="text-[10px] px-1.5 py-0">
-                                  Captured
+                                  {t("detail.payment.captured")}
                                 </Badge>
                               )}
                             </div>
@@ -551,7 +551,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <User className="h-5 w-5" />
-              Customer
+              {t("detail.sections.customer")}
             </h2>
 
             {order.customer ? (
@@ -568,7 +568,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                     <p className="font-medium">
                       {[order.customer.first_name, order.customer.last_name]
                         .filter(Boolean)
-                        .join(" ") || "Guest"}
+                        .join(" ") || t("detail.customer.guest")}
                     </p>
                     {order.customer.has_account !== undefined && (
                       <Badge
@@ -578,8 +578,8 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                         className="text-[10px] mt-0.5"
                       >
                         {order.customer.has_account
-                          ? "Registered"
-                          : "Guest"}
+                          ? t("detail.customer.registered")
+                          : t("detail.customer.guest")}
                       </Badge>
                     )}
                   </div>
@@ -606,7 +606,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                   href={`/customers/${order.customer.id}`}
                   className="text-sm text-primary hover:underline block"
                 >
-                  View Customer Profile
+                  {t("detail.customer.viewProfile")}
                 </Link>
               </div>
             ) : (
@@ -617,7 +617,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                     {order.email || "-"}
                   </span>
                 </div>
-                <p className="text-muted-foreground italic">Guest checkout</p>
+                <p className="text-muted-foreground italic">{t("detail.customer.guestCheckout")}</p>
               </div>
             )}
           </div>
@@ -626,7 +626,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <MapPin className="h-5 w-5" />
-              Shipping Address
+              {t("detail.sections.shippingAddress")}
             </h2>
 
             {order.shipping_address ? (
@@ -666,7 +666,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
               </div>
             ) : (
               <p className="text-sm text-muted-foreground italic">
-                No shipping address provided.
+                {t("detail.address.noShippingAddress")}
               </p>
             )}
           </div>
@@ -675,7 +675,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <CreditCard className="h-5 w-5" />
-              Billing Address
+              {t("detail.sections.billingAddress")}
             </h2>
 
             {order.billing_address ? (
@@ -704,18 +704,18 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
               </div>
             ) : (
               <p className="text-sm text-muted-foreground italic">
-                Same as shipping address.
+                {t("detail.address.sameAsShipping")}
               </p>
             )}
           </div>
 
           {/* Order Meta */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-3">
-            <h2 className="text-lg font-semibold">Order Info</h2>
+            <h2 className="text-lg font-semibold">{t("detail.sections.orderInfo")}</h2>
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground flex items-center gap-1.5">
-                  <Hash className="h-3.5 w-3.5" /> Order ID
+                  <Hash className="h-3.5 w-3.5" /> {t("detail.orderMeta.orderId")}
                 </span>
                 <code className="text-xs bg-muted px-2 py-0.5 rounded break-all max-w-[140px] text-right">
                   {order.id}
@@ -723,7 +723,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground flex items-center gap-1.5">
-                  <Calendar className="h-3.5 w-3.5" /> Created
+                  <Calendar className="h-3.5 w-3.5" /> {t("detail.orderMeta.created")}
                 </span>
                 <span>
                   {format(new Date(order.created_at), "MMM d, yyyy")}
@@ -731,7 +731,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground flex items-center gap-1.5">
-                  <Calendar className="h-3.5 w-3.5" /> Updated
+                  <Calendar className="h-3.5 w-3.5" /> {t("detail.orderMeta.updated")}
                 </span>
                 <span>
                   {format(new Date(order.updated_at), "MMM d, yyyy")}
@@ -739,20 +739,20 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
               </div>
               {order.region && (
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Region</span>
+                  <span className="text-muted-foreground">{t("detail.orderMeta.region")}</span>
                   <span>{order.region.name || order.region.id}</span>
                 </div>
               )}
               {order.sales_channel && (
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Sales Channel</span>
+                  <span className="text-muted-foreground">{t("detail.orderMeta.salesChannel")}</span>
                   <span>
                     {order.sales_channel.name || order.sales_channel.id}
                   </span>
                 </div>
               )}
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Currency</span>
+                <span className="text-muted-foreground">{t("detail.orderMeta.currency")}</span>
                 <span className="uppercase">{order.currency_code}</span>
               </div>
             </div>

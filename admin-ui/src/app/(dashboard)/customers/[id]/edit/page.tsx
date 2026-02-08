@@ -5,28 +5,34 @@ import { useParams, useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
+import { useTranslations } from "next-intl"
 import { useCustomer, useUpdateCustomer } from "@/hooks/use-customers"
 import { ArrowLeft, Save, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-const customerSchema = z.object({
-  first_name: z.string().optional(),
-  last_name: z.string().optional(),
-  email: z.string().email("Please enter a valid email address"),
-  phone: z.string().optional(),
-  company_name: z.string().optional(),
-})
+type CustomerFormValues = z.infer<ReturnType<typeof createCustomerSchema>>
 
-type CustomerFormValues = z.infer<typeof customerSchema>
+function createCustomerSchema(emailValidation: string) {
+  return z.object({
+    first_name: z.string().optional(),
+    last_name: z.string().optional(),
+    email: z.string().email(emailValidation),
+    phone: z.string().optional(),
+    company_name: z.string().optional(),
+  })
+}
 
 export default function CustomerEditPage() {
   const params = useParams()
   const router = useRouter()
+  const t = useTranslations("customers")
   const customerId = params.id as string
 
   const { data: customer, isLoading: isLoadingCustomer } =
     useCustomer(customerId)
   const updateCustomer = useUpdateCustomer(customerId)
+
+  const customerSchema = createCustomerSchema(t("edit.fields.emailValidation"))
 
   const {
     register,
@@ -88,10 +94,10 @@ export default function CustomerEditPage() {
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Customers
+          {t("detail.backToCustomers")}
         </button>
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <p className="text-sm text-destructive">Customer not found</p>
+          <p className="text-sm text-destructive">{t("detail.customerNotFound")}</p>
         </div>
       </div>
     )
@@ -105,14 +111,14 @@ export default function CustomerEditPage() {
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to Customer
+        {t("edit.backToCustomer")}
       </button>
 
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Edit Customer</h1>
+        <h1 className="text-2xl font-bold tracking-tight">{t("edit.title")}</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Update customer information for {customer.email}
+          {t("edit.description", { email: customer.email })}
         </p>
       </div>
 
@@ -120,19 +126,19 @@ export default function CustomerEditPage() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="rounded-lg border bg-card shadow-sm">
           <div className="px-6 py-4 border-b">
-            <h2 className="text-base font-semibold">Basic Information</h2>
+            <h2 className="text-base font-semibold">{t("edit.basicInformation")}</h2>
           </div>
           <div className="p-6 space-y-5">
             {/* First Name & Last Name */}
             <div className="grid gap-5 md:grid-cols-2">
               <FormField
-                label="First Name"
+                label={t("edit.fields.firstName")}
                 error={errors.first_name?.message}
               >
                 <input
                   type="text"
                   {...register("first_name")}
-                  placeholder="Enter first name"
+                  placeholder={t("edit.fields.firstNamePlaceholder")}
                   className={cn(
                     "h-10 w-full rounded-md border border-input bg-background px-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                     errors.first_name && "border-destructive"
@@ -140,11 +146,11 @@ export default function CustomerEditPage() {
                 />
               </FormField>
 
-              <FormField label="Last Name" error={errors.last_name?.message}>
+              <FormField label={t("edit.fields.lastName")} error={errors.last_name?.message}>
                 <input
                   type="text"
                   {...register("last_name")}
-                  placeholder="Enter last name"
+                  placeholder={t("edit.fields.lastNamePlaceholder")}
                   className={cn(
                     "h-10 w-full rounded-md border border-input bg-background px-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                     errors.last_name && "border-destructive"
@@ -154,11 +160,11 @@ export default function CustomerEditPage() {
             </div>
 
             {/* Email */}
-            <FormField label="Email" error={errors.email?.message} required>
+            <FormField label={t("edit.fields.email")} error={errors.email?.message} required>
               <input
                 type="email"
                 {...register("email")}
-                placeholder="Enter email address"
+                placeholder={t("edit.fields.emailPlaceholder")}
                 className={cn(
                   "h-10 w-full rounded-md border border-input bg-background px-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                   errors.email && "border-destructive"
@@ -167,11 +173,11 @@ export default function CustomerEditPage() {
             </FormField>
 
             {/* Phone */}
-            <FormField label="Phone" error={errors.phone?.message}>
+            <FormField label={t("edit.fields.phone")} error={errors.phone?.message}>
               <input
                 type="tel"
                 {...register("phone")}
-                placeholder="Enter phone number"
+                placeholder={t("edit.fields.phonePlaceholder")}
                 className={cn(
                   "h-10 w-full rounded-md border border-input bg-background px-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                   errors.phone && "border-destructive"
@@ -181,13 +187,13 @@ export default function CustomerEditPage() {
 
             {/* Company */}
             <FormField
-              label="Company Name"
+              label={t("edit.fields.companyName")}
               error={errors.company_name?.message}
             >
               <input
                 type="text"
                 {...register("company_name")}
-                placeholder="Enter company name"
+                placeholder={t("edit.fields.companyNamePlaceholder")}
                 className={cn(
                   "h-10 w-full rounded-md border border-input bg-background px-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                   errors.company_name && "border-destructive"
@@ -201,7 +207,7 @@ export default function CustomerEditPage() {
         {updateCustomer.isError && (
           <div className="rounded-md bg-destructive/10 p-4">
             <p className="text-sm text-destructive">
-              Failed to update customer. Please try again.
+              {t("edit.failedToUpdate")}
             </p>
           </div>
         )}
@@ -213,7 +219,7 @@ export default function CustomerEditPage() {
             onClick={() => router.push(`/customers/${customerId}`)}
             className="inline-flex h-10 items-center justify-center rounded-md border px-4 py-2 text-sm font-medium transition-colors hover:bg-accent"
           >
-            Cancel
+            {t("edit.cancel")}
           </button>
           <button
             type="submit"
@@ -225,7 +231,7 @@ export default function CustomerEditPage() {
             ) : (
               <Save className="h-4 w-4" />
             )}
-            Save Changes
+            {t("edit.saveChanges")}
           </button>
         </div>
       </form>
