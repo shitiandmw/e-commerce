@@ -8,7 +8,10 @@ import { getToken } from "@/lib/auth"
 export interface MediaFile {
   id: string
   url: string
+  name?: string
   key?: string
+  size?: number
+  mime_type?: string
   created_at?: string
   updated_at?: string
 }
@@ -53,19 +56,16 @@ async function deleteFile(fileId: string): Promise<void> {
   })
 }
 
-// Medusa v2 does NOT provide a GET /admin/uploads listing endpoint.
-// We maintain a client-side (session-level) cache inside React Query.
-// Uploaded files are added to the cache on success; deleted files are
-// removed from it.  The cache starts empty on every page load.
+// Fetch list of uploaded files from our custom GET /admin/uploads endpoint
+async function fetchFiles(): Promise<{ files: MediaFile[] }> {
+  return adminFetch<{ files: MediaFile[] }>("/admin/uploads?limit=200")
+}
 
 // Hooks
 export function useMediaFiles() {
   return useQuery<{ files: MediaFile[] }>({
     queryKey: ["media-files"],
-    queryFn: () => ({ files: [] }),
-    staleTime: Infinity,       // never refetch — we manage the cache manually
-    gcTime: Infinity,          // keep it alive for the whole session
-    retry: false,
+    queryFn: fetchFiles,
   })
 }
 
@@ -74,14 +74,8 @@ export function useUploadMedia() {
 
   return useMutation({
     mutationFn: (files: File[]) => uploadFiles(files),
-    onSuccess: (data) => {
-      // Append newly uploaded files into the query cache
-      queryClient.setQueryData<{ files: MediaFile[] }>(
-        ["media-files"],
-        (old) => ({
-          files: [...(old?.files ?? []), ...data.files],
-        })
-      )
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["media-files"] })
     },
   })
 }
@@ -91,14 +85,8 @@ export function useDeleteMedia() {
 
   return useMutation({
     mutationFn: (fileId: string) => deleteFile(fileId),
-    onSuccess: (_data, fileId) => {
-      // Remove deleted file from the query cache
-      queryClient.setQueryData<{ files: MediaFile[] }>(
-        ["media-files"],
-        (old) => ({
-          files: (old?.files ?? []).filter((f) => f.id !== fileId),
-        })
-      )
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["media-files"] })
     },
   })
 }
