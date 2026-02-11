@@ -1,0 +1,26 @@
+{
+  "seo": {
+    "title": "SEO",
+    "description": "Search engine optimization settings",
+    "metaTitle": "Meta Title",
+    "metaTitlePlaceholder": "Page title for search engines",
+    "metaTitleHint": "Recommended: 50-60 characters",
+    "metaDescription": "Meta Description",
+    "metaDescriptionPlaceholder": "Brief description for search results",
+    "metaDescriptionHint": "Recommended: 120-160 characters",
+    "ogImage": "OG Image",
+    "ogImagePlaceholder": "https://example.com/og-image.jpg",
+    "ogImageHint": "Image displayed when shared on social media",
+    "keywords": "Keywords",
+    "keywordsPlaceholder": "keyword1, keyword2, keyword3",
+    "keywordsHint": "Comma-separated keywords",
+    "preview": "Search Engine Preview",
+    "previewHint": "Approximate preview of how this page appears in search results",
+    "autoGenerate": "Auto Generate",
+    "autoGenerateTooltip": "Fill SEO fields from product title and description",
+    "characters": "{count} characters",
+    "browseMedia": "Browse Media",
+    "noTitle": "No title",
+    "noDescription": "No description"
+  }
+}

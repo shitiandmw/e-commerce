@@ -1,0 +1,26 @@
+{
+  "seo": {
+    "title": "SEO",
+    "description": "搜索引擎优化设置",
+    "metaTitle": "Meta 标题",
+    "metaTitlePlaceholder": "搜索引擎页面标题",
+    "metaTitleHint": "建议：50-60 个字符",
+    "metaDescription": "Meta 描述",
+    "metaDescriptionPlaceholder": "搜索结果中的简要描述",
+    "metaDescriptionHint": "建议：120-160 个字符",
+    "ogImage": "OG 图片",
+    "ogImagePlaceholder": "https://example.com/og-image.jpg",
+    "ogImageHint": "在社交媒体分享时显示的图片",
+    "keywords": "关键词",
+    "keywordsPlaceholder": "关键词1, 关键词2, 关键词3",
+    "keywordsHint": "以逗号分隔的关键词",
+    "preview": "搜索引擎预览",
+    "previewHint": "此页面在搜索结果中的大致预览效果",
+    "autoGenerate": "自动生成",
+    "autoGenerateTooltip": "从产品标题和描述自动填充 SEO 字段",
+    "characters": "{count} 个字符",
+    "browseMedia": "浏览媒体库",
+    "noTitle": "无标题",
+    "noDescription": "无描述"
+  }
+}

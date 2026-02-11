@@ -41,6 +41,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { MediaPicker } from "@/components/media/media-picker"
+import { SeoEditor, type SeoData } from "@/components/ui/seo-editor"
 
 const variantSchema = z.object({
   title: z.string().min(1, "Variant title is required"),
@@ -194,6 +195,17 @@ export function ProductForm({ product, mode }: ProductFormProps) {
   const [thumbnailPickerOpen, setThumbnailPickerOpen] = React.useState(false)
   const [imagesPickerOpen, setImagesPickerOpen] = React.useState(false)
 
+  // SEO state – stored in product.metadata.seo
+  const [seoData, setSeoData] = React.useState<SeoData>(() => {
+    const seo = product?.metadata?.seo as SeoData | undefined
+    return {
+      meta_title: seo?.meta_title ?? "",
+      meta_description: seo?.meta_description ?? "",
+      og_image: seo?.og_image ?? "",
+      keywords: seo?.keywords ?? "",
+    }
+  })
+
   const onSubmit = async (data: ProductFormData) => {
     try {
       // Build the API payload
@@ -209,6 +221,10 @@ export function ProductForm({ product, mode }: ProductFormProps) {
         length: data.length ? Number(data.length) : undefined,
         height: data.height ? Number(data.height) : undefined,
         width: data.width ? Number(data.width) : undefined,
+        metadata: {
+          ...(product?.metadata ?? {}),
+          seo: seoData,
+        },
       }
 
       if (data.category_ids.length > 0) {
@@ -724,6 +740,15 @@ export function ProductForm({ product, mode }: ProductFormProps) {
               </div>
             ))}
           </div>
+
+          {/* SEO */}
+          <SeoEditor
+            value={seoData}
+            onChange={setSeoData}
+            autoTitle={watch("title")}
+            autoDescription={watch("description")}
+            slug={watch("handle")}
+          />
         </div>
 
         {/* Sidebar */}

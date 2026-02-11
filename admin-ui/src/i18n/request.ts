@@ -25,6 +25,7 @@ const namespaces = [
   "promotions",
   "shipping",
   "pages",
+  "seo",
 ] as const
 
 async function loadMessages(locale: string) {

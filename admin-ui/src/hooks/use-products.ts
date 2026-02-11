@@ -79,6 +79,7 @@ export interface Product {
   length?: number | null
   height?: number | null
   width?: number | null
+  metadata?: Record<string, any> | null
   created_at: string
   updated_at: string
 }
@@ -129,7 +130,7 @@ export function useProduct(id: string) {
     queryKey: ["product", id],
     queryFn: () =>
       adminFetch<{ product: Product }>(
-        `/admin/products/${id}?fields=+variants,+variants.prices,+options,+options.values,+images,+categories,+brand`
+        `/admin/products/${id}?fields=+variants,+variants.prices,+options,+options.values,+images,+categories,+brand,+metadata`
       ),
     enabled: !!id,
   })
