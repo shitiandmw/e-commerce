@@ -1,0 +1,85 @@
+{
+  "pages": {
+    "title": "Pages",
+    "subtitle": "Manage your static content pages",
+    "addPage": "Add Page",
+    "createPage": "Create Page",
+    "editPage": "Edit Page",
+    "createSubtitle": "Create a new static page",
+    "editSubtitle": "Editing {name}",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "errorOccurred": "An error occurred",
+    "backToPages": "Back to Pages",
+    "pageNotFound": "Page not found or failed to load.",
+    "status": {
+      "draft": "Draft",
+      "published": "Published"
+    },
+    "templates": {
+      "about": "About Us",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "faq": "FAQ",
+      "shipping-policy": "Shipping Policy",
+      "returns": "Returns & Refunds",
+      "quality": "Quality Assurance"
+    },
+    "columns": {
+      "title": "Title",
+      "status": "Status",
+      "template": "Template",
+      "sortOrder": "Order",
+      "created": "Created"
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete",
+      "openMenu": "Open menu"
+    },
+    "filter": {
+      "allStatuses": "All Statuses"
+    },
+    "table": {
+      "errorLoading": "Failed to load pages",
+      "unknownError": "Unknown error",
+      "noPages": "No pages yet. Create your first page to get started.",
+      "showing": "Showing {from} to {to} of {total} pages",
+      "page": "Page {current} of {total}"
+    },
+    "deleteDialog": {
+      "title": "Delete Page",
+      "description": "Are you sure you want to delete \"{name}\"? This action cannot be undone.",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting..."
+    },
+    "form": {
+      "basicInfo": "Basic Information",
+      "titleLabel": "Title *",
+      "titlePlaceholder": "Page title",
+      "slugLabel": "Slug *",
+      "slugPlaceholder": "page-url-slug",
+      "slugHint": "URL path for this page. Auto-generated from the title.",
+      "contentLabel": "Content",
+      "contentPlaceholder": "Write the page content here...",
+      "statusLabel": "Status",
+      "templateLabel": "Template",
+      "templatePlaceholder": "Select a template",
+      "noTemplate": "No Template",
+      "sortOrderLabel": "Sort Order"
+    },
+    "detail": {
+      "pageContent": "Page Content",
+      "noContent": "No content provided.",
+      "quickInfo": "Quick Info",
+      "status": "Status",
+      "template": "Template",
+      "sortOrder": "Sort Order",
+      "created": "Created",
+      "updated": "Updated",
+      "pageId": "Page ID"
+    }
+  }
+}

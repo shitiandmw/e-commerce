@@ -8,8 +8,13 @@ import {
   PostAdminCreateBrand,
   PostAdminUpdateBrand,
 } from "./admin/brands/validators"
+import {
+  PostAdminCreatePage,
+  PostAdminUpdatePage,
+} from "./admin/pages/validators"
 
 export const GetBrandsSchema = createFindParams()
+export const GetPagesSchema = createFindParams()
 
 export default defineMiddlewares({
   routes: [
@@ -38,6 +43,33 @@ export default defineMiddlewares({
       method: "POST",
       middlewares: [
         validateAndTransformBody(PostAdminUpdateBrand),
+      ],
+    },
+    {
+      matcher: "/admin/pages",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(
+          GetPagesSchema,
+          {
+            defaults: ["id", "title", "slug", "content", "status", "template", "sort_order", "created_at", "updated_at"],
+            isList: true,
+          }
+        ),
+      ],
+    },
+    {
+      matcher: "/admin/pages",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminCreatePage),
+      ],
+    },
+    {
+      matcher: "/admin/pages/:id",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminUpdatePage),
       ],
     },
   ],

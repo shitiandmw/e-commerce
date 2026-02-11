@@ -23,6 +23,7 @@ const namespaces = [
   "importExport",
   "promotions",
   "shipping",
+  "pages",
 ] as const
 
 async function loadMessages(locale: string) {

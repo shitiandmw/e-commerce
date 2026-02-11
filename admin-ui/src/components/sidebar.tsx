@@ -19,6 +19,7 @@ import {
   BarChart3,
   Percent,
   Truck,
+  BookOpen,
 } from "lucide-react"
 import { LanguageSwitcher } from "@/components/language-switcher"
 
@@ -31,6 +32,7 @@ const navigation = [
   { key: "promotions", href: "/promotions", icon: Percent },
   { key: "shipping", href: "/shipping", icon: Truck },
   { key: "customers", href: "/customers", icon: Users },
+  { key: "pages", href: "/pages", icon: BookOpen },
   { key: "media", href: "/media", icon: ImageIcon },
   { key: "analytics", href: "/analytics", icon: BarChart3 },
   { key: "settings", href: "/settings", icon: Settings },

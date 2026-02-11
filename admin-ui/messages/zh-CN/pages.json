@@ -1,0 +1,85 @@
+{
+  "pages": {
+    "title": "页面管理",
+    "subtitle": "管理您的静态内容页面",
+    "addPage": "添加页面",
+    "createPage": "创建页面",
+    "editPage": "编辑页面",
+    "createSubtitle": "创建新的静态页面",
+    "editSubtitle": "正在编辑 {name}",
+    "saveChanges": "保存更改",
+    "saving": "保存中...",
+    "errorOccurred": "发生错误",
+    "backToPages": "返回页面列表",
+    "pageNotFound": "未找到页面或加载失败。",
+    "status": {
+      "draft": "草稿",
+      "published": "已发布"
+    },
+    "templates": {
+      "about": "关于我们",
+      "terms": "服务条款",
+      "privacy": "隐私政策",
+      "faq": "常见问题",
+      "shipping-policy": "物流政策",
+      "returns": "退换货政策",
+      "quality": "品质保障"
+    },
+    "columns": {
+      "title": "标题",
+      "status": "状态",
+      "template": "模板",
+      "sortOrder": "排序",
+      "created": "创建时间"
+    },
+    "actions": {
+      "view": "查看",
+      "edit": "编辑",
+      "delete": "删除",
+      "openMenu": "打开菜单"
+    },
+    "filter": {
+      "allStatuses": "全部状态"
+    },
+    "table": {
+      "errorLoading": "加载页面失败",
+      "unknownError": "未知错误",
+      "noPages": "暂无页面。创建您的第一个页面开始使用。",
+      "showing": "显示第 {from} 至 {to} 条，共 {total} 条页面",
+      "page": "第 {current} 页，共 {total} 页"
+    },
+    "deleteDialog": {
+      "title": "删除页面",
+      "description": "确定要删除「{name}」吗？此操作无法撤销。",
+      "cancel": "取消",
+      "delete": "删除",
+      "deleting": "删除中..."
+    },
+    "form": {
+      "basicInfo": "基本信息",
+      "titleLabel": "标题 *",
+      "titlePlaceholder": "页面标题",
+      "slugLabel": "URL 路径 *",
+      "slugPlaceholder": "page-url-slug",
+      "slugHint": "页面的 URL 路径，根据标题自动生成。",
+      "contentLabel": "正文内容",
+      "contentPlaceholder": "在此编写页面内容...",
+      "statusLabel": "状态",
+      "templateLabel": "页面模板",
+      "templatePlaceholder": "选择模板",
+      "noTemplate": "无模板",
+      "sortOrderLabel": "排序顺序"
+    },
+    "detail": {
+      "pageContent": "页面内容",
+      "noContent": "未提供内容。",
+      "quickInfo": "概要信息",
+      "status": "状态",
+      "template": "模板",
+      "sortOrder": "排序",
+      "created": "创建时间",
+      "updated": "更新时间",
+      "pageId": "页面 ID"
+    }
+  }
+}
