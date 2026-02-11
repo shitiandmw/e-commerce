@@ -1,0 +1,47 @@
+{
+  "announcements": {
+    "title": "公告栏管理",
+    "subtitle": "管理网站顶部滚动公告条的内容",
+    "addAnnouncement": "添加公告",
+    "createAnnouncement": "创建公告",
+    "editAnnouncement": "编辑公告",
+    "createSubtitle": "添加一条新的网站顶部公告",
+    "editSubtitle": "编辑公告内容和设置",
+    "errorOccurred": "发生错误",
+    "columns": {
+      "sort": "排序",
+      "text": "公告文案",
+      "link": "链接",
+      "enabled": "启用",
+      "startsAt": "开始时间",
+      "endsAt": "结束时间",
+      "actions": "操作"
+    },
+    "table": {
+      "errorLoading": "加载公告失败",
+      "unknownError": "未知错误",
+      "noAnnouncements": "暂无公告。创建您的第一条公告开始使用。"
+    },
+    "deleteDialog": {
+      "title": "删除公告",
+      "description": "确定要删除此公告：「{text}」吗？此操作无法撤销。",
+      "cancel": "取消",
+      "delete": "删除",
+      "deleting": "删除中..."
+    },
+    "form": {
+      "textLabel": "公告文案 *",
+      "textPlaceholder": "输入公告文案...",
+      "linkUrlLabel": "跳转链接",
+      "linkUrlPlaceholder": "https://example.com/promo",
+      "sortOrderLabel": "排序值",
+      "enabledLabel": "启用",
+      "startsAtLabel": "开始时间",
+      "endsAtLabel": "结束时间",
+      "cancel": "取消",
+      "save": "保存更改",
+      "create": "创建",
+      "saving": "保存中..."
+    }
+  }
+}

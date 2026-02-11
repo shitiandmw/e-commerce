@@ -21,6 +21,7 @@ import {
   Percent,
   Truck,
   BookOpen,
+  Megaphone,
 } from "lucide-react"
 import { LanguageSwitcher } from "@/components/language-switcher"
 
@@ -36,6 +37,7 @@ const navigation = [
   { key: "customers", href: "/customers", icon: Users },
   { key: "pages", href: "/pages", icon: BookOpen },
   { key: "media", href: "/media", icon: ImageIcon },
+  { key: "announcements", href: "/announcements", icon: Megaphone },
   { key: "analytics", href: "/analytics", icon: BarChart3 },
   { key: "settings", href: "/settings", icon: Settings },
 ]

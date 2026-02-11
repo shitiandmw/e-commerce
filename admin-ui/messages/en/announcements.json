@@ -1,0 +1,47 @@
+{
+  "announcements": {
+    "title": "Announcements",
+    "subtitle": "Manage your website top banner announcements",
+    "addAnnouncement": "Add Announcement",
+    "createAnnouncement": "Create Announcement",
+    "editAnnouncement": "Edit Announcement",
+    "createSubtitle": "Add a new announcement to your website banner",
+    "editSubtitle": "Edit the announcement content and settings",
+    "errorOccurred": "An error occurred",
+    "columns": {
+      "sort": "Sort",
+      "text": "Text",
+      "link": "Link",
+      "enabled": "Enabled",
+      "startsAt": "Starts At",
+      "endsAt": "Ends At",
+      "actions": "Actions"
+    },
+    "table": {
+      "errorLoading": "Failed to load announcements",
+      "unknownError": "Unknown error",
+      "noAnnouncements": "No announcements yet. Create your first announcement to get started."
+    },
+    "deleteDialog": {
+      "title": "Delete Announcement",
+      "description": "Are you sure you want to delete this announcement: \"{text}\"? This action cannot be undone.",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting..."
+    },
+    "form": {
+      "textLabel": "Announcement Text *",
+      "textPlaceholder": "Enter announcement text...",
+      "linkUrlLabel": "Link URL",
+      "linkUrlPlaceholder": "https://example.com/promo",
+      "sortOrderLabel": "Sort Order",
+      "enabledLabel": "Enabled",
+      "startsAtLabel": "Starts At",
+      "endsAtLabel": "Ends At",
+      "cancel": "Cancel",
+      "save": "Save Changes",
+      "create": "Create",
+      "saving": "Saving..."
+    }
+  }
+}

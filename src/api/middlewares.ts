@@ -17,10 +17,15 @@ import {
   PostAdminUpdateTag,
   PostAdminLinkProductTag,
 } from "./admin/tags/validators"
+import {
+  PostAdminCreateAnnouncement,
+  PostAdminUpdateAnnouncement,
+} from "./admin/announcements/validators"
 
 export const GetBrandsSchema = createFindParams()
 export const GetPagesSchema = createFindParams()
 export const GetTagsSchema = createFindParams()
+export const GetAnnouncementsSchema = createFindParams()
 
 export default defineMiddlewares({
   routes: [
@@ -120,6 +125,44 @@ export default defineMiddlewares({
       method: "DELETE",
       middlewares: [
         validateAndTransformBody(PostAdminLinkProductTag),
+      ],
+    },
+    // Announcement routes
+    {
+      matcher: "/admin/announcements",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(
+          GetAnnouncementsSchema,
+          {
+            defaults: [
+              "id",
+              "text",
+              "link_url",
+              "sort_order",
+              "is_enabled",
+              "starts_at",
+              "ends_at",
+              "created_at",
+              "updated_at",
+            ],
+            isList: true,
+          }
+        ),
+      ],
+    },
+    {
+      matcher: "/admin/announcements",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminCreateAnnouncement),
+      ],
+    },
+    {
+      matcher: "/admin/announcements/:id",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminUpdateAnnouncement),
       ],
     },
   ],
