@@ -21,11 +21,16 @@ import {
   PostAdminCreateAnnouncement,
   PostAdminUpdateAnnouncement,
 } from "./admin/announcements/validators"
+import {
+  PostAdminCreatePopup,
+  PostAdminUpdatePopup,
+} from "./admin/popups/validators"
 
 export const GetBrandsSchema = createFindParams()
 export const GetPagesSchema = createFindParams()
 export const GetTagsSchema = createFindParams()
 export const GetAnnouncementsSchema = createFindParams()
+export const GetPopupsSchema = createFindParams()
 
 export default defineMiddlewares({
   routes: [
@@ -163,6 +168,39 @@ export default defineMiddlewares({
       method: "POST",
       middlewares: [
         validateAndTransformBody(PostAdminUpdateAnnouncement),
+      ],
+    },
+    // Popup routes
+    {
+      matcher: "/admin/popups",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(
+          GetPopupsSchema,
+          {
+            defaults: [
+              "id", "title", "description", "image_url",
+              "button_text", "button_link", "is_enabled",
+              "trigger_type", "display_frequency", "target_page",
+              "sort_order", "created_at", "updated_at",
+            ],
+            isList: true,
+          }
+        ),
+      ],
+    },
+    {
+      matcher: "/admin/popups",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminCreatePopup),
+      ],
+    },
+    {
+      matcher: "/admin/popups/:id",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminUpdatePopup),
       ],
     },
   ],

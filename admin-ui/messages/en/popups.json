@@ -1,0 +1,99 @@
+{
+  "popups": {
+    "title": "Popups",
+    "subtitle": "Manage your marketing popups",
+    "addPopup": "Add Popup",
+    "createPopup": "Create Popup",
+    "editPopup": "Edit Popup",
+    "createSubtitle": "Create a new marketing popup",
+    "editSubtitle": "Editing {name}",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "errorOccurred": "An error occurred",
+    "backToPopups": "Back to Popups",
+    "popupNotFound": "Popup not found or failed to load.",
+    "columns": {
+      "title": "Title",
+      "untitled": "Untitled",
+      "status": "Status",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "triggerType": "Trigger",
+      "frequency": "Frequency",
+      "sortOrder": "Order",
+      "created": "Created"
+    },
+    "triggerType": {
+      "first_visit": "First Visit",
+      "every_visit": "Every Visit",
+      "specific_page": "Specific Page"
+    },
+    "displayFrequency": {
+      "once": "Once",
+      "once_per_session": "Once Per Session",
+      "once_per_day": "Once Per Day"
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete",
+      "openMenu": "Open menu"
+    },
+    "table": {
+      "errorLoading": "Failed to load popups",
+      "unknownError": "Unknown error",
+      "noPopups": "No popups yet. Create your first popup to get started.",
+      "showing": "Showing {from} to {to} of {total} popups",
+      "page": "Page {current} of {total}"
+    },
+    "deleteDialog": {
+      "title": "Delete Popup",
+      "description": "Are you sure you want to delete \"{name}\"? This action cannot be undone.",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting..."
+    },
+    "form": {
+      "basicInfo": "Basic Information",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Popup title",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Popup description...",
+      "imageLabel": "Image",
+      "selectImage": "Select from Media",
+      "buttonTextLabel": "Button Text",
+      "buttonTextPlaceholder": "e.g. Shop Now",
+      "buttonLinkLabel": "Button Link",
+      "buttonLinkPlaceholder": "https://example.com/sale",
+      "triggerConfig": "Trigger Configuration",
+      "triggerTypeLabel": "Trigger Type",
+      "displayFrequencyLabel": "Display Frequency",
+      "targetPageLabel": "Target Page Path",
+      "targetPagePlaceholder": "/products or /collections/summer",
+      "sortOrderLabel": "Sort Order",
+      "statusSection": "Status",
+      "enabledLabel": "Enabled",
+      "enabledDescription": "Enable this popup on your storefront",
+      "preview": "Preview",
+      "previewEmpty": "Fill in the form to see a preview"
+    },
+    "detail": {
+      "popupDetails": "Popup Details",
+      "description": "Description",
+      "noDescription": "No description provided.",
+      "image": "Image",
+      "buttonText": "Button Text",
+      "buttonLink": "Button Link",
+      "triggerConfig": "Trigger Configuration",
+      "triggerType": "Trigger Type",
+      "displayFrequency": "Display Frequency",
+      "targetPage": "Target Page",
+      "quickInfo": "Quick Info",
+      "status": "Status",
+      "sortOrder": "Sort Order",
+      "created": "Created",
+      "updated": "Updated",
+      "popupId": "Popup ID"
+    }
+  }
+}

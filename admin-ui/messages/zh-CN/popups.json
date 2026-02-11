@@ -1,0 +1,99 @@
+{
+  "popups": {
+    "title": "弹窗管理",
+    "subtitle": "管理您的营销弹窗",
+    "addPopup": "添加弹窗",
+    "createPopup": "创建弹窗",
+    "editPopup": "编辑弹窗",
+    "createSubtitle": "创建一个新的营销弹窗",
+    "editSubtitle": "正在编辑 {name}",
+    "saveChanges": "保存更改",
+    "saving": "保存中...",
+    "errorOccurred": "发生错误",
+    "backToPopups": "返回弹窗列表",
+    "popupNotFound": "未找到弹窗或加载失败。",
+    "columns": {
+      "title": "标题",
+      "untitled": "未命名",
+      "status": "状态",
+      "enabled": "已启用",
+      "disabled": "已禁用",
+      "triggerType": "触发方式",
+      "frequency": "显示频率",
+      "sortOrder": "排序",
+      "created": "创建时间"
+    },
+    "triggerType": {
+      "first_visit": "首次访问",
+      "every_visit": "每次访问",
+      "specific_page": "指定页面"
+    },
+    "displayFrequency": {
+      "once": "仅一次",
+      "once_per_session": "每次会话一次",
+      "once_per_day": "每天一次"
+    },
+    "actions": {
+      "view": "查看",
+      "edit": "编辑",
+      "delete": "删除",
+      "openMenu": "打开菜单"
+    },
+    "table": {
+      "errorLoading": "加载弹窗失败",
+      "unknownError": "未知错误",
+      "noPopups": "暂无弹窗。创建您的第一个弹窗开始使用。",
+      "showing": "显示第 {from} 至 {to} 条，共 {total} 条弹窗",
+      "page": "第 {current} 页，共 {total} 页"
+    },
+    "deleteDialog": {
+      "title": "删除弹窗",
+      "description": "确定要删除「{name}」吗？此操作无法撤销。",
+      "cancel": "取消",
+      "delete": "删除",
+      "deleting": "删除中..."
+    },
+    "form": {
+      "basicInfo": "基本信息",
+      "titleLabel": "标题",
+      "titlePlaceholder": "弹窗标题",
+      "descriptionLabel": "描述",
+      "descriptionPlaceholder": "弹窗描述...",
+      "imageLabel": "图片",
+      "selectImage": "从媒体库选取",
+      "buttonTextLabel": "按钮文案",
+      "buttonTextPlaceholder": "例如：立即选购",
+      "buttonLinkLabel": "按钮链接",
+      "buttonLinkPlaceholder": "https://example.com/sale",
+      "triggerConfig": "触发配置",
+      "triggerTypeLabel": "触发方式",
+      "displayFrequencyLabel": "显示频率",
+      "targetPageLabel": "目标页面路径",
+      "targetPagePlaceholder": "/products 或 /collections/summer",
+      "sortOrderLabel": "排序顺序",
+      "statusSection": "状态",
+      "enabledLabel": "启用",
+      "enabledDescription": "在店铺前端启用此弹窗",
+      "preview": "预览",
+      "previewEmpty": "填写表单后可查看预览"
+    },
+    "detail": {
+      "popupDetails": "弹窗详情",
+      "description": "描述",
+      "noDescription": "未提供描述。",
+      "image": "图片",
+      "buttonText": "按钮文案",
+      "buttonLink": "按钮链接",
+      "triggerConfig": "触发配置",
+      "triggerType": "触发方式",
+      "displayFrequency": "显示频率",
+      "targetPage": "目标页面",
+      "quickInfo": "概要信息",
+      "status": "状态",
+      "sortOrder": "排序顺序",
+      "created": "创建时间",
+      "updated": "更新时间",
+      "popupId": "弹窗 ID"
+    }
+  }
+}

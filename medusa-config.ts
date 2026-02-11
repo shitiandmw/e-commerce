@@ -19,6 +19,9 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/announcement",
     },
+    {
+      resolve: "./src/modules/popup",
+    },
   ],
   projectConfig: {
     redisUrl: process.env.REDIS_URL,
