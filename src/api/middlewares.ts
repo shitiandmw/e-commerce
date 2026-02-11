@@ -12,12 +12,19 @@ import {
   PostAdminCreatePage,
   PostAdminUpdatePage,
 } from "./admin/pages/validators"
+import {
+  PostAdminCreateTag,
+  PostAdminUpdateTag,
+  PostAdminLinkProductTag,
+} from "./admin/tags/validators"
 
 export const GetBrandsSchema = createFindParams()
 export const GetPagesSchema = createFindParams()
+export const GetTagsSchema = createFindParams()
 
 export default defineMiddlewares({
   routes: [
+    // Brand routes
     {
       matcher: "/admin/brands",
       method: "GET",
@@ -45,6 +52,7 @@ export default defineMiddlewares({
         validateAndTransformBody(PostAdminUpdateBrand),
       ],
     },
+    // Page routes
     {
       matcher: "/admin/pages",
       method: "GET",
@@ -70,6 +78,48 @@ export default defineMiddlewares({
       method: "POST",
       middlewares: [
         validateAndTransformBody(PostAdminUpdatePage),
+      ],
+    },
+    // Tag routes
+    {
+      matcher: "/admin/tags",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(
+          GetTagsSchema,
+          {
+            defaults: ["id", "name", "color", "type", "created_at", "updated_at"],
+            isList: true,
+          }
+        ),
+      ],
+    },
+    {
+      matcher: "/admin/tags",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminCreateTag),
+      ],
+    },
+    {
+      matcher: "/admin/tags/:id",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminUpdateTag),
+      ],
+    },
+    {
+      matcher: "/admin/tags/:id/products",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminLinkProductTag),
+      ],
+    },
+    {
+      matcher: "/admin/tags/:id/products",
+      method: "DELETE",
+      middlewares: [
+        validateAndTransformBody(PostAdminLinkProductTag),
       ],
     },
   ],

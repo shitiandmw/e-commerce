@@ -17,6 +17,11 @@ import {
   useLinkProductBrand,
   useUnlinkProductBrand,
 } from "@/hooks/use-brands"
+import {
+  useTags,
+  useLinkProductTag,
+  useUnlinkProductTag,
+} from "@/hooks/use-tags"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -67,6 +72,7 @@ const productSchema = z.object({
   variants: z.array(variantSchema),
   category_ids: z.array(z.string()),
   brand_id: z.string().optional(),
+  tag_ids: z.array(z.string()),
 })
 
 type ProductFormData = z.infer<typeof productSchema>
@@ -85,9 +91,13 @@ export function ProductForm({ product, mode }: ProductFormProps) {
   const { data: brandsData } = useBrands({ limit: 100 })
   const linkProductBrand = useLinkProductBrand()
   const unlinkProductBrand = useUnlinkProductBrand()
+  const { data: tagsData } = useTags({ limit: 100 })
+  const linkProductTag = useLinkProductTag()
+  const unlinkProductTag = useUnlinkProductTag()
 
   const categories = categoriesData?.product_categories ?? []
   const brands = brandsData?.brands ?? []
+  const allTags = tagsData?.tags ?? []
 
   const defaultValues: ProductFormData = product
     ? {
@@ -120,6 +130,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
           })) || [],
         category_ids: product.categories?.map((c) => c.id) || [],
         brand_id: product.brand?.id || "",
+        tag_ids: product.tags?.map((t) => t.id) || [],
       }
     : {
         title: "",
@@ -146,6 +157,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
         ],
         category_ids: [],
         brand_id: "",
+        tag_ids: [],
       }
 
   const {
@@ -243,6 +255,16 @@ export function ProductForm({ product, mode }: ProductFormProps) {
             brand_id: data.brand_id,
           })
         }
+
+        // Link tags to product
+        if (data.tag_ids.length > 0 && newProductId) {
+          for (const tagId of data.tag_ids) {
+            await linkProductTag.mutateAsync({
+              product_id: newProductId,
+              tag_id: tagId,
+            })
+          }
+        }
       } else {
         await updateProduct.mutateAsync(payload)
 
@@ -263,6 +285,30 @@ export function ProductForm({ product, mode }: ProductFormProps) {
             await linkProductBrand.mutateAsync({
               product_id: product.id,
               brand_id: newBrandId,
+            })
+          }
+        }
+
+        // Handle tag link changes
+        const oldTagIds = product?.tags?.map((t) => t.id) || []
+        const newTagIds = data.tag_ids
+
+        // Unlink removed tags
+        for (const tagId of oldTagIds) {
+          if (!newTagIds.includes(tagId) && product?.id) {
+            await unlinkProductTag.mutateAsync({
+              product_id: product.id,
+              tag_id: tagId,
+            })
+          }
+        }
+
+        // Link new tags
+        for (const tagId of newTagIds) {
+          if (!oldTagIds.includes(tagId) && product?.id) {
+            await linkProductTag.mutateAsync({
+              product_id: product.id,
+              tag_id: tagId,
             })
           }
         }
@@ -704,6 +750,71 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                 </option>
               ))}
             </Select>
+          </div>
+
+          {/* Tags */}
+          <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
+            <h2 className="text-lg font-semibold">{t("form.tags")}</h2>
+            {allTags.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                {t("form.noTags")}
+              </p>
+            ) : (
+              <Controller
+                name="tag_ids"
+                control={control}
+                render={({ field }) => (
+                  <div className="space-y-2">
+                    {field.value.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mb-2">
+                        {field.value.map((tagId) => {
+                          const tag = allTags.find((t) => t.id === tagId)
+                          return (
+                            <Badge
+                              key={tagId}
+                              variant="secondary"
+                              className="cursor-pointer"
+                              onClick={() =>
+                                field.onChange(
+                                  field.value.filter((id) => id !== tagId)
+                                )
+                              }
+                            >
+                              {tag?.color && (
+                                <span
+                                  className="inline-block w-2.5 h-2.5 rounded-full mr-1.5 flex-shrink-0"
+                                  style={{ backgroundColor: tag.color }}
+                                />
+                              )}
+                              {tag?.name || tagId}
+                              <X className="ml-1 h-3 w-3" />
+                            </Badge>
+                          )
+                        })}
+                      </div>
+                    )}
+                    <Select
+                      value=""
+                      onChange={(e) => {
+                        const val = e.target.value
+                        if (val && !field.value.includes(val)) {
+                          field.onChange([...field.value, val])
+                        }
+                      }}
+                    >
+                      <option value="">{t("form.selectTag")}</option>
+                      {allTags
+                        .filter((t) => !field.value.includes(t.id))
+                        .map((tag) => (
+                          <option key={tag.id} value={tag.id}>
+                            {tag.name}
+                          </option>
+                        ))}
+                    </Select>
+                  </div>
+                )}
+              />
+            )}
           </div>
 
           {/* Categories */}

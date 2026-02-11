@@ -1,0 +1,48 @@
+import {
+  createWorkflow,
+  createStep,
+  StepResponse,
+  WorkflowResponse,
+} from "@medusajs/framework/workflows-sdk"
+import { TAG_MODULE } from "../../modules/tag"
+import TagModuleService from "../../modules/tag/service"
+
+type DeleteTagInput = {
+  id: string
+}
+
+const deleteTagStep = createStep(
+  "delete-tag-step",
+  async ({ id }: DeleteTagInput, { container }) => {
+    const tagService: TagModuleService = container.resolve(TAG_MODULE)
+    const tag = await tagService.retrieveTag(id)
+    await tagService.deleteTags(id)
+    return new StepResponse(id, tag)
+  },
+  async (tag: Record<string, unknown>, { container }) => {
+    const tagService: TagModuleService = container.resolve(TAG_MODULE)
+    await tagService.createTags(tag as any)
+  }
+)
+
+const dismissTagLinksStep = createStep(
+  "dismiss-tag-links-step",
+  async ({ id }: DeleteTagInput, { container }) => {
+    const remoteLink = container.resolve("remoteLink") as any
+    await remoteLink.dismiss({
+      [TAG_MODULE]: {
+        tag_id: id,
+      },
+    })
+    return new StepResponse(undefined)
+  }
+)
+
+export const deleteTagWorkflow = createWorkflow(
+  "delete-tag",
+  (input: DeleteTagInput) => {
+    dismissTagLinksStep(input)
+    const id = deleteTagStep(input)
+    return new WorkflowResponse(id)
+  }
+)

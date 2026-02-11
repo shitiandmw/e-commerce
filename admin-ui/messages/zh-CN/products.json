@@ -95,6 +95,9 @@
       "status": "状态",
       "brand": "品牌",
       "noBrand": "无品牌",
+      "tags": "标签",
+      "noTags": "暂无可用标签。",
+      "selectTag": "选择标签...",
       "categories": "分类",
       "noCategories": "暂无可用分类。",
       "selectCategory": "选择分类...",
@@ -133,6 +136,7 @@
       "created": "创建时间",
       "updated": "更新时间",
       "brand": "品牌",
+      "tags": "标签",
       "categories": "分类",
       "productId": "商品 ID"
     },

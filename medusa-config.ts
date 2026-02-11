@@ -13,6 +13,9 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/page",
     },
+    {
+      resolve: "./src/modules/tag",
+    },
   ],
   projectConfig: {
     redisUrl: process.env.REDIS_URL,

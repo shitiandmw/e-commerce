@@ -16,6 +16,7 @@ const namespaces = [
   "orders",
   "customers",
   "brands",
+  "tags",
   "inventory",
   "settings",
   "media",

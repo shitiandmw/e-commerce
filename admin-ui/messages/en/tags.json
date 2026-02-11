@@ -1,0 +1,69 @@
+{
+  "tags": {
+    "title": "Tags",
+    "subtitle": "Manage product tags and badges",
+    "addTag": "Add Tag",
+    "createTag": "Create Tag",
+    "editTag": "Edit Tag",
+    "createSubtitle": "Add a new tag to your catalog",
+    "editSubtitle": "Editing {name}",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "errorOccurred": "An error occurred",
+    "backToTags": "Back to Tags",
+    "tagNotFound": "Tag not found or failed to load.",
+    "columns": {
+      "name": "Name",
+      "type": "Type",
+      "products": "Products",
+      "created": "Created"
+    },
+    "typeOptions": {
+      "badge": "Badge",
+      "attribute": "Attribute"
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete",
+      "openMenu": "Open menu"
+    },
+    "table": {
+      "errorLoading": "Failed to load tags",
+      "unknownError": "Unknown error",
+      "noTags": "No tags yet. Create your first tag to get started.",
+      "showing": "Showing {from} to {to} of {total} tags",
+      "page": "Page {current} of {total}"
+    },
+    "deleteDialog": {
+      "title": "Delete Tag",
+      "description": "Are you sure you want to delete {name}? This action cannot be undone. All product associations will be removed.",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting..."
+    },
+    "form": {
+      "basicInfo": "Basic Information",
+      "nameLabel": "Name *",
+      "namePlaceholder": "Tag name (e.g. Collector's Edition, 5 pcs/box)",
+      "typeLabel": "Type",
+      "typeHint": "Badge: Display badges (e.g. Collector's Edition, New). Attribute: Property tags (e.g. 5 pcs/box, Handmade).",
+      "color": "Color",
+      "colorPlaceholder": "#FF5733",
+      "colorHint": "Enter a hex color code for the tag display color."
+    },
+    "detail": {
+      "tagDetails": "Tag Details",
+      "type": "Type",
+      "color": "Color",
+      "noColor": "No color set",
+      "products": "Products",
+      "noProducts": "No products associated with this tag.",
+      "quickInfo": "Quick Info",
+      "productCount": "Products",
+      "created": "Created",
+      "updated": "Updated",
+      "tagId": "Tag ID"
+    }
+  }
+}

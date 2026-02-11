@@ -1,0 +1,69 @@
+{
+  "tags": {
+    "title": "标签管理",
+    "subtitle": "管理您的商品标签和徽章",
+    "addTag": "添加标签",
+    "createTag": "创建标签",
+    "editTag": "编辑标签",
+    "createSubtitle": "向您的目录中添加新标签",
+    "editSubtitle": "正在编辑 {name}",
+    "saveChanges": "保存更改",
+    "saving": "保存中...",
+    "errorOccurred": "发生错误",
+    "backToTags": "返回标签列表",
+    "tagNotFound": "未找到标签或加载失败。",
+    "columns": {
+      "name": "名称",
+      "type": "类型",
+      "products": "商品数",
+      "created": "创建时间"
+    },
+    "typeOptions": {
+      "badge": "徽章",
+      "attribute": "属性"
+    },
+    "actions": {
+      "view": "查看",
+      "edit": "编辑",
+      "delete": "删除",
+      "openMenu": "打开菜单"
+    },
+    "table": {
+      "errorLoading": "加载标签失败",
+      "unknownError": "未知错误",
+      "noTags": "暂无标签。创建您的第一个标签开始使用。",
+      "showing": "显示第 {from} 至 {to} 条，共 {total} 条标签",
+      "page": "第 {current} 页，共 {total} 页"
+    },
+    "deleteDialog": {
+      "title": "删除标签",
+      "description": "确定要删除 {name} 吗？此操作无法撤销。所有商品关联将被移除。",
+      "cancel": "取消",
+      "delete": "删除",
+      "deleting": "删除中..."
+    },
+    "form": {
+      "basicInfo": "基本信息",
+      "nameLabel": "名称 *",
+      "namePlaceholder": "标签名称（如：珍藏版、5支/盒）",
+      "typeLabel": "类型",
+      "typeHint": "徽章：展示型徽章（如"珍藏版"、"新品"）。属性：属性型标签（如"5支/盒"、"手工卷制"）。",
+      "color": "颜色",
+      "colorPlaceholder": "#FF5733",
+      "colorHint": "输入十六进制颜色代码作为标签显示颜色。"
+    },
+    "detail": {
+      "tagDetails": "标签详情",
+      "type": "类型",
+      "color": "颜色",
+      "noColor": "未设置颜色",
+      "products": "关联商品",
+      "noProducts": "暂无关联此标签的商品。",
+      "quickInfo": "概要信息",
+      "productCount": "商品数",
+      "created": "创建时间",
+      "updated": "更新时间",
+      "tagId": "标签 ID"
+    }
+  }
+}

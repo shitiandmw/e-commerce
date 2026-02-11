@@ -67,6 +67,12 @@ export interface Product {
     id: string
     name: string
   } | null
+  tags?: Array<{
+    id: string
+    name: string
+    color?: string | null
+    type: "badge" | "attribute"
+  }>
   collection_id?: string | null
   type_id?: string | null
   weight?: number | null
@@ -108,7 +114,7 @@ export function useProducts(params: ProductsQueryParams = {}) {
   queryParams.set(
     "fields",
     fields ||
-      "+variants,+variants.prices,+options,+options.values,+images,+categories,+brand"
+      "+variants,+variants.prices,+options,+options.values,+images,+categories,+brand,+tags"
   )
 
   return useQuery<ProductsResponse>({
