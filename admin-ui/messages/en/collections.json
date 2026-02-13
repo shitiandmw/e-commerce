@@ -1,0 +1,104 @@
+{
+  "collections": {
+    "title": "Collections",
+    "subtitle": "Manage curated product collections",
+    "addCollection": "Add Collection",
+    "createCollection": "Create Collection",
+    "editCollection": "Edit Collection",
+    "createSubtitle": "Create a new curated product collection",
+    "editSubtitle": "Editing {name}",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "errorOccurred": "An error occurred",
+    "backToCollections": "Back to Collections",
+    "collectionNotFound": "Collection not found or failed to load.",
+    "columns": {
+      "name": "Name",
+      "key": "Key",
+      "items": "Items",
+      "sortOrder": "Sort Order",
+      "created": "Created"
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete",
+      "openMenu": "Open menu"
+    },
+    "table": {
+      "errorLoading": "Failed to load collections",
+      "unknownError": "Unknown error",
+      "noCollections": "No collections yet. Create your first collection to get started.",
+      "showing": "Showing {from} to {to} of {total} collections",
+      "page": "Page {current} of {total}"
+    },
+    "deleteDialog": {
+      "title": "Delete Collection",
+      "description": "Are you sure you want to delete \"{name}\"? This action cannot be undone. All tabs and items will be removed.",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting..."
+    },
+    "form": {
+      "basicInfo": "Basic Information",
+      "nameLabel": "Name *",
+      "namePlaceholder": "Collection name",
+      "keyLabel": "Key *",
+      "keyPlaceholder": "collection-key",
+      "keyHint": "Unique identifier, lowercase letters, numbers and hyphens only",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Describe this collection...",
+      "sortOrderLabel": "Sort Order",
+      "sortOrderPlaceholder": "0"
+    },
+    "detail": {
+      "collectionDetails": "Collection Details",
+      "description": "Description",
+      "noDescription": "No description provided.",
+      "quickInfo": "Quick Info",
+      "key": "Key",
+      "sortOrder": "Sort Order",
+      "itemCount": "Items",
+      "tabCount": "Tabs",
+      "created": "Created",
+      "updated": "Updated",
+      "collectionId": "Collection ID"
+    },
+    "tabs": {
+      "title": "Tabs",
+      "addTab": "Add Tab",
+      "editTab": "Edit Tab",
+      "deleteTab": "Delete Tab",
+      "noTabs": "No tabs yet.",
+      "nameLabel": "Tab Name *",
+      "namePlaceholder": "Tab name",
+      "keyLabel": "Tab Key *",
+      "keyPlaceholder": "tab-key",
+      "sortOrderLabel": "Sort Order",
+      "save": "Save",
+      "cancel": "Cancel",
+      "confirmDelete": "Are you sure you want to delete tab \"{name}\"? Items in this tab will become unassigned.",
+      "all": "All"
+    },
+    "items": {
+      "title": "Products",
+      "addProduct": "Add Product",
+      "noItems": "No products in this collection yet.",
+      "noItemsInTab": "No products in this tab.",
+      "remove": "Remove",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "sortOrder": "Sort Order",
+      "confirmRemove": "Remove this product from the collection?"
+    },
+    "productPicker": {
+      "title": "Add Products",
+      "searchPlaceholder": "Search products...",
+      "noResults": "No products found.",
+      "add": "Add",
+      "close": "Close",
+      "adding": "Adding...",
+      "alreadyAdded": "Already added"
+    }
+  }
+}

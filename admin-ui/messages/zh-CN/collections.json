@@ -1,0 +1,104 @@
+{
+  "collections": {
+    "title": "商品集合",
+    "subtitle": "管理策展商品集合",
+    "addCollection": "添加集合",
+    "createCollection": "创建集合",
+    "editCollection": "编辑集合",
+    "createSubtitle": "创建新的策展商品集合",
+    "editSubtitle": "正在编辑 {name}",
+    "saveChanges": "保存更改",
+    "saving": "保存中...",
+    "errorOccurred": "发生错误",
+    "backToCollections": "返回集合列表",
+    "collectionNotFound": "未找到集合或加载失败。",
+    "columns": {
+      "name": "名称",
+      "key": "标识",
+      "items": "商品数",
+      "sortOrder": "排序",
+      "created": "创建时间"
+    },
+    "actions": {
+      "view": "查看",
+      "edit": "编辑",
+      "delete": "删除",
+      "openMenu": "打开菜单"
+    },
+    "table": {
+      "errorLoading": "加载集合失败",
+      "unknownError": "未知错误",
+      "noCollections": "暂无集合。创建您的第一个集合开始使用。",
+      "showing": "显示第 {from} 至 {to} 条，共 {total} 条集合",
+      "page": "第 {current} 页，共 {total} 页"
+    },
+    "deleteDialog": {
+      "title": "删除集合",
+      "description": "确定要删除「{name}」吗？此操作无法撤销。所有标签和商品项都将被移除。",
+      "cancel": "取消",
+      "delete": "删除",
+      "deleting": "删除中..."
+    },
+    "form": {
+      "basicInfo": "基本信息",
+      "nameLabel": "名称 *",
+      "namePlaceholder": "集合名称",
+      "keyLabel": "标识 *",
+      "keyPlaceholder": "collection-key",
+      "keyHint": "唯一标识符，仅支持小写字母、数字和连字符",
+      "descriptionLabel": "描述",
+      "descriptionPlaceholder": "描述该集合...",
+      "sortOrderLabel": "排序序号",
+      "sortOrderPlaceholder": "0"
+    },
+    "detail": {
+      "collectionDetails": "集合详情",
+      "description": "描述",
+      "noDescription": "未提供描述。",
+      "quickInfo": "概要信息",
+      "key": "标识",
+      "sortOrder": "排序序号",
+      "itemCount": "商品数",
+      "tabCount": "标签数",
+      "created": "创建时间",
+      "updated": "更新时间",
+      "collectionId": "集合 ID"
+    },
+    "tabs": {
+      "title": "标签页",
+      "addTab": "添加标签",
+      "editTab": "编辑标签",
+      "deleteTab": "删除标签",
+      "noTabs": "暂无标签。",
+      "nameLabel": "标签名称 *",
+      "namePlaceholder": "标签名称",
+      "keyLabel": "标签标识 *",
+      "keyPlaceholder": "tab-key",
+      "sortOrderLabel": "排序序号",
+      "save": "保存",
+      "cancel": "取消",
+      "confirmDelete": "确定要删除标签「{name}」吗？该标签下的商品将变为未分配状态。",
+      "all": "全部"
+    },
+    "items": {
+      "title": "商品",
+      "addProduct": "添加商品",
+      "noItems": "该集合暂无商品。",
+      "noItemsInTab": "该标签下暂无商品。",
+      "remove": "移除",
+      "moveUp": "上移",
+      "moveDown": "下移",
+      "sortOrder": "排序",
+      "confirmRemove": "确定将此商品从集合中移除？"
+    },
+    "productPicker": {
+      "title": "添加商品",
+      "searchPlaceholder": "搜索商品...",
+      "noResults": "未找到商品。",
+      "add": "添加",
+      "close": "关闭",
+      "adding": "添加中...",
+      "alreadyAdded": "已添加"
+    }
+  }
+}
