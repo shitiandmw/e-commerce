@@ -21,7 +21,7 @@ import {
   Undo2,
   Redo2,
   Link as LinkIcon,
-  LinkOff,
+  Link2Off as LinkOff,
   AlignLeft,
   AlignCenter,
   AlignRight,
@@ -111,7 +111,7 @@ export function RichTextEditor({
   // Sync external content changes
   React.useEffect(() => {
     if (editor && content !== editor.getHTML() && content !== undefined) {
-      editor.commands.setContent(content, false)
+      editor.commands.setContent(content, { emitUpdate: false })
     }
     // Only run when `content` changes from outside, not on every editor update
     // eslint-disable-next-line react-hooks/exhaustive-deps

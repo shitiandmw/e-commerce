@@ -1,0 +1,99 @@
+{
+  "banners": {
+    "title": "Banner Slots",
+    "subtitle": "Manage your banner carousel slots and items",
+    "addSlot": "Add Slot",
+    "createSlot": "Create Banner Slot",
+    "editSlot": "Edit Banner Slot",
+    "createSubtitle": "Create a new banner slot to organize your carousel banners",
+    "editSubtitle": "Editing {name}",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "errorOccurred": "An error occurred",
+    "backToSlots": "Back to Banner Slots",
+    "slotNotFound": "Banner slot not found or failed to load.",
+    "columns": {
+      "name": "Name",
+      "key": "Key",
+      "bannerCount": "Banners",
+      "created": "Created"
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete",
+      "openMenu": "Open menu"
+    },
+    "table": {
+      "errorLoading": "Failed to load banner slots",
+      "unknownError": "Unknown error",
+      "noSlots": "No banner slots yet. Create your first slot to get started.",
+      "showing": "Showing {from} to {to} of {total} slots",
+      "page": "Page {current} of {total}"
+    },
+    "deleteDialog": {
+      "title": "Delete Banner Slot",
+      "slotDescription": "Are you sure you want to delete \"{name}\"? This will also delete all banner items in this slot. This action cannot be undone.",
+      "itemTitle": "Delete Banner Item",
+      "itemDescription": "Are you sure you want to delete this banner item? This action cannot be undone.",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting..."
+    },
+    "form": {
+      "basicInfo": "Basic Information",
+      "nameLabel": "Name *",
+      "namePlaceholder": "e.g. Homepage Hero Banner",
+      "keyLabel": "Key *",
+      "keyPlaceholder": "e.g. homepage-hero",
+      "keyHint": "Unique identifier used in the storefront code",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Describe where this banner slot is used..."
+    },
+    "detail": {
+      "slotInfo": "Slot Information",
+      "description": "Description",
+      "noDescription": "No description provided.",
+      "quickInfo": "Quick Info",
+      "key": "Key",
+      "bannerCount": "Banners",
+      "created": "Created",
+      "updated": "Updated",
+      "slotId": "Slot ID"
+    },
+    "items": {
+      "title": "Banner Items",
+      "addItem": "Add Banner",
+      "noItems": "No banner items yet. Add your first banner to this slot.",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "noTitle": "Untitled Banner",
+      "sortOrder": "Order",
+      "activeNow": "Active Now",
+      "scheduled": "Scheduled",
+      "expired": "Expired",
+      "moveUp": "Move up",
+      "moveDown": "Move down"
+    },
+    "itemForm": {
+      "createTitle": "Add Banner Item",
+      "editTitle": "Edit Banner Item",
+      "imageUrlLabel": "Image URL *",
+      "imageUrlPlaceholder": "https://example.com/banner.jpg",
+      "selectFromMedia": "Select from Media",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Banner title",
+      "subtitleLabel": "Subtitle",
+      "subtitlePlaceholder": "Banner subtitle",
+      "linkUrlLabel": "Link URL",
+      "linkUrlPlaceholder": "https://example.com/page",
+      "sortOrderLabel": "Sort Order",
+      "enabledLabel": "Enabled",
+      "startsAtLabel": "Start Date",
+      "endsAtLabel": "End Date",
+      "save": "Save",
+      "cancel": "Cancel",
+      "saving": "Saving..."
+    }
+  }
+}

@@ -23,6 +23,7 @@ import {
   BookOpen,
   Megaphone,
   Maximize2,
+  Layers,
 } from "lucide-react"
 import { LanguageSwitcher } from "@/components/language-switcher"
 
@@ -37,6 +38,7 @@ const navigation = [
   { key: "shipping", href: "/shipping", icon: Truck },
   { key: "customers", href: "/customers", icon: Users },
   { key: "pages", href: "/pages", icon: BookOpen },
+  { key: "banners", href: "/banners", icon: Layers },
   { key: "media", href: "/media", icon: ImageIcon },
   { key: "announcements", href: "/announcements", icon: Megaphone },
   { key: "popups", href: "/popups", icon: Maximize2 },

@@ -1,0 +1,99 @@
+{
+  "banners": {
+    "title": "Banner 广告位",
+    "subtitle": "管理轮播广告位和广告项",
+    "addSlot": "新建广告位",
+    "createSlot": "创建 Banner 广告位",
+    "editSlot": "编辑 Banner 广告位",
+    "createSubtitle": "创建新的广告位来管理轮播 Banner",
+    "editSubtitle": "正在编辑 {name}",
+    "saveChanges": "保存更改",
+    "saving": "保存中...",
+    "errorOccurred": "发生错误",
+    "backToSlots": "返回广告位列表",
+    "slotNotFound": "Banner 广告位未找到或加载失败。",
+    "columns": {
+      "name": "名称",
+      "key": "标识",
+      "bannerCount": "Banner 数量",
+      "created": "创建时间"
+    },
+    "actions": {
+      "view": "查看",
+      "edit": "编辑",
+      "delete": "删除",
+      "openMenu": "打开菜单"
+    },
+    "table": {
+      "errorLoading": "加载广告位列表失败",
+      "unknownError": "未知错误",
+      "noSlots": "暂无广告位，请创建第一个广告位。",
+      "showing": "显示 {from} 到 {to}，共 {total} 个广告位",
+      "page": "第 {current} 页，共 {total} 页"
+    },
+    "deleteDialog": {
+      "title": "删除广告位",
+      "slotDescription": "确定要删除 {name} 吗？该操作会同时删除该广告位下的所有 Banner 项，且不可恢复。",
+      "itemTitle": "删除 Banner 项",
+      "itemDescription": "确定要删除这个 Banner 项吗？此操作不可恢复。",
+      "cancel": "取消",
+      "delete": "删除",
+      "deleting": "删除中..."
+    },
+    "form": {
+      "basicInfo": "基本信息",
+      "nameLabel": "名称 *",
+      "namePlaceholder": "例如：首页轮播广告",
+      "keyLabel": "标识 *",
+      "keyPlaceholder": "例如：homepage-hero",
+      "keyHint": "在店铺前端代码中使用的唯一标识符",
+      "descriptionLabel": "描述",
+      "descriptionPlaceholder": "描述此广告位的用途..."
+    },
+    "detail": {
+      "slotInfo": "广告位信息",
+      "description": "描述",
+      "noDescription": "暂无描述。",
+      "quickInfo": "快捷信息",
+      "key": "标识",
+      "bannerCount": "Banner 数量",
+      "created": "创建时间",
+      "updated": "更新时间",
+      "slotId": "广告位 ID"
+    },
+    "items": {
+      "title": "Banner 列表",
+      "addItem": "添加 Banner",
+      "noItems": "暂无 Banner 项，请为此广告位添加第一个 Banner。",
+      "enabled": "已启用",
+      "disabled": "已禁用",
+      "noTitle": "未命名 Banner",
+      "sortOrder": "排序",
+      "activeNow": "生效中",
+      "scheduled": "已排期",
+      "expired": "已过期",
+      "moveUp": "上移",
+      "moveDown": "下移"
+    },
+    "itemForm": {
+      "createTitle": "添加 Banner 项",
+      "editTitle": "编辑 Banner 项",
+      "imageUrlLabel": "图片 URL *",
+      "imageUrlPlaceholder": "https://example.com/banner.jpg",
+      "selectFromMedia": "从媒体库选择",
+      "titleLabel": "标题",
+      "titlePlaceholder": "Banner 标题",
+      "subtitleLabel": "副标题",
+      "subtitlePlaceholder": "Banner 副标题",
+      "linkUrlLabel": "跳转链接",
+      "linkUrlPlaceholder": "https://example.com/page",
+      "sortOrderLabel": "排序值",
+      "enabledLabel": "启用",
+      "startsAtLabel": "开始时间",
+      "endsAtLabel": "结束时间",
+      "save": "保存",
+      "cancel": "取消",
+      "saving": "保存中..."
+    }
+  }
+}
