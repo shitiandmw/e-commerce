@@ -33,6 +33,14 @@ import {
   PostAdminCreateBannerItem,
   PostAdminUpdateBannerItem,
 } from "./admin/banner-items/validators"
+import {
+  PostAdminCreateArticle,
+  PostAdminUpdateArticle,
+} from "./admin/articles/validators"
+import {
+  PostAdminCreateArticleCategory,
+  PostAdminUpdateArticleCategory,
+} from "./admin/article-categories/validators"
 
 export const GetBrandsSchema = createFindParams()
 export const GetPagesSchema = createFindParams()
@@ -41,6 +49,8 @@ export const GetAnnouncementsSchema = createFindParams()
 export const GetPopupsSchema = createFindParams()
 export const GetBannerSlotsSchema = createFindParams()
 export const GetBannerItemsSchema = createFindParams()
+export const GetArticlesSchema = createFindParams()
+export const GetArticleCategoriesSchema = createFindParams()
 
 export default defineMiddlewares({
   routes: [
@@ -271,6 +281,69 @@ export default defineMiddlewares({
       method: "POST",
       middlewares: [
         validateAndTransformBody(PostAdminUpdateBannerItem),
+      ],
+    },
+    // Article routes
+    {
+      matcher: "/admin/articles",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(
+          GetArticlesSchema,
+          {
+            defaults: [
+              "id", "title", "slug", "cover_image", "summary",
+              "status", "published_at", "sort_order", "is_pinned",
+              "created_at", "updated_at",
+            ],
+            isList: true,
+          }
+        ),
+      ],
+    },
+    {
+      matcher: "/admin/articles",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminCreateArticle),
+      ],
+    },
+    {
+      matcher: "/admin/articles/:id",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminUpdateArticle),
+      ],
+    },
+    // Article Category routes
+    {
+      matcher: "/admin/article-categories",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(
+          GetArticleCategoriesSchema,
+          {
+            defaults: [
+              "id", "name", "handle", "description",
+              "sort_order", "created_at", "updated_at",
+            ],
+            isList: true,
+          }
+        ),
+      ],
+    },
+    {
+      matcher: "/admin/article-categories",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminCreateArticleCategory),
+      ],
+    },
+    {
+      matcher: "/admin/article-categories/:id",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminUpdateArticleCategory),
       ],
     },
   ],

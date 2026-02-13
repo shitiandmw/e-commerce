@@ -25,6 +25,9 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/banner",
     },
+    {
+      resolve: "./src/modules/article",
+    },
   ],
   projectConfig: {
     redisUrl: process.env.REDIS_URL,
