@@ -1,0 +1,102 @@
+{
+  "menus": {
+    "title": "导航菜单",
+    "subtitle": "管理您的站点导航菜单",
+    "addMenu": "添加菜单",
+    "createMenu": "创建菜单",
+    "editMenu": "编辑菜单",
+    "createSubtitle": "创建一个新的导航菜单",
+    "editSubtitle": "正在编辑 {name}",
+    "saveChanges": "保存更改",
+    "saving": "保存中...",
+    "errorOccurred": "发生错误",
+    "backToMenus": "返回菜单列表",
+    "menuNotFound": "未找到菜单或加载失败。",
+    "columns": {
+      "name": "名称",
+      "key": "标识键",
+      "description": "描述",
+      "created": "创建时间"
+    },
+    "actions": {
+      "view": "查看",
+      "edit": "编辑",
+      "delete": "删除",
+      "openMenu": "打开菜单"
+    },
+    "table": {
+      "errorLoading": "加载菜单失败",
+      "unknownError": "未知错误",
+      "noMenus": "暂无菜单。创建您的第一个导航菜单开始使用。",
+      "showing": "显示第 {from} 至 {to} 条，共 {total} 条菜单",
+      "page": "第 {current} 页，共 {total} 页"
+    },
+    "deleteDialog": {
+      "title": "删除菜单",
+      "description": "确定要删除「{name}」吗？这将同时删除所有菜单项。此操作无法撤销。",
+      "cancel": "取消",
+      "delete": "删除",
+      "deleting": "删除中..."
+    },
+    "form": {
+      "basicInfo": "基本信息",
+      "nameLabel": "名称 *",
+      "namePlaceholder": "例如：主导航",
+      "keyLabel": "标识键 *",
+      "keyPlaceholder": "例如：main_nav",
+      "keyHint": "代码中使用的唯一标识符。请使用小写字母、数字和下划线。",
+      "descriptionLabel": "描述",
+      "descriptionPlaceholder": "描述此菜单的用途..."
+    },
+    "tree": {
+      "menuItems": "菜单项",
+      "noItems": "暂无菜单项。添加第一个菜单项来构建此菜单。",
+      "addItem": "添加菜单项",
+      "addChildItem": "添加子项",
+      "editItem": "编辑",
+      "deleteItem": "删除",
+      "moveUp": "上移",
+      "moveDown": "下移",
+      "saveOrder": "保存排序",
+      "savingOrder": "保存中...",
+      "orderSaved": "排序已保存",
+      "enabled": "已启用",
+      "disabled": "已禁用",
+      "hasUnsavedChanges": "您有未保存的排序更改。",
+      "deleteItemTitle": "删除菜单项",
+      "deleteItemDescription": "确定要删除「{label}」吗？此操作无法撤销。",
+      "deleteItemWithChildren": "警告：此菜单项有 {count} 个子项。删除后子项将成为孤立项。",
+      "collapse": "收起",
+      "expand": "展开"
+    },
+    "itemForm": {
+      "createTitle": "添加菜单项",
+      "editTitle": "编辑菜单项",
+      "labelField": "标签 *",
+      "labelPlaceholder": "例如：商品",
+      "urlField": "链接地址 *",
+      "urlPlaceholder": "例如：/products",
+      "iconUrlField": "图标链接",
+      "iconUrlPlaceholder": "https://example.com/icon.svg",
+      "parentField": "父级菜单项",
+      "parentNone": "无（顶级）",
+      "enabledField": "启用",
+      "metadataField": "元数据 (JSON)",
+      "metadataPlaceholder": "{}",
+      "save": "保存",
+      "cancel": "取消",
+      "saving": "保存中..."
+    },
+    "detail": {
+      "menuDetails": "菜单详情",
+      "description": "描述",
+      "noDescription": "未提供描述。",
+      "quickInfo": "概要信息",
+      "key": "标识键",
+      "itemCount": "菜单项数",
+      "created": "创建时间",
+      "updated": "更新时间",
+      "menuId": "菜单 ID"
+    }
+  }
+}

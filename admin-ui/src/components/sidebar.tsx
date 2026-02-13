@@ -26,6 +26,7 @@ import {
   Maximize2,
   Layers,
   FileText,
+  List,
 } from "lucide-react"
 import { LanguageSwitcher } from "@/components/language-switcher"
 
@@ -43,6 +44,7 @@ const navigation = [
   { key: "customers", href: "/customers", icon: Users },
   { key: "pages", href: "/pages", icon: BookOpen },
   { key: "banners", href: "/banners", icon: Layers },
+  { key: "menus", href: "/menus", icon: List },
   { key: "media", href: "/media", icon: ImageIcon },
   { key: "announcements", href: "/announcements", icon: Megaphone },
   { key: "popups", href: "/popups", icon: Maximize2 },

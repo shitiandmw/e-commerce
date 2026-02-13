@@ -31,6 +31,7 @@ const namespaces = [
   "banners",
   "articles",
   "collections",
+  "menus",
 ] as const
 
 async function loadMessages(locale: string) {

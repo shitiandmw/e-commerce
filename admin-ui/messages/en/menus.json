@@ -1,0 +1,102 @@
+{
+  "menus": {
+    "title": "Navigation Menus",
+    "subtitle": "Manage your site navigation menus",
+    "addMenu": "Add Menu",
+    "createMenu": "Create Menu",
+    "editMenu": "Edit Menu",
+    "createSubtitle": "Create a new navigation menu",
+    "editSubtitle": "Editing {name}",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "errorOccurred": "An error occurred",
+    "backToMenus": "Back to Menus",
+    "menuNotFound": "Menu not found or failed to load.",
+    "columns": {
+      "name": "Name",
+      "key": "Key",
+      "description": "Description",
+      "created": "Created"
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete",
+      "openMenu": "Open menu"
+    },
+    "table": {
+      "errorLoading": "Failed to load menus",
+      "unknownError": "Unknown error",
+      "noMenus": "No menus yet. Create your first navigation menu to get started.",
+      "showing": "Showing {from} to {to} of {total} menus",
+      "page": "Page {current} of {total}"
+    },
+    "deleteDialog": {
+      "title": "Delete Menu",
+      "description": "Are you sure you want to delete \"{name}\"? This will also delete all menu items. This action cannot be undone.",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting..."
+    },
+    "form": {
+      "basicInfo": "Basic Information",
+      "nameLabel": "Name *",
+      "namePlaceholder": "e.g. Main Navigation",
+      "keyLabel": "Key *",
+      "keyPlaceholder": "e.g. main_nav",
+      "keyHint": "Unique identifier used in code. Use lowercase letters, numbers, and underscores.",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Describe the purpose of this menu..."
+    },
+    "tree": {
+      "menuItems": "Menu Items",
+      "noItems": "No menu items yet. Add your first item to build this menu.",
+      "addItem": "Add Item",
+      "addChildItem": "Add Child",
+      "editItem": "Edit",
+      "deleteItem": "Delete",
+      "moveUp": "Move Up",
+      "moveDown": "Move Down",
+      "saveOrder": "Save Order",
+      "savingOrder": "Saving...",
+      "orderSaved": "Order saved successfully",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "hasUnsavedChanges": "You have unsaved ordering changes.",
+      "deleteItemTitle": "Delete Menu Item",
+      "deleteItemDescription": "Are you sure you want to delete \"{label}\"? This action cannot be undone.",
+      "deleteItemWithChildren": "Warning: This item has {count} child item(s). Deleting it will orphan the child items.",
+      "collapse": "Collapse",
+      "expand": "Expand"
+    },
+    "itemForm": {
+      "createTitle": "Add Menu Item",
+      "editTitle": "Edit Menu Item",
+      "labelField": "Label *",
+      "labelPlaceholder": "e.g. Products",
+      "urlField": "URL *",
+      "urlPlaceholder": "e.g. /products",
+      "iconUrlField": "Icon URL",
+      "iconUrlPlaceholder": "https://example.com/icon.svg",
+      "parentField": "Parent Item",
+      "parentNone": "None (Top Level)",
+      "enabledField": "Enabled",
+      "metadataField": "Metadata (JSON)",
+      "metadataPlaceholder": "{}",
+      "save": "Save",
+      "cancel": "Cancel",
+      "saving": "Saving..."
+    },
+    "detail": {
+      "menuDetails": "Menu Details",
+      "description": "Description",
+      "noDescription": "No description provided.",
+      "quickInfo": "Quick Info",
+      "key": "Key",
+      "itemCount": "Items",
+      "created": "Created",
+      "updated": "Updated",
+      "menuId": "Menu ID"
+    }
+  }
+}
