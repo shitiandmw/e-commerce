@@ -67,7 +67,7 @@ export interface Product {
     id: string
     name: string
   } | null
-  tags?: Array<{
+  custom_tags?: Array<{
     id: string
     name: string
     color?: string | null
@@ -115,7 +115,7 @@ export function useProducts(params: ProductsQueryParams = {}) {
   queryParams.set(
     "fields",
     fields ||
-      "+variants,+variants.prices,+options,+options.values,+images,+categories,+brand,+tags"
+      "+variants,+variants.prices,+options,+options.values,+images,+categories,+brand,+custom_tags"
   )
 
   return useQuery<ProductsResponse>({
@@ -130,7 +130,7 @@ export function useProduct(id: string) {
     queryKey: ["product", id],
     queryFn: () =>
       adminFetch<{ product: Product }>(
-        `/admin/products/${id}?fields=+variants,+variants.prices,+options,+options.values,+images,+categories,+brand,+metadata`
+        `/admin/products/${id}?fields=+variants,+variants.prices,+options,+options.values,+images,+categories,+brand,+custom_tags,+metadata`
       ),
     enabled: !!id,
   })

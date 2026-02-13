@@ -12,7 +12,7 @@ export const GET = async (
   const query = req.scope.resolve("query")
 
   const { data: tags, metadata } = await query.graph({
-    entity: "tag",
+    entity: "custom_tag",
     ...req.queryConfig,
   })
 

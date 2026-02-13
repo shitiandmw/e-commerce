@@ -43,6 +43,23 @@ import Link from "next/link"
 import { MediaPicker } from "@/components/media/media-picker"
 import { SeoEditor, type SeoData } from "@/components/ui/seo-editor"
 
+/**
+ * Generate a URL-safe handle (slug) from a product title.
+ * Strips non-ASCII chars (e.g. Chinese), keeps alphanumeric + hyphens,
+ * and falls back to a timestamp-based slug when nothing usable remains.
+ */
+function generateHandle(title: string): string {
+  const slug = title
+    .toLowerCase()
+    .trim()
+    .replace(/[\s_]+/g, "-")        // spaces / underscores → hyphens
+    .replace(/[^a-z0-9-]/g, "")     // strip everything non-URL-safe
+    .replace(/-+/g, "-")            // collapse consecutive hyphens
+    .replace(/^-|-$/g, "")          // trim leading/trailing hyphens
+
+  return slug || `product-${Date.now()}`
+}
+
 const variantSchema = z.object({
   title: z.string().min(1, "Variant title is required"),
   sku: z.string().optional(),
@@ -131,7 +148,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
           })) || [],
         category_ids: product.categories?.map((c) => c.id) || [],
         brand_id: product.brand?.id || "",
-        tag_ids: product.tags?.map((t) => t.id) || [],
+        tag_ids: product.custom_tags?.map((t) => t.id) || [],
       }
     : {
         title: "",
@@ -209,11 +226,17 @@ export function ProductForm({ product, mode }: ProductFormProps) {
   const onSubmit = async (data: ProductFormData) => {
     try {
       // Build the API payload
+      // Auto-generate a URL-safe handle if the user left it blank or it
+      // contains non-URL-safe characters (e.g. Chinese, special symbols).
+      const rawHandle = data.handle?.trim() || ""
+      const isUrlSafe = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(rawHandle)
+      const handle = rawHandle && isUrlSafe ? rawHandle : generateHandle(data.title)
+
       const payload: Record<string, any> = {
         title: data.title,
         subtitle: data.subtitle || undefined,
         description: data.description || undefined,
-        handle: data.handle || undefined,
+        handle,
         status: data.status,
         thumbnail: data.thumbnail || undefined,
         images: data.images.length > 0 ? data.images : undefined,
@@ -306,7 +329,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
         }
 
         // Handle tag link changes
-        const oldTagIds = product?.tags?.map((t) => t.id) || []
+        const oldTagIds = product?.custom_tags?.map((t) => t.id) || []
         const newTagIds = data.tag_ids
 
         // Unlink removed tags
@@ -342,7 +365,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       {/* Header — sticky so the save button is always reachable */}
-      <div className="sticky top-0 z-20 -mx-6 -mt-6 px-6 pt-6 pb-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b">
+      <div className="sticky top-0 z-20 -mx-8 -mt-8 px-8 pt-6 pb-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/products">

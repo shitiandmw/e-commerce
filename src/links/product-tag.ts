@@ -7,5 +7,8 @@ export default defineLink(
     linkable: ProductModule.linkable.product,
     isList: true,
   },
-  TagModule.linkable.tag
+  {
+    linkable: TagModule.linkable.customTag,
+    isList: true,
+  }
 )

@@ -7,7 +7,9 @@ import Placeholder from "@tiptap/extension-placeholder"
 import Link from "@tiptap/extension-link"
 import Underline from "@tiptap/extension-underline"
 import TextAlign from "@tiptap/extension-text-align"
+import Image from "@tiptap/extension-image"
 import { cn } from "@/lib/utils"
+import { getToken } from "@/lib/auth"
 import {
   Bold,
   Italic,
@@ -28,6 +30,8 @@ import {
   Heading3,
   Minus,
   Code,
+  ImagePlus,
+  Loader2,
 } from "lucide-react"
 
 interface RichTextEditorProps {
@@ -36,6 +40,26 @@ interface RichTextEditorProps {
   placeholder?: string
   className?: string
   disabled?: boolean
+}
+
+/** Upload a file to Medusa and return the public URL */
+async function uploadImageToMedusa(file: File): Promise<string> {
+  const token = getToken()
+  const baseUrl =
+    process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+  const formData = new FormData()
+  formData.append("files", file)
+
+  const res = await fetch(`${baseUrl}/admin/uploads`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  })
+
+  if (!res.ok) throw new Error("Image upload failed")
+
+  const data = await res.json()
+  return data.files?.[0]?.url ?? ""
 }
 
 export function RichTextEditor({
@@ -58,6 +82,12 @@ export function RichTextEditor({
       }),
       Underline,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
+      Image.configure({
+        HTMLAttributes: {
+          class: "rounded-md max-w-full h-auto",
+        },
+        allowBase64: false,
+      }),
     ],
     content,
     editable: !disabled,
@@ -106,6 +136,9 @@ export function RichTextEditor({
 // ─── Toolbar ─────────────────────────────────────────────
 
 function Toolbar({ editor }: { editor: Editor }) {
+  const [uploading, setUploading] = React.useState(false)
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
+
   const addLink = React.useCallback(() => {
     const prev = editor.getAttributes("link").href
     const url = window.prompt("URL", prev || "https://")
@@ -121,6 +154,28 @@ function Toolbar({ editor }: { editor: Editor }) {
         .run()
     }
   }, [editor])
+
+  const handleImageUpload = React.useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0]
+      if (!file) return
+      // Reset input so the same file can be re-selected
+      e.target.value = ""
+
+      setUploading(true)
+      try {
+        const url = await uploadImageToMedusa(file)
+        if (url) {
+          editor.chain().focus().setImage({ src: url, alt: file.name }).run()
+        }
+      } catch {
+        // Silently fail — user can retry
+      } finally {
+        setUploading(false)
+      }
+    },
+    [editor]
+  )
 
   return (
     <div className="flex flex-wrap items-center gap-0.5 border-b px-1 py-1">
@@ -260,6 +315,28 @@ function Toolbar({ editor }: { editor: Editor }) {
           <LinkOff className="h-4 w-4" />
         </ToolbarButton>
       )}
+
+      <Separator />
+
+      {/* Image upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleImageUpload}
+      />
+      <ToolbarButton
+        onClick={() => fileInputRef.current?.click()}
+        disabled={uploading}
+        title="Upload Image"
+      >
+        {uploading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <ImagePlus className="h-4 w-4" />
+        )}
+      </ToolbarButton>
 
       <Separator />
 

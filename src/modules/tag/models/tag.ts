@@ -1,6 +1,6 @@
 import { model } from "@medusajs/framework/utils"
 
-export const Tag = model.define("tag", {
+export const Tag = model.define("custom_tag", {
   id: model.id().primaryKey(),
   name: model.text(),
   color: model.text().nullable(),

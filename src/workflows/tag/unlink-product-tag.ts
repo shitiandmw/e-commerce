@@ -22,7 +22,7 @@ const unlinkProductTagStep = createStep(
         product_id,
       },
       [TAG_MODULE]: {
-        tag_id,
+        custom_tag_id: tag_id,
       },
     })
 
@@ -38,7 +38,7 @@ const unlinkProductTagStep = createStep(
         product_id,
       },
       [TAG_MODULE]: {
-        tag_id,
+        custom_tag_id: tag_id,
       },
     })
   }

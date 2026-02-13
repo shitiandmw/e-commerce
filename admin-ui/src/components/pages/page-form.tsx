@@ -14,13 +14,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Select } from "@/components/ui/select"
 import { RichTextEditor } from "@/components/ui/rich-text-editor"
 import { ArrowLeft, Save, Loader2 } from "lucide-react"
 import Link from "next/link"
@@ -248,14 +242,9 @@ export function PageForm({ page, mode }: PageFormProps) {
               name="status"
               control={control}
               render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="draft">{t("status.draft")}</SelectItem>
-                    <SelectItem value="published">{t("status.published")}</SelectItem>
-                  </SelectContent>
+                <Select value={field.value} onChange={(e) => field.onChange(e.target.value)}>
+                  <option value="draft">{t("status.draft")}</option>
+                  <option value="published">{t("status.published")}</option>
                 </Select>
               )}
             />
@@ -270,19 +259,14 @@ export function PageForm({ page, mode }: PageFormProps) {
               render={({ field }) => (
                 <Select
                   value={field.value || "none"}
-                  onValueChange={(val) => field.onChange(val === "none" ? "" : val)}
+                  onChange={(e) => field.onChange(e.target.value === "none" ? "" : e.target.value)}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t("form.templatePlaceholder")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">{t("form.noTemplate")}</SelectItem>
-                    {TEMPLATE_OPTIONS.map((tpl) => (
-                      <SelectItem key={tpl} value={tpl}>
-                        {t(`templates.${tpl}`)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
+                  <option value="none">{t("form.noTemplate")}</option>
+                  {TEMPLATE_OPTIONS.map((tpl) => (
+                    <option key={tpl} value={tpl}>
+                      {t(`templates.${tpl}`)}
+                    </option>
+                  ))}
                 </Select>
               )}
             />

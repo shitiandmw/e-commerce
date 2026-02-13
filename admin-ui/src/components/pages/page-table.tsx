@@ -23,13 +23,7 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Select } from "@/components/ui/select"
 import {
   ChevronLeft,
   ChevronRight,
@@ -99,19 +93,16 @@ export function PageTable() {
         <div className="flex items-center gap-2">
           <Select
             value={statusFilter}
-            onValueChange={(value) => {
+            onChange={(e) => {
+              const value = e.target.value
               setStatusFilter(value === "all" ? "" : value)
               setPagination((prev) => ({ ...prev, pageIndex: 0 }))
             }}
+            className="w-[160px]"
           >
-            <SelectTrigger className="w-[160px]">
-              <SelectValue placeholder={t("filter.allStatuses")} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t("filter.allStatuses")}</SelectItem>
-              <SelectItem value="draft">{t("status.draft")}</SelectItem>
-              <SelectItem value="published">{t("status.published")}</SelectItem>
-            </SelectContent>
+            <option value="all">{t("filter.allStatuses")}</option>
+            <option value="draft">{t("status.draft")}</option>
+            <option value="published">{t("status.published")}</option>
           </Select>
         </div>
         <Link href="/pages/new">

@@ -15,13 +15,13 @@ const deleteTagStep = createStep(
   "delete-tag-step",
   async ({ id }: DeleteTagInput, { container }) => {
     const tagService: TagModuleService = container.resolve(TAG_MODULE)
-    const tag = await tagService.retrieveTag(id)
-    await tagService.deleteTags(id)
+    const tag = await tagService.retrieveCustomTag(id)
+    await tagService.deleteCustomTags(id)
     return new StepResponse(id, tag)
   },
   async (tag: Record<string, unknown>, { container }) => {
     const tagService: TagModuleService = container.resolve(TAG_MODULE)
-    await tagService.createTags(tag as any)
+    await tagService.createCustomTags(tag as any)
   }
 )
 
@@ -31,7 +31,7 @@ const dismissTagLinksStep = createStep(
     const remoteLink = container.resolve("remoteLink") as any
     await remoteLink.dismiss({
       [TAG_MODULE]: {
-        tag_id: id,
+        custom_tag_id: id,
       },
     })
     return new StepResponse(undefined)

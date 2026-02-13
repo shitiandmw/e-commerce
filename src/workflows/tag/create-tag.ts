@@ -17,12 +17,12 @@ const createTagStep = createStep(
   "create-tag-step",
   async (input: CreateTagInput, { container }) => {
     const tagService: TagModuleService = container.resolve(TAG_MODULE)
-    const tag = await tagService.createTags(input)
+    const tag = await tagService.createCustomTags(input)
     return new StepResponse(tag, tag.id)
   },
   async (tagId: string, { container }) => {
     const tagService: TagModuleService = container.resolve(TAG_MODULE)
-    await tagService.deleteTags(tagId)
+    await tagService.deleteCustomTags(tagId)
   }
 )
 

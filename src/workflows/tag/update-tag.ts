@@ -18,13 +18,13 @@ const updateTagStep = createStep(
   "update-tag-step",
   async (input: UpdateTagInput, { container }) => {
     const tagService: TagModuleService = container.resolve(TAG_MODULE)
-    const existing = await tagService.retrieveTag(input.id)
-    const tag = await tagService.updateTags(input)
+    const existing = await tagService.retrieveCustomTag(input.id)
+    const tag = await tagService.updateCustomTags(input)
     return new StepResponse(tag, existing)
   },
   async (previous: Record<string, unknown>, { container }) => {
     const tagService: TagModuleService = container.resolve(TAG_MODULE)
-    await tagService.updateTags(previous as any)
+    await tagService.updateCustomTags(previous as any)
   }
 )
 
