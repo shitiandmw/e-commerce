@@ -25,12 +25,22 @@ import {
   PostAdminCreatePopup,
   PostAdminUpdatePopup,
 } from "./admin/popups/validators"
+import {
+  PostAdminCreateBannerSlot,
+  PostAdminUpdateBannerSlot,
+} from "./admin/banner-slots/validators"
+import {
+  PostAdminCreateBannerItem,
+  PostAdminUpdateBannerItem,
+} from "./admin/banner-items/validators"
 
 export const GetBrandsSchema = createFindParams()
 export const GetPagesSchema = createFindParams()
 export const GetTagsSchema = createFindParams()
 export const GetAnnouncementsSchema = createFindParams()
 export const GetPopupsSchema = createFindParams()
+export const GetBannerSlotsSchema = createFindParams()
+export const GetBannerItemsSchema = createFindParams()
 
 export default defineMiddlewares({
   routes: [
@@ -201,6 +211,66 @@ export default defineMiddlewares({
       method: "POST",
       middlewares: [
         validateAndTransformBody(PostAdminUpdatePopup),
+      ],
+    },
+    // Banner Slot routes
+    {
+      matcher: "/admin/banner-slots",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(
+          GetBannerSlotsSchema,
+          {
+            defaults: ["id", "name", "key", "description", "created_at", "updated_at"],
+            isList: true,
+          }
+        ),
+      ],
+    },
+    {
+      matcher: "/admin/banner-slots",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminCreateBannerSlot),
+      ],
+    },
+    {
+      matcher: "/admin/banner-slots/:id",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminUpdateBannerSlot),
+      ],
+    },
+    // Banner Item routes
+    {
+      matcher: "/admin/banner-items",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(
+          GetBannerItemsSchema,
+          {
+            defaults: [
+              "id", "slot_id", "image_url", "title", "subtitle",
+              "link_url", "sort_order", "is_enabled",
+              "starts_at", "ends_at", "created_at", "updated_at",
+            ],
+            isList: true,
+          }
+        ),
+      ],
+    },
+    {
+      matcher: "/admin/banner-items",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminCreateBannerItem),
+      ],
+    },
+    {
+      matcher: "/admin/banner-items/:id",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminUpdateBannerItem),
       ],
     },
   ],
