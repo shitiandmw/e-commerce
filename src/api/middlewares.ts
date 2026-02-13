@@ -41,6 +41,14 @@ import {
   PostAdminCreateArticleCategory,
   PostAdminUpdateArticleCategory,
 } from "./admin/article-categories/validators"
+import {
+  PostAdminCreateCuratedCollection,
+  PostAdminUpdateCuratedCollection,
+  PostAdminCreateCollectionTab,
+  PostAdminUpdateCollectionTab,
+  PostAdminAddCollectionItem,
+  PostAdminUpdateCollectionItem,
+} from "./admin/curated-collections/validators"
 
 export const GetBrandsSchema = createFindParams()
 export const GetPagesSchema = createFindParams()
@@ -51,6 +59,7 @@ export const GetBannerSlotsSchema = createFindParams()
 export const GetBannerItemsSchema = createFindParams()
 export const GetArticlesSchema = createFindParams()
 export const GetArticleCategoriesSchema = createFindParams()
+export const GetCuratedCollectionsSchema = createFindParams()
 
 export default defineMiddlewares({
   routes: [
@@ -344,6 +353,67 @@ export default defineMiddlewares({
       method: "POST",
       middlewares: [
         validateAndTransformBody(PostAdminUpdateArticleCategory),
+      ],
+    },
+    // Curated Collection routes
+    {
+      matcher: "/admin/curated-collections",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(
+          GetCuratedCollectionsSchema,
+          {
+            defaults: [
+              "id", "name", "key", "description",
+              "sort_order", "created_at", "updated_at",
+            ],
+            isList: true,
+          }
+        ),
+      ],
+    },
+    {
+      matcher: "/admin/curated-collections",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminCreateCuratedCollection),
+      ],
+    },
+    {
+      matcher: "/admin/curated-collections/:id",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminUpdateCuratedCollection),
+      ],
+    },
+    // Collection Tab routes
+    {
+      matcher: "/admin/curated-collections/:id/tabs",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminCreateCollectionTab),
+      ],
+    },
+    {
+      matcher: "/admin/curated-collections/:id/tabs/:tabId",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminUpdateCollectionTab),
+      ],
+    },
+    // Collection Item routes
+    {
+      matcher: "/admin/curated-collections/:id/items",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminAddCollectionItem),
+      ],
+    },
+    {
+      matcher: "/admin/curated-collections/:id/items/:itemId",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminUpdateCollectionItem),
       ],
     },
   ],

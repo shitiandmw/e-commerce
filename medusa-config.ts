@@ -28,6 +28,9 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/article",
     },
+    {
+      resolve: "./src/modules/curated-collection",
+    },
   ],
   projectConfig: {
     redisUrl: process.env.REDIS_URL,
