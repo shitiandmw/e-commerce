@@ -49,6 +49,15 @@ import {
   PostAdminAddCollectionItem,
   PostAdminUpdateCollectionItem,
 } from "./admin/curated-collections/validators"
+import {
+  PostAdminCreateMenu,
+  PostAdminUpdateMenu,
+} from "./admin/menus/validators"
+import {
+  PostAdminCreateMenuItem,
+  PostAdminUpdateMenuItem,
+  PostAdminReorderMenuItems,
+} from "./admin/menu-items/validators"
 
 export const GetBrandsSchema = createFindParams()
 export const GetPagesSchema = createFindParams()
@@ -60,6 +69,7 @@ export const GetBannerItemsSchema = createFindParams()
 export const GetArticlesSchema = createFindParams()
 export const GetArticleCategoriesSchema = createFindParams()
 export const GetCuratedCollectionsSchema = createFindParams()
+export const GetMenusSchema = createFindParams()
 
 export default defineMiddlewares({
   routes: [
@@ -414,6 +424,56 @@ export default defineMiddlewares({
       method: "POST",
       middlewares: [
         validateAndTransformBody(PostAdminUpdateCollectionItem),
+      ],
+    },
+    // Menu routes
+    {
+      matcher: "/admin/menus",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(
+          GetMenusSchema,
+          {
+            defaults: ["id", "name", "key", "description", "created_at", "updated_at"],
+            isList: true,
+          }
+        ),
+      ],
+    },
+    {
+      matcher: "/admin/menus",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminCreateMenu),
+      ],
+    },
+    {
+      matcher: "/admin/menus/:id",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminUpdateMenu),
+      ],
+    },
+    // Menu item routes
+    {
+      matcher: "/admin/menus/:id/items",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminCreateMenuItem),
+      ],
+    },
+    {
+      matcher: "/admin/menus/:id/items/:itemId",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminUpdateMenuItem),
+      ],
+    },
+    {
+      matcher: "/admin/menus/:id/reorder",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminReorderMenuItems),
       ],
     },
   ],
