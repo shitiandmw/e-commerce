@@ -21,7 +21,7 @@ import {
   Undo2,
   Redo2,
   Link as LinkIcon,
-  Link2Off as LinkOff,
+  Link2Off,
   AlignLeft,
   AlignCenter,
   AlignRight,
@@ -312,7 +312,7 @@ function Toolbar({ editor }: { editor: Editor }) {
           onClick={() => editor.chain().focus().unsetLink().run()}
           title="Remove Link"
         >
-          <LinkOff className="h-4 w-4" />
+          <Link2Off className="h-4 w-4" />
         </ToolbarButton>
       )}
 

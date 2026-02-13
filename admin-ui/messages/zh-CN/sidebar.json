@@ -5,6 +5,7 @@
     "products": "商品管理",
     "brands": "品牌管理",
     "tags": "标签管理",
+    "articles": "文章管理",
     "inventory": "库存管理",
     "orders": "订单管理",
     "promotions": "促销活动",

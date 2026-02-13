@@ -24,6 +24,7 @@ import {
   Megaphone,
   Maximize2,
   Layers,
+  FileText,
 } from "lucide-react"
 import { LanguageSwitcher } from "@/components/language-switcher"
 
@@ -32,6 +33,7 @@ const navigation = [
   { key: "products", href: "/products", icon: Package },
   { key: "brands", href: "/brands", icon: Tag },
   { key: "tags", href: "/tags", icon: Bookmark },
+  { key: "articles", href: "/articles", icon: FileText },
   { key: "inventory", href: "/inventory", icon: Warehouse },
   { key: "orders", href: "/orders", icon: ShoppingCart },
   { key: "promotions", href: "/promotions", icon: Percent },
