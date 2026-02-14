@@ -1,0 +1,290 @@
+E-commerce Admin & Content Platform Specification
+
+Build a production-ready operations backend and admin console for the existing Medusa-based e-commerce project.
+This is an enhancement project on top of the current codebase, not a rewrite.
+The system should support content operations, merchandising, and storefront-facing content delivery for a cigar-focused commerce site.
+
+
+Project Context and Constraints
+
+- Existing backend: Medusa v2 (`@medusajs/medusa` 2.13.1), custom modules under `src/modules`
+- Existing admin frontend: Next.js 14 app under `admin-ui`
+- Database: PostgreSQL
+- Cache/queue: Redis
+- Built-in Medusa admin is disabled; custom admin-ui must remain the primary admin experience
+- Keep current startup pattern:
+  - Backend on port 9000
+  - Admin UI on port 3002
+  - Docker Compose for PostgreSQL + Redis
+- Preserve existing route contracts where possible; avoid breaking changes to already used admin endpoints
+
+
+Current Implemented Baseline (Must Be Preserved)
+
+Custom modules already exist:
+- Brand
+- Tag
+- Page
+- Announcement
+- Popup
+- Banner (slot + item)
+- Article (article + category)
+- Curated Collection (collection + tab + item)
+- Menu (menu + menu item tree)
+
+Admin APIs already exist for:
+- `/admin/brands`, `/admin/tags`, `/admin/pages`, `/admin/announcements`, `/admin/popups`
+- `/admin/banner-slots`, `/admin/banner-items`
+- `/admin/articles`, `/admin/article-categories`
+- `/admin/curated-collections`, nested tabs/items
+- `/admin/menus`, nested items/reorder
+- `/admin/uploads` (list local uploaded files)
+
+Admin UI already includes pages/modules for:
+- products, brands, tags, articles, collections, banners, menus, pages
+- announcements, popups, media, orders, customers, inventory
+- promotions, shipping, analytics, settings
+
+
+Primary Goal
+
+Turn the current baseline into a complete content + merchandising platform that can:
+1) be operated entirely from admin-ui,
+2) expose stable storefront APIs for content rendering,
+3) support multi-language content workflows,
+4) support SEO configuration across key content entities.
+
+
+Feature Requirements
+
+P0 - Business-Critical Closed Loop
+
+1. Article/Blog Management
+- Full CRUD for articles and article categories
+- Fields: title, slug, cover image, summary, rich text content, status, publish time, pin/sort, category
+- List supports search/filter/pagination/sort
+- Rich text supports embedded links and media references
+- Category management with ordering
+
+2. Banner and Slot Management
+- CRUD for banner slots (position definitions)
+- CRUD for banner items under slots
+- Fields: image, title, subtitle, link, sort order, enabled state, active time range
+- Frontend consumption should respect enabled state + schedule window + sort order
+
+3. Curated Collection Management
+- CRUD for curated collections
+- Optional tab grouping under each collection
+- Add/remove/reorder product items in collection
+- Support product search while adding items
+- Support section key for deterministic storefront placement
+
+4. Navigation Menu Management
+- CRUD for multiple menu sets (for example, main and footer)
+- Tree-based menu item editing (parent-child)
+- Drag/reorder behavior
+- Fields: label, link, icon/image, enabled state, metadata
+- Output structure should be directly consumable by storefront navigation
+
+5. Storefront Content Delivery APIs (Critical Gap to Complete)
+- Implement public store APIs for content modules (currently mostly admin-only)
+- Must support locale parameter and publish-status filtering
+- Must return normalized payloads for frontend rendering without extra joins on client side
+
+
+P1 - Operations and Growth
+
+6. Static Page Management
+- CRUD for static pages
+- Template support (about, terms, privacy, FAQ, shipping-policy, returns, quality)
+- Slug uniqueness and publish-state control
+
+7. Announcement Bar Management
+- CRUD for announcements
+- Fields: text, link, sort order, enabled, active window
+- Storefront API returns active announcements only by default
+
+8. Popup Management
+- CRUD for popups
+- Fields: image, title, description, CTA text/link, enabled
+- Trigger settings: first visit, every visit, specific page
+- Frequency settings: once, once per session, once per day
+
+9. Product Brand/Tag Association
+- Keep product-brand and product-tag linking workflows stable
+- Product editor supports selecting brand and multiple tags
+- Tag types support badge/attribute use cases
+
+10. Media Library
+- Keep upload/list/delete workflow stable
+- Continue supporting local static storage listing via `/admin/uploads`
+- Ensure predictable URL generation and pagination
+
+
+P2 - Experience and Scalability
+
+11. Multi-language Content Management
+- Target locales: `zh-HK`, `zh-CN`, `en`
+- Current baseline has admin language switching (`zh-CN`/`en`), but content fields are mostly single-language
+- Add multi-language content storage and editing workflow for:
+  - Product core copy (title/subtitle/description)
+  - Article (title/summary/content)
+  - Static page (title/content)
+  - Optional: banner text, popup text, announcement text
+- Admin forms should provide locale tabs and fallback behavior
+
+12. SEO Management Expansion
+- Current baseline has SEO editor in product form
+- Expand SEO support to articles and pages
+- Required SEO fields: meta title, meta description, og image, keywords
+- Support default auto-generation from content with manual override
+
+13. Analytics and Import/Export Hardening
+- Keep current dashboard analytics page
+- Improve data completeness and consistency for key stats
+- Keep import/export capability stable and predictable for operations usage
+
+
+Data Model Requirements
+
+Existing entities to keep:
+- brand
+- custom_tag
+- page
+- announcement
+- popup
+- banner_slot
+- banner_item
+- article
+- article_category
+- curated_collection
+- collection_tab
+- collection_item
+- menu
+- menu_item
+
+Required model enhancements:
+1) Multi-language data
+- Add `translations` JSONB (or equivalent structured relation) to content-heavy entities
+- Recommended shape:
+  - `translations.zh-HK`
+  - `translations.zh-CN`
+  - `translations.en`
+- Each locale node may include title/subtitle/summary/content fields based on entity type
+
+2) SEO data normalization
+- Add `seo` JSONB (or equivalent fields) for article and page entities
+- Product SEO remains in `metadata.seo`, but should follow the same shape for consistency
+
+3) Publication consistency
+- Standardize publish fields where relevant:
+  - `status` (`draft` / `published`)
+  - `published_at`
+  - `is_enabled`
+  - `starts_at` / `ends_at`
+
+
+API Requirements
+
+Admin APIs (existing pattern to preserve):
+- Continue using current admin route structure and auth model
+- Keep support for list + detail + create + update + delete
+- Keep validation via `middlewares.ts` + zod validators
+
+New Store APIs to add (public consumption):
+- `GET /store/content/home`
+  - returns active banners, active announcements, active popups, curated collections snapshot
+- `GET /store/content/menus`
+  - query: `key`, `locale`
+  - returns menu tree ready for rendering
+- `GET /store/content/articles`
+  - query: `category`, `q`, `offset`, `limit`, `locale`
+- `GET /store/content/articles/:slug`
+- `GET /store/content/pages/:slug`
+- `GET /store/content/collections`
+  - query: `key`, `locale`
+
+API behavior expectations:
+- Pagination on list endpoints
+- Locale fallback logic (requested locale -> default locale)
+- Time-window filtering for scheduled content
+- Consistent error format and HTTP status handling
+
+
+Admin UI Requirements
+
+General:
+- Keep current dashboard IA and route layout
+- Continue using React Query + form validation approach already in place
+- Keep rich text editing and media picker integration
+
+Required upgrades:
+1) Add locale tabs in content forms (where multi-language is enabled)
+2) Add SEO editor to article/page forms (same interaction model as product SEO)
+3) Improve list pages with consistent filter/search/pagination UX across modules
+4) Keep sticky save actions and validation messages for operational efficiency
+
+
+Operational Workflows
+
+Content publishing workflow:
+1. Create content in draft
+2. Fill localized fields and SEO fields
+3. Attach media and set schedule
+4. Publish
+5. Validate via store API payload
+
+Homepage operations workflow:
+1. Configure banners by slot and schedule
+2. Configure curated collections/tabs/items
+3. Configure announcements and popups
+4. Validate effective content by locale through `/store/content/home`
+
+Navigation workflow:
+1. Build menu tree in admin
+2. Reorder and enable/disable nodes
+3. Validate storefront rendering using `/store/content/menus`
+
+
+Implementation Phases
+
+Phase 1 - Stabilize Existing Baseline
+- Audit existing module behavior and fix critical defects
+- Ensure P0 module CRUD and sort/order behavior is reliable
+- Add/complete tests for core workflows
+
+Phase 2 - Storefront API Completion
+- Implement and validate all store content endpoints
+- Add locale and schedule-aware filtering
+- Align payload contracts with storefront consumption needs
+
+Phase 3 - Multi-language + SEO Expansion
+- Add content localization storage and admin editing
+- Extend SEO to articles/pages
+- Add fallback logic and migration scripts
+
+Phase 4 - Operational Polish
+- Improve analytics/import-export reliability
+- UX consistency cleanup across admin modules
+- Documentation and runbook updates
+
+
+Acceptance Criteria
+
+Functional:
+- All P0 modules work end-to-end in admin (create/update/delete/list/reorder where applicable)
+- Storefront can render homepage/navigation/articles/pages entirely from store APIs
+- Multi-language content can be edited and read with fallback behavior
+- SEO fields available and persisted for product/article/page
+
+Quality:
+- No breaking changes to existing admin endpoints without migration notes
+- Validation and error responses are consistent
+- Production-safe migration path for schema updates
+- Key workflows covered by integration tests
+
+UX:
+- Admin workflows are efficient for daily content operations
+- Scheduling and enable/disable logic are transparent and predictable
+- Language switching and SEO editing are intuitive and consistent
+
