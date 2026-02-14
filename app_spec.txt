@@ -1,22 +1,28 @@
-E-commerce Admin & Content Platform Specification
+E-commerce Storefront + Admin Platform Specification (Timecigar-style)
 
-Build a production-ready operations backend and admin console for the existing Medusa-based e-commerce project.
+Build a production-ready storefront + operations platform for the existing Medusa-based e-commerce project.
 This is an enhancement project on top of the current codebase, not a rewrite.
-The system should support content operations, merchandising, and storefront-facing content delivery for a cigar-focused commerce site.
+The system should support storefront shopping, order/payment completion, content operations, and merchandising for a cigar-focused commerce site.
+Reference site: https://www.timecigar.com
+Replication target: information architecture + user experience equivalence, NOT pixel-perfect 1:1.
 
 
 Project Context and Constraints
 
 - Existing backend: Medusa v2 (`@medusajs/medusa` 2.13.1), custom modules under `src/modules`
 - Existing admin frontend: Next.js 14 app under `admin-ui`
+- Storefront app must be a separate frontend project in `storefront/` directory
+- Storefront stack: Next.js (App Router) + TypeScript + Tailwind CSS
 - Database: PostgreSQL
 - Cache/queue: Redis
 - Built-in Medusa admin is disabled; custom admin-ui must remain the primary admin experience
 - Keep current startup pattern:
   - Backend on port 9000
   - Admin UI on port 3002
+  - Storefront on port 3000 (recommended)
   - Docker Compose for PostgreSQL + Redis
 - Preserve existing route contracts where possible; avoid breaking changes to already used admin endpoints
+- Default primary language must be Simplified Chinese (`zh-CN`)
 
 
 Current Implemented Baseline (Must Be Preserved)
@@ -51,42 +57,77 @@ Primary Goal
 Turn the current baseline into a complete content + merchandising platform that can:
 1) be operated entirely from admin-ui,
 2) expose stable storefront APIs for content rendering,
-3) support multi-language content workflows,
-4) support SEO configuration across key content entities.
+3) provide a complete storefront purchasing flow (browse -> cart -> checkout -> payment -> order),
+4) support multi-language content workflows (zh-CN first),
+5) support SEO configuration across key content entities.
 
 
 Feature Requirements
 
-P0 - Business-Critical Closed Loop
+P0 - Storefront + Business-Critical Closed Loop
 
-1. Article/Blog Management
+0. Storefront Foundation and Page System
+- Build a complete storefront aligned with timecigar-style IA (not pixel-level copy)
+- Required page types:
+  - Home
+  - Product list / category / collection
+  - Product detail page (PDP)
+  - Brand landing page
+  - Article list/detail
+  - Static pages (about/terms/privacy/faq/shipping/returns/quality)
+  - Cart
+  - Checkout
+  - Payment result (success/failure)
+  - User order query page
+- Reuse existing content modules (banner/menu/collection/article/page/announcement/popup) as storefront data sources
+
+1. Shopping Cart and Checkout + Payment (Mandatory)
+- Cart operations: add item, update quantity, remove item, clear cart
+- Order placement must require authenticated customer login (no guest checkout in phase 1)
+- Unauthenticated users attempting checkout/order must be redirected to login flow
+- Checkout operations:
+  - address input and validation
+  - shipping option selection
+  - discount/promotion application (if available)
+  - tax/shipping/total calculation
+- Payment:
+  - must integrate Stripe as the first and mandatory payment channel
+  - must support Stripe test mode and production-ready configuration boundaries
+  - must handle success/cancel/failure and retry flow
+  - must handle webhook-driven payment status synchronization
+  - order must be created with correct final status and visible in admin order list
+- Post-order:
+  - show order confirmation details
+  - support order lookup in user-facing flow
+
+2. Article/Blog Management
 - Full CRUD for articles and article categories
 - Fields: title, slug, cover image, summary, rich text content, status, publish time, pin/sort, category
 - List supports search/filter/pagination/sort
 - Rich text supports embedded links and media references
 - Category management with ordering
 
-2. Banner and Slot Management
+3. Banner and Slot Management
 - CRUD for banner slots (position definitions)
 - CRUD for banner items under slots
 - Fields: image, title, subtitle, link, sort order, enabled state, active time range
 - Frontend consumption should respect enabled state + schedule window + sort order
 
-3. Curated Collection Management
+4. Curated Collection Management
 - CRUD for curated collections
 - Optional tab grouping under each collection
 - Add/remove/reorder product items in collection
 - Support product search while adding items
 - Support section key for deterministic storefront placement
 
-4. Navigation Menu Management
+5. Navigation Menu Management
 - CRUD for multiple menu sets (for example, main and footer)
 - Tree-based menu item editing (parent-child)
 - Drag/reorder behavior
 - Fields: label, link, icon/image, enabled state, metadata
 - Output structure should be directly consumable by storefront navigation
 
-5. Storefront Content Delivery APIs (Critical Gap to Complete)
+6. Storefront Content Delivery APIs (Critical Gap to Complete)
 - Implement public store APIs for content modules (currently mostly admin-only)
 - Must support locale parameter and publish-status filtering
 - Must return normalized payloads for frontend rendering without extra joins on client side
@@ -94,28 +135,28 @@ P0 - Business-Critical Closed Loop
 
 P1 - Operations and Growth
 
-6. Static Page Management
+7. Static Page Management
 - CRUD for static pages
 - Template support (about, terms, privacy, FAQ, shipping-policy, returns, quality)
 - Slug uniqueness and publish-state control
 
-7. Announcement Bar Management
+8. Announcement Bar Management
 - CRUD for announcements
 - Fields: text, link, sort order, enabled, active window
 - Storefront API returns active announcements only by default
 
-8. Popup Management
+9. Popup Management
 - CRUD for popups
 - Fields: image, title, description, CTA text/link, enabled
 - Trigger settings: first visit, every visit, specific page
 - Frequency settings: once, once per session, once per day
 
-9. Product Brand/Tag Association
+10. Product Brand/Tag Association
 - Keep product-brand and product-tag linking workflows stable
 - Product editor supports selecting brand and multiple tags
 - Tag types support badge/attribute use cases
 
-10. Media Library
+11. Media Library
 - Keep upload/list/delete workflow stable
 - Continue supporting local static storage listing via `/admin/uploads`
 - Ensure predictable URL generation and pagination
@@ -123,8 +164,8 @@ P1 - Operations and Growth
 
 P2 - Experience and Scalability
 
-11. Multi-language Content Management
-- Target locales: `zh-HK`, `zh-CN`, `en`
+12. Multi-language Content Management
+- Target locales priority: `zh-CN` (primary), `en` (secondary), optional `zh-HK` later
 - Current baseline has admin language switching (`zh-CN`/`en`), but content fields are mostly single-language
 - Add multi-language content storage and editing workflow for:
   - Product core copy (title/subtitle/description)
@@ -132,14 +173,15 @@ P2 - Experience and Scalability
   - Static page (title/content)
   - Optional: banner text, popup text, announcement text
 - Admin forms should provide locale tabs and fallback behavior
+- Storefront default locale is `zh-CN`; all pages/routes default to Simplified Chinese output
 
-12. SEO Management Expansion
+13. SEO Management Expansion
 - Current baseline has SEO editor in product form
 - Expand SEO support to articles and pages
 - Required SEO fields: meta title, meta description, og image, keywords
 - Support default auto-generation from content with manual override
 
-13. Analytics and Import/Export Hardening
+14. Analytics and Import/Export Hardening
 - Keep current dashboard analytics page
 - Improve data completeness and consistency for key stats
 - Keep import/export capability stable and predictable for operations usage
@@ -204,6 +246,13 @@ New Store APIs to add (public consumption):
 - `GET /store/content/collections`
   - query: `key`, `locale`
 
+Checkout/payment-related API expectations:
+- Reuse Medusa standard store commerce APIs for cart/checkout/payment whenever possible
+- Add custom wrapper endpoints only when needed for storefront UX consistency
+- Payment callback/return handling must be explicitly documented and testable
+- Stripe webhook endpoint handling must be included and idempotent
+- Customer auth/session handling must be enforced before order completion APIs
+
 API behavior expectations:
 - Pagination on list endpoints
 - Locale fallback logic (requested locale -> default locale)
@@ -223,6 +272,13 @@ Required upgrades:
 2) Add SEO editor to article/page forms (same interaction model as product SEO)
 3) Improve list pages with consistent filter/search/pagination UX across modules
 4) Keep sticky save actions and validation messages for operational efficiency
+
+Storefront UI requirements:
+1) Chinese-first copywriting and content presentation
+2) Strong mobile usability (home/product/cart/checkout)
+3) Clear conversion flow with minimal checkout friction
+4) Consistent empty/loading/error states on shopping-critical pages
+5) Dedicated auth flow for order-required login (login/register/forgot password)
 
 
 Operational Workflows
@@ -248,22 +304,29 @@ Navigation workflow:
 
 Implementation Phases
 
-Phase 1 - Stabilize Existing Baseline
+Phase 1 - Storefront Core and Transaction Flow
+- Initialize standalone storefront project in `storefront/`
+- Build storefront skeleton and core pages
+- Implement auth-gated cart/checkout flow and login redirect
+- Implement Stripe payment success/failure/cancel handling
+- Verify order creation and admin visibility
+
+Phase 2 - Stabilize Existing Baseline and Content Modules
 - Audit existing module behavior and fix critical defects
 - Ensure P0 module CRUD and sort/order behavior is reliable
 - Add/complete tests for core workflows
 
-Phase 2 - Storefront API Completion
+Phase 3 - Storefront API Completion
 - Implement and validate all store content endpoints
 - Add locale and schedule-aware filtering
 - Align payload contracts with storefront consumption needs
 
-Phase 3 - Multi-language + SEO Expansion
+Phase 4 - Multi-language + SEO Expansion
 - Add content localization storage and admin editing
 - Extend SEO to articles/pages
 - Add fallback logic and migration scripts
 
-Phase 4 - Operational Polish
+Phase 5 - Operational Polish
 - Improve analytics/import-export reliability
 - UX consistency cleanup across admin modules
 - Documentation and runbook updates
@@ -272,6 +335,12 @@ Phase 4 - Operational Polish
 Acceptance Criteria
 
 Functional:
+- Storefront supports complete purchase flow: browse -> cart -> checkout -> payment -> order confirmation
+- Storefront project is independently runnable from `storefront/`
+- Customer must log in before placing order; guest order placement is blocked
+- Payment success creates valid order; payment failure/cancel can recover or retry
+- Stripe payment flow works in test mode end-to-end, including webhook status updates
+- Order data appears correctly in admin order management
 - All P0 modules work end-to-end in admin (create/update/delete/list/reorder where applicable)
 - Storefront can render homepage/navigation/articles/pages entirely from store APIs
 - Multi-language content can be edited and read with fallback behavior
@@ -282,9 +351,11 @@ Quality:
 - Validation and error responses are consistent
 - Production-safe migration path for schema updates
 - Key workflows covered by integration tests
+- Primary locale (`zh-CN`) has complete copy coverage for all storefront critical pages
 
 UX:
 - Admin workflows are efficient for daily content operations
 - Scheduling and enable/disable logic are transparent and predictable
 - Language switching and SEO editing are intuitive and consistent
+- Storefront interaction is equivalent to reference-site quality level (not visual 1:1)
 
