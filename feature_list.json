@@ -1,2351 +1,2351 @@
 [
   {
     "category": "functional",
-    "description": "F001 [Implemented+Planned] Enforce customer login before checkout and order placement",
+    "description": "F001 [已实现][后台] 品牌列表查询与分页",
     "steps": [
-      "Step 1: Open storefront home page as an unauthenticated visitor.",
-      "Step 2: Browse to a product detail page.",
-      "Step 3: Add the product to cart.",
-      "Step 4: Open the cart page and click checkout.",
-      "Step 5: Verify redirect to login page before checkout form is shown.",
-      "Step 6: Enter valid customer credentials and submit login.",
-      "Step 7: Verify redirect back to checkout flow after login success.",
-      "Step 8: Fill shipping address and continue.",
-      "Step 9: Select shipping and payment method.",
-      "Step 10: Verify place-order action is now enabled only after authentication."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F002 [Planned] Complete purchase flow using Stripe success path",
+    "description": "F002 [已实现][后台] 品牌创建流程",
     "steps": [
-      "Step 1: Log in as a valid customer account.",
-      "Step 2: Add one in-stock product to cart.",
-      "Step 3: Open cart and verify item, quantity, and subtotal.",
-      "Step 4: Proceed to checkout.",
-      "Step 5: Enter shipping address and contact details.",
-      "Step 6: Select available shipping option.",
-      "Step 7: Select Stripe payment option.",
-      "Step 8: Complete Stripe test payment with a success test card.",
-      "Step 9: Wait for redirect to payment success or order confirmation page.",
-      "Step 10: Verify order ID, totals, and paid status are displayed."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F003 [Planned] Handle Stripe payment failure and retry checkout",
+    "description": "F003 [已实现][后台] 品牌编辑流程",
     "steps": [
-      "Step 1: Log in and add a product to cart.",
-      "Step 2: Open checkout and fill required shipping information.",
-      "Step 3: Select Stripe payment method.",
-      "Step 4: Complete Stripe test payment with a failure test card.",
-      "Step 5: Verify user is returned to failure state or checkout with clear error.",
-      "Step 6: Verify cart is not lost after failed payment.",
-      "Step 7: Re-open payment section and choose Stripe again.",
-      "Step 8: Complete payment with a success test card.",
-      "Step 9: Verify order is created once after successful retry.",
-      "Step 10: Verify failed attempt does not create a paid order."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F004 [Planned] Handle Stripe payment cancel flow and recover cart",
+    "description": "F004 [已实现][后台] 品牌删除流程",
     "steps": [
-      "Step 1: Log in and add multiple products to cart.",
-      "Step 2: Proceed through checkout to Stripe payment step.",
-      "Step 3: Open Stripe hosted/payment page.",
-      "Step 4: Click cancel or use cancel return path.",
-      "Step 5: Verify return to storefront checkout or cancel page.",
-      "Step 6: Verify cart line items are preserved.",
-      "Step 7: Verify no completed order is marked as paid.",
-      "Step 8: Resume checkout without re-entering all values when possible.",
-      "Step 9: Complete payment successfully after cancel.",
-      "Step 10: Verify final order data is consistent with cart snapshot."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F005 [Implemented+Planned] Cart quantity edits recalculate totals correctly",
+    "description": "F005 [已实现][后台] 品牌详情查看",
     "steps": [
-      "Step 1: Log in as a customer.",
-      "Step 2: Add at least two different products to cart.",
-      "Step 3: Open cart and capture initial subtotal.",
-      "Step 4: Increase quantity for one line item.",
-      "Step 5: Verify line total and cart subtotal update immediately.",
-      "Step 6: Decrease quantity for the same line item.",
-      "Step 7: Verify totals update with no negative quantity.",
-      "Step 8: Remove one item completely.",
-      "Step 9: Verify shipping and tax estimates are recalculated.",
-      "Step 10: Verify totals persist after page refresh."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F006 [Planned] Shipping option selection updates checkout totals",
+    "description": "F006 [已实现][后台] 品牌关联商品",
     "steps": [
-      "Step 1: Log in and create a cart eligible for at least two shipping options.",
-      "Step 2: Proceed to checkout and fill valid shipping address.",
-      "Step 3: Open shipping option list.",
-      "Step 4: Select shipping option A and record total.",
-      "Step 5: Select shipping option B and record total.",
-      "Step 6: Verify shipping amount changes between options.",
-      "Step 7: Verify order total updates after each selection.",
-      "Step 8: Refresh checkout page.",
-      "Step 9: Verify last selected option remains selected.",
-      "Step 10: Verify totals remain consistent with selected option."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F007 [Planned] Promotion or discount application in checkout",
+    "description": "F007 [已实现][后台] 品牌解除商品",
     "steps": [
-      "Step 1: Log in and add eligible products to cart.",
-      "Step 2: Open cart and note subtotal.",
-      "Step 3: Enter a valid promotion code.",
-      "Step 4: Apply the code.",
-      "Step 5: Verify discount line appears with expected amount.",
-      "Step 6: Verify total is reduced accordingly.",
-      "Step 7: Remove the promotion code.",
-      "Step 8: Verify discount is removed and total returns.",
-      "Step 9: Enter an invalid code and apply.",
-      "Step 10: Verify clear validation error and unchanged totals."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F008 [Planned] Customer order history and order detail after purchase",
+    "description": "F008 [已实现][后台] 品牌关键字搜索",
     "steps": [
-      "Step 1: Log in as a customer.",
-      "Step 2: Complete one successful order with Stripe test card.",
-      "Step 3: Navigate to account order history page.",
-      "Step 4: Verify new order appears at top with correct date.",
-      "Step 5: Verify order total and status match confirmation page.",
-      "Step 6: Open order detail view.",
-      "Step 7: Verify line items, quantities, and addresses are correct.",
-      "Step 8: Verify payment and fulfillment status fields are present.",
-      "Step 9: Refresh order detail page directly via URL.",
-      "Step 10: Verify authenticated customer can still access own order only."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F009 [Planned] Stripe webhook idempotency for duplicated events",
+    "description": "F009 [已实现][后台] 标签列表查询与分页",
     "steps": [
-      "Step 1: Complete one Stripe test payment successfully.",
-      "Step 2: Capture resulting payment intent or event identifiers.",
-      "Step 3: Trigger webhook delivery replay from Stripe dashboard or test harness.",
-      "Step 4: Send the same success event a second time.",
-      "Step 5: Verify backend accepts webhook without creating duplicate order.",
-      "Step 6: Verify payment status remains correct after replay.",
-      "Step 7: Send additional duplicate event deliveries.",
-      "Step 8: Verify order count remains unchanged.",
-      "Step 9: Verify idempotency logs or dedup markers are recorded.",
-      "Step 10: Verify webhook endpoint still handles a new unique event correctly."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F010 [Implemented+Planned] Admin order visibility after storefront payment",
+    "description": "F010 [已实现][后台] 标签创建流程",
     "steps": [
-      "Step 1: Complete a successful storefront purchase.",
-      "Step 2: Copy generated order ID from confirmation page.",
-      "Step 3: Open admin UI and log in as admin.",
-      "Step 4: Navigate to Orders list.",
-      "Step 5: Search for the new order by ID or customer email.",
-      "Step 6: Open order detail page.",
-      "Step 7: Verify paid status, totals, line items, and addresses.",
-      "Step 8: Verify payment collection and transaction metadata exist.",
-      "Step 9: Verify order timestamps are consistent.",
-      "Step 10: Verify no duplicate order records for same checkout."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F011 [Planned] Home page assembly from content APIs",
+    "description": "F011 [已实现][后台] 标签编辑流程",
     "steps": [
-      "Step 1: Ensure banner, announcement, popup, and curated collection data exist.",
-      "Step 2: Open storefront home page.",
-      "Step 3: Inspect network requests for content API calls.",
-      "Step 4: Verify home endpoint returns all required sections.",
-      "Step 5: Verify active banners render in expected positions.",
-      "Step 6: Verify active announcements render in announcement bar.",
-      "Step 7: Verify curated product sections render with products.",
-      "Step 8: Verify disabled or expired content is not shown.",
-      "Step 9: Refresh page and verify deterministic ordering.",
-      "Step 10: Verify missing section data degrades gracefully without crash."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F012 [Implemented+Planned] Multi-level menu navigation from admin menu tree",
+    "description": "F012 [已实现][后台] 标签删除流程",
     "steps": [
-      "Step 1: In admin, create a menu with three nested levels.",
-      "Step 2: Enable all menu items and set sort order.",
-      "Step 3: Open storefront header navigation.",
-      "Step 4: Hover or click top-level menu item.",
-      "Step 5: Verify second-level items appear in correct order.",
-      "Step 6: Open one second-level item with children.",
-      "Step 7: Verify third-level items appear and link correctly.",
-      "Step 8: Disable one child item in admin and save.",
-      "Step 9: Refresh storefront and verify disabled item is hidden.",
-      "Step 10: Verify keyboard navigation reaches visible menu links."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F013 [Implemented+Planned] Banner slot and schedule logic on storefront",
+    "description": "F013 [已实现][后台] 标签类型为徽章",
     "steps": [
-      "Step 1: In admin, create one banner slot with three items.",
-      "Step 2: Configure item A active now, item B future, item C expired.",
-      "Step 3: Enable all three items.",
-      "Step 4: Open storefront section mapped to that slot.",
-      "Step 5: Verify only item A is visible.",
-      "Step 6: Verify item order matches sort_order.",
-      "Step 7: Disable item A in admin.",
-      "Step 8: Refresh storefront and verify no active item remains.",
-      "Step 9: Set item B start time to now and save.",
-      "Step 10: Verify item B appears without code changes."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F014 [Implemented+Planned] Curated collection with tab grouping and ordering",
+    "description": "F014 [已实现][后台] 标签类型为属性",
     "steps": [
-      "Step 1: Create curated collection with at least two tabs in admin.",
-      "Step 2: Add products to each tab with explicit sort_order values.",
-      "Step 3: Open storefront section linked to collection key.",
-      "Step 4: Verify tab labels render in configured order.",
-      "Step 5: Switch between tabs.",
-      "Step 6: Verify each tab shows only assigned products.",
-      "Step 7: Verify product order follows configured sort_order.",
-      "Step 8: Move one product to another tab in admin.",
-      "Step 9: Refresh storefront and verify item moved correctly.",
-      "Step 10: Verify empty tab state is handled without layout break."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F015 [Implemented+Planned] Article list and detail end-to-end with category filter",
+    "description": "F015 [已实现][后台] 标签关联商品",
     "steps": [
-      "Step 1: Create at least two article categories in admin.",
-      "Step 2: Create multiple articles across categories with publish status.",
-      "Step 3: Open storefront article list page.",
-      "Step 4: Verify only published articles are visible.",
-      "Step 5: Filter by one category.",
-      "Step 6: Verify list updates to that category.",
-      "Step 7: Search by keyword in title or summary.",
-      "Step 8: Verify matching results only.",
-      "Step 9: Open one article detail by slug.",
-      "Step 10: Verify cover image, title, content, and metadata are correct."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F016 [Implemented+Planned] Static page rendering from slug and publish status",
+    "description": "F016 [已实现][后台] 标签解除商品",
     "steps": [
-      "Step 1: Create draft and published static pages in admin.",
-      "Step 2: Assign templates and slugs.",
-      "Step 3: Open storefront URL for published page slug.",
-      "Step 4: Verify published page content renders correctly.",
-      "Step 5: Open storefront URL for draft page slug.",
-      "Step 6: Verify draft page is not publicly exposed.",
-      "Step 7: Update draft page to published and save.",
-      "Step 8: Refresh storefront URL for the same slug.",
-      "Step 9: Verify page now renders.",
-      "Step 10: Verify unknown slug returns proper not-found behavior."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F017 [Implemented+Planned] Announcement bar scheduling and sorting",
+    "description": "F017 [已实现][后台] 静态页面列表查询",
     "steps": [
-      "Step 1: Create three announcements with different sort_order values.",
-      "Step 2: Configure one active, one future, one expired.",
-      "Step 3: Open storefront home page.",
-      "Step 4: Verify only active announcement is displayed.",
-      "Step 5: Verify text and link target are correct.",
-      "Step 6: Change active record to disabled in admin.",
-      "Step 7: Refresh storefront and verify it disappears.",
-      "Step 8: Activate second announcement by schedule change.",
-      "Step 9: Verify new active announcement appears first.",
-      "Step 10: Verify no announcement state is handled cleanly."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F018 [Implemented+Planned] Popup trigger and frequency rules",
+    "description": "F018 [已实现][后台] 静态页面创建流程",
     "steps": [
-      "Step 1: Create popup with first_visit trigger and enabled status.",
-      "Step 2: Open storefront in clean browser context.",
-      "Step 3: Verify popup appears once on first visit.",
-      "Step 4: Close popup and navigate to another page.",
-      "Step 5: Verify popup does not re-open in same rule context.",
-      "Step 6: Change popup to every_visit in admin.",
-      "Step 7: Refresh storefront and verify popup appears again.",
-      "Step 8: Change popup to specific_page with target URL.",
-      "Step 9: Verify popup appears only on target page.",
-      "Step 10: Verify popup CTA navigates to configured link."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F019 [Implemented+Planned] Product listing browse, filter, and sort flow",
+    "description": "F019 [已实现][后台] 静态页面编辑流程",
     "steps": [
-      "Step 1: Seed product catalog with multiple categories and prices.",
-      "Step 2: Open storefront product list page.",
-      "Step 3: Verify initial product grid renders with pagination or infinite scroll.",
-      "Step 4: Apply category filter.",
-      "Step 5: Verify only category-matched products remain.",
-      "Step 6: Apply sort by price ascending.",
-      "Step 7: Verify order is ascending by displayed price.",
-      "Step 8: Change sort to newest.",
-      "Step 9: Verify ordering updates without full app crash.",
-      "Step 10: Verify filter and sort states persist in URL or state model."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F020 [Implemented+Planned] PDP variant selection and stock-aware add-to-cart",
+    "description": "F020 [已实现][后台] 静态页面删除流程",
     "steps": [
-      "Step 1: Open a product with at least two variants.",
-      "Step 2: Verify default variant information is shown.",
-      "Step 3: Select another variant.",
-      "Step 4: Verify price, SKU, and stock indicators update.",
-      "Step 5: Set quantity within available stock and add to cart.",
-      "Step 6: Verify cart line references selected variant.",
-      "Step 7: Return to PDP and select out-of-stock variant if available.",
-      "Step 8: Verify add-to-cart is disabled or blocked for out-of-stock.",
-      "Step 9: Select in-stock variant again and add.",
-      "Step 10: Verify cart merges or separates lines per variant rule."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F021 [Planned] Locale default to zh-CN with fallback behavior",
+    "description": "F021 [已实现][后台] 静态页面模板配置",
     "steps": [
-      "Step 1: Ensure storefront supports at least zh-CN and en locale keys.",
-      "Step 2: Open storefront without locale preference cookie.",
-      "Step 3: Verify default locale resolves to zh-CN.",
-      "Step 4: Navigate to article list and product pages.",
-      "Step 5: Verify zh-CN copy is shown for available translated fields.",
-      "Step 6: Switch locale to en and refresh.",
-      "Step 7: Verify en copy appears where translations exist.",
-      "Step 8: Open content missing en translation.",
-      "Step 9: Verify fallback content is shown using defined fallback chain.",
-      "Step 10: Verify locale selection persists across pages."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F022 [Implemented+Planned] SEO metadata rendering on storefront pages",
+    "description": "F022 [已实现][后台] 静态页面发布状态切换",
     "steps": [
-      "Step 1: Open product editor in admin and set SEO fields.",
-      "Step 2: Publish or update product.",
-      "Step 3: Open storefront product page.",
-      "Step 4: Inspect page head metadata.",
-      "Step 5: Verify title, description, and OG image match SEO values.",
-      "Step 6: Remove one optional SEO field in admin.",
-      "Step 7: Refresh storefront page.",
-      "Step 8: Verify fallback generation for missing fields.",
-      "Step 9: Repeat for article and static page when implemented.",
-      "Step 10: Verify metadata updates after content change and redeploy/runtime refresh."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F023 [Planned] Mobile end-to-end purchase flow",
+    "description": "F023 [已实现][后台] 静态页面排序调整",
     "steps": [
-      "Step 1: Open storefront in mobile viewport.",
-      "Step 2: Log in as customer through mobile login form.",
-      "Step 3: Navigate product list and open PDP.",
-      "Step 4: Add product to cart from mobile layout.",
-      "Step 5: Open cart drawer/page and verify controls are usable.",
-      "Step 6: Start checkout and fill address on mobile keyboard.",
-      "Step 7: Select shipping and continue to Stripe.",
-      "Step 8: Complete test payment in mobile-compatible flow.",
-      "Step 9: Return to storefront confirmation page.",
-      "Step 10: Verify no unusable overflow or blocked controls occur."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F024 [Planned] Auth session expiration during checkout recovery",
+    "description": "F024 [已实现][后台] 静态页面Slug唯一校验",
     "steps": [
-      "Step 1: Log in and begin checkout with items in cart.",
-      "Step 2: Fill shipping details but do not pay yet.",
-      "Step 3: Expire auth token/session manually or wait for timeout.",
-      "Step 4: Attempt to continue to payment.",
-      "Step 5: Verify user is prompted to re-authenticate.",
-      "Step 6: Complete re-authentication.",
-      "Step 7: Verify checkout state is restored as much as possible.",
-      "Step 8: Continue to payment and complete Stripe test payment.",
-      "Step 9: Verify order is created once.",
-      "Step 10: Verify expired session did not leak customer data."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F025 [Implemented+Planned] Startup and health check for backend, admin, and storefront",
+    "description": "F025 [已实现][后台] 静态页面富文本保存",
     "steps": [
-      "Step 1: Start infrastructure services (PostgreSQL and Redis).",
-      "Step 2: Start Medusa backend on expected port.",
-      "Step 3: Start admin UI on expected port.",
-      "Step 4: Start storefront app on expected port.",
-      "Step 5: Open backend health endpoint and verify success status.",
-      "Step 6: Open admin login page and verify load success.",
-      "Step 7: Open storefront home page and verify load success.",
-      "Step 8: Verify API calls from admin and storefront reach backend.",
-      "Step 9: Stop one service and verify clear failure behavior.",
-      "Step 10: Restart service and verify system recovers without data loss."
+      "步骤1：登录后台并进入系统首页。",
+      "步骤2：进入对应模块列表页。",
+      "步骤3：新建一条测试数据并填写必填项。",
+      "步骤4：提交保存并确认成功提示。",
+      "步骤5：在列表中搜索并定位该数据。",
+      "步骤6：打开详情页核对关键字段。",
+      "步骤7：修改一项关键字段并再次保存。",
+      "步骤8：刷新页面后再次核对数据。",
+      "步骤9：执行一次关联或状态操作并保存。",
+      "步骤10：清理测试数据并确认结果正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F026 [Planned] Home page visual hierarchy and section spacing",
+    "category": "functional",
+    "description": "F026 [已实现][后台] 公告列表查询",
     "steps": [
-      "Step 1: Open storefront home page on desktop viewport.",
-      "Step 2: Capture screenshot of full page.",
-      "Step 3: Verify hero, curated sections, and footer have consistent spacing.",
-      "Step 4: Verify typography hierarchy is clear for section titles."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F027 [Planned] Desktop header navigation alignment and readability",
+    "category": "functional",
+    "description": "F027 [已实现][后台] 公告创建",
     "steps": [
-      "Step 1: Open storefront home page on desktop viewport.",
-      "Step 2: Capture screenshot of header and top nav.",
-      "Step 3: Verify logo, menu labels, search, and account actions are aligned.",
-      "Step 4: Verify active and hover states are visually distinct."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F028 [Planned] Mobile header and menu drawer usability",
+    "category": "functional",
+    "description": "F028 [已实现][后台] 公告编辑",
     "steps": [
-      "Step 1: Open storefront in mobile viewport.",
-      "Step 2: Open navigation drawer or menu overlay.",
-      "Step 3: Verify menu items are readable and tappable.",
-      "Step 4: Verify drawer closes cleanly without layout jump."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F029 [Planned] Product card visual consistency in grid",
+    "category": "functional",
+    "description": "F029 [已实现][后台] 公告删除",
     "steps": [
-      "Step 1: Open product listing page with at least 12 items.",
-      "Step 2: Capture screenshot of first viewport grid.",
-      "Step 3: Verify image ratio, title truncation, and price alignment are consistent.",
-      "Step 4: Verify tag/badge elements do not overlap card content."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F030 [Planned] PDP media gallery and content column balance",
+    "category": "functional",
+    "description": "F030 [已实现][后台] 公告启用禁用",
     "steps": [
-      "Step 1: Open product detail page on desktop.",
-      "Step 2: Capture screenshot of top fold.",
-      "Step 3: Verify media gallery and purchase panel proportions are balanced.",
-      "Step 4: Verify variant controls and CTA buttons are clearly visible."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F031 [Planned] Cart page readability and action emphasis",
+    "category": "functional",
+    "description": "F031 [已实现][后台] 公告生效时间窗",
     "steps": [
-      "Step 1: Open cart page with at least two items.",
-      "Step 2: Capture screenshot of cart lines and summary panel.",
-      "Step 3: Verify quantity controls are clear and non-overlapping.",
-      "Step 4: Verify checkout CTA has primary visual emphasis."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F032 [Planned] Checkout form layout and validation visual states",
+    "category": "functional",
+    "description": "F032 [已实现][后台] 公告排序",
     "steps": [
-      "Step 1: Open checkout page in desktop viewport.",
-      "Step 2: Trigger validation errors by leaving required fields empty.",
-      "Step 3: Capture screenshot of error state.",
-      "Step 4: Verify error text, field borders, and helper text are legible and consistent."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F033 [Planned] Payment success and failure page visual clarity",
+    "category": "functional",
+    "description": "F033 [已实现][后台] 弹窗列表查询",
     "steps": [
-      "Step 1: Open payment success page state.",
-      "Step 2: Open payment failure page state.",
-      "Step 3: Capture screenshots for both states.",
-      "Step 4: Verify status iconography, title, and next actions are unmistakable."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F034 [Planned] Login and registration page design consistency",
+    "category": "functional",
+    "description": "F034 [已实现][后台] 弹窗创建",
     "steps": [
-      "Step 1: Open login page and registration page.",
-      "Step 2: Capture screenshots of both pages.",
-      "Step 3: Verify form spacing, labels, and buttons follow same design language.",
-      "Step 4: Verify mobile layout keeps forms fully usable."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F035 [Planned] Article list card style and image treatment",
+    "category": "functional",
+    "description": "F035 [已实现][后台] 弹窗编辑",
     "steps": [
-      "Step 1: Open article list page with multiple entries.",
-      "Step 2: Capture screenshot of article grid/list.",
-      "Step 3: Verify title, summary, date, and category labels are balanced.",
-      "Step 4: Verify cover image cropping is consistent."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F036 [Planned] Article detail typography and rich text spacing",
+    "category": "functional",
+    "description": "F036 [已实现][后台] 弹窗删除",
     "steps": [
-      "Step 1: Open one long-form article detail page.",
-      "Step 2: Capture screenshots of header and body sections.",
-      "Step 3: Verify heading, paragraph, list, and quote styles are readable.",
-      "Step 4: Verify code blocks and links have clear visual treatment."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F037 [Implemented+Planned] Static page typography consistency",
+    "category": "functional",
+    "description": "F037 [已实现][后台] 弹窗触发类型配置",
     "steps": [
-      "Step 1: Open two static pages with different templates.",
-      "Step 2: Capture screenshots of both pages.",
-      "Step 3: Verify heading hierarchy and paragraph spacing are consistent.",
-      "Step 4: Verify no text clipping or overflow appears."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F038 [Implemented+Planned] Announcement bar contrast and legibility",
+    "category": "functional",
+    "description": "F038 [已实现][后台] 弹窗频率配置",
     "steps": [
-      "Step 1: Enable announcement bar content in admin.",
-      "Step 2: Open storefront home page.",
-      "Step 3: Capture screenshot of announcement area.",
-      "Step 4: Verify text contrast and link affordance meet accessibility expectations."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F039 [Implemented+Planned] Popup visual quality across viewport sizes",
+    "category": "functional",
+    "description": "F039 [已实现][后台] 弹窗目标页面配置",
     "steps": [
-      "Step 1: Enable popup and open storefront desktop view.",
-      "Step 2: Capture popup screenshot on desktop.",
-      "Step 3: Repeat on mobile viewport.",
-      "Step 4: Verify image, text, and CTA remain readable and non-overlapping."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F040 [Planned] Footer information density and link grouping",
+    "category": "functional",
+    "description": "F040 [已实现][后台] 弹窗素材选择",
     "steps": [
-      "Step 1: Open storefront footer on desktop and mobile.",
-      "Step 2: Capture screenshots for both viewports.",
-      "Step 3: Verify legal, help, and navigation links are grouped logically.",
-      "Step 4: Verify touch targets are adequate on mobile."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F041 [Planned] Home endpoint returns only currently active banners",
+    "description": "F041 [已实现][后台] Banner位列表查询",
     "steps": [
-      "Step 1: Prepare banners with mixed enabled and schedule states.",
-      "Step 2: Call home content endpoint.",
-      "Step 3: Verify only active-in-window items are returned.",
-      "Step 4: Verify disabled or out-of-window items are excluded."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F042 [Planned] Home endpoint returns only active announcements",
+    "description": "F042 [已实现][后台] Banner位创建",
     "steps": [
-      "Step 1: Prepare announcements with mixed states and schedules.",
-      "Step 2: Call home content endpoint.",
-      "Step 3: Verify only active announcements are returned.",
-      "Step 4: Verify response ordering follows sort_order."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F043 [Planned] Home endpoint returns popup payload under valid rules",
+    "description": "F043 [已实现][后台] Banner位编辑",
     "steps": [
-      "Step 1: Configure popup with enabled state and trigger rules.",
-      "Step 2: Call home content endpoint.",
-      "Step 3: Verify popup payload appears when rule context matches.",
-      "Step 4: Verify non-matching popup rules do not leak irrelevant payload."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F044 [Planned] Curated collection snapshot by key on home payload",
+    "description": "F044 [已实现][后台] Banner位删除",
     "steps": [
-      "Step 1: Configure curated collections with keys and product assignments.",
-      "Step 2: Call home content endpoint.",
-      "Step 3: Verify expected collection keys are present.",
-      "Step 4: Verify products and tabs match admin configuration."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F045 [Planned] Menu endpoint returns normalized tree payload",
+    "description": "F045 [已实现][后台] Banner项列表查询",
     "steps": [
-      "Step 1: Configure menu with nested items in admin.",
-      "Step 2: Call menu endpoint with menu key.",
-      "Step 3: Verify payload is hierarchical and sorted.",
-      "Step 4: Verify disabled nodes are excluded by default."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F046 [Implemented] Menu disabled item is hidden in API and UI",
+    "description": "F046 [已实现][后台] Banner项创建",
     "steps": [
-      "Step 1: Disable one existing menu item in admin.",
-      "Step 2: Fetch menu data.",
-      "Step 3: Verify disabled item is not rendered in storefront nav.",
-      "Step 4: Verify siblings remain unaffected."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F047 [Implemented] Menu reorder action reflected in storefront navigation",
+    "description": "F047 [已实现][后台] Banner项编辑",
     "steps": [
-      "Step 1: Reorder top-level menu items in admin.",
-      "Step 2: Save and refresh storefront.",
-      "Step 3: Verify visual order matches admin order.",
-      "Step 4: Verify item links remain correct after reorder."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F048 [Planned] Collections endpoint supports locale parameter fallback",
+    "description": "F048 [已实现][后台] Banner项删除",
     "steps": [
-      "Step 1: Request collection endpoint with locale set to zh-CN.",
-      "Step 2: Request same endpoint with locale set to en.",
-      "Step 3: Verify translated fields change when translations exist.",
-      "Step 4: Verify fallback content is returned for missing locale fields."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F049 [Planned] Article list endpoint supports pagination",
+    "description": "F049 [已实现][后台] Banner项时间窗配置",
     "steps": [
-      "Step 1: Seed more than 30 published articles.",
-      "Step 2: Request articles endpoint with limit and offset values.",
-      "Step 3: Verify response count and page size are correct.",
-      "Step 4: Verify no duplicate item between adjacent pages."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F050 [Planned] Article list endpoint supports keyword search",
+    "description": "F050 [已实现][后台] Banner项启用禁用",
     "steps": [
-      "Step 1: Create articles with distinct keywords in title and summary.",
-      "Step 2: Call article list endpoint with query parameter.",
-      "Step 3: Verify only matching records are returned.",
-      "Step 4: Verify non-matching records are excluded."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F051 [Planned] Article list endpoint supports category filter",
+    "description": "F051 [已实现][后台] Banner项排序配置",
     "steps": [
-      "Step 1: Create at least two categories and assign articles.",
-      "Step 2: Request articles endpoint with category filter A.",
-      "Step 3: Verify only category A articles are returned.",
-      "Step 4: Request category B and verify separate result set."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F052 [Implemented+Planned] Article detail endpoint returns 404 for invalid slug",
+    "description": "F052 [已实现][后台] 文章列表查询",
     "steps": [
-      "Step 1: Request article detail endpoint using non-existent slug.",
-      "Step 2: Verify API returns not-found status.",
-      "Step 3: Open matching storefront URL.",
-      "Step 4: Verify storefront shows not-found page."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F053 [Implemented+Planned] Static page endpoint returns 404 for invalid slug",
+    "description": "F053 [已实现][后台] 文章创建",
     "steps": [
-      "Step 1: Request page endpoint with unknown slug.",
-      "Step 2: Verify not-found response from API.",
-      "Step 3: Open unknown page URL in storefront.",
-      "Step 4: Verify user sees clean 404 state."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F054 [Implemented+Planned] Draft static pages are not publicly visible",
+    "description": "F054 [已实现][后台] 文章编辑",
     "steps": [
-      "Step 1: Create static page with draft status.",
-      "Step 2: Call public page endpoint with that slug.",
-      "Step 3: Verify endpoint does not return published content.",
-      "Step 4: Verify storefront route blocks draft page access."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F055 [Implemented+Planned] Draft articles are hidden from public list",
+    "description": "F055 [已实现][后台] 文章删除",
     "steps": [
-      "Step 1: Create one draft article and one published article.",
-      "Step 2: Request public article list endpoint.",
-      "Step 3: Verify only published article appears.",
-      "Step 4: Verify draft slug is inaccessible publicly."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F056 [Implemented+Planned] Expired banner items are excluded on storefront",
+    "description": "F056 [已实现][后台] 文章草稿与发布状态切换",
     "steps": [
-      "Step 1: Configure banner item with past end time.",
-      "Step 2: Open storefront section that uses this slot.",
-      "Step 3: Verify expired item is not rendered.",
-      "Step 4: Verify currently valid banner still renders."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F057 [Implemented+Planned] Scheduled announcement start time behavior",
+    "description": "F057 [已实现][后台] 文章发布时间配置",
     "steps": [
-      "Step 1: Create announcement with start time in the future.",
-      "Step 2: Open storefront before start time.",
-      "Step 3: Verify announcement is hidden.",
-      "Step 4: Move start time to current and verify it appears."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F058 [Implemented+Planned] Popup specific-page trigger correctness",
+    "description": "F058 [已实现][后台] 文章置顶与排序",
     "steps": [
-      "Step 1: Configure popup trigger as specific_page with target path.",
-      "Step 2: Open a non-target storefront page.",
-      "Step 3: Verify popup does not appear.",
-      "Step 4: Open target page and verify popup appears."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F059 [Implemented+Planned] Popup once-per-day frequency persistence",
+    "description": "F059 [已实现][后台] 文章封面图选择",
     "steps": [
-      "Step 1: Configure popup display_frequency as once_per_day.",
-      "Step 2: Open site and dismiss popup.",
-      "Step 3: Reload site on same day and verify popup does not reappear.",
-      "Step 4: Simulate next day and verify popup appears again."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F060 [Implemented+Planned] Popup once-per-session frequency behavior",
+    "description": "F060 [已实现][后台] 文章富文本编辑",
     "steps": [
-      "Step 1: Configure popup display_frequency as once_per_session.",
-      "Step 2: Open site and dismiss popup.",
-      "Step 3: Reload within same session and verify no popup.",
-      "Step 4: Start new session and verify popup appears again."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F061 [Planned] Brand landing page shows filtered products",
+    "description": "F061 [已实现][后台] 文章分类列表查询",
     "steps": [
-      "Step 1: Link several products to one brand in admin.",
-      "Step 2: Open storefront brand landing page for that brand.",
-      "Step 3: Verify only linked products are displayed.",
-      "Step 4: Verify pagination and sorting still work on this page."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F062 [Implemented+Planned] Product tag badge and attribute rendering",
+    "description": "F062 [已实现][后台] 文章分类创建",
     "steps": [
-      "Step 1: Create tags of type badge and attribute.",
-      "Step 2: Link tags to products in admin.",
-      "Step 3: Open product card and detail on storefront.",
-      "Step 4: Verify each tag type renders with correct visual semantics."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F063 [Implemented+Planned] Product brand and tag relation sync to storefront",
+    "description": "F063 [已实现][后台] 文章分类编辑",
     "steps": [
-      "Step 1: Link one product to a brand and two tags.",
-      "Step 2: Open storefront product detail.",
-      "Step 3: Verify brand and tags appear.",
-      "Step 4: Unlink one tag in admin and verify storefront update."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F064 [Implemented] Media URL rendering for uploaded assets",
+    "description": "F064 [已实现][后台] 文章分类删除",
     "steps": [
-      "Step 1: Upload image asset through admin workflow.",
-      "Step 2: Use media URL in article or banner.",
-      "Step 3: Open storefront page using that asset.",
-      "Step 4: Verify media loads with valid URL and mime handling."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F065 [Implemented] Admin uploads endpoint pagination",
+    "description": "F065 [已实现][后台] 文章分类排序",
     "steps": [
-      "Step 1: Ensure static folder has more than 60 files.",
-      "Step 2: Call uploads endpoint with limit 20 offset 0.",
-      "Step 3: Call uploads endpoint with limit 20 offset 20.",
-      "Step 4: Verify count metadata and non-overlapping file IDs."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F066 [Implemented] Admin uploads endpoint returns expected mime types",
+    "description": "F066 [已实现][后台] 文章关联分类",
     "steps": [
-      "Step 1: Upload or place files with png, jpg, webp, pdf, and csv extensions.",
-      "Step 2: Request uploads endpoint.",
-      "Step 3: Verify mime_type field matches extension mapping.",
-      "Step 4: Verify unknown extensions default safely."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F067 [Planned] Storefront fallback when media asset is missing",
+    "description": "F067 [已实现][后台] 策展集合列表查询",
     "steps": [
-      "Step 1: Set one content record to reference a broken media URL.",
-      "Step 2: Open affected storefront page.",
-      "Step 3: Verify placeholder media is shown instead of broken layout.",
-      "Step 4: Verify page remains interactive."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F068 [Planned] Deep link refresh support for storefront routes",
+    "description": "F068 [已实现][后台] 策展集合创建",
     "steps": [
-      "Step 1: Open nested storefront route directly by URL.",
-      "Step 2: Refresh browser.",
-      "Step 3: Verify route resolves without blank page.",
-      "Step 4: Verify route data fetches correctly after refresh."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F069 [Planned] Not-found route behavior for unknown storefront URLs",
+    "description": "F069 [已实现][后台] 策展集合编辑",
     "steps": [
-      "Step 1: Open a non-existent storefront path.",
-      "Step 2: Verify HTTP and UI not-found handling.",
-      "Step 3: Verify user can navigate back to home.",
-      "Step 4: Verify no unhandled exception in console."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F070 [Planned] Error boundary behavior when content API fails",
+    "description": "F070 [已实现][后台] 策展集合删除",
     "steps": [
-      "Step 1: Simulate API failure for one content section.",
-      "Step 2: Open storefront page that depends on that API.",
-      "Step 3: Verify localized error or fallback section appears.",
-      "Step 4: Verify rest of page still renders."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F071 [Planned] Home loading skeleton visual quality",
+    "category": "functional",
+    "description": "F071 [已实现][后台] 策展Tab创建",
     "steps": [
-      "Step 1: Throttle network to slow mode and open home page.",
-      "Step 2: Capture loading state screenshot.",
-      "Step 3: Verify skeleton matches final layout proportions.",
-      "Step 4: Verify no flashing or abrupt jump on content load."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F072 [Planned] Product list loading skeleton consistency",
+    "category": "functional",
+    "description": "F072 [已实现][后台] 策展Tab编辑",
     "steps": [
-      "Step 1: Open product list under slow network profile.",
-      "Step 2: Capture loading state screenshot.",
-      "Step 3: Verify card skeleton count and spacing are consistent.",
-      "Step 4: Verify transition to loaded cards is smooth."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F073 [Planned] Empty curated section visual treatment",
+    "category": "functional",
+    "description": "F073 [已实现][后台] 策展Tab删除",
     "steps": [
-      "Step 1: Configure one curated section with no products.",
-      "Step 2: Open home page where section is expected.",
-      "Step 3: Capture screenshot of empty state.",
-      "Step 4: Verify empty state is informative and non-breaking."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F074 [Planned] Empty article list visual treatment",
+    "category": "functional",
+    "description": "F074 [已实现][后台] 策展商品添加",
     "steps": [
-      "Step 1: Filter article list to a category with zero published items.",
-      "Step 2: Capture screenshot of empty result state.",
-      "Step 3: Verify messaging is clear and styled consistently.",
-      "Step 4: Verify reset-filter action is visible."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F075 [Planned] Empty cart visual and CTA quality",
+    "category": "functional",
+    "description": "F075 [已实现][后台] 策展商品移除",
     "steps": [
-      "Step 1: Remove all cart items.",
-      "Step 2: Open cart page.",
-      "Step 3: Capture screenshot of empty cart state.",
-      "Step 4: Verify primary CTA to continue shopping is prominent."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F076 [Planned] Disabled checkout button visual feedback",
+    "category": "functional",
+    "description": "F076 [已实现][后台] 策展商品排序",
     "steps": [
-      "Step 1: Open checkout with missing required fields.",
-      "Step 2: Observe disabled place-order button.",
-      "Step 3: Capture screenshot of disabled state.",
-      "Step 4: Verify disabled styling is obvious and accessible."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F077 [Planned] zh-CN price formatting and currency symbol display",
+    "category": "functional",
+    "description": "F077 [已实现][后台] 策展商品切换Tab",
     "steps": [
-      "Step 1: Open product list in zh-CN locale.",
-      "Step 2: Capture screenshot of multiple prices.",
-      "Step 3: Verify decimal/thousand formatting is consistent.",
-      "Step 4: Verify currency symbol placement is consistent."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F078 [Planned] Discount and original price style hierarchy",
+    "category": "functional",
+    "description": "F078 [已实现][后台] 菜单列表查询",
     "steps": [
-      "Step 1: Open a product with active discount.",
-      "Step 2: Capture screenshot of price block.",
-      "Step 3: Verify discounted price has visual priority.",
-      "Step 4: Verify original price appears with clear strike-through style."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F079 [Planned] Breadcrumb style and spacing consistency",
+    "category": "functional",
+    "description": "F079 [已实现][后台] 菜单创建",
     "steps": [
-      "Step 1: Open a deep product detail route with breadcrumbs.",
-      "Step 2: Capture breadcrumb screenshot.",
-      "Step 3: Verify separators and active item styling are clear.",
-      "Step 4: Verify breadcrumb wraps safely on narrow screens."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F080 [Planned] Button hover, active, and focus visual states",
+    "category": "functional",
+    "description": "F080 [已实现][后台] 菜单编辑",
     "steps": [
-      "Step 1: Inspect primary and secondary buttons across storefront.",
-      "Step 2: Trigger hover and focus states.",
-      "Step 3: Capture screenshots for each state.",
-      "Step 4: Verify states are distinguishable and consistent."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F081 [Planned] Form validation message placement and readability",
+    "category": "functional",
+    "description": "F081 [已实现][后台] 菜单删除",
     "steps": [
-      "Step 1: Trigger multiple form validation errors in checkout.",
-      "Step 2: Capture screenshot of error messages.",
-      "Step 3: Verify message placement does not shift unrelated controls excessively.",
-      "Step 4: Verify error colors and text are readable."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F082 [Planned] Success toast and inline feedback design consistency",
+    "category": "functional",
+    "description": "F082 [已实现][后台] 菜单项创建",
     "steps": [
-      "Step 1: Trigger an action that should show success feedback.",
-      "Step 2: Capture screenshot of feedback element.",
-      "Step 3: Verify style matches global notification design.",
-      "Step 4: Verify feedback disappears with expected timing."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F083 [Planned] Modal overlay and layering behavior",
+    "category": "functional",
+    "description": "F083 [已实现][后台] 菜单项编辑",
     "steps": [
-      "Step 1: Open popup or confirmation modal.",
-      "Step 2: Capture screenshot with modal visible.",
-      "Step 3: Verify overlay dimming and z-index layering are correct.",
-      "Step 4: Verify background is not interactable when modal is open."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F084 [Planned] Header sticky behavior and shadow transition",
+    "category": "functional",
+    "description": "F084 [已实现][后台] 菜单项删除",
     "steps": [
-      "Step 1: Open long storefront page.",
-      "Step 2: Scroll from top to deep section.",
-      "Step 3: Capture screenshots before and after sticky transition.",
-      "Step 4: Verify sticky header remains readable and non-jittery."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F085 [Planned] Checkout summary sticky panel behavior",
+    "category": "functional",
+    "description": "F085 [已实现][后台] 菜单父子层级配置",
     "steps": [
-      "Step 1: Open checkout page with long form.",
-      "Step 2: Scroll through address form.",
-      "Step 3: Capture summary panel behavior.",
-      "Step 4: Verify summary remains visible without overlapping form fields."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F086 [Planned] Responsive image ratio handling across breakpoints",
+    "category": "functional",
+    "description": "F086 [已实现][后台] 菜单树重排",
     "steps": [
-      "Step 1: Open same page on desktop, tablet, and mobile sizes.",
-      "Step 2: Capture screenshots of major media components.",
-      "Step 3: Verify image distortion does not occur.",
-      "Step 4: Verify cropping strategy remains visually acceptable."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F087 [Planned] Product grid spacing consistency across rows",
+    "category": "functional",
+    "description": "F087 [已实现][后台] 菜单项启用禁用",
     "steps": [
-      "Step 1: Open product list with enough items for multiple rows.",
-      "Step 2: Capture full viewport screenshot.",
-      "Step 3: Verify horizontal and vertical spacing consistency.",
-      "Step 4: Verify no orphan card causes uneven layout."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F088 [Planned] Header icon alignment and hit area quality",
+    "category": "functional",
+    "description": "F088 [已实现][后台] 媒体列表接口查询",
     "steps": [
-      "Step 1: Open storefront header on desktop and mobile.",
-      "Step 2: Capture screenshots of icon buttons.",
-      "Step 3: Verify icon optical alignment and touch target size.",
-      "Step 4: Verify badge counters do not overlap icons."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F089 [Planned] Navigation dropdown animation smoothness",
+    "category": "functional",
+    "description": "F089 [已实现][后台] 媒体MIME类型识别",
     "steps": [
-      "Step 1: Open and close mega menu multiple times.",
-      "Step 2: Record animation transitions.",
-      "Step 3: Verify no frame drops or stutter on normal hardware.",
-      "Step 4: Verify animation duration feels consistent."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F090 [Planned] Checkout page layout stability and CLS minimization",
+    "category": "functional",
+    "description": "F090 [已实现][后台] 媒体分页查询",
     "steps": [
-      "Step 1: Open checkout under slow network profile.",
-      "Step 2: Observe initial to loaded transitions.",
-      "Step 3: Capture screenshots before and after data loads.",
-      "Step 4: Verify no major content shift that disrupts user actions."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F091 [Implemented] Admin brand CRUD end-to-end",
+    "description": "F091 [已实现][后台] 商品创建（含变体）",
     "steps": [
-      "Step 1: Open admin brands list page.",
-      "Step 2: Create a new brand with name and description.",
-      "Step 3: Edit the brand fields and save.",
-      "Step 4: Delete the brand and verify removal from list."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F092 [Implemented] Admin brand-product link and unlink flow",
+    "description": "F092 [已实现][后台] 商品编辑",
     "steps": [
-      "Step 1: Open one brand detail page in admin.",
-      "Step 2: Link one product to the brand.",
-      "Step 3: Verify product appears in linked list.",
-      "Step 4: Unlink product and verify relation removal."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F093 [Implemented] Admin brands list search and pagination",
+    "description": "F093 [已实现][后台] 商品分类绑定",
     "steps": [
-      "Step 1: Ensure at least 30 brands exist.",
-      "Step 2: Use search input with partial brand name.",
-      "Step 3: Verify filtered result set is correct.",
-      "Step 4: Verify pagination controls work with filtered and unfiltered results."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F094 [Implemented] Admin tag CRUD end-to-end",
+    "description": "F094 [已实现][后台] 商品品牌绑定",
     "steps": [
-      "Step 1: Open admin tags page.",
-      "Step 2: Create a new tag with name and type.",
-      "Step 3: Edit tag color and save.",
-      "Step 4: Delete tag and verify it is removed."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F095 [Implemented] Admin tag type support for badge and attribute",
+    "description": "F095 [已实现][后台] 商品标签绑定",
     "steps": [
-      "Step 1: Create one badge tag and one attribute tag.",
-      "Step 2: Open tag detail for both records.",
-      "Step 3: Verify type values persist correctly.",
-      "Step 4: Verify list page shows type distinctions."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F096 [Implemented] Admin tag-product link and unlink flow",
+    "description": "F096 [已实现][后台] 商品SEO保存",
     "steps": [
-      "Step 1: Open one tag detail page.",
-      "Step 2: Link product to tag.",
-      "Step 3: Verify link appears in product relation list.",
-      "Step 4: Unlink and verify relation removal."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F097 [Implemented] Admin static page CRUD flow",
+    "description": "F097 [已实现][后台] 订单列表查询",
     "steps": [
-      "Step 1: Open admin pages list.",
-      "Step 2: Create page with title, slug, and content.",
-      "Step 3: Edit page status and content.",
-      "Step 4: Delete page and verify it is removed."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F098 [Implemented] Admin static page template assignment flow",
+    "description": "F098 [已实现][后台] 订单详情查看",
     "steps": [
-      "Step 1: Open page create or edit form.",
-      "Step 2: Select one template option.",
-      "Step 3: Save changes and reopen record.",
-      "Step 4: Verify template value persisted."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F099 [Implemented] Admin announcement CRUD flow",
+    "description": "F099 [已实现][后台] 客户列表查询",
     "steps": [
-      "Step 1: Open announcements list in admin.",
-      "Step 2: Create announcement with text and optional link.",
-      "Step 3: Edit sort order and enabled state.",
-      "Step 4: Delete record and verify list update."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F100 [Implemented] Admin announcement schedule fields behavior",
+    "description": "F100 [已实现][后台] 客户详情查看",
     "steps": [
-      "Step 1: Edit an announcement and set starts_at and ends_at.",
-      "Step 2: Save record.",
-      "Step 3: Reopen form and verify datetime values persisted.",
-      "Step 4: Verify list and API return the same schedule values."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F101 [Implemented] Admin popup CRUD flow",
+    "description": "F101 [已实现][后台] 库存列表查询",
     "steps": [
-      "Step 1: Open popups list in admin.",
-      "Step 2: Create popup with title and CTA fields.",
-      "Step 3: Edit popup settings and save.",
-      "Step 4: Delete popup and verify removal."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F102 [Implemented] Admin popup trigger and frequency fields persistence",
+    "description": "F102 [已实现][后台] 库存调整",
     "steps": [
-      "Step 1: Set popup trigger_type and display_frequency.",
-      "Step 2: Save popup.",
-      "Step 3: Reopen popup edit form.",
-      "Step 4: Verify selected trigger and frequency values persist."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F103 [Implemented] Admin banner slot CRUD flow",
+    "description": "F103 [已实现][后台] 配送配置页可用",
     "steps": [
-      "Step 1: Open banner slots page.",
-      "Step 2: Create slot with name and key.",
-      "Step 3: Edit slot description.",
-      "Step 4: Delete slot and verify cleanup."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F104 [Implemented] Admin banner item CRUD flow",
+    "description": "F104 [已实现][后台] 促销列表查询",
     "steps": [
-      "Step 1: Open one banner slot detail.",
-      "Step 2: Create banner item with image and link.",
-      "Step 3: Edit item title and sort_order.",
-      "Step 4: Delete item and verify list update."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F105 [Implemented] Admin banner item schedule and enabled fields",
+    "description": "F105 [已实现][后台] 促销创建",
     "steps": [
-      "Step 1: Create banner item with starts_at and ends_at.",
-      "Step 2: Set is_enabled true and save.",
-      "Step 3: Reopen item and verify field values.",
-      "Step 4: Toggle is_enabled false and verify persistence."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F106 [Implemented] Admin article CRUD flow",
+    "description": "F106 [已实现][后台] 促销编辑",
     "steps": [
-      "Step 1: Open articles list page.",
-      "Step 2: Create article with title, slug, and summary.",
-      "Step 3: Edit article status and publish datetime.",
-      "Step 4: Delete article and verify removal."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F107 [Implemented] Admin article rich text and media embedding",
+    "description": "F107 [已实现][后台] 数据看板加载",
     "steps": [
-      "Step 1: Open article edit form.",
-      "Step 2: Insert formatted content with link and media.",
-      "Step 3: Save article.",
-      "Step 4: Reopen and verify rich text content integrity."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F108 [Implemented] Admin article category CRUD flow",
+    "description": "F108 [已实现][后台] 设置页加载",
     "steps": [
-      "Step 1: Open article category manager.",
-      "Step 2: Create new category with name and handle.",
-      "Step 3: Edit description and sort_order.",
-      "Step 4: Delete category and verify update."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F109 [Implemented] Admin article category assignment to articles",
+    "description": "F109 [已实现][后台] 后台登录",
     "steps": [
-      "Step 1: Open article edit form.",
-      "Step 2: Select one category and save.",
-      "Step 3: Reopen article and verify category is linked.",
-      "Step 4: Change category and verify relation update."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F110 [Implemented] Admin curated collection CRUD flow",
+    "description": "F110 [已实现][后台] 后台登出",
     "steps": [
-      "Step 1: Open curated collections list.",
-      "Step 2: Create collection with name and key.",
-      "Step 3: Edit description and sort_order.",
-      "Step 4: Delete collection and verify removal."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F111 [Implemented] Admin collection tab CRUD flow",
+    "description": "F111 [已实现][后台] 登录态过期自动跳转",
     "steps": [
-      "Step 1: Open one collection detail page.",
-      "Step 2: Create a tab and save.",
-      "Step 3: Edit tab name and order.",
-      "Step 4: Delete tab and verify list update."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F112 [Implemented] Admin collection item add and remove flow",
+    "description": "F112 [已实现][后台] 后台接口参数校验",
     "steps": [
-      "Step 1: Open collection detail page.",
-      "Step 2: Add a product item to the collection.",
-      "Step 3: Verify item appears in item list.",
-      "Step 4: Remove item and verify it disappears."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F113 [Implemented] Admin collection item sort order update",
+    "description": "F113 [已实现][后台] 后台错误提示展示",
     "steps": [
-      "Step 1: Add at least three items to one collection.",
-      "Step 2: Change sort order values.",
-      "Step 3: Save changes.",
-      "Step 4: Verify API returns items in updated order."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F114 [Implemented] Admin menu CRUD flow",
+    "description": "F114 [已实现][后台] 后台空状态展示",
     "steps": [
-      "Step 1: Open menus list in admin.",
-      "Step 2: Create menu with name and key.",
-      "Step 3: Edit menu description.",
-      "Step 4: Delete menu and verify removal."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F115 [Implemented] Admin menu item CRUD flow",
+    "description": "F115 [已实现][后台] 后台骨架屏展示",
     "steps": [
-      "Step 1: Open one menu detail page.",
-      "Step 2: Create a menu item with label and URL.",
-      "Step 3: Edit icon URL and enabled state.",
-      "Step 4: Delete item and verify list update."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F116 [Implemented] Admin menu item parent-child assignment flow",
+    "description": "F116 [已实现][后台] 后台中英文切换",
     "steps": [
-      "Step 1: Create parent and child menu items.",
-      "Step 2: Assign child parent_id to parent item.",
-      "Step 3: Save and reload page.",
-      "Step 4: Verify tree nesting is retained."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F117 [Implemented] Admin menu reorder endpoint behavior",
+    "description": "F117 [已实现][后台] 后台侧边栏导航跳转",
     "steps": [
-      "Step 1: Reorder menu items in UI and submit reorder action.",
-      "Step 2: Refresh page.",
-      "Step 3: Verify order persisted in UI.",
-      "Step 4: Verify backend response reflects new order."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F118 [Implemented] Admin product create and edit with variants",
+    "description": "F118 [已实现][后台] 后台表格组件一致性",
     "steps": [
-      "Step 1: Open product create form.",
-      "Step 2: Enter required fields and add at least one variant.",
-      "Step 3: Save product and open detail.",
-      "Step 4: Edit variant values and verify updates persist."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F119 [Implemented] Admin product SEO metadata persistence",
+    "description": "F119 [已实现][后台] 后台弹窗交互一致性",
     "steps": [
-      "Step 1: Open product edit form.",
-      "Step 2: Enter meta_title, meta_description, and og_image.",
-      "Step 3: Save product.",
-      "Step 4: Reopen and verify SEO metadata remains in product metadata."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F120 [Implemented] Admin orders list and detail accessibility",
+    "description": "F120 [已实现][后台] 后台富文本工具栏可用性",
     "steps": [
-      "Step 1: Open admin orders list.",
-      "Step 2: Select one order from list.",
-      "Step 3: Open order detail page.",
-      "Step 4: Verify key sections (items, totals, customer) render without errors."
+      "步骤1：登录后台并进入对应页面。",
+      "步骤2：执行该功能核心操作。",
+      "步骤3：提交保存并刷新页面或重新请求接口。",
+      "步骤4：验证返回数据和界面结果符合预期。"
     ],
     "passes": false
   },
   {
-    "category": "functional",
-    "description": "F121 [Implemented] Admin customers list and detail accessibility",
+    "category": "style",
+    "description": "F121 [已实现][后台样式] 后台侧边栏视觉一致性",
     "steps": [
-      "Step 1: Open admin customers page.",
-      "Step 2: Select one customer record.",
-      "Step 3: Open customer detail page.",
-      "Step 4: Verify account details render correctly."
+      "步骤1：打开对应页面并准备桌面与移动端视图。",
+      "步骤2：截图检查布局、间距和对齐。",
+      "步骤3：检查悬浮、激活、禁用等交互状态。",
+      "步骤4：确认无重叠、截断和低对比问题。"
     ],
     "passes": false
   },
   {
-    "category": "functional",
-    "description": "F122 [Implemented] Admin inventory quantity adjustment flow",
+    "category": "style",
+    "description": "F122 [已实现][后台样式] 后台列表页表格排版一致性",
     "steps": [
-      "Step 1: Open inventory page and select one SKU.",
-      "Step 2: Trigger inventory adjust dialog.",
-      "Step 3: Submit positive or negative adjustment.",
-      "Step 4: Verify updated quantity is shown."
+      "步骤1：打开对应页面并准备桌面与移动端视图。",
+      "步骤2：截图检查布局、间距和对齐。",
+      "步骤3：检查悬浮、激活、禁用等交互状态。",
+      "步骤4：确认无重叠、截断和低对比问题。"
     ],
     "passes": false
   },
   {
-    "category": "functional",
-    "description": "F123 [Implemented] Admin shipping configuration page baseline behavior",
+    "category": "style",
+    "description": "F123 [已实现][后台样式] 后台表单页标题与操作区对齐",
     "steps": [
-      "Step 1: Open shipping page in admin.",
-      "Step 2: Verify shipping providers and options load.",
-      "Step 3: Open one shipping option form.",
-      "Step 4: Verify form can save a change without crash."
+      "步骤1：打开对应页面并准备桌面与移动端视图。",
+      "步骤2：截图检查布局、间距和对齐。",
+      "步骤3：检查悬浮、激活、禁用等交互状态。",
+      "步骤4：确认无重叠、截断和低对比问题。"
     ],
     "passes": false
   },
   {
-    "category": "functional",
-    "description": "F124 [Implemented] Admin promotions CRUD baseline",
+    "category": "style",
+    "description": "F124 [已实现][后台样式] 后台粘性保存栏视觉稳定性",
     "steps": [
-      "Step 1: Open promotions list page.",
-      "Step 2: Create a promotion with basic settings.",
-      "Step 3: Edit promotion and save changes.",
-      "Step 4: Verify promotion appears in list with updated status."
+      "步骤1：打开对应页面并准备桌面与移动端视图。",
+      "步骤2：截图检查布局、间距和对齐。",
+      "步骤3：检查悬浮、激活、禁用等交互状态。",
+      "步骤4：确认无重叠、截断和低对比问题。"
     ],
     "passes": false
   },
   {
-    "category": "functional",
-    "description": "F125 [Implemented] Admin analytics dashboard data load",
+    "category": "style",
+    "description": "F125 [已实现][后台样式] 后台按钮主次层级清晰度",
     "steps": [
-      "Step 1: Open analytics dashboard page.",
-      "Step 2: Verify summary cards load values.",
-      "Step 3: Verify chart components render without runtime errors.",
-      "Step 4: Verify API failures show fallback messaging."
+      "步骤1：打开对应页面并准备桌面与移动端视图。",
+      "步骤2：截图检查布局、间距和对齐。",
+      "步骤3：检查悬浮、激活、禁用等交互状态。",
+      "步骤4：确认无重叠、截断和低对比问题。"
     ],
     "passes": false
   },
   {
-    "category": "functional",
-    "description": "F126 [Implemented] Admin settings pages baseline accessibility",
+    "category": "style",
+    "description": "F126 [已实现][后台样式] 后台输入框与标签间距一致性",
     "steps": [
-      "Step 1: Open settings section.",
-      "Step 2: Navigate through tabs or settings subpages.",
-      "Step 3: Verify forms and switches load correctly.",
-      "Step 4: Verify save actions return feedback."
+      "步骤1：打开对应页面并准备桌面与移动端视图。",
+      "步骤2：截图检查布局、间距和对齐。",
+      "步骤3：检查悬浮、激活、禁用等交互状态。",
+      "步骤4：确认无重叠、截断和低对比问题。"
     ],
     "passes": false
   },
   {
-    "category": "functional",
-    "description": "F127 [Implemented] Admin login and logout flow",
+    "category": "style",
+    "description": "F127 [已实现][后台样式] 后台日期时间输入排版",
     "steps": [
-      "Step 1: Open admin login page.",
-      "Step 2: Submit valid credentials.",
-      "Step 3: Verify navigation to dashboard.",
-      "Step 4: Trigger logout and verify return to login page."
+      "步骤1：打开对应页面并准备桌面与移动端视图。",
+      "步骤2：截图检查布局、间距和对齐。",
+      "步骤3：检查悬浮、激活、禁用等交互状态。",
+      "步骤4：确认无重叠、截断和低对比问题。"
     ],
     "passes": false
   },
   {
-    "category": "functional",
-    "description": "F128 [Implemented] Admin token expiration redirect behavior",
+    "category": "style",
+    "description": "F128 [已实现][后台样式] 后台开关组件视觉反馈",
     "steps": [
-      "Step 1: Log in to admin and open a protected page.",
-      "Step 2: Expire auth token manually.",
-      "Step 3: Refresh page or trigger API call.",
-      "Step 4: Verify redirect to login page."
+      "步骤1：打开对应页面并准备桌面与移动端视图。",
+      "步骤2：截图检查布局、间距和对齐。",
+      "步骤3：检查悬浮、激活、禁用等交互状态。",
+      "步骤4：确认无重叠、截断和低对比问题。"
     ],
     "passes": false
   },
   {
-    "category": "functional",
-    "description": "F129 [Implemented] Admin route validator rejects invalid payload",
+    "category": "style",
+    "description": "F129 [已实现][后台样式] 后台标签色块与文案对比度",
     "steps": [
-      "Step 1: Call one admin POST endpoint with malformed body.",
-      "Step 2: Verify API returns validation error response.",
-      "Step 3: Verify server does not create or mutate record.",
-      "Step 4: Verify error message is actionable."
+      "步骤1：打开对应页面并准备桌面与移动端视图。",
+      "步骤2：截图检查布局、间距和对齐。",
+      "步骤3：检查悬浮、激活、禁用等交互状态。",
+      "步骤4：确认无重叠、截断和低对比问题。"
     ],
     "passes": false
   },
   {
-    "category": "functional",
-    "description": "F130 [Implemented] Nested delete behaviors for related entities",
+    "category": "style",
+    "description": "F130 [已实现][后台样式] 后台Banner预览缩略图清晰度",
     "steps": [
-      "Step 1: Create parent entity with related child records.",
-      "Step 2: Delete parent record via admin route.",
-      "Step 3: Verify expected cascade or safeguard behavior.",
-      "Step 4: Verify no orphan records break list pages."
+      "步骤1：打开对应页面并准备桌面与移动端视图。",
+      "步骤2：截图检查布局、间距和对齐。",
+      "步骤3：检查悬浮、激活、禁用等交互状态。",
+      "步骤4：确认无重叠、截断和低对比问题。"
     ],
     "passes": false
   },
   {
     "category": "style",
-    "description": "F131 [Implemented] Admin sidebar visual consistency",
+    "description": "F131 [已实现][后台样式] 后台文章封面预览样式",
     "steps": [
-      "Step 1: Open admin dashboard and inspect sidebar.",
-      "Step 2: Capture screenshot with active and inactive items.",
-      "Step 3: Verify icon and label alignment across entries.",
-      "Step 4: Verify active state contrast is clear."
+      "步骤1：打开对应页面并准备桌面与移动端视图。",
+      "步骤2：截图检查布局、间距和对齐。",
+      "步骤3：检查悬浮、激活、禁用等交互状态。",
+      "步骤4：确认无重叠、截断和低对比问题。"
     ],
     "passes": false
   },
   {
     "category": "style",
-    "description": "F132 [Implemented] Admin table layout consistency",
+    "description": "F132 [已实现][后台样式] 后台弹窗预览卡片样式",
     "steps": [
-      "Step 1: Open brands, articles, and collections tables.",
-      "Step 2: Capture screenshots for each table.",
-      "Step 3: Verify header styles and row spacing are consistent.",
-      "Step 4: Verify pagination controls align across modules."
+      "步骤1：打开对应页面并准备桌面与移动端视图。",
+      "步骤2：截图检查布局、间距和对齐。",
+      "步骤3：检查悬浮、激活、禁用等交互状态。",
+      "步骤4：确认无重叠、截断和低对比问题。"
     ],
     "passes": false
   },
   {
     "category": "style",
-    "description": "F133 [Implemented] Admin sticky save header behavior in large forms",
+    "description": "F133 [已实现][后台样式] 后台菜单树缩进与层级可读性",
     "steps": [
-      "Step 1: Open product and article edit forms.",
-      "Step 2: Scroll deep down form sections.",
-      "Step 3: Capture screenshots of top action area.",
-      "Step 4: Verify save action remains visible and non-overlapping."
+      "步骤1：打开对应页面并准备桌面与移动端视图。",
+      "步骤2：截图检查布局、间距和对齐。",
+      "步骤3：检查悬浮、激活、禁用等交互状态。",
+      "步骤4：确认无重叠、截断和低对比问题。"
     ],
     "passes": false
   },
   {
     "category": "style",
-    "description": "F134 [Implemented] Rich text editor toolbar usability style",
+    "description": "F134 [已实现][后台样式] 后台策展商品卡片信息密度",
     "steps": [
-      "Step 1: Open rich text editor in article form.",
-      "Step 2: Capture screenshot of toolbar and editable area.",
-      "Step 3: Verify icon spacing and active states are readable.",
-      "Step 4: Verify toolbar wraps gracefully on narrow widths."
+      "步骤1：打开对应页面并准备桌面与移动端视图。",
+      "步骤2：截图检查布局、间距和对齐。",
+      "步骤3：检查悬浮、激活、禁用等交互状态。",
+      "步骤4：确认无重叠、截断和低对比问题。"
     ],
     "passes": false
   },
   {
     "category": "style",
-    "description": "F135 [Implemented] Media picker grid and item selection states",
+    "description": "F135 [已实现][后台样式] 后台SEO预览区样式一致性",
     "steps": [
-      "Step 1: Open media picker modal from a form.",
-      "Step 2: Capture screenshot of media grid.",
-      "Step 3: Select one and multiple items.",
-      "Step 4: Verify selected state indicator is clear."
+      "步骤1：打开对应页面并准备桌面与移动端视图。",
+      "步骤2：截图检查布局、间距和对齐。",
+      "步骤3：检查悬浮、激活、禁用等交互状态。",
+      "步骤4：确认无重叠、截断和低对比问题。"
     ],
     "passes": false
   },
   {
     "category": "style",
-    "description": "F136 [Implemented] Admin modal overlay and focus appearance",
+    "description": "F136 [已实现][后台样式] 后台错误提示颜色与对比度",
     "steps": [
-      "Step 1: Open delete confirmation modal in admin.",
-      "Step 2: Capture modal screenshot.",
-      "Step 3: Verify modal elevation, spacing, and button hierarchy.",
-      "Step 4: Verify keyboard focus ring is visible."
+      "步骤1：打开对应页面并准备桌面与移动端视图。",
+      "步骤2：截图检查布局、间距和对齐。",
+      "步骤3：检查悬浮、激活、禁用等交互状态。",
+      "步骤4：确认无重叠、截断和低对比问题。"
     ],
     "passes": false
   },
   {
     "category": "style",
-    "description": "F137 [Implemented] Date and datetime field visual alignment in forms",
+    "description": "F137 [已实现][后台样式] 后台空状态文案与CTA可见性",
     "steps": [
-      "Step 1: Open form sections with datetime inputs.",
-      "Step 2: Capture screenshot of aligned fields.",
-      "Step 3: Verify label and input baselines align.",
-      "Step 4: Verify timezone/help text does not overlap."
+      "步骤1：打开对应页面并准备桌面与移动端视图。",
+      "步骤2：截图检查布局、间距和对齐。",
+      "步骤3：检查悬浮、激活、禁用等交互状态。",
+      "步骤4：确认无重叠、截断和低对比问题。"
     ],
     "passes": false
   },
   {
     "category": "style",
-    "description": "F138 [Implemented] Toggle and switch affordance in admin forms",
+    "description": "F138 [已实现][后台样式] 后台加载状态骨架屏一致性",
     "steps": [
-      "Step 1: Open forms containing switch components.",
-      "Step 2: Capture enabled and disabled states.",
-      "Step 3: Verify switch state is immediately understandable.",
-      "Step 4: Verify labels are clearly associated with control."
+      "步骤1：打开对应页面并准备桌面与移动端视图。",
+      "步骤2：截图检查布局、间距和对齐。",
+      "步骤3：检查悬浮、激活、禁用等交互状态。",
+      "步骤4：确认无重叠、截断和低对比问题。"
     ],
     "passes": false
   },
   {
     "category": "style",
-    "description": "F139 [Implemented] Tag color chip and label display quality",
+    "description": "F139 [已实现][后台样式] 后台平板端布局可用性",
     "steps": [
-      "Step 1: Create tags with different colors.",
-      "Step 2: Open tags list and product form.",
-      "Step 3: Capture screenshots of tag chips.",
-      "Step 4: Verify color chip contrast and text readability."
+      "步骤1：打开对应页面并准备桌面与移动端视图。",
+      "步骤2：截图检查布局、间距和对齐。",
+      "步骤3：检查悬浮、激活、禁用等交互状态。",
+      "步骤4：确认无重叠、截断和低对比问题。"
     ],
     "passes": false
   },
   {
     "category": "style",
-    "description": "F140 [Implemented] Banner preview thumbnail clarity in admin",
+    "description": "F140 [已实现][后台样式] 后台国际化文案换行与截断表现",
     "steps": [
-      "Step 1: Open banner item list with image previews.",
-      "Step 2: Capture screenshot of preview column.",
-      "Step 3: Verify thumbnails maintain aspect ratio.",
-      "Step 4: Verify text metadata aligns with thumbnail row."
+      "步骤1：打开对应页面并准备桌面与移动端视图。",
+      "步骤2：截图检查布局、间距和对齐。",
+      "步骤3：检查悬浮、激活、禁用等交互状态。",
+      "步骤4：确认无重叠、截断和低对比问题。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F141 [Implemented] Article cover image preview quality in form",
+    "category": "functional",
+    "description": "F141 [规划中][前台] 初始化独立前台项目目录storefront",
     "steps": [
-      "Step 1: Open article form with cover image selected.",
-      "Step 2: Capture screenshot of preview block.",
-      "Step 3: Verify image scaling and cropping are acceptable.",
-      "Step 4: Verify preview area does not shift adjacent fields."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F142 [Implemented] Popup live preview card style in admin",
+    "category": "functional",
+    "description": "F142 [规划中][前台] 前台环境变量校验",
     "steps": [
-      "Step 1: Open popup edit form and fill title, image, and CTA.",
-      "Step 2: Capture screenshot of preview card.",
-      "Step 3: Verify preview reflects entered values accurately.",
-      "Step 4: Verify preview layout remains stable with long text."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F143 [Implemented] Menu tree indentation and hierarchy readability",
+    "category": "functional",
+    "description": "F143 [规划中][前台] 前台首页搭建",
     "steps": [
-      "Step 1: Open menu tree editor with nested items.",
-      "Step 2: Capture screenshot of tree structure.",
-      "Step 3: Verify indentation clearly communicates depth.",
-      "Step 4: Verify drag handles and actions are not cramped."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F144 [Implemented] Collection item card visual density in admin",
+    "category": "functional",
+    "description": "F144 [规划中][前台] 前台分类/集合列表页搭建",
     "steps": [
-      "Step 1: Open collection detail with many product items.",
-      "Step 2: Capture screenshot of item cards.",
-      "Step 3: Verify key metadata is visible without clutter.",
-      "Step 4: Verify controls are reachable on smaller screens."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F145 [Implemented] Product SEO editor snippet preview style",
+    "category": "functional",
+    "description": "F145 [规划中][前台] 前台商品详情页搭建",
     "steps": [
-      "Step 1: Open product form SEO editor section.",
-      "Step 2: Fill title and description.",
-      "Step 3: Capture preview screenshot.",
-      "Step 4: Verify snippet preview resembles search-result hierarchy."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F146 [Implemented] Admin error alert visibility and contrast",
+    "category": "functional",
+    "description": "F146 [规划中][前台] 前台品牌落地页搭建",
     "steps": [
-      "Step 1: Trigger API validation error in one admin form.",
-      "Step 2: Capture screenshot of error alert block.",
-      "Step 3: Verify alert text contrast is sufficient.",
-      "Step 4: Verify alert placement does not hide actionable controls."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F147 [Implemented] Admin empty state messaging and CTA quality",
+    "category": "functional",
+    "description": "F147 [规划中][前台] 前台文章列表页搭建",
     "steps": [
-      "Step 1: Open module list with zero records.",
-      "Step 2: Capture screenshot of empty state.",
-      "Step 3: Verify message is clear and action-oriented.",
-      "Step 4: Verify create CTA is visible."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F148 [Implemented] Admin loading skeleton consistency across modules",
+    "category": "functional",
+    "description": "F148 [规划中][前台] 前台文章详情页搭建",
     "steps": [
-      "Step 1: Simulate slow network and open several admin list pages.",
-      "Step 2: Capture loading screenshots.",
-      "Step 3: Verify skeleton style is consistent.",
-      "Step 4: Verify transition to loaded state is smooth."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F149 [Implemented] Admin tablet viewport usability baseline",
+    "category": "functional",
+    "description": "F149 [规划中][前台] 前台静态页路由搭建",
     "steps": [
-      "Step 1: Open admin pages in tablet viewport width.",
-      "Step 2: Capture screenshots of list and form views.",
-      "Step 3: Verify side navigation and content do not overlap.",
-      "Step 4: Verify primary actions remain visible."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F150 [Implemented] Admin i18n label overflow and truncation handling",
+    "category": "functional",
+    "description": "F150 [规划中][前台] 前台购物车页搭建",
     "steps": [
-      "Step 1: Switch admin language between zh-CN and en.",
-      "Step 2: Open modules with long labels.",
-      "Step 3: Capture screenshots.",
-      "Step 4: Verify labels do not clip or overlap controls."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F151 [Planned] Initialize standalone storefront project in storefront directory",
+    "description": "F151 [规划中][前台] 前台结算页搭建",
     "steps": [
-      "Step 1: Create `storefront/` directory with Next.js app structure.",
-      "Step 2: Configure package scripts for dev, build, and start.",
-      "Step 3: Run install and start dev server.",
-      "Step 4: Verify storefront can run independently from admin UI."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F152 [Planned] Storefront environment variable validation",
+    "description": "F152 [规划中][前台] 前台支付结果页搭建",
     "steps": [
-      "Step 1: Start storefront with all required env variables set.",
-      "Step 2: Verify successful startup.",
-      "Step 3: Remove one required env variable.",
-      "Step 4: Verify startup fails with explicit configuration error."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F153 [Planned] Customer registration end-to-end",
+    "description": "F153 [规划中][前台] 前台订单查询页搭建",
     "steps": [
-      "Step 1: Open storefront registration page.",
-      "Step 2: Submit valid customer registration data.",
-      "Step 3: Verify account creation success response.",
-      "Step 4: Verify customer can log in with new credentials."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F154 [Planned] Forgot password and reset flow",
+    "description": "F154 [规划中][前台] 前台注册流程",
     "steps": [
-      "Step 1: Open forgot-password form.",
-      "Step 2: Submit known customer email.",
-      "Step 3: Complete reset token flow in test mode.",
-      "Step 4: Verify customer can log in with new password."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F155 [Planned] Optional email verification guard behavior",
+    "description": "F155 [规划中][前台] 前台登录流程",
     "steps": [
-      "Step 1: Register a new customer account.",
-      "Step 2: Mark account as unverified in test setup.",
-      "Step 3: Attempt protected action requiring verified account.",
-      "Step 4: Verify verification prompt and expected restriction behavior."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F156 [Planned] Route guard for checkout and order pages",
+    "description": "F156 [规划中][前台] 前台忘记密码流程",
     "steps": [
-      "Step 1: Open checkout URL directly while logged out.",
-      "Step 2: Verify redirect to login with return URL.",
-      "Step 3: Log in successfully.",
-      "Step 4: Verify redirect returns user to original protected page."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F157 [Planned] Public store content home endpoint contract",
+    "description": "F157 [规划中][前台] 强制登录下单拦截",
     "steps": [
-      "Step 1: Call `/store/content/home`.",
-      "Step 2: Verify response includes banners, announcements, popups, and collections.",
-      "Step 3: Verify schema shape matches frontend contract.",
-      "Step 4: Verify endpoint handles empty sections gracefully."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F158 [Planned] Public store content menus endpoint contract",
+    "description": "F158 [规划中][前台] 未登录回跳机制",
     "steps": [
-      "Step 1: Call `/store/content/menus?key=main`.",
-      "Step 2: Verify nested tree nodes and ordering.",
-      "Step 3: Verify locale parameter affects translated labels.",
-      "Step 4: Verify missing key returns clear not-found or empty contract."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F159 [Planned] Public store content articles list endpoint contract",
+    "description": "F159 [规划中][前台] 购物车增删改查",
     "steps": [
-      "Step 1: Call `/store/content/articles` with default params.",
-      "Step 2: Verify list payload includes pagination fields.",
-      "Step 3: Verify category and query filters work together.",
-      "Step 4: Verify draft items are excluded."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F160 [Planned] Public store content article detail endpoint contract",
+    "description": "F160 [规划中][前台] 结算地址校验",
     "steps": [
-      "Step 1: Call `/store/content/articles/:slug` with published slug.",
-      "Step 2: Verify full article payload including category and seo.",
-      "Step 3: Call endpoint with invalid slug.",
-      "Step 4: Verify not-found response contract."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F161 [Planned] Public store content page detail endpoint contract",
+    "description": "F161 [规划中][前台] 配送方式选择",
     "steps": [
-      "Step 1: Call `/store/content/pages/:slug` with published page slug.",
-      "Step 2: Verify payload includes content and template metadata.",
-      "Step 3: Request draft or unknown slug.",
-      "Step 4: Verify safe not-found behavior."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F162 [Planned] Public store content collections endpoint contract",
+    "description": "F162 [规划中][前台] 优惠码应用与移除",
     "steps": [
-      "Step 1: Call `/store/content/collections?key=featured`.",
-      "Step 2: Verify tabs and items are included.",
-      "Step 3: Verify product references are valid and sorted.",
-      "Step 4: Verify missing key behavior is deterministic."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F163 [Planned] Locale parameter and fallback logic in store APIs",
+    "description": "F163 [规划中][支付] Stripe支付成功链路",
     "steps": [
-      "Step 1: Call one store content endpoint with locale zh-CN.",
-      "Step 2: Call same endpoint with locale en.",
-      "Step 3: Verify translated fields differ when available.",
-      "Step 4: Verify fallback field values when translation is missing."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F164 [Planned] Article SEO editor in admin and persistence",
+    "description": "F164 [规划中][支付] Stripe支付失败重试链路",
     "steps": [
-      "Step 1: Open article form and fill SEO fields.",
-      "Step 2: Save article.",
-      "Step 3: Reopen article and verify SEO field persistence.",
-      "Step 4: Verify public article endpoint includes SEO payload."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F165 [Planned] Static page SEO editor in admin and persistence",
+    "description": "F165 [规划中][支付] Stripe支付取消恢复链路",
     "steps": [
-      "Step 1: Open static page form and fill SEO fields.",
-      "Step 2: Save page.",
-      "Step 3: Reopen page and verify fields persisted.",
-      "Step 4: Verify public page endpoint exposes SEO payload."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F166 [Planned] Product multi-language fields for zh-CN and en",
+    "description": "F166 [规划中][支付] Stripe Webhook幂等处理",
     "steps": [
-      "Step 1: Open product form with locale tabs.",
-      "Step 2: Enter zh-CN and en title/subtitle/description values.",
-      "Step 3: Save product and reopen form.",
-      "Step 4: Verify both locales persisted and are retrievable."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F167 [Planned] Article multi-language fields for zh-CN and en",
+    "description": "F167 [规划中][支付] Stripe Webhook重试处理",
     "steps": [
-      "Step 1: Open article form locale tabs.",
-      "Step 2: Enter zh-CN and en article content fields.",
-      "Step 3: Save and reopen article.",
-      "Step 4: Verify locale content persistence and retrieval."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F168 [Planned] Static page multi-language fields for zh-CN and en",
+    "description": "F168 [规划中][前后台联调] 支付后订单入库并后台可见",
     "steps": [
-      "Step 1: Open page form locale tabs.",
-      "Step 2: Enter zh-CN and en title/content.",
-      "Step 3: Save and reopen page.",
-      "Step 4: Verify both locale variants persist correctly."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F169 [Planned] Optional zh-HK locale fallback chain behavior",
+    "description": "F169 [规划中][接口] Store内容接口home",
     "steps": [
-      "Step 1: Add partial zh-HK translations for selected entities.",
-      "Step 2: Request content with locale zh-HK.",
-      "Step 3: Verify available zh-HK fields are used first.",
-      "Step 4: Verify missing fields fallback in configured order."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F170 [Planned] Data migration backfills translations from existing fields",
+    "description": "F170 [规划中][接口] Store内容接口menus",
     "steps": [
-      "Step 1: Snapshot existing single-language data.",
-      "Step 2: Run migration script that creates translations JSON structure.",
-      "Step 3: Verify original content is mapped into default locale.",
-      "Step 4: Verify no content loss after migration."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F171 [Planned] zh-CN storefront typography baseline",
+    "category": "functional",
+    "description": "F171 [规划中][接口] Store内容接口articles列表",
     "steps": [
-      "Step 1: Open key storefront pages in zh-CN locale.",
-      "Step 2: Capture screenshots of major text blocks.",
-      "Step 3: Verify line height and font rendering are readable for Chinese text.",
-      "Step 4: Verify punctuation and numeric formatting alignment."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F172 [Planned] Admin locale tab design for multilingual forms",
+    "category": "functional",
+    "description": "F172 [规划中][接口] Store内容接口article详情",
     "steps": [
-      "Step 1: Open multilingual-enabled form in admin.",
-      "Step 2: Capture screenshots of locale tab controls.",
-      "Step 3: Verify active tab and unsaved state are visible.",
-      "Step 4: Verify tab labels fit without overflow."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F173 [Planned] SEO editor visual parity across product, article, and page forms",
+    "category": "functional",
+    "description": "F173 [规划中][接口] Store内容接口pages详情",
     "steps": [
-      "Step 1: Open SEO sections in product, article, and page forms.",
-      "Step 2: Capture screenshots from each module.",
-      "Step 3: Verify layout and interaction patterns are consistent.",
-      "Step 4: Verify preview panel has consistent styling."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F174 [Planned] Checkout copy and helper text localization quality in zh-CN",
+    "category": "functional",
+    "description": "F174 [规划中][接口] Store内容接口collections",
     "steps": [
-      "Step 1: Open checkout in zh-CN locale.",
-      "Step 2: Capture screenshot of all form sections.",
-      "Step 3: Verify translated labels are natural and concise.",
-      "Step 4: Verify no mixed-language artifacts remain."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F175 [Planned] Auth pages visual parity with storefront design system",
+    "category": "functional",
+    "description": "F175 [规划中][前后台联调] 前台菜单渲染联调",
     "steps": [
-      "Step 1: Open login, register, and forgot-password pages.",
-      "Step 2: Capture screenshots for each auth page.",
-      "Step 3: Verify colors, spacing, and buttons match storefront system.",
-      "Step 4: Verify responsive behavior is consistent."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F176 [Planned] Mobile navigation drawer visual ergonomics",
+    "category": "functional",
+    "description": "F176 [规划中][前后台联调] 前台Banner渲染联调",
     "steps": [
-      "Step 1: Open mobile nav drawer.",
-      "Step 2: Capture screenshot with nested links expanded.",
-      "Step 3: Verify spacing and tap targets support thumb interaction.",
-      "Step 4: Verify drawer close affordance is always visible."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F177 [Planned] Payment result iconography and message clarity",
+    "category": "functional",
+    "description": "F177 [规划中][前后台联调] 前台公告栏渲染联调",
     "steps": [
-      "Step 1: Open success and failure result pages.",
-      "Step 2: Capture screenshots of status blocks.",
-      "Step 3: Verify icon style aligns with system feedback patterns.",
-      "Step 4: Verify primary next step is visually emphasized."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F178 [Planned] Order history timeline and card layout readability",
+    "category": "functional",
+    "description": "F178 [规划中][前后台联调] 前台弹窗渲染联调",
     "steps": [
-      "Step 1: Open account order history with several orders.",
-      "Step 2: Capture screenshot of order list/timeline.",
-      "Step 3: Verify order card hierarchy and spacing are clear.",
-      "Step 4: Verify status badges are visually distinct."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F179 [Planned] High-contrast accessibility mode compatibility",
+    "category": "functional",
+    "description": "F179 [规划中][前后台联调] 前台策展区渲染联调",
     "steps": [
-      "Step 1: Enable high-contrast mode in browser or OS settings.",
-      "Step 2: Open key storefront pages.",
-      "Step 3: Capture screenshots for critical UI elements.",
-      "Step 4: Verify actionable controls remain distinguishable."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F180 [Planned] Reduced-motion mode animation behavior",
+    "category": "functional",
+    "description": "F180 [规划中][多语言] 默认语言zh-CN",
     "steps": [
-      "Step 1: Enable reduced-motion preference.",
-      "Step 2: Open pages with transitions and popups.",
-      "Step 3: Verify animations are reduced or removed.",
-      "Step 4: Verify functionality remains intact."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F181 [Planned] Home page performance target validation",
+    "description": "F181 [规划中][多语言] zh-CN与en回退策略",
     "steps": [
-      "Step 1: Run performance audit on storefront home page.",
-      "Step 2: Capture LCP and CLS metrics.",
-      "Step 3: Verify metrics meet agreed thresholds.",
-      "Step 4: Document bottlenecks if thresholds are missed."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F182 [Planned] Product list performance under large catalog",
+    "description": "F182 [规划中][多语言] 商品多语言字段",
     "steps": [
-      "Step 1: Seed large product catalog dataset.",
-      "Step 2: Open product list and paginate through several pages.",
-      "Step 3: Verify response and rendering times remain acceptable.",
-      "Step 4: Verify browser memory does not grow unbounded."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F183 [Planned] Checkout interaction performance and responsiveness",
+    "description": "F183 [规划中][多语言] 文章多语言字段",
     "steps": [
-      "Step 1: Open checkout with realistic cart size.",
-      "Step 2: Fill fields and switch shipping methods rapidly.",
-      "Step 3: Verify totals update with minimal lag.",
-      "Step 4: Verify no UI freeze on payment initiation."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F184 [Planned] Store content API response time baseline",
+    "description": "F184 [规划中][多语言] 静态页面多语言字段",
     "steps": [
-      "Step 1: Measure response time for `/store/content/home` under normal load.",
-      "Step 2: Repeat for `/store/content/menus` and `/store/content/articles`.",
-      "Step 3: Verify p95 latency is within target range.",
-      "Step 4: Record slow query candidates for optimization."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F185 [Planned] Menu tree query efficiency with deep hierarchies",
+    "description": "F185 [规划中][SEO] 文章SEO字段扩展",
     "steps": [
-      "Step 1: Create menu with large nested structure.",
-      "Step 2: Request menu endpoint.",
-      "Step 3: Verify response time and payload size remain acceptable.",
-      "Step 4: Verify no N+1 query regression in logs."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F186 [Planned] Stripe webhook retry handling under transient failures",
+    "description": "F186 [规划中][SEO] 页面SEO字段扩展",
     "steps": [
-      "Step 1: Simulate temporary backend failure during webhook processing.",
-      "Step 2: Trigger Stripe retry behavior.",
-      "Step 3: Restore backend and process retried webhook.",
-      "Step 4: Verify final payment and order states are correct."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F187 [Planned] Idempotency for repeated place-order submissions",
+    "description": "F187 [规划中][SEO] 前台SEO头信息输出",
     "steps": [
-      "Step 1: Trigger rapid repeated place-order submissions from same checkout context.",
-      "Step 2: Verify backend deduplicates requests.",
-      "Step 3: Verify only one final order is created.",
-      "Step 4: Verify user gets consistent confirmation response."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F188 [Planned] Structured logging and traceability for checkout flow",
+    "description": "F188 [规划中][接口] 内容接口分页与筛选一致性",
     "steps": [
-      "Step 1: Run one complete checkout flow.",
-      "Step 2: Inspect backend logs for correlation IDs or request IDs.",
-      "Step 3: Verify key lifecycle events are logged (cart, payment, order).",
-      "Step 4: Verify sensitive payment data is not logged in plain text."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F189 [Planned] Frontend secret leakage prevention",
+    "description": "F189 [规划中][接口] 发布状态过滤一致性",
     "steps": [
-      "Step 1: Build storefront for production mode.",
-      "Step 2: Inspect generated client bundles and runtime config.",
-      "Step 3: Verify Stripe secret key and backend secrets are absent.",
-      "Step 4: Verify only public-safe variables are exposed."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F190 [Planned] CORS and origin isolation between admin and storefront",
+    "description": "F190 [规划中][接口] 定时生效过滤一致性",
     "steps": [
-      "Step 1: Call backend admin API from storefront origin.",
-      "Step 2: Verify unauthorized cross-origin access is blocked as expected.",
-      "Step 3: Call store APIs from storefront origin.",
-      "Step 4: Verify allowed origins work and blocked origins fail."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F191 [Planned] Session and cookie security settings validation",
+    "description": "F191 [规划中][前台] 前台404与异常兜底",
     "steps": [
-      "Step 1: Log in as customer and inspect auth cookies.",
-      "Step 2: Verify secure, httpOnly, and sameSite settings per environment policy.",
-      "Step 3: Log in as admin and inspect admin session behavior.",
-      "Step 4: Verify cross-site session misuse is mitigated."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F192 [Planned] Integration test suite for purchase flow",
+    "description": "F192 [规划中][性能] 前台性能指标LCP/CLS达标",
     "steps": [
-      "Step 1: Run integration test command for storefront purchase scenarios.",
-      "Step 2: Verify login, cart, checkout, and payment tests execute.",
-      "Step 3: Verify order creation assertions pass.",
-      "Step 4: Verify failures provide actionable diagnostics."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F193 [Planned] Integration test suite for store content APIs",
+    "description": "F193 [规划中][测试] 下单支付自动化集成测试",
     "steps": [
-      "Step 1: Run integration tests targeting `/store/content/*` endpoints.",
-      "Step 2: Verify contract, filtering, and fallback tests execute.",
-      "Step 3: Verify schedule and publish-state tests pass.",
-      "Step 4: Verify backward compatibility assertions are included."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "functional",
-    "description": "F194 [Planned] Regression suite for admin CRUD modules",
+    "description": "F194 [规划中][测试] 内容接口自动化集成测试",
     "steps": [
-      "Step 1: Run regression tests for brands, tags, pages, articles, banners, menus, collections.",
-      "Step 2: Verify create, update, delete, and list scenarios pass.",
-      "Step 3: Verify relation link/unlink scenarios pass.",
-      "Step 4: Verify validation errors are asserted."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
-    "category": "style",
-    "description": "F195 [Planned] Desktop screenshot baseline for critical storefront pages",
+    "category": "functional",
+    "description": "F195 [规划中][测试] 全站回归测试套件",
     "steps": [
-      "Step 1: Capture baseline screenshots for home, list, PDP, cart, checkout, confirmation.",
-      "Step 2: Compare against expected visual snapshots.",
-      "Step 3: Verify no major regressions in layout or typography.",
-      "Step 4: Record and approve intentional changes."
+      "步骤1：按需求完成该功能开发并启动联调环境。",
+      "步骤2：在前台页面或接口层触发该功能流程。",
+      "步骤3：覆盖正常路径与异常路径。",
+      "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
     "passes": false
   },
   {
     "category": "style",
-    "description": "F196 [Planned] Mobile screenshot baseline for critical storefront pages",
+    "description": "F196 [规划中][前台样式] 前台首页视觉层级与间距规范",
     "steps": [
-      "Step 1: Capture mobile screenshots for home, list, PDP, cart, checkout, confirmation.",
-      "Step 2: Compare against expected mobile snapshots.",
-      "Step 3: Verify touch-first layout quality.",
-      "Step 4: Record and approve intentional visual updates."
+      "步骤1：完成功能实现后在桌面与移动端打开页面。",
+      "步骤2：截图检查视觉层级、排版和留白。",
+      "步骤3：检查交互反馈与可点击区域。",
+      "步骤4：确认无视觉缺陷并记录基线截图。"
     ],
     "passes": false
   },
   {
     "category": "style",
-    "description": "F197 [Planned] Console cleanliness during core user journeys",
+    "description": "F197 [规划中][前台样式] 前台移动端适配质量",
     "steps": [
-      "Step 1: Perform end-to-end browse to purchase flow.",
-      "Step 2: Capture browser console output.",
-      "Step 3: Verify no uncaught errors or critical warnings appear.",
-      "Step 4: Verify no repetitive noisy logs in production mode."
+      "步骤1：完成功能实现后在桌面与移动端打开页面。",
+      "步骤2：截图检查视觉层级、排版和留白。",
+      "步骤3：检查交互反馈与可点击区域。",
+      "步骤4：确认无视觉缺陷并记录基线截图。"
     ],
     "passes": false
   },
   {
     "category": "style",
-    "description": "F198 [Planned] Error page visual quality for 404 and 500 states",
+    "description": "F198 [规划中][前台样式] 前台结算表单可读性与错误态",
     "steps": [
-      "Step 1: Trigger 404 page in storefront.",
-      "Step 2: Trigger 500-like fallback state via test route.",
-      "Step 3: Capture screenshots of both pages.",
-      "Step 4: Verify message clarity and navigation recovery actions."
+      "步骤1：完成功能实现后在桌面与移动端打开页面。",
+      "步骤2：截图检查视觉层级、排版和留白。",
+      "步骤3：检查交互反馈与可点击区域。",
+      "步骤4：确认无视觉缺陷并记录基线截图。"
     ],
     "passes": false
   },
   {
-    "category": "functional",
-    "description": "F199 [Implemented+Planned] Deployment smoke test for full stack",
+    "category": "style",
+    "description": "F199 [规划中][前台样式] 前台支付结果视觉反馈清晰度",
     "steps": [
-      "Step 1: Bring up infrastructure and start backend, admin, and storefront.",
-      "Step 2: Verify all apps respond on expected ports.",
-      "Step 3: Verify one admin API call and one store API call succeed.",
-      "Step 4: Verify one storefront page and one admin page render without runtime error."
+      "步骤1：完成功能实现后在桌面与移动端打开页面。",
+      "步骤2：截图检查视觉层级、排版和留白。",
+      "步骤3：检查交互反馈与可点击区域。",
+      "步骤4：确认无视觉缺陷并记录基线截图。"
     ],
     "passes": false
   },
   {
-    "category": "functional",
-    "description": "F200 [Planned] Backup and restore verification for critical commerce data",
+    "category": "style",
+    "description": "F200 [规划中][前台样式] 前台关键页面截图基线建立",
     "steps": [
-      "Step 1: Create sample data for products, content modules, carts, and orders.",
-      "Step 2: Perform database backup.",
-      "Step 3: Restore backup into clean environment.",
-      "Step 4: Verify key entities and relations are intact after restore."
+      "步骤1：完成功能实现后在桌面与移动端打开页面。",
+      "步骤2：截图检查视觉层级、排版和留白。",
+      "步骤3：检查交互反馈与可点击区域。",
+      "步骤4：确认无视觉缺陷并记录基线截图。"
     ],
     "passes": false
   }
