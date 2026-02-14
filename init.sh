@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # ============================================================================
-# dev.sh — 一键启动开发环境（基础设施 + 后端 + 前端）
-# 用法: npm run dev:all 或 bash scripts/dev.sh
+# init.sh — 一键启动开发环境（基础设施 + 后端 + 前端）
+# 用法: bash init.sh 或 ./init.sh
 # ============================================================================
 set -e
 
-ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT_DIR"
 
 # ---------- 颜色 ----------
@@ -15,13 +15,25 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-log()  { echo -e "${GREEN}[dev]${NC} $1"; }
-warn() { echo -e "${YELLOW}[dev]${NC} $1"; }
-err()  { echo -e "${RED}[dev]${NC} $1"; }
+log()  { echo -e "${GREEN}[init]${NC} $1"; }
+warn() { echo -e "${YELLOW}[init]${NC} $1"; }
+err()  { echo -e "${RED}[init]${NC} $1"; }
 
 # ---------- 环境变量配置 ----------
 export DATABASE_URL="postgres://medusa:medusa_password@localhost:55432/medusa_ecommerce"
 export REDIS_URL="redis://localhost:56739"
+
+# ---------- 安装依赖 ----------
+if [ ! -d "node_modules" ]; then
+  log "安装项目依赖..."
+  npm install
+fi
+
+# ---------- 安装 Admin UI 依赖 ----------
+if [ ! -d "admin-ui/node_modules" ]; then
+  log "安装 Admin UI 依赖..."
+  cd "$ROOT_DIR/admin-ui" && npm install && cd "$ROOT_DIR"
+fi
 
 # ---------- 提高文件描述符限制 ----------
 CURRENT_LIMIT=$(ulimit -n)
