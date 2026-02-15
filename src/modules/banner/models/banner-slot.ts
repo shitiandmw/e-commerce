@@ -7,6 +7,6 @@ export const BannerSlot = model.define("banner_slot", {
   key: model.text(),
   description: model.text().nullable(),
   items: model.hasMany(() => BannerItem, {
-    foreignKey: "slot_id",
+    mappedBy: "slot",
   }),
 })

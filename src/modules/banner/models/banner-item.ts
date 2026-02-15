@@ -4,7 +4,7 @@ import { BannerSlot } from "./banner-slot"
 export const BannerItem = model.define("banner_item", {
   id: model.id().primaryKey(),
   slot: model.belongsTo(() => BannerSlot, {
-    mappedBy: "items",
+    foreignKey: "slot_id",
   }),
   image_url: model.text(),
   title: model.text().nullable(),

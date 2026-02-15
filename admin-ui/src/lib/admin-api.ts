@@ -39,6 +39,15 @@ export async function adminFetch<T>(
   })
 
   if (!res.ok) {
+    // Handle 401 Unauthorized - clear token and redirect to login
+    if (res.status === 401) {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("medusa_admin_token")
+        window.location.href = "/login"
+      }
+      throw new Error("Unauthorized")
+    }
+    
     const errorData = await res.json().catch(() => ({}))
     throw new Error(
       errorData.message || `Admin API error: ${res.status} ${res.statusText}`

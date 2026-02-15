@@ -91,7 +91,35 @@ else
   warn "请确保 PostgreSQL 和 Redis 已手动启动"
 fi
 
-# ---------- 2. 启动 Medusa 后端 ----------
+# ---------- 2. 初始化数据库 ----------
+log "检查数据库迁移状态..."
+DB_NEEDS_INIT=false
+if ! npx medusa db:migrate 2>&1 | grep -q "No pending migrations"; then
+  log "运行数据库迁移..."
+  npx medusa db:migrate || {
+    warn "迁移失败，尝试完整初始化..."
+    npx medusa db:setup || {
+      err "数据库初始化失败"
+      exit 1
+    }
+  }
+  log "数据库迁移完成"
+  DB_NEEDS_INIT=true
+else
+  log "数据库已是最新状态"
+fi
+
+# ---------- 3. 创建默认管理员账号 ----------
+if [ "$DB_NEEDS_INIT" = true ]; then
+  log "创建默认管理员账号..."
+  npx medusa user -e admin@test.com -p admin123456 2>/dev/null || {
+    warn "管理员账号可能已存在或创建失败"
+    warn "默认账号: admin@test.com / admin123456"
+  }
+  log "✓ 管理员账号: admin@test.com / admin123456"
+fi
+
+# ---------- 4. 启动 Medusa 后端 ----------
 log "启动 Medusa 后端（端口 9000）..."
 npm run dev &
 BACKEND_PID=$!
@@ -107,7 +135,7 @@ for i in $(seq 1 30); do
   sleep 1
 done
 
-# ---------- 3. 启动 Admin UI 前端 ----------
+# ---------- 5. 启动 Admin UI 前端 ----------
 log "启动 Admin UI 前端（端口 3002）..."
 cd "$ROOT_DIR/admin-ui"
 npx next dev -p 3002 &
@@ -132,8 +160,12 @@ echo -e "${GREEN}  开发环境已启动${NC}"
 echo -e "${BLUE}============================================${NC}"
 echo -e "  后端: ${GREEN}http://localhost:9000${NC}"
 echo -e "  前端: ${GREEN}http://localhost:3002${NC}"
-echo -e "  数据库: PostgreSQL :5432"
-echo -e "  缓存: Redis :6379"
+echo -e "  数据库: PostgreSQL :55432"
+echo -e "  缓存: Redis :56739"
+echo -e "${BLUE}--------------------------------------------${NC}"
+echo -e "  管理员账号:"
+echo -e "  邮箱: ${GREEN}admin@test.com${NC}"
+echo -e "  密码: ${GREEN}admin123456${NC}"
 echo -e "${BLUE}============================================${NC}"
 echo -e "  按 ${YELLOW}Ctrl+C${NC} 停止所有服务"
 echo ""
