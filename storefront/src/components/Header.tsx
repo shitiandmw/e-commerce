@@ -1,6 +1,24 @@
+"use client"
+
 import Link from "next/link"
+import { useEffect, useState } from "react"
+import { isLoggedIn, logout } from "@/lib/auth"
+import { useRouter } from "next/navigation"
 
 export default function Header() {
+  const router = useRouter()
+  const [loggedIn, setLoggedIn] = useState(false)
+
+  useEffect(() => {
+    setLoggedIn(isLoggedIn())
+  }, [])
+
+  function handleLogout() {
+    logout()
+    setLoggedIn(false)
+    router.push("/")
+  }
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
@@ -25,9 +43,23 @@ export default function Header() {
           <Link href="/cart" className="text-sm text-muted transition-colors hover:text-gold">
             购物车
           </Link>
-          <Link href="/account" className="text-sm text-muted transition-colors hover:text-gold">
-            账户
-          </Link>
+          {loggedIn ? (
+            <>
+              <Link href="/account" className="text-sm text-muted transition-colors hover:text-gold">
+                账户
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="text-sm text-muted transition-colors hover:text-gold"
+              >
+                退出
+              </button>
+            </>
+          ) : (
+            <Link href="/login" className="text-sm text-muted transition-colors hover:text-gold">
+              登录
+            </Link>
+          )}
         </div>
       </div>
     </header>
