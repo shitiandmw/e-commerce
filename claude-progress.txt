@@ -202,3 +202,27 @@ F108 设置页加载        ✅ PASS
 - 10/10 功能全部通过
 - 修复了 1 个侧边栏布局 bug（F139）
 - 其余 9 个功能直接通过视觉验证和代码审查
+
+### 2026-02-16 Session - 前台项目初始化 (F141-F142)
+
+测试功能: F141-F142 前台项目初始化（共 2 个功能）
+
+| Feature | 名称 | 状态 | 备注 |
+|---------|------|------|------|
+| F141 | 初始化独立前台项目目录storefront | ✅ PASS | Next.js App Router + TS + Tailwind，端口3000 |
+| F142 | 前台环境变量校验 | ✅ PASS | Medusa JS SDK 安装配置，服务端+客户端连通 |
+
+#### 实现内容
+- 使用 create-next-app 创建 storefront/ 目录（Next.js 16 + TypeScript + Tailwind CSS 4）
+- 配置 dev 脚本在端口 3000 启动
+- 配置 Tailwind 主题色：深色背景(#0c0c0c) + 金色调(#c9a96e)，参考 timecigar 风格
+- 创建 Header 组件（TIMECIGAR logo + 导航 + 购物车/账户）
+- 创建 Footer 组件（四列布局：品牌/购物指南/关于/联系）
+- 配置 .env.local（NEXT_PUBLIC_MEDUSA_BACKEND_URL=http://localhost:9000）
+- 安装 @medusajs/js-sdk，创建 SDK 客户端实例 lib/medusa.ts
+- 创建 /test-sdk 测试页面，验证服务端和客户端 SDK 均可连接后端获取商品列表
+- 后端(9000)不受影响
+
+#### 总结
+- 2/2 功能全部通过
+- 无需修复已有代码

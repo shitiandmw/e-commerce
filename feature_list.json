@@ -1698,7 +1698,7 @@
       "步骤3：覆盖正常路径与异常路径。",
       "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1709,7 +1709,7 @@
       "步骤3：覆盖正常路径与异常路径。",
       "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
