@@ -29,11 +29,15 @@ const dismissTagLinksStep = createStep(
   "dismiss-tag-links-step",
   async ({ id }: DeleteTagInput, { container }) => {
     const remoteLink = container.resolve("remoteLink") as any
-    await remoteLink.dismiss({
-      [TAG_MODULE]: {
-        custom_tag_id: id,
-      },
-    })
+    try {
+      await remoteLink.dismiss({
+        [TAG_MODULE]: {
+          custom_tag_id: id,
+        },
+      })
+    } catch (e) {
+      // Links may not exist, safe to ignore
+    }
     return new StepResponse(undefined)
   }
 )

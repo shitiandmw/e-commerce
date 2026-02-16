@@ -29,11 +29,15 @@ const dismissBrandLinksStep = createStep(
   "dismiss-brand-links-step",
   async ({ id }: DeleteBrandInput, { container }) => {
     const remoteLink = container.resolve("remoteLink") as any
-    await remoteLink.dismiss({
-      [BRAND_MODULE]: {
-        brand_id: id,
-      },
-    })
+    try {
+      await remoteLink.dismiss({
+        [BRAND_MODULE]: {
+          brand_id: id,
+        },
+      })
+    } catch (e) {
+      // Links may not exist, safe to ignore
+    }
     return new StepResponse(undefined)
   }
 )
