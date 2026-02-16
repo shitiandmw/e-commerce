@@ -14,5 +14,5 @@ export const Article = model.define("article", {
   is_pinned: model.boolean().default(false),
   category: model.belongsTo(() => ArticleCategory, {
     mappedBy: "articles",
-  }),
+  }).nullable(),
 })

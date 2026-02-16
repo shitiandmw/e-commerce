@@ -112,6 +112,7 @@ export function ArticleCategoryManager({
                       size="icon"
                       className="h-8 w-8"
                       onClick={() => handleEdit(category)}
+                      aria-label={`Edit ${category.name}`}
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </Button>
@@ -120,6 +121,7 @@ export function ArticleCategoryManager({
                       size="icon"
                       className="h-8 w-8 text-destructive hover:text-destructive"
                       onClick={() => setDeletingCategory(category)}
+                      aria-label={`Delete ${category.name}`}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>

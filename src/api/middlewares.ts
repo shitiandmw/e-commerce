@@ -67,7 +67,11 @@ export const GetAnnouncementsSchema = createFindParams()
 export const GetPopupsSchema = createFindParams()
 export const GetBannerSlotsSchema = createFindParams()
 export const GetBannerItemsSchema = createFindParams().merge(z.object({ slot_id: z.string().optional() }))
-export const GetArticlesSchema = createFindParams()
+export const GetArticlesSchema = createFindParams().merge(z.object({
+  q: z.string().optional(),
+  status: z.string().optional(),
+  category_id: z.string().optional(),
+}))
 export const GetArticleCategoriesSchema = createFindParams()
 export const GetCuratedCollectionsSchema = createFindParams()
 export const GetMenusSchema = createFindParams()
@@ -314,6 +318,7 @@ export default defineMiddlewares({
             defaults: [
               "id", "title", "slug", "cover_image", "summary",
               "status", "published_at", "sort_order", "is_pinned",
+              "category_id", "category.*",
               "created_at", "updated_at",
             ],
             isList: true,

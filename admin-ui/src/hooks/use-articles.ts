@@ -64,6 +64,7 @@ export function useArticles(params: ArticlesQueryParams = {}) {
       const queryParams: Record<string, string> = {
         offset: String(offset),
         limit: String(limit),
+        fields: "id,title,slug,cover_image,summary,status,published_at,sort_order,is_pinned,category_id,category.*,created_at,updated_at",
       }
       if (q) queryParams.q = q
       if (status) queryParams.status = status
