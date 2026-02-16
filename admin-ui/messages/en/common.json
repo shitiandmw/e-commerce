@@ -42,7 +42,6 @@
     "processing": "Processing...",
     "uploading": "Uploading...",
     "downloading": "Downloading...",
-
     "status": "Status",
     "name": "Name",
     "title": "Title",
@@ -78,7 +77,6 @@
     "dimensions": "Dimensions",
     "createdAt": "Created",
     "updatedAt": "Updated",
-
     "active": "Active",
     "inactive": "Inactive",
     "enabled": "Enabled",
@@ -95,21 +93,18 @@
     "unknown": "Unknown",
     "registered": "Registered",
     "guest": "Guest",
-
     "paid": "Paid",
     "unpaid": "Not Paid",
     "awaiting": "Awaiting",
     "refunded": "Refunded",
     "partialRefund": "Partial Refund",
     "captured": "Captured",
-
     "fulfilled": "Fulfilled",
     "unfulfilled": "Unfulfilled",
     "shipped": "Shipped",
     "delivered": "Delivered",
     "partial": "Partial",
     "notFulfilled": "Unfulfilled",
-
     "inStock": "In Stock",
     "lowStock": "Low Stock",
     "outOfStock": "Out of Stock",
@@ -117,11 +112,9 @@
     "reserved": "Reserved",
     "available": "Available",
     "incoming": "Incoming",
-
     "allStatus": "All Status",
     "allPayments": "All Payments",
     "allFulfillment": "All Fulfillment",
-
     "export": "Export",
     "exportCSV": "Export CSV",
     "import": "Import",
@@ -129,7 +122,6 @@
     "upload": "Upload",
     "download": "Download",
     "downloadTemplate": "Download Template",
-
     "showing": "Showing",
     "to": "to",
     "of": "of",
@@ -139,13 +131,11 @@
     "totalItems": "Total Items",
     "noResults": "No results found",
     "noMatchSearch": "No items match your search criteria.",
-
     "basicInformation": "Basic Information",
     "quickInfo": "Quick Info",
     "media": "Media",
     "options": "Options",
     "logo": "Logo",
-
     "payment": "Payment",
     "payments": "Payments",
     "shipping": "Shipping",
@@ -157,7 +147,6 @@
     "tax": "Tax",
     "orderInfo": "Order Info",
     "salesChannel": "Sales Channel",
-
     "deleteConfirmTitle": "Are you sure?",
     "deleteConfirmDescription": "This action cannot be undone.",
     "failedToLoad": "Failed to load data",
@@ -182,7 +171,6 @@
     "tracking": "Tracking",
     "guestCheckout": "Guest checkout",
     "viewCustomerProfile": "View Customer Profile",
-
     "complete": "Complete",
     "refund": "Refund",
     "cancelOrder": "Cancel Order",
@@ -192,11 +180,11 @@
     "keepOrder": "Keep Order",
     "canceling": "Canceling...",
     "completing": "Completing...",
-
     "account": "Account",
     "company": "Company",
     "firstName": "First Name",
-    "lastName": "Last Name"
+    "lastName": "Last Name",
+    "translations": "Translations"
   },
   "languageSwitcher": {
     "label": "Language",

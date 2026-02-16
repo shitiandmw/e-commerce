@@ -75,6 +75,24 @@
           "default": "0",
           "mappedType": "integer"
         },
+        "translations": {
+          "name": "translations",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
+        "seo": {
+          "name": "seo",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamptz",
@@ -112,15 +130,6 @@
       "schema": "public",
       "indexes": [
         {
-          "keyName": "IDX_page_slug_unique",
-          "columnNames": [],
-          "composite": false,
-          "constraint": false,
-          "primary": false,
-          "unique": true,
-          "expression": "CREATE UNIQUE INDEX IF NOT EXISTS \"IDX_page_slug_unique\" ON \"page\" (\"slug\") WHERE deleted_at IS NULL"
-        },
-        {
           "keyName": "IDX_page_deleted_at",
           "columnNames": [],
           "composite": false,
@@ -128,15 +137,6 @@
           "primary": false,
           "unique": false,
           "expression": "CREATE INDEX IF NOT EXISTS \"IDX_page_deleted_at\" ON \"page\" (\"deleted_at\") WHERE deleted_at IS NULL"
-        },
-        {
-          "keyName": "IDX_page_status",
-          "columnNames": [],
-          "composite": false,
-          "constraint": false,
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_page_status\" ON \"page\" (\"status\") WHERE deleted_at IS NULL"
         },
         {
           "keyName": "page_pkey",

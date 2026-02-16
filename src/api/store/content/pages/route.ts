@@ -17,36 +17,28 @@ function applyLocale(entity: any, locale?: string) {
 
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const query = req.scope.resolve("query")
-  const { slug } = req.params
   const url = new URL(req.url || "", `http://${req.headers.host}`)
   const locale = url.searchParams.get("locale") || undefined
+  const offset = parseInt(url.searchParams.get("offset") || "0", 10)
+  const limit = parseInt(url.searchParams.get("limit") || "20", 10)
 
-  const { data: [page] } = await query.graph({
+  const { data: pages, metadata } = await query.graph({
     entity: "page",
     fields: [
       "id", "title", "slug", "content", "status", "template",
       "sort_order", "translations", "seo", "created_at", "updated_at",
     ],
-    filters: { slug, status: "published" },
+    filters: { status: "published" },
+    pagination: { skip: offset, take: limit, order: { sort_order: "ASC" } },
   })
 
-  if (!page) {
-    res.status(404).json({ message: "Page not found" })
-    return
-  }
+  const plainPages = JSON.parse(JSON.stringify(pages))
+  const localizedPages = plainPages.map((p: any) => applyLocale(p, locale))
 
-  const plain = JSON.parse(JSON.stringify(page))
-  const localized = applyLocale(plain, locale)
-
-  // Auto-generate SEO defaults if not set
-  if (!localized.seo || (!localized.seo.meta_title && !localized.seo.meta_description)) {
-    localized.seo = {
-      meta_title: localized.seo?.meta_title || localized.title?.slice(0, 60),
-      meta_description: localized.seo?.meta_description || (localized.content || "").replace(/<[^>]*>/g, " ").slice(0, 160),
-      og_image: localized.seo?.og_image || "",
-      keywords: localized.seo?.keywords || "",
-    }
-  }
-
-  res.json({ page: localized })
+  res.json({
+    pages: localizedPages,
+    count: metadata?.count || pages.length,
+    offset,
+    limit,
+  })
 }

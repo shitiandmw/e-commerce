@@ -196,7 +196,8 @@
     "account": "账户",
     "company": "公司",
     "firstName": "名",
-    "lastName": "姓"
+    "lastName": "姓",
+    "translations": "多语言内容"
   },
   "languageSwitcher": {
     "label": "语言",

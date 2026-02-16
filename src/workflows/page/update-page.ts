@@ -15,6 +15,8 @@ type UpdatePageInput = {
   status?: string
   template?: string | null
   sort_order?: number
+  translations?: Record<string, any> | null
+  seo?: Record<string, any> | null
 }
 
 const updatePageStep = createStep(

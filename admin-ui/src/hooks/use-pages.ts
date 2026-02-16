@@ -12,6 +12,8 @@ export interface Page {
   status: "draft" | "published"
   template?: string | null
   sort_order: number
+  translations?: Record<string, { title?: string; content?: string }> | null
+  seo?: { meta_title?: string; meta_description?: string; og_image?: string; keywords?: string } | null
   created_at: string
   updated_at: string
 }
@@ -69,6 +71,8 @@ export function useCreatePage() {
       status?: string
       template?: string | null
       sort_order?: number
+      translations?: Record<string, any> | null
+      seo?: Record<string, any> | null
     }) =>
       adminFetch<{ page: Page }>("/admin/pages", {
         method: "POST",
@@ -91,6 +95,8 @@ export function useUpdatePage(id: string) {
       status?: string
       template?: string | null
       sort_order?: number
+      translations?: Record<string, any> | null
+      seo?: Record<string, any> | null
     }) =>
       adminFetch<{ page: Page }>(`/admin/pages/${id}`, {
         method: "POST",

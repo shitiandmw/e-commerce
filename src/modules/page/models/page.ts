@@ -8,4 +8,6 @@ export const Page = model.define("page", {
   status: model.enum(["draft", "published"]).default("draft"),
   template: model.text().nullable(),
   sort_order: model.number().default(0),
+  translations: model.json().nullable(),
+  seo: model.json().nullable(),
 })

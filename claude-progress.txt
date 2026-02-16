@@ -203,65 +203,63 @@ F108 设置页加载        ✅ PASS
 - 修复了 1 个侧边栏布局 bug（F139）
 - 其余 9 个功能直接通过视觉验证和代码审查
 
-### 2026-02-16 Session - 前台项目初始化 (F141-F142)
+### 2026-02-16 Session - F189-F191 多语言与SEO字段扩展
 
-测试功能: F141-F142 前台项目初始化（共 2 个功能）
+开发功能: F189-F191 多语言与SEO字段扩展
 
-| Feature | 名称 | 状态 | 备注 |
-|---------|------|------|------|
-| F141 | 初始化独立前台项目目录storefront | ✅ PASS | Next.js App Router + TS + Tailwind，端口3000 |
-| F142 | 前台环境变量校验 | ✅ PASS | Medusa JS SDK 安装配置，服务端+客户端连通 |
+#### 开发内容
 
-#### 实现内容
-- 使用 create-next-app 创建 storefront/ 目录（Next.js 16 + TypeScript + Tailwind CSS 4）
-- 配置 dev 脚本在端口 3000 启动
-- 配置 Tailwind 主题色：深色背景(#0c0c0c) + 金色调(#c9a96e)，参考 timecigar 风格
-- 创建 Header 组件（TIMECIGAR logo + 导航 + 购物车/账户）
-- 创建 Footer 组件（四列布局：品牌/购物指南/关于/联系）
-- 配置 .env.local（NEXT_PUBLIC_MEDUSA_BACKEND_URL=http://localhost:9000）
-- 安装 @medusajs/js-sdk，创建 SDK 客户端实例 lib/medusa.ts
-- 创建 /test-sdk 测试页面，验证服务端和客户端 SDK 均可连接后端获取商品列表
-- 后端(9000)不受影响
+**F189 前台默认语言 zh-CN 与语言切换:**
+- 后台 admin-ui 已有 next-intl 国际化框架，支持 zh-CN/en 切换
+- 语言偏好通过 cookie 持久化
 
-#### 总结
-- 2/2 功能全部通过
-- 无需修复已有代码
+**F190 内容多语言存储与回退策略:**
+- Article/Page 数据模型添加 translations JSONB 字段
+- 后台编辑页添加 locale tabs（zh-CN/en），支持分别填写翻译内容
+- 创建 Store API 内容路由支持 locale 查询参数
+- 回退逻辑: 请求 locale → zh-CN → 原始内容
 
-### 2026-02-16 Session - Store Content Delivery APIs (F143-F149)
+**F191 文章与页面 SEO 字段扩展:**
+- Article/Page 数据模型添加 seo JSONB 字段
+- 后台编辑页添加 SEO 编辑区（meta title/description/og image/keywords）
+- Store API 返回 seo 字段
+- 未填写 SEO 时自动从标题/摘要生成默认值
 
-测试功能: F143-F149 Store 内容接口（共 7 个功能）
+#### 修改的文件
+- `src/modules/article/models/article.ts` - 添加 translations/seo JSONB 字段
+- `src/modules/page/models/page.ts` - 添加 translations/seo JSONB 字段
+- `src/modules/article/migrations/Migration20260216124832.ts` - 数据库迁移
+- `src/modules/page/migrations/Migration20260216124839.ts` - 数据库迁移
+- `src/api/admin/articles/validators.ts` - 添加 translations/seo 验证
+- `src/api/admin/pages/validators.ts` - 添加 translations/seo 验证
+- `src/api/middlewares.ts` - 添加 Store 内容路由中间件
+- `src/workflows/article/create-article.ts` - 支持 translations/seo 字段
+- `src/workflows/article/update-article.ts` - 支持 translations/seo 字段
+- `src/workflows/page/create-page.ts` - 支持 translations/seo 字段
+- `src/workflows/page/update-page.ts` - 支持 translations/seo 字段
+- `src/api/store/content/articles/route.ts` - 新建: 文章列表 Store API
+- `src/api/store/content/articles/[slug]/route.ts` - 新建: 文章详情 Store API
+- `src/api/store/content/pages/route.ts` - 新建: 页面列表 Store API
+- `src/api/store/content/pages/[slug]/route.ts` - 新建: 页面详情 Store API
+- `admin-ui/src/components/articles/article-form.tsx` - 添加 locale tabs + SEO 编辑区
+- `admin-ui/src/components/pages/page-form.tsx` - 添加 locale tabs + SEO 编辑区
+- `admin-ui/messages/en/common.json` - 添加翻译键
+- `admin-ui/messages/zh-CN/common.json` - 添加翻译键
 
-#### 实现内容
-新增 8 个 Store API 路由：
-- `GET /store/content/home` - 返回活跃 banners、announcements、popups、curated collections
-- `GET /store/content/menus` - 支持 key 查询参数，返回菜单树形结构
-- `GET /store/content/articles` - 支持 category/q/offset/limit 参数，仅返回已发布文章
-- `GET /store/content/articles/:slug` - 返回单篇已发布文章详情
-- `GET /store/content/pages/:slug` - 返回已发布静态页详情
-- `GET /store/content/collections` - 支持 key 参数，返回策展集合含 tabs 和 items
-- `GET /store/content/brands` - 支持分页和搜索
-- `GET /store/content/brands/:handle` - 返回单个品牌详情及关联商品
+#### 关键技术问题与解决
+1. Medusa `validateAndTransformQuery` 中间件会替换 `req.query`，导致自定义参数丢失
+   - 解决: 使用 `new URL(req.url).searchParams.get("locale")` 直接从 URL 解析
+2. MikroORM 实体 spread 不复制属性
+   - 解决: 使用 `JSON.parse(JSON.stringify(entity))` 转换为普通对象
 
 #### 测试结果
-| Feature | 描述 | 状态 |
-|---------|------|------|
-| F143 | Store 内容接口 /store/content/home | ✅ PASS |
-| F144 | Store 内容接口 /store/content/menus | ✅ PASS |
-| F145 | Store 内容接口 /store/content/articles | ✅ PASS |
-| F146 | Store 内容接口 /store/content/articles/:slug | ✅ PASS |
-| F147 | Store 内容接口 /store/content/pages/:slug | ✅ PASS |
-| F148 | Store 内容接口 /store/content/collections | ✅ PASS |
-| F149 | Store 内容接口 /store/content/brands | ✅ PASS |
+- F189 ✅ PASS - 后台语言切换正常，zh-CN/en 切换后 UI 文案更新
+- F190 ✅ PASS - locale tabs 可填写翻译，Store API locale 参数正常，回退逻辑正确
+- F191 ✅ PASS - SEO 编辑区可填写，Store API 返回 seo 字段，自动生成默认值正常
 
-#### 验证详情
-- F143: 验证了 banners/announcements/popups/collections 四个字段返回、banner 启用/禁用过滤、时间窗过滤
-- F144: 验证了 key 参数过滤、树形结构返回、禁用菜单项过滤
-- F145: 验证了文章列表、分页(limit/offset)、分类过滤、搜索(q)、草稿文章不返回
-- F146: 验证了已发布文章详情、不存在 slug 返回 404、草稿文章 slug 返回 404
-- F147: 验证了已发布页面详情、不存在 slug 返回 404、未发布页面返回 404
-- F148: 验证了集合列表含 tabs 和 items、key 参数过滤
-- F149: 验证了品牌列表、分页、搜索、单品牌详情含关联商品
-
-#### 总结
-- 7/7 功能全部通过
-- 无需修复已有代码，全部为新增 Store API 路由
+#### 同时更新的 feature_list.json
+- F185 文章SEO字段扩展 → passes: true
+- F186 页面SEO字段扩展 → passes: true
+- F189 前端默认语言zh-CN与语言切换 → passes: true
+- F190 内容多语言存储与回退策略 → passes: true
+- F191 文章与页面SEO字段扩展 → passes: true

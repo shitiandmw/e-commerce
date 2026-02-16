@@ -19,6 +19,8 @@ type UpdateArticleInput = {
   sort_order?: number
   is_pinned?: boolean
   category_id?: string | null
+  translations?: Record<string, any> | null
+  seo?: Record<string, any> | null
 }
 
 const updateArticleStep = createStep(
