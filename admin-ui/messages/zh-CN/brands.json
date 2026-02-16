@@ -3,6 +3,7 @@
     "title": "品牌管理",
     "subtitle": "管理您的商品品牌",
     "addBrand": "添加品牌",
+    "searchPlaceholder": "搜索品牌...",
     "createBrand": "创建品牌",
     "editBrand": "编辑品牌",
     "createSubtitle": "向您的目录中添加新品牌",

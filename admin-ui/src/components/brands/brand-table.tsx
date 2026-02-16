@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   ChevronLeft,
@@ -29,20 +30,32 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Plus,
+  Search,
 } from "lucide-react"
 import Link from "next/link"
 
 export function BrandTable() {
   const t = useTranslations("brands")
   const [sorting, setSorting] = React.useState<SortingState>([])
+  const [searchQuery, setSearchQuery] = React.useState("")
+  const [debouncedQuery, setDebouncedQuery] = React.useState("")
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: 20,
   })
 
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery)
+      setPagination((prev) => ({ ...prev, pageIndex: 0 }))
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
   const { data, isLoading, isError, error } = useBrands({
     offset: pagination.pageIndex * pagination.pageSize,
     limit: pagination.pageSize,
+    q: debouncedQuery || undefined,
   })
 
   const deleteBrand = useDeleteBrand()
@@ -87,7 +100,15 @@ export function BrandTable() {
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex items-center justify-between">
-        <div />
+        <div className="relative w-64">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder={t("searchPlaceholder")}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-8"
+          />
+        </div>
         <Link href="/brands/new">
           <Button>
             <Plus className="mr-2 h-4 w-4" />

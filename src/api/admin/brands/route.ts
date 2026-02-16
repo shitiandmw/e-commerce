@@ -11,9 +11,17 @@ export const GET = async (
 ) => {
   const query = req.scope.resolve("query")
 
+  const filters: Record<string, any> = {}
+  const q = req.query.q as string | undefined
+
+  if (q) {
+    filters.name = { $like: `%${q}%` }
+  }
+
   const { data: brands, metadata } = await query.graph({
     entity: "brand",
     ...req.queryConfig,
+    filters,
   })
 
   res.json({

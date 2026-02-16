@@ -4,6 +4,7 @@ import {
   validateAndTransformQuery,
 } from "@medusajs/framework/http"
 import { createFindParams } from "@medusajs/medusa/api/utils/validators"
+import { z } from "zod"
 import {
   PostAdminCreateBrand,
   PostAdminUpdateBrand,
@@ -59,7 +60,7 @@ import {
   PostAdminReorderMenuItems,
 } from "./admin/menu-items/validators"
 
-export const GetBrandsSchema = createFindParams()
+export const GetBrandsSchema = createFindParams().merge(z.object({ q: z.string().optional() }))
 export const GetPagesSchema = createFindParams()
 export const GetTagsSchema = createFindParams()
 export const GetAnnouncementsSchema = createFindParams()

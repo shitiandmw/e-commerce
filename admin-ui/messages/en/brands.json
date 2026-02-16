@@ -3,6 +3,7 @@
     "title": "Brands",
     "subtitle": "Manage your product brands",
     "addBrand": "Add Brand",
+    "searchPlaceholder": "Search brands...",
     "createBrand": "Create Brand",
     "editBrand": "Edit Brand",
     "createSubtitle": "Add a new brand to your catalog",

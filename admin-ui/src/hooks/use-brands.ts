@@ -29,21 +29,25 @@ export interface BrandsResponse {
 export interface BrandsQueryParams {
   offset?: number
   limit?: number
+  q?: string
 }
 
 // Hooks
 export function useBrands(params: BrandsQueryParams = {}) {
-  const { offset = 0, limit = 20 } = params
+  const { offset = 0, limit = 20, q } = params
 
   return useQuery<BrandsResponse>({
-    queryKey: ["brands", { offset, limit }],
-    queryFn: () =>
-      adminFetch<BrandsResponse>("/admin/brands", {
-        params: {
-          offset: String(offset),
-          limit: String(limit),
-        },
-      }),
+    queryKey: ["brands", { offset, limit, q }],
+    queryFn: () => {
+      const queryParams: Record<string, string> = {
+        offset: String(offset),
+        limit: String(limit),
+      }
+      if (q) queryParams.q = q
+      return adminFetch<BrandsResponse>("/admin/brands", {
+        params: queryParams,
+      })
+    },
   })
 }
 
