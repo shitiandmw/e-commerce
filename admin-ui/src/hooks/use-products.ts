@@ -115,7 +115,7 @@ export function useProducts(params: ProductsQueryParams = {}) {
   queryParams.set(
     "fields",
     fields ||
-      "+variants,+variants.prices,+options,+options.values,+images,+categories,+brand,+custom_tags"
+      "+variants,+variants.prices,+options,+options.values,+images,*categories,*brand,*custom_tags"
   )
 
   return useQuery<ProductsResponse>({
@@ -130,7 +130,7 @@ export function useProduct(id: string) {
     queryKey: ["product", id],
     queryFn: () =>
       adminFetch<{ product: Product }>(
-        `/admin/products/${id}?fields=+variants,+variants.prices,+options,+options.values,+images,+categories,+brand,+custom_tags,+metadata`
+        `/admin/products/${id}?fields=+variants,+variants.prices,+options,+options.values,+images,*categories,*brand,*custom_tags,+metadata`
       ),
     enabled: !!id,
   })
@@ -189,6 +189,36 @@ export function useCategories() {
         "/admin/product-categories",
         { params: { limit: "100", offset: "0" } }
       ),
+  })
+}
+
+export function useLinkProductCategory() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ category_id, product_id }: { category_id: string; product_id: string }) =>
+      adminFetch(`/admin/product-categories/${category_id}/products`, {
+        method: "POST",
+        body: { add: [product_id] },
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] })
+      queryClient.invalidateQueries({ queryKey: ["product"] })
+    },
+  })
+}
+
+export function useUnlinkProductCategory() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ category_id, product_id }: { category_id: string; product_id: string }) =>
+      adminFetch(`/admin/product-categories/${category_id}/products`, {
+        method: "POST",
+        body: { remove: [product_id] },
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] })
+      queryClient.invalidateQueries({ queryKey: ["product"] })
+    },
   })
 }
 

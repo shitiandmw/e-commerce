@@ -60,3 +60,19 @@
 - F090: 验证了分页参数 offset/limit 正确工作，返回 count 总数，边界情况（超出范围返回空数组）处理正确
 
 完成状态: F088-F090 全部通过
+
+### 2026-02-16 Session - 商品管理模块 (F091-F096)
+
+| Feature | 名称 | 状态 | 备注 |
+|---------|------|------|------|
+| F091 | 商品创建（含变体） | ✅ PASS | 创建商品 F091Test，含默认变体 |
+| F092 | 商品编辑 | ✅ PASS | 修改标题为 F091Test-Edited，添加副标题 |
+| F093 | 商品分类绑定 | ✅ PASS | 绑定 Shirts 分类，修复了分类绑定需使用独立 API 的问题 |
+| F094 | 商品品牌绑定 | ✅ PASS | 绑定 Test Brand Edited，修复了 fields 参数需用 *brand 的问题 |
+| F095 | 商品标签绑定 | ✅ PASS | 绑定 测试标签F009，通过 UI 选择并 API 验证 |
+| F096 | 商品SEO保存 | ✅ PASS | 填写 meta_title/meta_description/keywords，保存到 metadata.seo 并验证回显 |
+
+#### 代码修复记录
+- `use-products.ts`: fields 参数从 `+categories,+brand,+custom_tags` 改为 `*categories,*brand,*custom_tags`（Medusa v2 自定义模块链接需要 * 前缀）
+- `use-products.ts`: 新增 `useLinkProductCategory` 和 `useUnlinkProductCategory` hooks
+- `product-form.tsx`: 编辑模式下分类/品牌/标签绑定改用独立 API 端点而非产品更新 API

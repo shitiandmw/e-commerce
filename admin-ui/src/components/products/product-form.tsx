@@ -11,6 +11,8 @@ import {
   useCreateProduct,
   useUpdateProduct,
   useCategories,
+  useLinkProductCategory,
+  useUnlinkProductCategory,
 } from "@/hooks/use-products"
 import {
   useBrands,
@@ -112,6 +114,8 @@ export function ProductForm({ product, mode }: ProductFormProps) {
   const { data: tagsData } = useTags({ limit: 100 })
   const linkProductTag = useLinkProductTag()
   const unlinkProductTag = useUnlinkProductTag()
+  const linkProductCategory = useLinkProductCategory()
+  const unlinkProductCategory = useUnlinkProductCategory()
 
   const categories = categoriesData?.product_categories ?? []
   const brands = brandsData?.brands ?? []
@@ -250,11 +254,12 @@ export function ProductForm({ product, mode }: ProductFormProps) {
         },
       }
 
-      if (data.category_ids.length > 0) {
-        payload.categories = data.category_ids.map((id) => ({ id }))
-      }
-
       if (mode === "create") {
+        // Include categories in create payload (Medusa supports it on create)
+        if (data.category_ids.length > 0) {
+          payload.categories = data.category_ids.map((id) => ({ id }))
+        }
+
         // Medusa v2 requires every variant to reference valid option values.
         // When the user hasn't defined custom options we create a default one
         // so that the API call succeeds.
@@ -348,6 +353,30 @@ export function ProductForm({ product, mode }: ProductFormProps) {
             await linkProductTag.mutateAsync({
               product_id: product.id,
               tag_id: tagId,
+            })
+          }
+        }
+
+        // Handle category link changes
+        const oldCategoryIds = product?.categories?.map((c) => c.id) || []
+        const newCategoryIds = data.category_ids
+
+        // Unlink removed categories
+        for (const catId of oldCategoryIds) {
+          if (!newCategoryIds.includes(catId) && product?.id) {
+            await unlinkProductCategory.mutateAsync({
+              category_id: catId,
+              product_id: product.id,
+            })
+          }
+        }
+
+        // Link new categories
+        for (const catId of newCategoryIds) {
+          if (!oldCategoryIds.includes(catId) && product?.id) {
+            await linkProductCategory.mutateAsync({
+              category_id: catId,
+              product_id: product.id,
             })
           }
         }
