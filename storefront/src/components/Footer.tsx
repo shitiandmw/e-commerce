@@ -14,17 +14,17 @@ export default function Footer() {
           <div>
             <h4 className="mb-4 text-sm font-semibold text-foreground">购物指南</h4>
             <ul className="space-y-2">
-              <li><Link href="/shipping" className="text-sm text-muted hover:text-gold">配送说明</Link></li>
-              <li><Link href="/returns" className="text-sm text-muted hover:text-gold">退换政策</Link></li>
-              <li><Link href="/faq" className="text-sm text-muted hover:text-gold">常见问题</Link></li>
+              <li><Link href="/pages/shipping" className="text-sm text-muted hover:text-gold">配送说明</Link></li>
+              <li><Link href="/pages/returns" className="text-sm text-muted hover:text-gold">退换政策</Link></li>
+              <li><Link href="/pages/faq" className="text-sm text-muted hover:text-gold">常见问题</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="mb-4 text-sm font-semibold text-foreground">关于</h4>
             <ul className="space-y-2">
-              <li><Link href="/about" className="text-sm text-muted hover:text-gold">关于我们</Link></li>
-              <li><Link href="/terms" className="text-sm text-muted hover:text-gold">服务条款</Link></li>
-              <li><Link href="/privacy" className="text-sm text-muted hover:text-gold">隐私政策</Link></li>
+              <li><Link href="/pages/about" className="text-sm text-muted hover:text-gold">关于我们</Link></li>
+              <li><Link href="/pages/terms" className="text-sm text-muted hover:text-gold">服务条款</Link></li>
+              <li><Link href="/pages/privacy" className="text-sm text-muted hover:text-gold">隐私政策</Link></li>
             </ul>
           </div>
           <div>
