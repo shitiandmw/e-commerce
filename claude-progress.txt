@@ -98,3 +98,26 @@ F108 设置页加载        ✅ PASS
 1. promotion-form.tsx: allocation 字段 Zod schema 不接受空字符串，导致表单提交静默失败
    - 修改: z.enum(["each","across"]).optional() → z.union([z.enum(["each","across"]), z.literal("")]).optional()
    - 同时确保 API payload 始终发送 allocation 和 max_quantity
+
+### 2026-02-16 Session - F109-F115 后台通用功能A（登录/校验/状态）
+
+#### 测试结果
+- F109 后台登录 ✅ 直接通过
+- F110 后台登出 ✅ 直接通过
+- F111 登录态过期自动跳转 ✅ 直接通过
+- F112 后台接口参数校验 ✅ 直接通过
+- F113 后台错误提示展示 ✅ 直接通过
+- F114 后台空状态展示 ✅ 直接通过
+- F115 后台骨架屏展示 ✅ 直接通过
+
+#### 测试详情
+- F109: 登录页面正常显示，错误凭据显示"邮箱或密码错误"，正确凭据跳转到 /dashboard
+- F110: 点击"退出登录"后跳转到 /login，登出后无法直接访问 dashboard
+- F111: 将 token 替换为无效值后，API 返回 401，系统自动清除 token 并跳转到 /login
+- F112: 前端表单校验（"Name is required"）和后端 API 校验（"Invalid request: Field 'name' is required"）均正常
+- F113: 登录错误提示、表单校验错误、API 错误均有对应的 UI 展示（红色文本/红色背景块）
+- F114: 搜索不存在的品牌时显示"暂无品牌。创建您的第一个品牌开始使用。"
+- F115: Skeleton 组件使用 animate-pulse 动画，在 57 个组件中广泛使用
+
+#### 完成状态
+7/7 功能通过 (100%)，无需代码修复
