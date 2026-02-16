@@ -226,3 +226,42 @@ F108 设置页加载        ✅ PASS
 #### 总结
 - 2/2 功能全部通过
 - 无需修复已有代码
+
+### 2026-02-16 Session - Store Content Delivery APIs (F143-F149)
+
+测试功能: F143-F149 Store 内容接口（共 7 个功能）
+
+#### 实现内容
+新增 8 个 Store API 路由：
+- `GET /store/content/home` - 返回活跃 banners、announcements、popups、curated collections
+- `GET /store/content/menus` - 支持 key 查询参数，返回菜单树形结构
+- `GET /store/content/articles` - 支持 category/q/offset/limit 参数，仅返回已发布文章
+- `GET /store/content/articles/:slug` - 返回单篇已发布文章详情
+- `GET /store/content/pages/:slug` - 返回已发布静态页详情
+- `GET /store/content/collections` - 支持 key 参数，返回策展集合含 tabs 和 items
+- `GET /store/content/brands` - 支持分页和搜索
+- `GET /store/content/brands/:handle` - 返回单个品牌详情及关联商品
+
+#### 测试结果
+| Feature | 描述 | 状态 |
+|---------|------|------|
+| F143 | Store 内容接口 /store/content/home | ✅ PASS |
+| F144 | Store 内容接口 /store/content/menus | ✅ PASS |
+| F145 | Store 内容接口 /store/content/articles | ✅ PASS |
+| F146 | Store 内容接口 /store/content/articles/:slug | ✅ PASS |
+| F147 | Store 内容接口 /store/content/pages/:slug | ✅ PASS |
+| F148 | Store 内容接口 /store/content/collections | ✅ PASS |
+| F149 | Store 内容接口 /store/content/brands | ✅ PASS |
+
+#### 验证详情
+- F143: 验证了 banners/announcements/popups/collections 四个字段返回、banner 启用/禁用过滤、时间窗过滤
+- F144: 验证了 key 参数过滤、树形结构返回、禁用菜单项过滤
+- F145: 验证了文章列表、分页(limit/offset)、分类过滤、搜索(q)、草稿文章不返回
+- F146: 验证了已发布文章详情、不存在 slug 返回 404、草稿文章 slug 返回 404
+- F147: 验证了已发布页面详情、不存在 slug 返回 404、未发布页面返回 404
+- F148: 验证了集合列表含 tabs 和 items、key 参数过滤
+- F149: 验证了品牌列表、分页、搜索、单品牌详情含关联商品
+
+#### 总结
+- 7/7 功能全部通过
+- 无需修复已有代码，全部为新增 Store API 路由
