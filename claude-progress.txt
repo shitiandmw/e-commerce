@@ -202,3 +202,64 @@ F108 设置页加载        ✅ PASS
 - 10/10 功能全部通过
 - 修复了 1 个侧边栏布局 bug（F139）
 - 其余 9 个功能直接通过视觉验证和代码审查
+
+### 2026-02-16 Session - F189-F191 多语言与SEO字段扩展
+
+开发功能: F189-F191 多语言与SEO字段扩展
+
+#### 开发内容
+
+**F189 前台默认语言 zh-CN 与语言切换:**
+- 后台 admin-ui 已有 next-intl 国际化框架，支持 zh-CN/en 切换
+- 语言偏好通过 cookie 持久化
+
+**F190 内容多语言存储与回退策略:**
+- Article/Page 数据模型添加 translations JSONB 字段
+- 后台编辑页添加 locale tabs（zh-CN/en），支持分别填写翻译内容
+- 创建 Store API 内容路由支持 locale 查询参数
+- 回退逻辑: 请求 locale → zh-CN → 原始内容
+
+**F191 文章与页面 SEO 字段扩展:**
+- Article/Page 数据模型添加 seo JSONB 字段
+- 后台编辑页添加 SEO 编辑区（meta title/description/og image/keywords）
+- Store API 返回 seo 字段
+- 未填写 SEO 时自动从标题/摘要生成默认值
+
+#### 修改的文件
+- `src/modules/article/models/article.ts` - 添加 translations/seo JSONB 字段
+- `src/modules/page/models/page.ts` - 添加 translations/seo JSONB 字段
+- `src/modules/article/migrations/Migration20260216124832.ts` - 数据库迁移
+- `src/modules/page/migrations/Migration20260216124839.ts` - 数据库迁移
+- `src/api/admin/articles/validators.ts` - 添加 translations/seo 验证
+- `src/api/admin/pages/validators.ts` - 添加 translations/seo 验证
+- `src/api/middlewares.ts` - 添加 Store 内容路由中间件
+- `src/workflows/article/create-article.ts` - 支持 translations/seo 字段
+- `src/workflows/article/update-article.ts` - 支持 translations/seo 字段
+- `src/workflows/page/create-page.ts` - 支持 translations/seo 字段
+- `src/workflows/page/update-page.ts` - 支持 translations/seo 字段
+- `src/api/store/content/articles/route.ts` - 新建: 文章列表 Store API
+- `src/api/store/content/articles/[slug]/route.ts` - 新建: 文章详情 Store API
+- `src/api/store/content/pages/route.ts` - 新建: 页面列表 Store API
+- `src/api/store/content/pages/[slug]/route.ts` - 新建: 页面详情 Store API
+- `admin-ui/src/components/articles/article-form.tsx` - 添加 locale tabs + SEO 编辑区
+- `admin-ui/src/components/pages/page-form.tsx` - 添加 locale tabs + SEO 编辑区
+- `admin-ui/messages/en/common.json` - 添加翻译键
+- `admin-ui/messages/zh-CN/common.json` - 添加翻译键
+
+#### 关键技术问题与解决
+1. Medusa `validateAndTransformQuery` 中间件会替换 `req.query`，导致自定义参数丢失
+   - 解决: 使用 `new URL(req.url).searchParams.get("locale")` 直接从 URL 解析
+2. MikroORM 实体 spread 不复制属性
+   - 解决: 使用 `JSON.parse(JSON.stringify(entity))` 转换为普通对象
+
+#### 测试结果
+- F189 ✅ PASS - 后台语言切换正常，zh-CN/en 切换后 UI 文案更新
+- F190 ✅ PASS - locale tabs 可填写翻译，Store API locale 参数正常，回退逻辑正确
+- F191 ✅ PASS - SEO 编辑区可填写，Store API 返回 seo 字段，自动生成默认值正常
+
+#### 同时更新的 feature_list.json
+- F185 文章SEO字段扩展 → passes: true
+- F186 页面SEO字段扩展 → passes: true
+- F189 前端默认语言zh-CN与语言切换 → passes: true
+- F190 内容多语言存储与回退策略 → passes: true
+- F191 文章与页面SEO字段扩展 → passes: true
