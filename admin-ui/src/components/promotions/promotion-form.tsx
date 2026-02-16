@@ -29,7 +29,7 @@ const promotionSchema = z.object({
   discount_value: z.coerce.number().min(0, "Value must be non-negative"),
   currency_code: z.string().default("usd"),
   target_type: z.enum(["items", "shipping_methods", "order"]),
-  allocation: z.enum(["each", "across"]).optional(),
+  allocation: z.union([z.enum(["each", "across"]), z.literal("")]).optional(),
   starts_at: z.string().optional(),
   ends_at: z.string().optional(),
 })
@@ -104,10 +104,11 @@ export function PromotionForm({ promotion, mode }: PromotionFormProps) {
           type: data.discount_type,
           value: data.discount_value,
           target_type: data.target_type,
+          allocation: data.allocation || "each",
+          max_quantity: 1,
           ...(data.discount_type === "fixed"
             ? { currency_code: data.currency_code }
             : {}),
-          ...(data.allocation ? { allocation: data.allocation } : {}),
         },
         ...(data.starts_at
           ? { starts_at: new Date(data.starts_at).toISOString() }

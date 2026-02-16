@@ -76,3 +76,25 @@
 - `use-products.ts`: fields 参数从 `+categories,+brand,+custom_tags` 改为 `*categories,*brand,*custom_tags`（Medusa v2 自定义模块链接需要 * 前缀）
 - `use-products.ts`: 新增 `useLinkProductCategory` 和 `useUnlinkProductCategory` hooks
 - `product-form.tsx`: 编辑模式下分类/品牌/标签绑定改用独立 API 端点而非产品更新 API
+
+### 2026-02-16 Session - 订单/客户/库存/配送/促销/看板/设置 (F097-F108)
+
+测试结果: 12/12 全部通过
+
+F097 订单列表查询      ✅ PASS
+F098 订单详情查看      ✅ PASS
+F099 客户列表查询      ✅ PASS
+F100 客户详情查看      ✅ PASS
+F101 库存列表查询      ✅ PASS
+F102 库存调整          ✅ PASS
+F103 配送配置页可用    ✅ PASS
+F104 促销列表查询      ✅ PASS
+F105 促销创建          ✅ PASS (修复了 Zod schema 验证问题)
+F106 促销编辑          ✅ PASS
+F107 数据看板加载      ✅ PASS
+F108 设置页加载        ✅ PASS
+
+修复的 Bug:
+1. promotion-form.tsx: allocation 字段 Zod schema 不接受空字符串，导致表单提交静默失败
+   - 修改: z.enum(["each","across"]).optional() → z.union([z.enum(["each","across"]), z.literal("")]).optional()
+   - 同时确保 API payload 始终发送 allocation 和 max_quantity
