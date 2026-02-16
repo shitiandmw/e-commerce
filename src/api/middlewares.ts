@@ -76,8 +76,83 @@ export const GetArticleCategoriesSchema = createFindParams()
 export const GetCuratedCollectionsSchema = createFindParams()
 export const GetMenusSchema = createFindParams()
 
+export const GetStoreContentSchema = createFindParams().merge(z.object({
+  locale: z.string().optional(),
+  q: z.string().optional(),
+  category: z.string().optional(),
+}))
+
 export default defineMiddlewares({
   routes: [
+    // Store content routes
+    {
+      matcher: "/store/content/articles",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(
+          GetStoreContentSchema,
+          {
+            defaults: [
+              "id", "title", "slug", "cover_image", "summary",
+              "status", "published_at", "sort_order", "is_pinned",
+              "category_id", "category.*", "translations", "seo",
+              "created_at", "updated_at",
+            ],
+            isList: true,
+          }
+        ),
+      ],
+    },
+    {
+      matcher: "/store/content/articles/:slug",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(
+          GetStoreContentSchema,
+          {
+            defaults: [
+              "id", "title", "slug", "cover_image", "summary", "content",
+              "status", "published_at", "sort_order", "is_pinned",
+              "category_id", "category.*", "translations", "seo",
+              "created_at", "updated_at",
+            ],
+            isList: false,
+          }
+        ),
+      ],
+    },
+    {
+      matcher: "/store/content/pages",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(
+          GetStoreContentSchema,
+          {
+            defaults: [
+              "id", "title", "slug", "content", "status", "template",
+              "sort_order", "translations", "seo", "created_at", "updated_at",
+            ],
+            isList: true,
+          }
+        ),
+      ],
+    },
+    {
+      matcher: "/store/content/pages/:slug",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(
+          GetStoreContentSchema,
+          {
+            defaults: [
+              "id", "title", "slug", "content", "status", "template",
+              "sort_order", "translations", "seo", "created_at", "updated_at",
+            ],
+            isList: false,
+          }
+        ),
+      ],
+    },
     // Brand routes
     {
       matcher: "/admin/brands",
@@ -114,7 +189,7 @@ export default defineMiddlewares({
         validateAndTransformQuery(
           GetPagesSchema,
           {
-            defaults: ["id", "title", "slug", "content", "status", "template", "sort_order", "created_at", "updated_at"],
+            defaults: ["id", "title", "slug", "content", "status", "template", "sort_order", "translations", "seo", "created_at", "updated_at"],
             isList: true,
           }
         ),
@@ -318,7 +393,7 @@ export default defineMiddlewares({
             defaults: [
               "id", "title", "slug", "cover_image", "summary",
               "status", "published_at", "sort_order", "is_pinned",
-              "category_id", "category.*",
+              "category_id", "category.*", "translations", "seo",
               "created_at", "updated_at",
             ],
             isList: true,

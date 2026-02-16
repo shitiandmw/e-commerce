@@ -1,5 +1,18 @@
 import { z } from "zod"
 
+const SeoSchema = z.object({
+  meta_title: z.string().optional(),
+  meta_description: z.string().optional(),
+  og_image: z.string().optional(),
+  keywords: z.string().optional(),
+}).nullable().optional()
+
+const TranslationsSchema = z.record(z.string(), z.object({
+  title: z.string().optional(),
+  summary: z.string().optional(),
+  content: z.string().optional(),
+})).nullable().optional()
+
 export const PostAdminCreateArticle = z.object({
   title: z.string().min(1),
   slug: z.string().min(1),
@@ -11,6 +24,8 @@ export const PostAdminCreateArticle = z.object({
   sort_order: z.number().optional(),
   is_pinned: z.boolean().optional(),
   category_id: z.string().optional(),
+  translations: TranslationsSchema,
+  seo: SeoSchema,
 })
 
 export const PostAdminUpdateArticle = z.object({
@@ -24,6 +39,8 @@ export const PostAdminUpdateArticle = z.object({
   sort_order: z.number().optional(),
   is_pinned: z.boolean().optional(),
   category_id: z.string().nullable().optional(),
+  translations: TranslationsSchema,
+  seo: SeoSchema,
 })
 
 export type PostAdminCreateArticleType = z.infer<typeof PostAdminCreateArticle>

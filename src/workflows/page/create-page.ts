@@ -14,6 +14,8 @@ type CreatePageInput = {
   status?: string
   template?: string | null
   sort_order?: number
+  translations?: Record<string, any> | null
+  seo?: Record<string, any> | null
 }
 
 const createPageStep = createStep(

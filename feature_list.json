@@ -2175,25 +2175,25 @@
   },
   {
     "category": "functional",
-    "description": "F185 [规划中][SEO] 文章SEO字段扩展",
+    "description": "F185 [已实现][SEO] 文章SEO字段扩展",
     "steps": [
       "步骤1：按需求完成该功能开发并启动联调环境。",
       "步骤2：在前台页面或接口层触发该功能流程。",
       "步骤3：覆盖正常路径与异常路径。",
       "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
-    "description": "F186 [规划中][SEO] 页面SEO字段扩展",
+    "description": "F186 [已实现][SEO] 页面SEO字段扩展",
     "steps": [
       "步骤1：按需求完成该功能开发并启动联调环境。",
       "步骤2：在前台页面或接口层触发该功能流程。",
       "步骤3：覆盖正常路径与异常路径。",
       "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -2219,36 +2219,36 @@
   },
   {
     "category": "functional",
-    "description": "F189 [规划中][接口] 发布状态过滤一致性",
+    "description": "F189 [已实现][前端] 前端默认语言zh-CN与语言切换",
     "steps": [
       "步骤1：按需求完成该功能开发并启动联调环境。",
       "步骤2：在前台页面或接口层触发该功能流程。",
       "步骤3：覆盖正常路径与异常路径。",
       "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
-    "description": "F190 [规划中][接口] 定时生效过滤一致性",
+    "description": "F190 [已实现][接口] 内容多语言存储与回退策略",
     "steps": [
       "步骤1：按需求完成该功能开发并启动联调环境。",
       "步骤2：在前台页面或接口层触发该功能流程。",
       "步骤3：覆盖正常路径与异常路径。",
       "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
-    "description": "F191 [规划中][前台] 前台404与异常兜底",
+    "description": "F191 [已实现][前台] 文章与页面SEO字段扩展",
     "steps": [
       "步骤1：按需求完成该功能开发并启动联调环境。",
       "步骤2：在前台页面或接口层触发该功能流程。",
       "步骤3：覆盖正常路径与异常路径。",
       "步骤4：校验页面表现、接口响应和数据状态均正确。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

@@ -18,6 +18,8 @@ type CreateArticleInput = {
   sort_order?: number
   is_pinned?: boolean
   category_id?: string
+  translations?: Record<string, any> | null
+  seo?: Record<string, any> | null
 }
 
 const createArticleStep = createStep(

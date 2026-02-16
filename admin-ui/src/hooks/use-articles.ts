@@ -27,6 +27,8 @@ export interface Article {
   is_pinned?: boolean
   category_id?: string | null
   category?: ArticleCategory | null
+  translations?: Record<string, { title?: string; summary?: string; content?: string }> | null
+  seo?: { meta_title?: string; meta_description?: string; og_image?: string; keywords?: string } | null
   created_at: string
   updated_at: string
 }
@@ -64,7 +66,7 @@ export function useArticles(params: ArticlesQueryParams = {}) {
       const queryParams: Record<string, string> = {
         offset: String(offset),
         limit: String(limit),
-        fields: "id,title,slug,cover_image,summary,status,published_at,sort_order,is_pinned,category_id,category.*,created_at,updated_at",
+        fields: "id,title,slug,cover_image,summary,status,published_at,sort_order,is_pinned,category_id,category.*,translations,seo,created_at,updated_at",
       }
       if (q) queryParams.q = q
       if (status) queryParams.status = status
@@ -100,6 +102,8 @@ export function useCreateArticle() {
       sort_order?: number
       is_pinned?: boolean
       category_id?: string
+      translations?: Record<string, any> | null
+      seo?: Record<string, any> | null
     }) =>
       adminFetch<{ article: Article }>("/admin/articles", {
         method: "POST",
@@ -126,6 +130,8 @@ export function useUpdateArticle(id: string) {
       sort_order?: number
       is_pinned?: boolean
       category_id?: string | null
+      translations?: Record<string, any> | null
+      seo?: Record<string, any> | null
     }) =>
       adminFetch<{ article: Article }>(`/admin/articles/${id}`, {
         method: "POST",
