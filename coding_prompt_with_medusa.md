@@ -310,6 +310,8 @@ This will load the skill's knowledge and guidelines for your current task.
 
 ## IMPORTANT REMINDERS
 
+**管理后台默认账号：** `admin@test.com` / `admin123456`，禁止修改此账号密码。
+
 **Your Goal:** Production-quality application with all 200+ tests passing
 
 **This Session's Goal:** Complete at least one feature perfectly

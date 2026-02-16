@@ -305,6 +305,8 @@ Skill: medusa-dev:building-with-medusa
 
 ## IMPORTANT REMINDERS
 
+**管理后台默认账号：** `admin@test.com` / `admin123456`，禁止修改此账号密码。
+
 **Your Goal:** Systematically test every `"passes": false` feature, mark passing ones as true, fix failing ones, commit after each.
 
 **This Session's Goal:** Test and pass as many features as possible.
