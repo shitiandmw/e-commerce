@@ -18,3 +18,31 @@
 - 8/8 功能全部通过，无需代码修复
 - 弹窗管理模块功能完整：CRUD、触发类型配置、频率配置、目标页面配置、媒体素材选择
 - 所有功能通过浏览器 UI 端到端验证
+
+### 2026-02-16 Session - Banner 管理模块 (F041-F051)
+
+测试功能: F041-F051 Banner 管理模块（共 11 个功能）
+
+#### 测试结果
+| Feature | 描述 | 状态 |
+|---------|------|------|
+| F041 | Banner位列表查询 | ✅ PASS |
+| F042 | Banner位创建 | ✅ PASS |
+| F043 | Banner位编辑 | ✅ PASS |
+| F044 | Banner位删除 | ✅ PASS |
+| F045 | Banner项列表查询 | ✅ PASS |
+| F046 | Banner项创建 | ✅ PASS (修复了2个bug) |
+| F047 | Banner项编辑 | ✅ PASS |
+| F048 | Banner项删除 | ✅ PASS |
+| F049 | Banner项时间窗配置 | ✅ PASS |
+| F050 | Banner项启用禁用 | ✅ PASS |
+| F051 | Banner项排序配置 | ✅ PASS |
+
+#### 修复的 Bug
+1. `src/api/middlewares.ts`: `GetBannerItemsSchema` 缺少 `slot_id` 字段，导致前端按 slot 过滤 banner items 时报 "Unrecognized fields" 错误
+2. `src/api/admin/banner-items/validators.ts`: `PostAdminCreateBannerItem` 的 `starts_at`、`ends_at`、`title`、`subtitle`、`link_url` 字段缺少 `.nullable()`，导致前端发送 null 值时验证失败
+
+#### 总结
+- 11/11 功能全部通过
+- 修复了 2 个后端验证 bug
+- 所有功能通过浏览器 UI 端到端验证
