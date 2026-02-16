@@ -36,6 +36,9 @@ ecommerce_redis_data/
 # Medusa uploaded files
 static/
 
+# Test screenshots
+test-snap/
+
 # admin-ui
 admin-ui/.next/
 admin-ui/node_modules/
