@@ -269,7 +269,7 @@
       "步骤9：执行一次关联或状态操作并保存。",
       "步骤10：清理测试数据并确认结果正确。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
