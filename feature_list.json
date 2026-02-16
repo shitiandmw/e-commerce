@@ -1005,7 +1005,7 @@
       "步骤3：提交保存并刷新页面或重新请求接口。",
       "步骤4：验证返回数据和界面结果符合预期。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1016,7 +1016,7 @@
       "步骤3：提交保存并刷新页面或重新请求接口。",
       "步骤4：验证返回数据和界面结果符合预期。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1027,7 +1027,7 @@
       "步骤3：提交保存并刷新页面或重新请求接口。",
       "步骤4：验证返回数据和界面结果符合预期。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1038,7 +1038,7 @@
       "步骤3：提交保存并刷新页面或重新请求接口。",
       "步骤4：验证返回数据和界面结果符合预期。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1049,7 +1049,7 @@
       "步骤3：提交保存并刷新页面或重新请求接口。",
       "步骤4：验证返回数据和界面结果符合预期。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1060,7 +1060,7 @@
       "步骤3：提交保存并刷新页面或重新请求接口。",
       "步骤4：验证返回数据和界面结果符合预期。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1071,7 +1071,7 @@
       "步骤3：提交保存并刷新页面或重新请求接口。",
       "步骤4：验证返回数据和界面结果符合预期。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1082,7 +1082,7 @@
       "步骤3：提交保存并刷新页面或重新请求接口。",
       "步骤4：验证返回数据和界面结果符合预期。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1093,7 +1093,7 @@
       "步骤3：提交保存并刷新页面或重新请求接口。",
       "步骤4：验证返回数据和界面结果符合预期。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1104,7 +1104,7 @@
       "步骤3：提交保存并刷新页面或重新请求接口。",
       "步骤4：验证返回数据和界面结果符合预期。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
