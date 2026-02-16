@@ -61,7 +61,7 @@ import {
 } from "./admin/menu-items/validators"
 
 export const GetBrandsSchema = createFindParams().merge(z.object({ q: z.string().optional() }))
-export const GetPagesSchema = createFindParams()
+export const GetPagesSchema = createFindParams().merge(z.object({ status: z.string().optional() }))
 export const GetTagsSchema = createFindParams()
 export const GetAnnouncementsSchema = createFindParams()
 export const GetPopupsSchema = createFindParams()

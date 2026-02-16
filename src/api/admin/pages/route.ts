@@ -11,12 +11,16 @@ export const GET = async (
 ) => {
   const query = req.scope.resolve("query")
 
+  const filters: Record<string, any> = {}
+  const status = req.query.status as string | undefined
+  if (status) {
+    filters.status = status
+  }
+
   const { data: pages, metadata } = await query.graph({
     entity: "page",
     ...req.queryConfig,
-    filters: {
-      ...req.filterableFields,
-    },
+    filters,
   })
 
   res.json({
