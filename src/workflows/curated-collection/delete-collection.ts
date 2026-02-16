@@ -4,6 +4,7 @@ import {
   StepResponse,
   WorkflowResponse,
 } from "@medusajs/framework/workflows-sdk"
+import { Modules } from "@medusajs/framework/utils"
 import { CURATED_COLLECTION_MODULE } from "../../modules/curated-collection"
 import CuratedCollectionModuleService from "../../modules/curated-collection/service"
 
@@ -66,12 +67,25 @@ const deleteCollectionTabsStep = createStep(
 const dismissCollectionLinksStep = createStep(
   "dismiss-collection-links-step",
   async ({ id }: DeleteCollectionInput, { container }) => {
-    const remoteLink = container.resolve("remoteLink") as any
-    await remoteLink.dismiss({
-      [CURATED_COLLECTION_MODULE]: {
-        collection_item_id: id,
-      },
+    const service: CuratedCollectionModuleService = container.resolve(
+      CURATED_COLLECTION_MODULE
+    )
+    const items = await service.listCollectionItems({
+      collection_id: id,
     })
+    if (items.length > 0) {
+      const remoteLink = container.resolve("remoteLink") as any
+      for (const item of items) {
+        await remoteLink.dismiss({
+          [CURATED_COLLECTION_MODULE]: {
+            collection_item_id: item.id,
+          },
+          [Modules.PRODUCT]: {
+            product_id: item.product_id,
+          },
+        })
+      }
+    }
     return new StepResponse(undefined)
   }
 )
@@ -97,9 +111,9 @@ const deleteCollectionStep = createStep(
 export const deleteCuratedCollectionWorkflow = createWorkflow(
   "delete-curated-collection",
   (input: DeleteCollectionInput) => {
+    dismissCollectionLinksStep(input)
     deleteCollectionItemsStep(input)
     deleteCollectionTabsStep(input)
-    dismissCollectionLinksStep(input)
     const id = deleteCollectionStep(input)
     return new WorkflowResponse(id)
   }

@@ -18,11 +18,13 @@ export const PostAdminUpdateCuratedCollection = z.object({
 // Tab validators
 export const PostAdminCreateCollectionTab = z.object({
   name: z.string().min(1),
+  key: z.string().min(1),
   sort_order: z.number().int().optional(),
 })
 
 export const PostAdminUpdateCollectionTab = z.object({
   name: z.string().min(1).optional(),
+  key: z.string().min(1).optional(),
   sort_order: z.number().int().optional(),
 })
 
