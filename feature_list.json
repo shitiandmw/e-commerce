@@ -2382,7 +2382,7 @@
       "步骤5：点击横幅跳转到对应分类商品列表页（/products?category_id=xxx）。",
       "步骤6：确认首页渲染正常，横幅图片使用 next/image 优化加载。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -2499,7 +2499,7 @@
       "步骤5：点击 Logo 跳转到品牌详情页（/brands/[handle]）。",
       "步骤6：支持查看全部品牌链接跳转到 /brands 页面。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

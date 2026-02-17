@@ -1,5 +1,33 @@
 ## 测试进度记录
 
+### 2026-02-17 Session - 首页分类横幅 + 品牌Logo网格 (F200+F209)
+
+开发功能: F200 首页分类横幅区块组件 + F209 首页品牌Logo网格展示
+
+#### 开发内容
+- F200: 新增后端 API 路由 `GET /store/content/banners?position=xxx`，支持按 key 过滤 BannerSlot
+- F200: 新增 `CategoryBanners` 组件，从 `/store/content/banners?position=home_category` 获取数据
+  - 响应式网格布局（桌面4列/平板2列/移动1列）
+  - 每个横幅含背景图(next/image)、标题、描述、CTA按钮
+  - 渐变遮罩 + hover 缩放效果
+  - 点击跳转到 link_url（分类商品列表页）
+- F209: 改造 `BrandShowcase` 组件为 Logo 图片网格
+  - 网格布局：桌面8列/平板6列/中屏4列/移动3列
+  - 使用 next/image 替代 img 标签
+  - hover 效果：Logo 容器 scale-110 放大
+  - 新增"查看全部"链接跳转到 /brands 页面
+  - 标题区域改为左对齐 + 右侧"查看全部"链接
+- 两个组件集成到首页 page.tsx（CategoryBanners 在 CuratedCollections 和 BrandShowcase 之间）
+
+#### 测试结果
+- F200 首页分类横幅区块组件 ✅ 通过
+- F209 首页品牌Logo网格展示 ✅ 通过
+
+#### 总结
+- 2/2 功能全部通过
+- TypeScript 编译无错误
+- 后端 build 成功（admin-ui 错误为预存问题，与本次修改无关）
+
 ### 2026-02-17 Session - 购物车功能 (F175-F176)
 
 开发功能: F175-F176 购物车（共 2 个功能）
