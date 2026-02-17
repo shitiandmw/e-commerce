@@ -1,6 +1,7 @@
 import { fetchContent } from "@/lib/medusa"
 import HeroBanner from "@/components/HeroBanner"
 import CuratedCollections from "@/components/CuratedCollections"
+import CategoryBanners from "@/components/CategoryBanners"
 import BrandShowcase from "@/components/BrandShowcase"
 import LatestArticles from "@/components/LatestArticles"
 import PopupModal from "@/components/PopupModal"
@@ -9,6 +10,10 @@ interface HomeData {
   banners: any[]
   collections: any[]
   popups: any[]
+}
+
+interface BannersData {
+  banners: any[]
 }
 
 interface BrandsData {
@@ -21,12 +26,14 @@ interface ArticlesData {
 
 export default async function Home() {
   let homeData: HomeData = { banners: [], collections: [], popups: [] }
+  let categoryBannersData: BannersData = { banners: [] }
   let brandsData: BrandsData = { brands: [] }
   let articlesData: ArticlesData = { articles: [] }
 
   try {
-    ;[homeData, brandsData, articlesData] = await Promise.all([
+    ;[homeData, categoryBannersData, brandsData, articlesData] = await Promise.all([
       fetchContent<HomeData>("/store/content/home"),
+      fetchContent<BannersData>("/store/content/banners", { position: "home_category" }),
       fetchContent<BrandsData>("/store/content/brands"),
       fetchContent<ArticlesData>("/store/content/articles?limit=4"),
     ])
@@ -56,6 +63,7 @@ export default async function Home() {
       )}
 
       <CuratedCollections collections={homeData.collections || []} />
+      <CategoryBanners banners={categoryBannersData.banners || []} />
       <BrandShowcase brands={brandsData.brands || []} />
       <LatestArticles articles={articlesData.articles || []} />
       <PopupModal popups={homeData.popups || []} />
