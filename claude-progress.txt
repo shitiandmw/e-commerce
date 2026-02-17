@@ -265,3 +265,34 @@ F108 设置页加载        ✅ PASS
 #### 总结
 - 7/7 功能全部通过
 - 无需修复已有代码，全部为新增 Store API 路由
+
+### 2026-02-17 Session - 前台首页区块 (F154-F157)
+
+测试功能: F154-F157 前台首页四大区块（共 4 个功能）
+
+#### 实现内容
+新增 4 个首页组件 + 更新首页 page.tsx + 配置 SDK publishable API key：
+- `HeroBanner.tsx` - Banner 轮播组件，自动轮播(5s)+手动切换，单张隐藏控件，移动端自适应
+- `CuratedCollections.tsx` - 策展集合区，Tab 切换展示不同集合商品，商品卡片含图片/名称/价格
+- `BrandShowcase.tsx` - 品牌展示区，logo 网格布局，点击跳转品牌落地页
+- `LatestArticles.tsx` - 文章资讯区，封面/标题/摘要/分类标签，含「查看更多」链接
+- `medusa.ts` - 添加 publishable API key 配置和 fetchContent 服务端数据获取函数
+- `page.tsx` - 整合四个区块，服务端 Promise.all 并行获取数据
+
+#### 测试结果
+| Feature | 描述 | 状态 |
+|---------|------|------|
+| F154 | 前台首页 Banner 轮播区 | ✅ PASS |
+| F155 | 前台首页策展集合区（商品推荐） | ✅ PASS |
+| F156 | 前台首页品牌展示区 | ✅ PASS |
+| F157 | 前台首页文章/资讯区 | ✅ PASS |
+
+#### 验证详情
+- F154: Banner 从 /store/content/home 获取数据，3 张轮播正常，手动切换(上一张/下一张/指示器)正常，点击跳转链接正常，移动端(375px)自适应正常
+- F155: 策展集合从 /store/content/home 获取 collections，Tab 切换正常，空集合显示"暂无商品"友好提示
+- F156: 品牌从 /store/content/brands 获取，9 个品牌 logo 网格展示正常，点击跳转品牌落地页
+- F157: 文章从 /store/content/articles?limit=4 获取，4 篇文章展示封面/标题/摘要/分类标签，「查看更多」链接指向 /articles
+
+#### 总结
+- 4/4 功能全部通过
+- 无需修复已有后端代码

@@ -1842,7 +1842,7 @@
   },
   {
     "category": "functional",
-    "description": "F154 [规划中][前台] 前台首页 Banner 轮播区",
+    "description": "F154 [已实现][前台] 前台首页 Banner 轮播区",
     "steps": [
       "步骤1：首页顶部实现 Banner 轮播组件，从 /store/content/home 获取 banners 数据。",
       "步骤2：渲染 Banner 图片，支持自动轮播和手动切换。",
@@ -1850,11 +1850,11 @@
       "步骤4：只有一张 Banner 时不显示切换控件。",
       "步骤5：确认移动端 Banner 图片自适应。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
-    "description": "F155 [规划中][前台] 前台首页策展集合区（商品推荐）",
+    "description": "F155 [已实现][前台] 前台首页策展集合区（商品推荐）",
     "steps": [
       "步骤1：首页渲染策展集合区域，从 /store/content/home 获取 collections 数据。",
       "步骤2：支持 Tab 切换展示不同集合的商品。",
@@ -1862,29 +1862,29 @@
       "步骤4：点击商品卡片跳转商品详情页。",
       "步骤5：确认空集合时显示友好提示。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
-    "description": "F156 [规划中][前台] 前台首页品牌展示区",
+    "description": "F156 [已实现][前台] 前台首页品牌展示区",
     "steps": [
       "步骤1：首页渲染品牌 logo 展示区（轮播或网格）。",
       "步骤2：展示品牌 logo 和名称。",
       "步骤3：点击品牌跳转品牌落地页。",
       "步骤4：确认品牌数量多时支持滚动或分页。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
-    "description": "F157 [规划中][前台] 前台首页文章/资讯区",
+    "description": "F157 [已实现][前台] 前台首页文章/资讯区",
     "steps": [
       "步骤1：首页底部渲染最新文章区域，从 /store/content/articles 获取最新 3-4 篇文章。",
       "步骤2：展示文章封面图、标题、摘要。",
       "步骤3：点击文章跳转文章详情页。",
       "步骤4：包含「查看更多」链接跳转文章列表页。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
