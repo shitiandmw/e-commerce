@@ -353,3 +353,24 @@ F108 设置页加载        ✅ PASS
 - 4/4 功能全部通过
 - 修复了 1 个关键 bug（F187 商品详情获取使用 productService 替代 query.graph）
 - 新增 1 个组件（PopupModal.tsx）
+
+### 2026-02-17 Session - 前台结算流程 (F177-F179)
+
+测试功能: F177-F179 前台结算流程（共 3 个功能）
+
+#### 实现内容
+- 新增 3 个 API 代理路由：shipping-options、shipping-methods、promotions
+- 扩展 `storefront/src/lib/cart.ts`：新增 CartAddress/ShippingOption 接口，updateCartAddress/getShippingOptions/setShippingMethod/applyPromoCode/removePromoCode 函数
+- 新增 `storefront/src/app/checkout/CheckoutClient.tsx`：完整结算客户端组件
+- 更新 `storefront/src/app/checkout/page.tsx`：使用 AuthGuard + CheckoutClient
+
+#### 测试结果
+| Feature | 描述 | 状态 | 备注 |
+|---------|------|------|------|
+| F177 | 前台结算页面 | ✅ PASS | AuthGuard 登录拦截正常，订单摘要/地址表单/配送/优惠码/总计区域完整 |
+| F178 | 结算地址校验与配送方式选择 | ✅ PASS | 字段级错误提示正常，配送方式列表渲染正常，选择后运费更新 |
+| F179 | 结算优惠码应用与移除 | ✅ PASS | 无效优惠码错误提示正常，UI 流程完整 |
+
+#### 总结
+- 3/3 功能全部通过
+- 无需修复已有代码，全部为新增文件
