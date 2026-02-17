@@ -11,7 +11,7 @@ async function getProduct(handle: string) {
   try {
     const { products } = await sdk.store.product.list({
       handle,
-      fields: "id,title,handle,subtitle,description,thumbnail,images.*,options.*,options.values.*,variants.*,variants.options.*,variants.prices.*,variants.inventory_quantity,*brand,tags.*,metadata",
+      fields: "id,title,handle,subtitle,description,thumbnail,images.*,options.*,options.values.*,variants.*,variants.options.*,variants.prices.*,+variants.calculated_price,variants.inventory_quantity,*brand,tags.*,metadata",
       limit: 1,
     })
     return products?.[0] || null
