@@ -18,6 +18,8 @@ type CreatePopupInput = {
   display_frequency?: "once" | "once_per_session" | "once_per_day"
   target_page?: string | null
   sort_order?: number
+  popup_type?: "general" | "coupon"
+  coupon_code?: string | null
 }
 
 const createPopupStep = createStep(

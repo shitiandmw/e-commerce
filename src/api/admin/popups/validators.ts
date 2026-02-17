@@ -11,6 +11,8 @@ export const PostAdminCreatePopup = z.object({
   display_frequency: z.enum(["once", "once_per_session", "once_per_day"]).optional(),
   target_page: z.string().nullable().optional(),
   sort_order: z.number().optional(),
+  popup_type: z.enum(["general", "coupon"]).optional(),
+  coupon_code: z.string().nullable().optional(),
 })
 
 export const PostAdminUpdatePopup = z.object({
@@ -24,6 +26,8 @@ export const PostAdminUpdatePopup = z.object({
   display_frequency: z.enum(["once", "once_per_session", "once_per_day"]).optional(),
   target_page: z.string().nullable().optional(),
   sort_order: z.number().optional(),
+  popup_type: z.enum(["general", "coupon"]).optional(),
+  coupon_code: z.string().nullable().optional(),
 })
 
 export type PostAdminCreatePopupType = z.infer<typeof PostAdminCreatePopup>

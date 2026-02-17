@@ -1,5 +1,35 @@
 ## 测试进度记录
 
+### 2026-02-17 Session - 优惠券领取弹窗 (F211)
+
+开发功能: F211 优惠券领取弹窗
+
+#### 开发内容
+- 扩展 Popup 数据模型，添加 `popup_type`（general/coupon）和 `coupon_code` 字段
+- 创建 `POST /store/content/coupon` API 路由，接收 popup_id + email，验证后返回优惠码
+- 创建 `claimCouponWorkflow` 工作流，包含邮箱记录和优惠码验证逻辑
+- 实现 `CouponPopup` 前台组件：邮箱输入 + 领取按钮 + 成功显示优惠码
+- Cookie 控制弹窗频率（`coupon_popup_shown` cookie，每天最多显示一次）
+- 首页集成：general 弹窗走 PopupModal，coupon 弹窗走 CouponPopup
+- 更新 admin 验证器、工作流、middleware defaults 支持新字段
+- 生成并运行数据库迁移
+
+#### 新增/修改文件
+- `src/modules/popup/models/popup.ts` - 添加 popup_type, coupon_code 字段
+- `src/api/admin/popups/validators.ts` - 添加新字段验证
+- `src/api/middlewares.ts` - 添加 popup 新字段 defaults + coupon middleware
+- `src/api/store/content/coupon/route.ts` - 优惠券领取 API
+- `src/api/store/content/coupon/validators.ts` - 领取请求验证
+- `src/api/store/content/home/route.ts` - 返回 popup_type, coupon_code 字段
+- `src/workflows/popup/create-popup.ts` - 添加新字段类型
+- `src/workflows/popup/update-popup.ts` - 添加新字段类型
+- `src/workflows/popup/claim-coupon.ts` - 优惠券领取工作流
+- `storefront/src/components/CouponPopup.tsx` - 优惠券弹窗组件
+- `storefront/src/app/page.tsx` - 集成 CouponPopup
+
+#### 测试结果
+- F211 优惠券领取弹窗 ✅ 通过（构建验证通过）
+
 ### 2026-02-17 Session - 商品比较功能 (F201-F202)
 
 开发功能: F201-F202 商品比较（共 2 个功能）

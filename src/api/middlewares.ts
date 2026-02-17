@@ -59,6 +59,9 @@ import {
   PostAdminUpdateMenuItem,
   PostAdminReorderMenuItems,
 } from "./admin/menu-items/validators"
+import {
+  couponMiddlewares,
+} from "./store/content/coupon/validators"
 
 export const GetBrandsSchema = createFindParams().merge(z.object({ q: z.string().optional() }))
 export const GetPagesSchema = createFindParams()
@@ -301,7 +304,8 @@ export default defineMiddlewares({
               "id", "title", "description", "image_url",
               "button_text", "button_link", "is_enabled",
               "trigger_type", "display_frequency", "target_page",
-              "sort_order", "created_at", "updated_at",
+              "sort_order", "popup_type", "coupon_code",
+              "created_at", "updated_at",
             ],
             isList: true,
           }
@@ -557,5 +561,7 @@ export default defineMiddlewares({
         validateAndTransformBody(PostAdminReorderMenuItems),
       ],
     },
+    // Coupon claim route
+    ...couponMiddlewares,
   ],
 })

@@ -5,6 +5,7 @@ import CategoryBanners from "@/components/CategoryBanners"
 import BrandShowcase from "@/components/BrandShowcase"
 import LatestArticles from "@/components/LatestArticles"
 import PopupModal from "@/components/PopupModal"
+import CouponPopup from "@/components/CouponPopup"
 
 interface HomeData {
   banners: any[]
@@ -66,7 +67,8 @@ export default async function Home() {
       <CategoryBanners banners={categoryBannersData.banners || []} />
       <BrandShowcase brands={brandsData.brands || []} />
       <LatestArticles articles={articlesData.articles || []} />
-      <PopupModal popups={homeData.popups || []} />
+      <PopupModal popups={(homeData.popups || []).filter((p: any) => p.popup_type !== "coupon")} />
+      <CouponPopup popups={(homeData.popups || []).filter((p: any) => p.popup_type === "coupon")} />
     </>
   )
 }
