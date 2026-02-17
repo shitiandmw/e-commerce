@@ -1,6 +1,14 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import type { Metadata } from "next"
 import { fetchContent } from "@/lib/api"
+
+interface SeoData {
+  meta_title?: string
+  meta_description?: string
+  og_image?: string
+  keywords?: string
+}
 
 interface Article {
   id: string
@@ -10,7 +18,48 @@ interface Article {
   summary: string | null
   content: string | null
   published_at: string | null
+  seo?: SeoData | null
   category?: { id: string; name: string; handle: string } | null
+}
+
+async function getArticle(slug: string): Promise<Article | null> {
+  try {
+    const data = await fetchContent<{ article: Article }>(
+      `/store/content/articles/${slug}`
+    )
+    return data.article
+  } catch {
+    return null
+  }
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await params
+  const article = await getArticle(slug)
+  if (!article) return { title: "文章未找到" }
+
+  const seo = article.seo
+  // If seo.meta_title differs from article.title, it's user-customized
+  const isCustomTitle = !!seo?.meta_title && seo.meta_title !== article.title
+  const displayTitle = isCustomTitle ? seo!.meta_title! : (article.title || "")
+  const description =
+    seo?.meta_description || article.summary || `${article.title} - TIMECIGAR 资讯`
+  const ogImage = seo?.og_image || article.cover_image || undefined
+
+  return {
+    title: isCustomTitle ? { absolute: displayTitle } : displayTitle,
+    description,
+    keywords: seo?.keywords || undefined,
+    openGraph: {
+      title: isCustomTitle ? displayTitle : `${displayTitle} - TIMECIGAR`,
+      description,
+      ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+    },
+  }
 }
 
 export default async function ArticleDetailPage({
@@ -19,16 +68,8 @@ export default async function ArticleDetailPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-
-  let article: Article
-  try {
-    const data = await fetchContent<{ article: Article }>(
-      `/store/content/articles/${slug}`
-    )
-    article = data.article
-  } catch {
-    notFound()
-  }
+  const article = await getArticle(slug)
+  if (!article) notFound()
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-12">

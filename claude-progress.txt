@@ -295,3 +295,33 @@ F108 设置页加载        ✅ PASS
 #### 总结
 - 4/4 功能全部通过
 - 修复了 2 个 bug（校验提示、路由组冲突）
+
+### 2026-02-17 Session - 前台 SEO 头信息输出 (F192)
+
+测试功能: F192 前台 SEO 头信息输出
+
+#### 实现内容
+- `storefront/src/app/products/[handle]/page.tsx`: 添加 generateMetadata，从 product.metadata.seo 读取 SEO 数据
+- `storefront/src/app/articles/[slug]/page.tsx`: 添加 generateMetadata，从 article.seo 读取 SEO 数据
+- `storefront/src/app/pages/[slug]/page.tsx`: 添加 generateMetadata，从 page.seo 读取 SEO 数据
+- `storefront/src/app/layout.tsx`: 添加 metadataBase、title.template（"%s - TIMECIGAR"）、openGraph.siteName
+- `storefront/next.config.ts`: 添加 htmlLimitedBots: /.*/ 禁用 Next.js 16 流式 metadata
+- 自定义 SEO 标题使用 title: { absolute: ... } 绕过 template
+- 未配置 SEO 时自动使用 "页面标题 - TIMECIGAR" 格式
+
+#### 测试结果
+| 步骤 | 描述 | 状态 |
+|------|------|------|
+| 步骤1 | 商品详情页 meta title/description/og:image | ✅ PASS |
+| 步骤2 | 文章详情页 SEO 头信息 | ✅ PASS |
+| 步骤3 | 静态页 SEO 头信息 | ✅ PASS |
+| 步骤4 | curl 查看 HTML head 确认 meta 标签 | ✅ PASS |
+| 步骤5 | 未配置 SEO 时使用默认值 | ✅ PASS |
+
+#### 关键技术点
+- Next.js 16 默认将 metadata 流式传输到 body（非 bot UA），需配置 htmlLimitedBots 强制输出到 head
+- 后端 API 自动为文章/页面生成默认 SEO（meta_title=title），前端通过比较 seo.meta_title 与原标题判断是否为用户自定义
+
+#### 总结
+- 5/5 步骤全部通过
+- 浏览器截图已保存至 test-snap/F192/

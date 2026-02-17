@@ -16,8 +16,15 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "TIMECIGAR - 精选雪茄",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  title: {
+    default: "TIMECIGAR - 精选雪茄",
+    template: "%s - TIMECIGAR",
+  },
   description: "精选雪茄，品味生活。TIMECIGAR 为您提供全球优质雪茄。",
+  openGraph: {
+    siteName: "TIMECIGAR",
+  },
 }
 
 export default function RootLayout({

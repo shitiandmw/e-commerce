@@ -1,6 +1,14 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
+import type { Metadata } from "next"
 import { fetchContent } from "@/lib/api"
+
+interface SeoData {
+  meta_title?: string
+  meta_description?: string
+  og_image?: string
+  keywords?: string
+}
 
 interface Page {
   id: string
@@ -8,6 +16,46 @@ interface Page {
   slug: string
   content: string | null
   template: string | null
+  seo?: SeoData | null
+}
+
+async function getPage(slug: string): Promise<Page | null> {
+  try {
+    const data = await fetchContent<{ page: Page }>(
+      `/store/content/pages/${slug}`
+    )
+    return data.page
+  } catch {
+    return null
+  }
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await params
+  const page = await getPage(slug)
+  if (!page) return { title: "页面未找到" }
+
+  const seo = page.seo
+  // If seo.meta_title differs from page.title, it's user-customized
+  const isCustomTitle = !!seo?.meta_title && seo.meta_title !== page.title
+  const displayTitle = isCustomTitle ? seo!.meta_title! : (page.title || "")
+  const description = seo?.meta_description || `${page.title} - TIMECIGAR`
+  const ogImage = seo?.og_image || undefined
+
+  return {
+    title: isCustomTitle ? { absolute: displayTitle } : displayTitle,
+    description,
+    keywords: seo?.keywords || undefined,
+    openGraph: {
+      title: isCustomTitle ? displayTitle : `${displayTitle} - TIMECIGAR`,
+      description,
+      ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+    },
+  }
 }
 
 export default async function StaticPage({
@@ -16,16 +64,8 @@ export default async function StaticPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-
-  let page: Page
-  try {
-    const data = await fetchContent<{ page: Page }>(
-      `/store/content/pages/${slug}`
-    )
-    page = data.page
-  } catch {
-    notFound()
-  }
+  const page = await getPage(slug)
+  if (!page) notFound()
 
   const isFaqTemplate = page.template === "faq"
 
