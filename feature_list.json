@@ -1814,7 +1814,7 @@
       "步骤4：移动端显示汉堡菜单，点击展开侧边导航。",
       "步骤5：确认 Header 在所有页面一致显示。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1826,7 +1826,7 @@
       "步骤4：确认 Footer 在所有页面底部一致显示。",
       "步骤5：确认移动端布局合理。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1838,7 +1838,7 @@
       "步骤4：无公告时公告栏不占空间。",
       "步骤5：支持用户关闭公告栏。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

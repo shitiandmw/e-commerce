@@ -265,3 +265,23 @@ F108 设置页加载        ✅ PASS
 #### 总结
 - 7/7 功能全部通过
 - 无需修复已有代码，全部为新增 Store API 路由
+
+### 2026-02-17 Session - 前台布局组件 (F151-F153)
+
+测试功能: F151-F153 前台布局组件（共 3 个功能）
+
+| Feature | 名称 | 状态 | 备注 |
+|---------|------|------|------|
+| F151 | 前台 Header 导航栏 | ✅ PASS | API 驱动菜单、下拉子菜单、搜索/用户/购物车图标、移动端汉堡菜单 |
+| F152 | 前台 Footer 页脚 | ✅ PASS | API 驱动链接、联系方式、版权信息、响应式布局 |
+| F153 | 前台公告栏组件 | ✅ PASS | API 获取公告、自动轮播、手动切换、关闭功能 |
+
+#### 实现内容
+- Header (Server + Client Component): 调用 /store/content/menus?key=main 渲染主导航，支持下拉子菜单、搜索/用户/购物车图标、移动端侧边导航
+- Footer (Server Component): 调用 /store/content/menus?key=footer 渲染页脚链接，四列布局含联系方式和版权
+- AnnouncementBar (Server + Client Component): 调用 /store/content/home 获取公告，支持自动轮播(4s)、手动切换、关闭
+- 配置 Medusa SDK publishable API key 用于 Store API 认证
+
+#### 总结
+- 3/3 功能全部通过
+- 无需修复已有后端代码
