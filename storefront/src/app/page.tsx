@@ -3,10 +3,12 @@ import HeroBanner from "@/components/HeroBanner"
 import CuratedCollections from "@/components/CuratedCollections"
 import BrandShowcase from "@/components/BrandShowcase"
 import LatestArticles from "@/components/LatestArticles"
+import PopupModal from "@/components/PopupModal"
 
 interface HomeData {
   banners: any[]
   collections: any[]
+  popups: any[]
 }
 
 interface BrandsData {
@@ -18,7 +20,7 @@ interface ArticlesData {
 }
 
 export default async function Home() {
-  let homeData: HomeData = { banners: [], collections: [] }
+  let homeData: HomeData = { banners: [], collections: [], popups: [] }
   let brandsData: BrandsData = { brands: [] }
   let articlesData: ArticlesData = { articles: [] }
 
@@ -56,6 +58,7 @@ export default async function Home() {
       <CuratedCollections collections={homeData.collections || []} />
       <BrandShowcase brands={brandsData.brands || []} />
       <LatestArticles articles={articlesData.articles || []} />
+      <PopupModal popups={homeData.popups || []} />
     </>
   )
 }

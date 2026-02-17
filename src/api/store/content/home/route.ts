@@ -1,4 +1,5 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { Modules } from "@medusajs/framework/utils"
 
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const query = req.scope.resolve("query")
@@ -71,12 +72,42 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     ],
   })
 
+  // Collect all product_ids from collection items
+  const productIds = new Set<string>()
+  for (const c of allCollections || []) {
+    for (const item of c.items || []) {
+      if (item.product_id) productIds.add(item.product_id)
+    }
+  }
+
+  // Batch fetch product details via product module service (bypasses store scoping)
+  const productMap = new Map<string, any>()
+  if (productIds.size > 0) {
+    try {
+      const productService = req.scope.resolve(Modules.PRODUCT)
+      const prods = await productService.listProducts(
+        { id: Array.from(productIds) },
+        { select: ["id", "title", "handle", "thumbnail"] }
+      )
+      for (const p of prods || []) {
+        productMap.set(p.id, { id: p.id, title: p.title, handle: p.handle, thumbnail: p.thumbnail })
+      }
+    } catch (e: any) {
+      console.error("[home] Failed to fetch products:", e?.message)
+    }
+  }
+
   const collections = (allCollections || [])
     .sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0))
     .map((c: any) => ({
       ...c,
       tabs: (c.tabs || []).sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0)),
-      items: (c.items || []).sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0)),
+      items: (c.items || [])
+        .sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0))
+        .map((item: any) => ({
+          ...item,
+          product: productMap.get(item.product_id) || null,
+        })),
     }))
 
   res.json({

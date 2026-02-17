@@ -326,3 +326,30 @@ F108 设置页加载        ✅ PASS
 #### 总结
 - 4/4 功能全部通过
 - 修复了 2 个 bug（校验提示、路由组冲突）
+
+### 2026-02-17 Session - 前后台联调 (F184-F187)
+
+测试功能: F184-F187 前后台联调（共 4 个功能）
+
+#### 实现内容
+- F186: 新增 `storefront/src/components/PopupModal.tsx` 弹窗组件
+  - 支持 trigger_type: first_visit / every_visit / specific_page
+  - 支持 display_frequency: once (localStorage) / once_per_session (sessionStorage) / once_per_day (localStorage+时间戳)
+  - 集成到首页 page.tsx
+- F187: 修复 home API 和 collections API 中策展集合商品详情获取
+  - 问题: `query.graph()` 查询 product 实体在 store 路由上下文中受 publishable key 作用域限制，返回空结果
+  - 解决: 改用 `productService.listProducts()` 直接通过产品模块服务查询，绕过 store 作用域限制
+  - 修改文件: `src/api/store/content/home/route.ts`, `src/api/store/content/collections/route.ts`
+
+#### 测试结果
+| Feature | 描述 | 状态 | 备注 |
+|---------|------|------|------|
+| F184 | 前台菜单渲染联调 | ✅ PASS | Header 显示 main 菜单，Footer 显示 footer 菜单，禁用项正确隐藏 |
+| F185 | 前台 Banner 渲染联调 | ✅ PASS | 5 张 Banner 轮播正常，禁用项正确隐藏 |
+| F186 | 前台弹窗渲染联调 | ✅ PASS | 弹窗正确弹出，关闭后频率控制生效（once 模式刷新不再弹出） |
+| F187 | 前台策展集合渲染联调 | ✅ PASS | 集合标题/Tab/商品卡片正确渲染，Tab 切换正常 |
+
+#### 总结
+- 4/4 功能全部通过
+- 修复了 1 个关键 bug（F187 商品详情获取使用 productService 替代 query.graph）
+- 新增 1 个组件（PopupModal.tsx）
