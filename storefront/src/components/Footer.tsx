@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { sdk } from "@/lib/medusa"
+import { getDictionary, type Locale } from "@/lib/i18n"
 
 type MenuItem = {
   id: string
@@ -16,10 +17,10 @@ type Menu = {
   items: MenuItem[]
 }
 
-async function getFooterMenu(): Promise<MenuItem[]> {
+async function getFooterMenu(locale: Locale): Promise<MenuItem[]> {
   try {
     const data = await sdk.client.fetch<{ menus: Menu[] }>(
-      "/store/content/menus?key=footer",
+      `/store/content/menus?key=footer&locale=${locale}`,
       { method: "GET" }
     )
     return data.menus?.[0]?.items || []
@@ -28,10 +29,12 @@ async function getFooterMenu(): Promise<MenuItem[]> {
   }
 }
 
-export default async function Footer() {
-  const menuItems = await getFooterMenu()
+export default async function Footer({ locale }: { locale: Locale }) {
+  const [menuItems, dict] = await Promise.all([
+    getFooterMenu(locale),
+    getDictionary(locale),
+  ])
 
-  // Split items into two columns
   const mid = Math.ceil(menuItems.length / 2)
   const col1 = menuItems.slice(0, mid)
   const col2 = menuItems.slice(mid)
@@ -40,42 +43,36 @@ export default async function Footer() {
     <footer className="border-t border-border bg-surface">
       <div className="mx-auto max-w-7xl px-4 py-10 md:py-12">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-          {/* Brand */}
           <div>
             <h3 className="mb-4 text-lg font-bold text-gold">TIMECIGAR</h3>
-            <p className="text-sm text-muted">
-              精选雪茄，品味生活。
-            </p>
+            <p className="text-sm text-muted">{dict.footer_tagline}</p>
           </div>
-          {/* Footer links col 1 */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold text-foreground">购物指南</h4>
+            <h4 className="mb-4 text-sm font-semibold text-foreground">{dict.shopping_guide}</h4>
             <ul className="space-y-2">
               {col1.map((item) => (
                 <li key={item.id}>
-                  <Link href={item.url} className="text-sm text-muted hover:text-gold">
+                  <Link href={`/${locale}${item.url}`} className="text-sm text-muted hover:text-gold">
                     {item.label}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
-          {/* Footer links col 2 */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold text-foreground">关于</h4>
+            <h4 className="mb-4 text-sm font-semibold text-foreground">{dict.about}</h4>
             <ul className="space-y-2">
               {col2.map((item) => (
                 <li key={item.id}>
-                  <Link href={item.url} className="text-sm text-muted hover:text-gold">
+                  <Link href={`/${locale}${item.url}`} className="text-sm text-muted hover:text-gold">
                     {item.label}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
-          {/* Contact */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold text-foreground">联系我们</h4>
+            <h4 className="mb-4 text-sm font-semibold text-foreground">{dict.contact_us}</h4>
             <ul className="space-y-2 text-sm text-muted">
               <li>
                 <a href="mailto:support@timecigar.com" className="hover:text-gold">
@@ -91,7 +88,7 @@ export default async function Footer() {
           </div>
         </div>
         <div className="mt-8 border-t border-border pt-8 text-center text-sm text-muted">
-          &copy; {new Date().getFullYear()} TIMECIGAR. All rights reserved.
+          &copy; {new Date().getFullYear()} TIMECIGAR. {dict.all_rights_reserved}
         </div>
       </div>
     </footer>

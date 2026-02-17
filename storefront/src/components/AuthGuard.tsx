@@ -12,9 +12,12 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [checked, setChecked] = useState(false)
 
   useEffect(() => {
-    const needsAuth = PROTECTED_PATHS.some((p) => pathname.startsWith(p))
+    // Strip locale prefix to check protected paths
+    const pathWithoutLocale = pathname.replace(/^\/(zh-CN|zh-TW|en)/, "") || "/"
+    const locale = pathname.match(/^\/(zh-CN|zh-TW|en)/)?.[1] || "zh-CN"
+    const needsAuth = PROTECTED_PATHS.some((p) => pathWithoutLocale.startsWith(p))
     if (needsAuth && !isLoggedIn()) {
-      router.replace(`/login?redirect=${encodeURIComponent(pathname)}`)
+      router.replace(`/${locale}/login?redirect=${encodeURIComponent(pathname)}`)
     } else {
       setChecked(true)
     }
@@ -23,7 +26,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   if (!checked) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="text-muted">加载中...</div>
+        <div className="text-muted">...</div>
       </div>
     )
   }

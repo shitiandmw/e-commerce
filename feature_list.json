@@ -2421,7 +2421,7 @@
       "步骤5：确认所有现有页面在 /zh-CN 前缀下正常访问。",
       "步骤6：确认语言信息通过 params 或 context 传递到页面组件。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -2434,7 +2434,7 @@
       "步骤5：页面静态文案（按钮/标签/提示）从翻译文件加载。",
       "步骤6：确认切换语言后页面内容正确更新，无闪烁。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

@@ -2,7 +2,9 @@
 
 import Link from "next/link"
 import { useState, useRef, useEffect } from "react"
+import { useRouter, usePathname } from "next/navigation"
 import { useCart } from "@/components/CartProvider"
+import type { Locale } from "@/lib/i18n"
 
 type MenuItem = {
   id: string
@@ -11,6 +13,14 @@ type MenuItem = {
   sort_order: number
   children: MenuItem[]
 }
+
+const LOCALE_LABELS: Record<string, string> = {
+  "zh-CN": "简体中文",
+  "zh-TW": "繁體中文",
+  en: "English",
+}
+
+const LOCALES = ["zh-CN", "zh-TW", "en"] as const
 
 // SVG Icons
 function SearchIcon() {
@@ -46,6 +56,7 @@ function CartIcon({ count }: { count: number }) {
     </span>
   )
 }
+
 function MenuIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -70,8 +81,70 @@ function ChevronDown() {
   )
 }
 
+function GlobeIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M2 12h20" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  )
+}
+
+// Language switcher dropdown
+function LanguageSwitcher({ locale, dict }: { locale: Locale; dict: Record<string, string> }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+  const pathname = usePathname()
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  function switchLocale(newLocale: string) {
+    // Remove current locale prefix from pathname
+    const pathWithoutLocale = pathname.replace(/^\/(zh-CN|zh-TW|en)/, "") || "/"
+    // Set cookie to remember choice
+    document.cookie = `NEXT_LOCALE=${newLocale};path=/;max-age=${365 * 24 * 60 * 60};SameSite=Lax`
+    router.push(`/${newLocale}${pathWithoutLocale}`)
+    setOpen(false)
+  }
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex h-11 w-11 items-center justify-center text-muted transition-colors hover:text-gold"
+        aria-label={dict.language || "Language"}
+      >
+        <GlobeIcon />
+      </button>
+      {open && (
+        <div className="absolute right-0 top-full mt-1 min-w-[140px] rounded-md border border-border bg-surface py-1 shadow-lg">
+          {LOCALES.map((loc) => (
+            <button
+              key={loc}
+              onClick={() => switchLocale(loc)}
+              className={`block w-full px-4 py-2 text-left text-sm transition-colors hover:bg-surface-light hover:text-gold ${
+                loc === locale ? "text-gold font-medium" : "text-muted"
+              }`}
+            >
+              {LOCALE_LABELS[loc]}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // Desktop dropdown menu item
-function DesktopMenuItem({ item }: { item: MenuItem }) {
+function DesktopMenuItem({ item, locale }: { item: MenuItem; locale: Locale }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -83,9 +156,11 @@ function DesktopMenuItem({ item }: { item: MenuItem }) {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
+  const localizeUrl = (url: string) => `/${locale}${url}`
+
   if (item.children.length === 0) {
     return (
-      <Link href={item.url} className="text-sm text-muted transition-colors hover:text-gold">
+      <Link href={localizeUrl(item.url)} className="text-sm text-muted transition-colors hover:text-gold">
         {item.label}
       </Link>
     )
@@ -103,7 +178,7 @@ function DesktopMenuItem({ item }: { item: MenuItem }) {
       {open && (
         <div className="absolute left-0 top-full mt-1 min-w-[160px] rounded-md border border-border bg-surface py-1 shadow-lg">
           <Link
-            href={item.url}
+            href={localizeUrl(item.url)}
             className="block px-4 py-2 text-sm text-muted transition-colors hover:bg-surface-light hover:text-gold"
             onClick={() => setOpen(false)}
           >
@@ -112,7 +187,7 @@ function DesktopMenuItem({ item }: { item: MenuItem }) {
           {item.children.map((child) => (
             <Link
               key={child.id}
-              href={child.url}
+              href={localizeUrl(child.url)}
               className="block px-4 py-2 text-sm text-muted transition-colors hover:bg-surface-light hover:text-gold"
               onClick={() => setOpen(false)}
             >
@@ -124,13 +199,15 @@ function DesktopMenuItem({ item }: { item: MenuItem }) {
     </div>
   )
 }
+
 // Mobile sidebar menu item
-function MobileMenuItem({ item, onClose }: { item: MenuItem; onClose: () => void }) {
+function MobileMenuItem({ item, locale, onClose }: { item: MenuItem; locale: Locale; onClose: () => void }) {
   const [expanded, setExpanded] = useState(false)
+  const localizeUrl = (url: string) => `/${locale}${url}`
 
   if (item.children.length === 0) {
     return (
-      <Link href={item.url} onClick={onClose} className="block py-3 text-base text-foreground transition-colors hover:text-gold">
+      <Link href={localizeUrl(item.url)} onClick={onClose} className="block py-3 text-base text-foreground transition-colors hover:text-gold">
         {item.label}
       </Link>
     )
@@ -147,11 +224,11 @@ function MobileMenuItem({ item, onClose }: { item: MenuItem; onClose: () => void
       </button>
       {expanded && (
         <div className="ml-4 border-l border-border pl-4">
-          <Link href={item.url} onClick={onClose} className="block py-2 text-sm text-muted transition-colors hover:text-gold">
+          <Link href={localizeUrl(item.url)} onClick={onClose} className="block py-2 text-sm text-muted transition-colors hover:text-gold">
             {item.label}
           </Link>
           {item.children.map((child) => (
-            <Link key={child.id} href={child.url} onClick={onClose} className="block py-2 text-sm text-muted transition-colors hover:text-gold">
+            <Link key={child.id} href={localizeUrl(child.url)} onClick={onClose} className="block py-2 text-sm text-muted transition-colors hover:text-gold">
               {child.label}
             </Link>
           ))}
@@ -161,7 +238,7 @@ function MobileMenuItem({ item, onClose }: { item: MenuItem; onClose: () => void
   )
 }
 
-export default function HeaderClient({ menuItems }: { menuItems: MenuItem[] }) {
+export default function HeaderClient({ menuItems, locale, dict }: { menuItems: MenuItem[]; locale: Locale; dict: Record<string, string> }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const { itemCount: cartCount } = useCart()
 
@@ -170,26 +247,27 @@ export default function HeaderClient({ menuItems }: { menuItems: MenuItem[] }) {
       {/* Desktop nav */}
       <nav className="hidden items-center gap-8 md:flex">
         {menuItems.map((item) => (
-          <DesktopMenuItem key={item.id} item={item} />
+          <DesktopMenuItem key={item.id} item={item} locale={locale} />
         ))}
       </nav>
 
       {/* Right side icons */}
       <div className="flex items-center gap-1 md:gap-3">
-        <Link href="/search" className="flex h-11 w-11 items-center justify-center text-muted transition-colors hover:text-gold" aria-label="搜索">
+        <LanguageSwitcher locale={locale} dict={dict} />
+        <Link href={`/${locale}/search`} className="flex h-11 w-11 items-center justify-center text-muted transition-colors hover:text-gold" aria-label={dict.search}>
           <SearchIcon />
         </Link>
-        <Link href="/account" className="flex h-11 w-11 items-center justify-center text-muted transition-colors hover:text-gold" aria-label="账户">
+        <Link href={`/${locale}/account`} className="flex h-11 w-11 items-center justify-center text-muted transition-colors hover:text-gold" aria-label={dict.account}>
           <UserIcon />
         </Link>
-        <Link href="/cart" className="flex h-11 w-11 items-center justify-center text-muted transition-colors hover:text-gold" aria-label="购物车">
+        <Link href={`/${locale}/cart`} className="flex h-11 w-11 items-center justify-center text-muted transition-colors hover:text-gold" aria-label={dict.cart}>
           <CartIcon count={cartCount} />
         </Link>
         {/* Mobile hamburger */}
         <button
           className="flex h-11 w-11 items-center justify-center text-muted transition-colors hover:text-gold md:hidden"
           onClick={() => setMobileOpen(true)}
-          aria-label="打开菜单"
+          aria-label={dict.open_menu}
         >
           <MenuIcon />
         </button>
@@ -202,24 +280,24 @@ export default function HeaderClient({ menuItems }: { menuItems: MenuItem[] }) {
           <div className="absolute right-0 top-0 h-full w-72 bg-background p-6 shadow-xl">
             <div className="mb-6 flex items-center justify-between">
               <span className="text-lg font-bold text-gold">TIMECIGAR</span>
-              <button onClick={() => setMobileOpen(false)} className="text-muted hover:text-foreground" aria-label="关闭菜单">
+              <button onClick={() => setMobileOpen(false)} className="text-muted hover:text-foreground" aria-label={dict.close_menu}>
                 <CloseIcon />
               </button>
             </div>
             <nav className="divide-y divide-border">
               {menuItems.map((item) => (
-                <MobileMenuItem key={item.id} item={item} onClose={() => setMobileOpen(false)} />
+                <MobileMenuItem key={item.id} item={item} locale={locale} onClose={() => setMobileOpen(false)} />
               ))}
             </nav>
             <div className="mt-6 space-y-3 border-t border-border pt-6">
-              <Link href="/search" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 text-sm text-muted hover:text-gold">
-                <SearchIcon /> 搜索
+              <Link href={`/${locale}/search`} onClick={() => setMobileOpen(false)} className="flex items-center gap-3 text-sm text-muted hover:text-gold">
+                <SearchIcon /> {dict.search}
               </Link>
-              <Link href="/account" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 text-sm text-muted hover:text-gold">
-                <UserIcon /> 我的账户
+              <Link href={`/${locale}/account`} onClick={() => setMobileOpen(false)} className="flex items-center gap-3 text-sm text-muted hover:text-gold">
+                <UserIcon /> {dict.my_account}
               </Link>
-              <Link href="/cart" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 text-sm text-muted hover:text-gold">
-                <CartIcon count={cartCount} /> 购物车
+              <Link href={`/${locale}/cart`} onClick={() => setMobileOpen(false)} className="flex items-center gap-3 text-sm text-muted hover:text-gold">
+                <CartIcon count={cartCount} /> {dict.cart}
               </Link>
             </div>
           </div>

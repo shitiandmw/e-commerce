@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { sdk } from "@/lib/medusa"
+import { getDictionary, type Locale } from "@/lib/i18n"
 import HeaderClient from "./HeaderClient"
 
 type MenuItem = {
@@ -17,10 +18,10 @@ type Menu = {
   items: MenuItem[]
 }
 
-async function getMainMenu(): Promise<MenuItem[]> {
+async function getMainMenu(locale: Locale): Promise<MenuItem[]> {
   try {
     const data = await sdk.client.fetch<{ menus: Menu[] }>(
-      "/store/content/menus?key=main",
+      `/store/content/menus?key=main&locale=${locale}`,
       { method: "GET" }
     )
     return data.menus?.[0]?.items || []
@@ -29,16 +30,19 @@ async function getMainMenu(): Promise<MenuItem[]> {
   }
 }
 
-export default async function Header() {
-  const menuItems = await getMainMenu()
+export default async function Header({ locale }: { locale: Locale }) {
+  const [menuItems, dict] = await Promise.all([
+    getMainMenu(locale),
+    getDictionary(locale),
+  ])
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-        <Link href="/" className="text-xl font-bold tracking-wider text-gold">
+        <Link href={`/${locale}`} className="text-xl font-bold tracking-wider text-gold">
           TIMECIGAR
         </Link>
-        <HeaderClient menuItems={menuItems} />
+        <HeaderClient menuItems={menuItems} locale={locale} dict={dict} />
       </div>
     </header>
   )

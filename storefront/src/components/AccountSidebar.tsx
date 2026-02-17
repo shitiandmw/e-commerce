@@ -4,45 +4,53 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useState, useCallback } from "react"
 import { getCustomer, isLoggedIn, logout } from "@/lib/auth"
+import type { Locale } from "@/lib/i18n"
 
 const NAV_ITEMS = [
-  { href: "/account", label: "账户概览" },
-  { href: "/account/profile", label: "个人资料" },
-  { href: "/account/addresses", label: "收货地址" },
-  { href: "/account/orders", label: "订单历史" },
+  { path: "/account", labelKey: "account_overview" },
+  { path: "/account/profile", labelKey: "profile" },
+  { path: "/account/addresses", labelKey: "addresses" },
+  { path: "/account/orders", labelKey: "order_history" },
 ]
 
-export default function AccountSidebar({ children }: { children: React.ReactNode }) {
+const LABELS: Record<string, Record<string, string>> = {
+  "zh-CN": { account_overview: "账户概览", profile: "个人资料", addresses: "收货地址", order_history: "订单历史", logout: "退出登录", loading: "加载中..." },
+  "zh-TW": { account_overview: "帳戶概覽", profile: "個人資料", addresses: "收貨地址", order_history: "訂單歷史", logout: "登出", loading: "載入中..." },
+  en: { account_overview: "Account Overview", profile: "Profile", addresses: "Addresses", order_history: "Order History", logout: "Logout", loading: "Loading..." },
+}
+
+export default function AccountSidebar({ children, locale }: { children: React.ReactNode; locale: Locale }) {
   const pathname = usePathname()
   const router = useRouter()
   const [customer, setCustomer] = useState<{ first_name?: string; last_name?: string; email?: string } | null>(null)
   const [loading, setLoading] = useState(true)
+  const t = LABELS[locale] || LABELS["zh-CN"]
 
   const loadCustomer = useCallback(async () => {
     if (!isLoggedIn()) {
-      router.replace(`/login?redirect=${encodeURIComponent(pathname)}`)
+      router.replace(`/${locale}/login?redirect=${encodeURIComponent(pathname)}`)
       return
     }
     const c = await getCustomer()
     if (!c) {
-      router.replace(`/login?redirect=${encodeURIComponent(pathname)}`)
+      router.replace(`/${locale}/login?redirect=${encodeURIComponent(pathname)}`)
       return
     }
     setCustomer(c)
     setLoading(false)
-  }, [pathname, router])
+  }, [pathname, router, locale])
 
   useEffect(() => { loadCustomer() }, [loadCustomer])
 
   const handleLogout = async () => {
     await logout()
-    router.replace("/login")
+    router.replace(`/${locale}/login`)
   }
 
   if (loading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="text-muted">加载中...</div>
+        <div className="text-muted">{t.loading}</div>
       </div>
     )
   }
@@ -59,18 +67,19 @@ export default function AccountSidebar({ children }: { children: React.ReactNode
           </div>
           <nav className="flex flex-row gap-1 overflow-x-auto md:flex-col md:gap-0">
             {NAV_ITEMS.map((item) => {
-              const active = pathname === item.href
+              const href = `/${locale}${item.path}`
+              const active = pathname === href
               return (
                 <Link
-                  key={item.href}
-                  href={item.href}
+                  key={item.path}
+                  href={href}
                   className={`whitespace-nowrap rounded-md px-3 py-2 text-sm transition-colors ${
                     active
                       ? "bg-surface-light text-gold font-medium"
                       : "text-muted hover:text-foreground hover:bg-surface"
                   }`}
                 >
-                  {item.label}
+                  {t[item.labelKey]}
                 </Link>
               )
             })}
@@ -79,7 +88,7 @@ export default function AccountSidebar({ children }: { children: React.ReactNode
             onClick={handleLogout}
             className="mt-4 w-full rounded-md px-3 py-2 text-left text-sm text-muted transition-colors hover:bg-surface hover:text-red-400"
           >
-            退出登录
+            {t.logout}
           </button>
         </aside>
         <div className="min-w-0 flex-1">{children}</div>
