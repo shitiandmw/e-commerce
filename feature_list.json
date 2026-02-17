@@ -2050,7 +2050,7 @@
       "步骤4：包含侧边导航：概览、个人资料、订单、收藏、优惠券。",
       "步骤5：未登录时跳转登录页。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -2062,7 +2062,7 @@
       "步骤4：保存成功后显示成功提示。",
       "步骤5：表单校验不通过时显示错误提示。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -2074,7 +2074,7 @@
       "步骤4：支持设置默认收货地址。",
       "步骤5：结算时可选择已保存地址。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -2086,7 +2086,7 @@
       "步骤4：支持分页加载。",
       "步骤5：无订单时显示空状态。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
