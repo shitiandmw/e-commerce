@@ -265,3 +265,33 @@ F108 设置页加载        ✅ PASS
 #### 总结
 - 7/7 功能全部通过
 - 无需修复已有代码，全部为新增 Store API 路由
+
+### 2026-02-17 Session - 前台认证流程 (F167-F170)
+
+测试功能: F167-F170 前台认证流程（共 4 个功能）
+
+#### 实现内容
+- 创建 `lib/auth.ts` 认证库（register/login/logout/requestPasswordReset/getCustomer）
+- 更新 Medusa SDK 配置启用 JWT 认证
+- 创建 `/register` 注册页面（邮箱+密码+姓名，表单校验，调用 Medusa Store API）
+- 创建 `/login` 登录页面（邮箱+密码，支持 redirect 回跳）
+- 创建 `/forgot-password` 忘记密码页面（不泄露用户是否存在）
+- 创建 `AuthGuard` 组件实现登录拦截（/checkout、/account、/orders）
+- 创建 `AuthLayout` 和 `MainLayout` 组件分离认证页面和主站布局
+- Header 根据登录状态显示登录/账户+退出
+
+#### 测试结果
+| Feature | 描述 | 状态 | 备注 |
+|---------|------|------|------|
+| F167 | 前台用户注册流程 | ✅ PASS | 表单校验正常，5个字段校验错误正确显示 |
+| F168 | 前台用户登录流程 | ✅ PASS | 校验正常，错误登录显示"邮箱或密码错误" |
+| F169 | 前台忘记密码流程 | ✅ PASS | 提交后显示"邮件已发送"，不泄露用户存在 |
+| F170 | 前台登录拦截与回跳 | ✅ PASS | /checkout→/login?redirect=%2Fcheckout，/account、/orders 同理 |
+
+#### 代码修复记录
+- 修复注册页面姓名校验提示错误（firstName/lastName 错误消息互换）
+- 修复路由组冲突：移除 (auth)/(main) 路由组，改用 AuthLayout/MainLayout 组件方案
+
+#### 总结
+- 4/4 功能全部通过
+- 修复了 2 个 bug（校验提示、路由组冲突）
