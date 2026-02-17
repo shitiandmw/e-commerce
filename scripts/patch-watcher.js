@@ -1,10 +1,12 @@
 /**
- * Patch Medusa develop command to ignore admin-ui directory in file watcher.
+ * Patch Medusa develop command to ignore admin-ui and storefront directories
+ * in file watcher.
  *
  * Problem: Medusa's chokidar watcher monitors the entire project root but only
- * ignores root-level node_modules. Our admin-ui/ directory (a separate Next.js
- * app) contains its own node_modules with tens of thousands of files, causing
- * ENFILE (file table overflow) errors and unwanted server restarts.
+ * ignores root-level node_modules. Our admin-ui/ and storefront/ directories
+ * (separate Next.js apps) contain their own node_modules with tens of thousands
+ * of files, causing ENFILE (file table overflow) errors and unwanted server
+ * restarts when these apps generate or modify files (e.g. next-env.d.ts).
  *
  * This script runs automatically via the "postinstall" npm hook.
  */
@@ -29,20 +31,33 @@ try {
   }
 
   let content = fs.readFileSync(developJsPath, "utf8")
+  let patched = false
 
-  if (content.includes('"admin-ui"')) {
+  // Add "admin-ui" to the ignored array
+  if (!content.includes('"admin-ui"')) {
+    content = content.replace(
+      '"src/admin",',
+      '"src/admin",\n                    "admin-ui",'
+    )
+    patched = true
+  }
+
+  // Add "storefront" to the ignored array
+  if (!content.includes('"storefront"')) {
+    content = content.replace(
+      '"admin-ui",',
+      '"admin-ui",\n                    "storefront",'
+    )
+    patched = true
+  }
+
+  if (!patched) {
     console.log("[patch-watcher] Already patched, skipping.")
     process.exit(0)
   }
 
-  // Add "admin-ui" to the ignored array in the chokidar.watch() call
-  content = content.replace(
-    '"src/admin",',
-    '"src/admin",\n                    "admin-ui",'
-  )
-
   fs.writeFileSync(developJsPath, content)
-  console.log("[patch-watcher] Patched: admin-ui added to watcher ignore list.")
+  console.log("[patch-watcher] Patched: admin-ui + storefront added to watcher ignore list.")
 } catch (err) {
   console.error("[patch-watcher] Failed to patch:", err.message)
   // Non-fatal — don't block npm install
