@@ -2004,7 +2004,7 @@
       "步骤4：注册成功后自动登录并跳转首页。",
       "步骤5：注册已存在邮箱时显示错误提示。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -2016,7 +2016,7 @@
       "步骤4：登录失败显示错误提示。",
       "步骤5：已登录用户访问 /login 自动跳转首页。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -2027,7 +2027,7 @@
       "步骤3：确认输入不存在的邮箱时不泄露用户是否存在（统一提示）。",
       "步骤4：确认页面样式与登录页一致。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -2038,7 +2038,7 @@
       "步骤3：未登录用户点击「加入购物车」时提示登录。",
       "步骤4：直接访问 /login（无 redirect）登录后跳转首页。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

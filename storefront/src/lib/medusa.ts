@@ -10,6 +10,9 @@ export const sdk = new Medusa({
   baseUrl: MEDUSA_BACKEND_URL,
   debug: process.env.NODE_ENV === "development",
   publishableKey: PUBLISHABLE_KEY,
+  auth: {
+    type: "jwt",
+  },
 })
 
 // Helper for fetching from custom store content API routes

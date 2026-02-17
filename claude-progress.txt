@@ -266,44 +266,32 @@ F108 设置页加载        ✅ PASS
 - 7/7 功能全部通过
 - 无需修复已有代码，全部为新增 Store API 路由
 
-### 2026-02-17 Session - 前台文章/静态页/404/搜索 (F162-F166)
+### 2026-02-17 Session - 前台认证流程 (F167-F170)
 
-测试功能: F162-F166 前台内容页面（共 5 个功能）
+测试功能: F167-F170 前台认证流程（共 4 个功能）
 
 #### 实现内容
-新增前台页面和组件：
-- `storefront/src/lib/api.ts` - 统一 API 请求工具，含 publishable API key 头
-- `storefront/src/app/articles/page.tsx` - 文章列表页，支持分类筛选和分页
-- `storefront/src/app/articles/[slug]/page.tsx` - 文章详情页，富文本渲染
-- `storefront/src/app/pages/[slug]/page.tsx` - 静态页面渲染，支持模板布局
-- `storefront/src/app/not-found.tsx` - 自定义 404 页面
-- `storefront/src/app/global-error.tsx` - 全局错误边界
-- `storefront/src/app/search/page.tsx` - 全站搜索页，支持商品搜索
-- `storefront/src/app/globals.css` - 新增 prose-content 富文本样式和 faq-layout 样式
-- 更新 `Header.tsx` 添加搜索入口图标
-- 更新 `Footer.tsx` 链接指向 /pages/ 路由
+- 创建 `lib/auth.ts` 认证库（register/login/logout/requestPasswordReset/getCustomer）
+- 更新 Medusa SDK 配置启用 JWT 认证
+- 创建 `/register` 注册页面（邮箱+密码+姓名，表单校验，调用 Medusa Store API）
+- 创建 `/login` 登录页面（邮箱+密码，支持 redirect 回跳）
+- 创建 `/forgot-password` 忘记密码页面（不泄露用户是否存在）
+- 创建 `AuthGuard` 组件实现登录拦截（/checkout、/account、/orders）
+- 创建 `AuthLayout` 和 `MainLayout` 组件分离认证页面和主站布局
+- Header 根据登录状态显示登录/账户+退出
 
 #### 测试结果
-| Feature | 描述 | 状态 |
-|---------|------|------|
-| F162 | 文章列表页 /articles | ✅ PASS |
-| F163 | 文章详情页 /articles/:slug | ✅ PASS |
-| F164 | 静态页面 /pages/:slug | ✅ PASS |
-| F165 | 404 页面与全局错误处理 | ✅ PASS |
-| F166 | 全站搜索功能 | ✅ PASS |
+| Feature | 描述 | 状态 | 备注 |
+|---------|------|------|------|
+| F167 | 前台用户注册流程 | ✅ PASS | 表单校验正常，5个字段校验错误正确显示 |
+| F168 | 前台用户登录流程 | ✅ PASS | 校验正常，错误登录显示"邮箱或密码错误" |
+| F169 | 前台忘记密码流程 | ✅ PASS | 提交后显示"邮件已发送"，不泄露用户存在 |
+| F170 | 前台登录拦截与回跳 | ✅ PASS | /checkout→/login?redirect=%2Fcheckout，/account、/orders 同理 |
 
-#### 验证详情
-- F162: 文章列表正常加载，分类筛选（全部/雪茄文化/技术/生活）工作正常，文章卡片显示封面图、标题、摘要、分类标签、发布日期
-- F163: 文章详情页正常渲染富文本内容，不存在的 slug 正确显示 404
-- F164: 静态页面（about/terms/faq）正常渲染，FAQ 页面使用专用布局样式
-- F165: 访问不存在路径显示自定义 404 页面（金色 404 标题 + "返回首页"按钮），全局错误边界组件就绪
-- F166: 搜索页面正常工作，输入关键词显示商品结果，无结果时显示空状态提示
-
-#### 遇到的问题及解决
-1. **端口冲突**: 端口 3000 被 OrbStack Docker 代理占用，改用端口 3001 启动前台
-2. **Publishable API Key**: Store API 路由需要 `x-publishable-api-key` 头，从数据库查询获取 key 并配置到 .env.local
-3. **后端不稳定**: Medusa 后端多次崩溃，需手动重启
+#### 代码修复记录
+- 修复注册页面姓名校验提示错误（firstName/lastName 错误消息互换）
+- 修复路由组冲突：移除 (auth)/(main) 路由组，改用 AuthLayout/MainLayout 组件方案
 
 #### 总结
-- 5/5 功能全部通过
-- 全部为新增前台页面，无需修复已有代码
+- 4/4 功能全部通过
+- 修复了 2 个 bug（校验提示、路由组冲突）
