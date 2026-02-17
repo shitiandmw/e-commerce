@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { sdk } from "@/lib/medusa"
 import ProductCard from "@/components/ProductCard"
 
 interface Category {
@@ -32,26 +31,28 @@ export default function ProductListClient() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
 
   useEffect(() => {
-    sdk.store.category.list({ limit: 50 }).then(({ product_categories }) => {
-      setCategories(product_categories as Category[])
-    }).catch(() => {})
+    fetch("/api/categories")
+      .then((r) => r.json())
+      .then((data) => setCategories(data.product_categories || []))
+      .catch(() => {})
   }, [])
 
   const fetchProducts = useCallback(async () => {
     setLoading(true)
     try {
-      const params: Record<string, any> = {
-        limit: LIMIT,
-        offset,
+      const params = new URLSearchParams({
+        limit: String(LIMIT),
+        offset: String(offset),
         fields: "id,title,handle,thumbnail,variants.prices.*,*brand",
         order: sortOrder === "desc" ? `-${sortBy}` : sortBy,
-      }
+      })
       if (selectedCategory) {
-        params.category_id = [selectedCategory]
+        params.set("category_id[]", selectedCategory)
       }
-      const { products: data, count: total } = await sdk.store.product.list(params)
-      setProducts(data as Product[])
-      setCount(total)
+      const res = await fetch(`/api/products?${params}`)
+      const data = await res.json()
+      setProducts(data.products || [])
+      setCount(data.count || 0)
     } catch {
       setProducts([])
       setCount(0)

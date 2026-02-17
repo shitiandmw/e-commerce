@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { fetchContent } from "@/lib/medusa"
 
 interface Brand {
   id: string
@@ -33,9 +32,10 @@ export default function BrandListClient() {
   const fetchBrands = useCallback(async () => {
     setLoading(true)
     try {
-      const params: Record<string, string> = { limit: "100" }
-      if (debouncedSearch) params.q = debouncedSearch
-      const data = await fetchContent<BrandsResponse>("/store/content/brands", params)
+      const params = new URLSearchParams({ limit: "100" })
+      if (debouncedSearch) params.set("q", debouncedSearch)
+      const res = await fetch(`/api/brands?${params}`)
+      const data = await res.json()
       setBrands(data?.brands || [])
     } catch {
       setBrands([])
