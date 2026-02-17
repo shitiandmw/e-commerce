@@ -1937,7 +1937,7 @@
   },
   {
     "category": "functional",
-    "description": "F162 [规划中][前台] 前台文章列表页",
+    "description": "F162 [已完成][前台] 前台文章列表页",
     "steps": [
       "步骤1：创建文章列表页路由 /articles，调用 /store/content/articles。",
       "步骤2：渲染文章卡片（封面图、标题、摘要、发布时间）。",
@@ -1945,22 +1945,22 @@
       "步骤4：支持分页加载。",
       "步骤5：空列表显示友好提示。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
-    "description": "F163 [规划中][前台] 前台文章详情页",
+    "description": "F163 [已完成][前台] 前台文章详情页",
     "steps": [
       "步骤1：创建文章详情页路由 /articles/:slug，调用 /store/content/articles/:slug。",
       "步骤2：渲染文章标题、封面图、富文本内容、发布时间、分类。",
       "步骤3：富文本中的链接和图片正常渲染。",
       "步骤4：文章不存在时显示 404。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
-    "description": "F164 [规划中][前台] 前台静态页面（关于/条款/隐私/FAQ/配送/退换）",
+    "description": "F164 [已完成][前台] 前台静态页面（关于/条款/隐私/FAQ/配送/退换）",
     "steps": [
       "步骤1：创建静态页路由 /pages/:slug，调用 /store/content/pages/:slug。",
       "步骤2：根据 template 字段选择布局模板。",
@@ -1968,22 +1968,22 @@
       "步骤4：页面不存在时显示 404。",
       "步骤5：确认 about/terms/privacy/faq/shipping/returns 等页面均可访问。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
-    "description": "F165 [规划中][前台] 前台 404 页面与全局错误处理",
+    "description": "F165 [已完成][前台] 前台 404 页面与全局错误处理",
     "steps": [
       "步骤1：创建自定义 404 页面，包含返回首页链接。",
       "步骤2：创建全局错误边界组件，捕获渲染异常显示友好错误页。",
       "步骤3：访问不存在的路由，确认显示 404 页面。",
       "步骤4：确认 404 页面样式与整体风格一致。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
-    "description": "F166 [规划中][前台] 前台全站搜索功能",
+    "description": "F166 [已完成][前台] 前台全站搜索功能",
     "steps": [
       "步骤1：实现搜索页面 /search，调用 Medusa Store API 搜索商品。",
       "步骤2：Header 搜索图标点击后展开搜索输入框或跳转搜索页。",
@@ -1992,7 +1992,7 @@
       "步骤5：无结果时显示友好提示和推荐。",
       "步骤6：确认搜索支持中文关键词。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
