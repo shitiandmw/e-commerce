@@ -266,22 +266,33 @@ F108 设置页加载        ✅ PASS
 - 7/7 功能全部通过
 - 无需修复已有代码，全部为新增 Store API 路由
 
-### 2026-02-17 Session - 前台布局组件 (F151-F153)
+### 2026-02-17 Session - 前台首页区块 (F154-F157)
 
-测试功能: F151-F153 前台布局组件（共 3 个功能）
-
-| Feature | 名称 | 状态 | 备注 |
-|---------|------|------|------|
-| F151 | 前台 Header 导航栏 | ✅ PASS | API 驱动菜单、下拉子菜单、搜索/用户/购物车图标、移动端汉堡菜单 |
-| F152 | 前台 Footer 页脚 | ✅ PASS | API 驱动链接、联系方式、版权信息、响应式布局 |
-| F153 | 前台公告栏组件 | ✅ PASS | API 获取公告、自动轮播、手动切换、关闭功能 |
+测试功能: F154-F157 前台首页四大区块（共 4 个功能）
 
 #### 实现内容
-- Header (Server + Client Component): 调用 /store/content/menus?key=main 渲染主导航，支持下拉子菜单、搜索/用户/购物车图标、移动端侧边导航
-- Footer (Server Component): 调用 /store/content/menus?key=footer 渲染页脚链接，四列布局含联系方式和版权
-- AnnouncementBar (Server + Client Component): 调用 /store/content/home 获取公告，支持自动轮播(4s)、手动切换、关闭
-- 配置 Medusa SDK publishable API key 用于 Store API 认证
+新增 4 个首页组件 + 更新首页 page.tsx + 配置 SDK publishable API key：
+- `HeroBanner.tsx` - Banner 轮播组件，自动轮播(5s)+手动切换，单张隐藏控件，移动端自适应
+- `CuratedCollections.tsx` - 策展集合区，Tab 切换展示不同集合商品，商品卡片含图片/名称/价格
+- `BrandShowcase.tsx` - 品牌展示区，logo 网格布局，点击跳转品牌落地页
+- `LatestArticles.tsx` - 文章资讯区，封面/标题/摘要/分类标签，含「查看更多」链接
+- `medusa.ts` - 添加 publishable API key 配置和 fetchContent 服务端数据获取函数
+- `page.tsx` - 整合四个区块，服务端 Promise.all 并行获取数据
+
+#### 测试结果
+| Feature | 描述 | 状态 |
+|---------|------|------|
+| F154 | 前台首页 Banner 轮播区 | ✅ PASS |
+| F155 | 前台首页策展集合区（商品推荐） | ✅ PASS |
+| F156 | 前台首页品牌展示区 | ✅ PASS |
+| F157 | 前台首页文章/资讯区 | ✅ PASS |
+
+#### 验证详情
+- F154: Banner 从 /store/content/home 获取数据，3 张轮播正常，手动切换(上一张/下一张/指示器)正常，点击跳转链接正常，移动端(375px)自适应正常
+- F155: 策展集合从 /store/content/home 获取 collections，Tab 切换正常，空集合显示"暂无商品"友好提示
+- F156: 品牌从 /store/content/brands 获取，9 个品牌 logo 网格展示正常，点击跳转品牌落地页
+- F157: 文章从 /store/content/articles?limit=4 获取，4 篇文章展示封面/标题/摘要/分类标签，「查看更多」链接指向 /articles
 
 #### 总结
-- 3/3 功能全部通过
+- 4/4 功能全部通过
 - 无需修复已有后端代码

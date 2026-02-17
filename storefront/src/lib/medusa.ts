@@ -8,6 +8,17 @@ const PUBLISHABLE_KEY =
 
 export const sdk = new Medusa({
   baseUrl: MEDUSA_BACKEND_URL,
-  debug: false,
+  debug: process.env.NODE_ENV === "development",
   publishableKey: PUBLISHABLE_KEY,
 })
+
+export async function fetchContent<T>(path: string): Promise<T> {
+  const res = await fetch(`${MEDUSA_BACKEND_URL}${path}`, {
+    headers: {
+      "x-publishable-api-key": PUBLISHABLE_KEY,
+    },
+    next: { revalidate: 60 },
+  })
+  if (!res.ok) throw new Error(`Failed to fetch ${path}`)
+  return res.json()
+}
