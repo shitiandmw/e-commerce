@@ -175,19 +175,19 @@ export default function HeaderClient({ menuItems }: { menuItems: MenuItem[] }) {
       </nav>
 
       {/* Right side icons */}
-      <div className="flex items-center gap-3">
-        <Link href="/search" className="text-muted transition-colors hover:text-gold" aria-label="搜索">
+      <div className="flex items-center gap-1 md:gap-3">
+        <Link href="/search" className="flex h-11 w-11 items-center justify-center text-muted transition-colors hover:text-gold" aria-label="搜索">
           <SearchIcon />
         </Link>
-        <Link href="/account" className="text-muted transition-colors hover:text-gold" aria-label="账户">
+        <Link href="/account" className="flex h-11 w-11 items-center justify-center text-muted transition-colors hover:text-gold" aria-label="账户">
           <UserIcon />
         </Link>
-        <Link href="/cart" className="text-muted transition-colors hover:text-gold" aria-label="购物车">
+        <Link href="/cart" className="flex h-11 w-11 items-center justify-center text-muted transition-colors hover:text-gold" aria-label="购物车">
           <CartIcon count={cartCount} />
         </Link>
         {/* Mobile hamburger */}
         <button
-          className="text-muted transition-colors hover:text-gold md:hidden"
+          className="flex h-11 w-11 items-center justify-center text-muted transition-colors hover:text-gold md:hidden"
           onClick={() => setMobileOpen(true)}
           aria-label="打开菜单"
         >

@@ -41,7 +41,7 @@ export default function CuratedCollections({
   if (!collections || collections.length === 0) return null
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-16">
+    <section className="mx-auto max-w-7xl px-4 py-12 md:py-20">
       {collections.map((collection) => (
         <CollectionBlock key={collection.id} collection={collection} />
       ))}
@@ -65,7 +65,7 @@ function CollectionBlock({ collection }: { collection: CuratedCollection }) {
 
   return (
     <div className="mb-12">
-      <h2 className="mb-2 text-center text-2xl font-bold text-gold">
+      <h2 className="mb-2 text-center text-xl font-bold text-gold md:text-2xl">
         {collection.name}
       </h2>
       {collection.description && (
@@ -95,7 +95,7 @@ function CollectionBlock({ collection }: { collection: CuratedCollection }) {
       {sortedItems.length === 0 ? (
         <p className="py-12 text-center text-muted">暂无商品</p>
       ) : (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 md:gap-6 md:grid-cols-4">
           {sortedItems.map((item) => (
             <ProductCard key={item.id} item={item} />
           ))}
