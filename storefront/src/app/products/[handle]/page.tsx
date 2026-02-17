@@ -23,10 +23,27 @@ async function getProduct(handle: string) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { handle } = await params
   const product = await getProduct(handle)
-  if (!product) return { title: "商品未找到 - TIMECIGAR" }
+  if (!product) return { title: "商品未找到" }
+
+  const seo = (product.metadata as any)?.seo as
+    | { meta_title?: string; meta_description?: string; og_image?: string; keywords?: string }
+    | undefined
+
+  const isCustomTitle = !!seo?.meta_title
+  const displayTitle = isCustomTitle ? seo!.meta_title! : (product.title || "")
+  const description =
+    seo?.meta_description || product.description || `${product.title} - TIMECIGAR 精选雪茄`
+  const ogImage = seo?.og_image || product.thumbnail || undefined
+
   return {
-    title: `${product.title} - TIMECIGAR`,
-    description: product.description || `${product.title} - TIMECIGAR 精选雪茄`,
+    title: isCustomTitle ? { absolute: displayTitle } : displayTitle,
+    description,
+    keywords: seo?.keywords || undefined,
+    openGraph: {
+      title: isCustomTitle ? displayTitle : `${displayTitle} - TIMECIGAR`,
+      description,
+      ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+    },
   }
 }
 

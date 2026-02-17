@@ -2291,7 +2291,7 @@
       "步骤4：用 curl 查看页面 HTML head，确认 meta 标签正确。",
       "步骤5：未配置 SEO 时使用默认值（页面标题 + 站点名称）。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

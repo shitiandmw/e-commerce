@@ -22,9 +22,9 @@ async function getBrand(handle: string) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { handle } = await params
   const data = await getBrand(handle)
-  if (!data?.brand) return { title: "品牌未找到 - TIMECIGAR" }
+  if (!data?.brand) return { title: "品牌未找到" }
   return {
-    title: `${data.brand.name} - TIMECIGAR`,
+    title: data.brand.name,
     description: data.brand.description || `${data.brand.name} - TIMECIGAR 合作品牌`,
   }
 }
