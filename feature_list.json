@@ -2149,7 +2149,7 @@
   },
   {
     "category": "functional",
-    "description": "F180 [规划中][支付] Stripe 支付集成（Mock/Test 模式）",
+    "description": "F180 [已实现][支付] Stripe 支付集成（Mock/Test 模式）",
     "steps": [
       "步骤1：配置 Stripe Payment Provider（使用 test mode API key）。",
       "步骤2：在结算页集成 Stripe Elements 支付表单。",
@@ -2157,40 +2157,40 @@
       "步骤4：支付成功后跳转支付结果页，显示订单确认信息。",
       "步骤5：确认 Medusa 后端订单状态更新为已支付。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
-    "description": "F181 [规划中][支付] Stripe 支付失败与取消处理",
+    "description": "F181 [已实现][支付] Stripe 支付失败与取消处理",
     "steps": [
       "步骤1：使用测试卡号 4000000000000002（被拒绝）发起支付，确认显示错误提示。",
       "步骤2：用户可重新输入卡号重试，重试成功后正常完成。",
       "步骤3：在支付页面点击取消/返回，确认回到结算页，购物车数据保留。",
       "步骤4：确认取消操作不会创建无效订单。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
-    "description": "F182 [规划中][支付] Stripe Webhook 处理（幂等）",
+    "description": "F182 [已实现][支付] Stripe Webhook 处理（幂等）",
     "steps": [
       "步骤1：实现 Stripe Webhook 端点接收支付事件。",
       "步骤2：模拟发送 payment_intent.succeeded 事件，确认订单状态更新。",
       "步骤3：重复发送同一事件，确认不会重复处理（幂等）。",
       "步骤4：发送无效签名的事件，确认被拒绝。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
-    "description": "F183 [规划中][前台] 前台支付结果页",
+    "description": "F183 [已实现][前台] 前台支付结果页",
     "steps": [
       "步骤1：创建支付成功页 /checkout/success，显示订单号和确认信息。",
       "步骤2：创建支付失败页 /checkout/failure，显示失败原因和重试链接。",
       "步骤3：CTA 按钮：「查看订单」「继续购物」「重试支付」。",
       "步骤4：直接访问支付结果页（无订单上下文）时重定向到首页。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
