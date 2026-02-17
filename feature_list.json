@@ -2473,7 +2473,7 @@
       "步骤5：桌面端 hover 展开，移动端改为手风琴折叠展开。",
       "步骤6：确认菜单层级正确渲染，点击叶子节点跳转到对应分类/品牌页面。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -2486,7 +2486,7 @@
       "步骤5：创建示例菜单数据：古巴雪茄（子分类）、世界品牌（品牌列表）、配件等。",
       "步骤6：确认 API 返回的菜单树结构可被前台 Mega Menu 组件正确消费。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",

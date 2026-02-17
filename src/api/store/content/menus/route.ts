@@ -2,6 +2,12 @@ import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { MENU_MODULE } from "../../../../modules/menu"
 import MenuModuleService from "../../../../modules/menu/service"
 
+interface BrandRecord {
+  id: string
+  name: string
+  logo_url: string | null
+}
+
 interface MenuItemRecord {
   id: string
   label: string
@@ -12,6 +18,7 @@ interface MenuItemRecord {
   metadata: Record<string, unknown> | null
   parent_id: string | null
   children?: MenuItemRecord[]
+  brands?: BrandRecord[]
 }
 
 function buildTree(items: MenuItemRecord[]): MenuItemRecord[] {
@@ -44,6 +51,24 @@ function buildTree(items: MenuItemRecord[]): MenuItemRecord[] {
   return sortAndFilter(roots)
 }
 
+// Check if any menu item in the tree has item_type=brand
+function hasBrandItems(items: MenuItemRecord[]): boolean {
+  for (const item of items) {
+    if (item.metadata?.item_type === "brand") return true
+    if (item.children && hasBrandItems(item.children)) return true
+  }
+  return false
+}
+
+// Attach brand data to items with item_type=brand
+function attachBrands(items: MenuItemRecord[], brands: BrandRecord[]): MenuItemRecord[] {
+  return items.map((item) => ({
+    ...item,
+    brands: item.metadata?.item_type === "brand" ? brands : undefined,
+    children: item.children ? attachBrands(item.children, brands) : [],
+  }))
+}
+
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const key = req.query.key as string | undefined
   const query = req.scope.resolve("query")
@@ -68,12 +93,24 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
       })
       const items = (fullMenu.items || []) as unknown as MenuItemRecord[]
       const tree = buildTree(items)
+
+      // If any item has item_type=brand, load brands and attach
+      let finalTree = tree
+      if (hasBrandItems(tree)) {
+        const { data: brands } = await query.graph({
+          entity: "brand",
+          fields: ["id", "name", "logo_url"],
+          pagination: { order: { name: "ASC" } },
+        })
+        finalTree = attachBrands(tree, (brands || []) as unknown as BrandRecord[])
+      }
+
       return {
         id: menu.id,
         name: menu.name,
         key: menu.key,
         description: menu.description,
-        items: tree,
+        items: finalTree,
       }
     })
   )

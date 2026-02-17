@@ -2,12 +2,21 @@ import Link from "next/link"
 import { sdk } from "@/lib/medusa"
 import HeaderClient from "./HeaderClient"
 
-type MenuItem = {
+export type Brand = {
+  id: string
+  name: string
+  logo_url: string | null
+}
+
+export type MenuItem = {
   id: string
   label: string
   url: string
   sort_order: number
+  icon_url?: string | null
+  metadata?: Record<string, unknown> | null
   children: MenuItem[]
+  brands?: Brand[]
 }
 
 type Menu = {

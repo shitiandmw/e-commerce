@@ -1,5 +1,36 @@
 ## 测试进度记录
 
+### 2026-02-17 Session - Mega Menu 多级分类导航 (F207-F208)
+
+开发功能: F207-F208 Mega Menu（共 2 个功能）
+
+#### 开发内容
+- F208 后台: Menu 数据模型已支持 parent_id/children 递归嵌套（无需修改）
+- F208 后台: 菜单项通过 metadata.item_type 字段区分类型（category/brand/url）
+- F208 后台: Store Content API /store/content/menus 扩展，当 item_type=brand 时自动附带品牌列表数据
+- F208 后台: 后台管理界面已支持多级嵌套编辑（parent_id 选择器、树形编辑器）
+- F208 后台: 创建示例菜单 seed 脚本 src/scripts/seed-menu.ts
+- F207 前台: HeaderClient 改造为 Mega Menu
+  - 桌面端: hover 展开全宽面板，按列展示二级分类和三级子项
+  - 品牌分类: 按首字母分组的品牌 Logo 网格展示
+  - 移动端: 手风琴折叠展开，递归支持多级菜单
+  - 支持 ESC 关闭、鼠标离开延迟关闭
+
+#### 新增/修改文件
+- `src/api/store/content/menus/route.ts` - 扩展支持品牌数据附带
+- `src/scripts/seed-menu.ts` - 示例菜单数据 seed 脚本
+- `storefront/src/components/Header.tsx` - 更新类型定义支持 brands/metadata
+- `storefront/src/components/HeaderClient.tsx` - 重写为 Mega Menu 组件
+
+#### 测试结果
+- F207 前台 Mega Menu 多级分类导航 ✅ 通过
+- F208 后台 Menu 模块支持多级嵌套与品牌关联 ✅ 通过
+
+#### 总结
+- 2/2 功能全部通过
+- storefront npm run build 无报错
+- 后端 medusa build 无新增报错（admin-ui 预存在的 TS 错误不影响）
+
 ### 2026-02-17 Session - 商品比较功能 (F201-F202)
 
 开发功能: F201-F202 商品比较（共 2 个功能）
