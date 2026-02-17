@@ -1897,7 +1897,7 @@
       "步骤5：支持排序（价格升/降、最新）。",
       "步骤6：空列表显示友好提示。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1911,7 +1911,7 @@
       "步骤6：商品不存在时显示 404。",
       "步骤7：确认移动端布局正常。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1922,7 +1922,7 @@
       "步骤3：支持搜索品牌名称。",
       "步骤4：点击品牌跳转品牌落地页。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -1933,7 +1933,7 @@
       "步骤3：列出该品牌下的所有商品，支持分页。",
       "步骤4：品牌不存在时显示 404。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
