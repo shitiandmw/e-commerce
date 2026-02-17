@@ -1,16 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { useCart } from "@/components/CartProvider"
-
-type MenuItem = {
-  id: string
-  label: string
-  url: string
-  sort_order: number
-  children: MenuItem[]
-}
+import type { MenuItem, Brand } from "./Header"
 
 // SVG Icons
 function SearchIcon() {
@@ -46,6 +39,7 @@ function CartIcon({ count }: { count: number }) {
     </span>
   )
 }
+
 function MenuIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -61,76 +55,165 @@ function CloseIcon() {
     </svg>
   )
 }
-
-function ChevronDown() {
+function ChevronDown({ className }: { className?: string }) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
       <path d="m6 9 6 6 6-6" />
     </svg>
   )
 }
 
-// Desktop dropdown menu item
-function DesktopMenuItem({ item }: { item: MenuItem }) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
+// Group brands by first letter
+function groupBrandsByLetter(brands: Brand[]): Record<string, Brand[]> {
+  const groups: Record<string, Brand[]> = {}
+  for (const brand of brands) {
+    const letter = brand.name.charAt(0).toUpperCase()
+    if (!groups[letter]) groups[letter] = []
+    groups[letter].push(brand)
+  }
+  return groups
+}
 
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+// Brand Logo Grid for Mega Menu
+function BrandGrid({ brands }: { brands: Brand[] }) {
+  const grouped = groupBrandsByLetter(brands)
+  const letters = Object.keys(grouped).sort()
 
-  if (item.children.length === 0) {
+  return (
+    <div className="space-y-4">
+      {letters.map((letter) => (
+        <div key={letter}>
+          <div className="mb-2 text-xs font-semibold uppercase text-gold">{letter}</div>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {grouped[letter].map((brand) => (
+              <Link
+                key={brand.id}
+                href={`/brands/${brand.name.toLowerCase().replace(/\s+/g, "-")}`}
+                className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted transition-colors hover:bg-surface-light hover:text-gold"
+              >
+                {brand.logo_url ? (
+                  <img src={brand.logo_url} alt={brand.name} className="h-6 w-6 rounded object-contain" />
+                ) : (
+                  <span className="flex h-6 w-6 items-center justify-center rounded bg-surface-light text-[10px] font-bold text-gold">
+                    {brand.name.charAt(0)}
+                  </span>
+                )}
+                <span className="truncate">{brand.name}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// Mega Menu Panel for desktop
+function MegaMenuPanel({ item, onClose }: { item: MenuItem; onClose: () => void }) {
+  const isBrandMenu = item.metadata?.item_type === "brand"
+  const hasBrands = isBrandMenu && item.brands && item.brands.length > 0
+
+  return (
+    <div className="absolute left-0 right-0 top-full z-50 border-b border-border bg-background/98 shadow-xl backdrop-blur">
+      <div className="mx-auto max-w-7xl px-4 py-6">
+        {hasBrands ? (
+          /* Brand menu: show brand grid */
+          <div>
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-gold">{item.label}</h3>
+              {item.url && (
+                <Link href={item.url} onClick={onClose} className="text-xs text-muted transition-colors hover:text-gold">
+                  查看全部 →
+                </Link>
+              )}
+            </div>
+            <BrandGrid brands={item.brands!} />
+          </div>
+        ) : (
+          /* Category menu: multi-column layout */
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            {item.children.map((col) => (
+              <div key={col.id}>
+                <Link
+                  href={col.url || "#"}
+                  onClick={onClose}
+                  className="mb-3 block text-sm font-semibold text-gold transition-colors hover:text-gold/80"
+                >
+                  {col.label}
+                </Link>
+                {col.children.length > 0 && (
+                  <ul className="space-y-1.5">
+                    {col.children.map((sub) => (
+                      <li key={sub.id}>
+                        <Link
+                          href={sub.url || "#"}
+                          onClick={onClose}
+                          className="block text-sm text-muted transition-colors hover:text-gold"
+                        >
+                          {sub.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+// Desktop menu item with Mega Menu support
+function DesktopMenuItem({ item, onOpenMega, onCloseMega, isOpen }: {
+  item: MenuItem
+  onOpenMega: (id: string) => void
+  onCloseMega: () => void
+  isOpen: boolean
+}) {
+  const hasChildren = item.children.length > 0
+  const hasBrands = item.metadata?.item_type === "brand" && item.brands && item.brands.length > 0
+  const showMega = hasChildren || hasBrands
+
+  if (!showMega) {
     return (
-      <Link href={item.url} className="text-sm text-muted transition-colors hover:text-gold">
+      <Link
+        href={item.url || "#"}
+        className="text-sm text-muted transition-colors hover:text-gold"
+        onMouseEnter={onCloseMega}
+      >
         {item.label}
       </Link>
     )
   }
 
   return (
-    <div ref={ref} className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-1 text-sm text-muted transition-colors hover:text-gold"
-      >
-        {item.label}
-        <ChevronDown />
-      </button>
-      {open && (
-        <div className="absolute left-0 top-full mt-1 min-w-[160px] rounded-md border border-border bg-surface py-1 shadow-lg">
-          <Link
-            href={item.url}
-            className="block px-4 py-2 text-sm text-muted transition-colors hover:bg-surface-light hover:text-gold"
-            onClick={() => setOpen(false)}
-          >
-            {item.label}
-          </Link>
-          {item.children.map((child) => (
-            <Link
-              key={child.id}
-              href={child.url}
-              className="block px-4 py-2 text-sm text-muted transition-colors hover:bg-surface-light hover:text-gold"
-              onClick={() => setOpen(false)}
-            >
-              {child.label}
-            </Link>
-          ))}
-        </div>
-      )}
-    </div>
+    <button
+      onMouseEnter={() => onOpenMega(item.id)}
+      className={`flex items-center gap-1 text-sm transition-colors ${
+        isOpen ? "text-gold" : "text-muted hover:text-gold"
+      }`}
+    >
+      {item.label}
+      <ChevronDown className={`transition-transform ${isOpen ? "rotate-180" : ""}`} />
+    </button>
   )
 }
-// Mobile sidebar menu item
-function MobileMenuItem({ item, onClose }: { item: MenuItem; onClose: () => void }) {
-  const [expanded, setExpanded] = useState(false)
 
-  if (item.children.length === 0) {
+// Mobile accordion menu item (recursive)
+function MobileMenuItem({ item, onClose, depth = 0 }: { item: MenuItem; onClose: () => void; depth?: number }) {
+  const [expanded, setExpanded] = useState(false)
+  const hasChildren = item.children.length > 0
+  const hasBrands = item.metadata?.item_type === "brand" && item.brands && item.brands.length > 0
+
+  if (!hasChildren && !hasBrands) {
     return (
-      <Link href={item.url} onClick={onClose} className="block py-3 text-base text-foreground transition-colors hover:text-gold">
+      <Link
+        href={item.url || "#"}
+        onClick={onClose}
+        className="block py-3 text-base text-foreground transition-colors hover:text-gold"
+        style={{ paddingLeft: depth > 0 ? `${depth * 16}px` : undefined }}
+      >
         {item.label}
       </Link>
     )
@@ -141,36 +224,110 @@ function MobileMenuItem({ item, onClose }: { item: MenuItem; onClose: () => void
       <button
         onClick={() => setExpanded(!expanded)}
         className="flex w-full items-center justify-between py-3 text-base text-foreground transition-colors hover:text-gold"
+        style={{ paddingLeft: depth > 0 ? `${depth * 16}px` : undefined }}
       >
         {item.label}
-        <span className={`transition-transform ${expanded ? "rotate-180" : ""}`}><ChevronDown /></span>
+        <ChevronDown className={`transition-transform ${expanded ? "rotate-180" : ""}`} />
       </button>
       {expanded && (
-        <div className="ml-4 border-l border-border pl-4">
-          <Link href={item.url} onClick={onClose} className="block py-2 text-sm text-muted transition-colors hover:text-gold">
-            {item.label}
-          </Link>
-          {item.children.map((child) => (
-            <Link key={child.id} href={child.url} onClick={onClose} className="block py-2 text-sm text-muted transition-colors hover:text-gold">
-              {child.label}
+        <div className="border-l border-border ml-2 pl-2">
+          {item.url && (
+            <Link href={item.url} onClick={onClose} className="block py-2 text-sm text-gold transition-colors hover:text-gold/80">
+              查看全部
             </Link>
-          ))}
+          )}
+          {hasBrands ? (
+            <div className="space-y-1 py-2">
+              {item.brands!.map((brand) => (
+                <Link
+                  key={brand.id}
+                  href={`/brands/${brand.name.toLowerCase().replace(/\s+/g, "-")}`}
+                  onClick={onClose}
+                  className="flex items-center gap-2 py-1.5 text-sm text-muted transition-colors hover:text-gold"
+                >
+                  {brand.logo_url ? (
+                    <img src={brand.logo_url} alt={brand.name} className="h-5 w-5 rounded object-contain" />
+                  ) : (
+                    <span className="flex h-5 w-5 items-center justify-center rounded bg-surface-light text-[9px] font-bold text-gold">
+                      {brand.name.charAt(0)}
+                    </span>
+                  )}
+                  {brand.name}
+                </Link>
+              ))}
+            </div>
+          ) : (
+            item.children.map((child) => (
+              <MobileMenuItem key={child.id} item={child} onClose={onClose} depth={depth + 1} />
+            ))
+          )}
         </div>
       )}
     </div>
   )
 }
-
 export default function HeaderClient({ menuItems }: { menuItems: MenuItem[] }) {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [openMegaId, setOpenMegaId] = useState<string | null>(null)
   const { itemCount: cartCount } = useCart()
+  const megaRef = useRef<HTMLDivElement>(null)
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const openMegaItem = menuItems.find((item) => item.id === openMegaId)
+
+  const handleOpenMega = useCallback((id: string) => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
+    }
+    setOpenMegaId(id)
+  }, [])
+
+  const handleCloseMega = useCallback(() => {
+    closeTimerRef.current = setTimeout(() => {
+      setOpenMegaId(null)
+    }, 150)
+  }, [])
+
+  const handlePanelEnter = useCallback(() => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
+    }
+  }, [])
+
+  const handlePanelLeave = useCallback(() => {
+    setOpenMegaId(null)
+  }, [])
+
+  // Close mega menu on escape
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpenMegaId(null)
+    }
+    document.addEventListener("keydown", handleEsc)
+    return () => document.removeEventListener("keydown", handleEsc)
+  }, [])
+
+  // Clean up timer on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
+    }
+  }, [])
 
   return (
     <>
       {/* Desktop nav */}
-      <nav className="hidden items-center gap-8 md:flex">
+      <nav className="hidden items-center gap-8 md:flex" onMouseLeave={handleCloseMega}>
         {menuItems.map((item) => (
-          <DesktopMenuItem key={item.id} item={item} />
+          <DesktopMenuItem
+            key={item.id}
+            item={item}
+            onOpenMega={handleOpenMega}
+            onCloseMega={handleCloseMega}
+            isOpen={openMegaId === item.id}
+          />
         ))}
       </nav>
 
@@ -195,11 +352,22 @@ export default function HeaderClient({ menuItems }: { menuItems: MenuItem[] }) {
         </button>
       </div>
 
+      {/* Mega Menu Panel (desktop) */}
+      {openMegaItem && (
+        <div
+          ref={megaRef}
+          onMouseEnter={handlePanelEnter}
+          onMouseLeave={handlePanelLeave}
+        >
+          <MegaMenuPanel item={openMegaItem} onClose={() => setOpenMegaId(null)} />
+        </div>
+      )}
+
       {/* Mobile sidebar overlay */}
       {mobileOpen && (
         <div className="fixed inset-0 z-[100] md:hidden">
           <div className="absolute inset-0 bg-black/60" onClick={() => setMobileOpen(false)} />
-          <div className="absolute right-0 top-0 h-full w-72 bg-background p-6 shadow-xl">
+          <div className="absolute right-0 top-0 h-full w-72 overflow-y-auto bg-background p-6 shadow-xl">
             <div className="mb-6 flex items-center justify-between">
               <span className="text-lg font-bold text-gold">TIMECIGAR</span>
               <button onClick={() => setMobileOpen(false)} className="text-muted hover:text-foreground" aria-label="关闭菜单">
