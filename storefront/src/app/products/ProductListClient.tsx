@@ -14,8 +14,16 @@ interface Product {
   title: string
   handle: string
   thumbnail: string | null
-  variants?: { prices?: { amount: number; currency_code: string }[] }[]
+  variants?: {
+    id: string
+    title?: string
+    options?: { id: string; value: string; option_id: string }[]
+    prices?: { amount: number; currency_code: string }[]
+    calculated_price?: { calculated_amount?: number; original_amount?: number; currency_code?: string }
+  }[]
+  options?: { id: string; title: string; values?: { id: string; value: string }[] }[]
   brand?: { name: string } | null
+  metadata?: Record<string, unknown> | null
 }
 
 const LIMIT = 12
@@ -43,7 +51,7 @@ export default function ProductListClient() {
       const params = new URLSearchParams({
         limit: String(LIMIT),
         offset: String(offset),
-        fields: "id,title,handle,thumbnail,variants.prices.*,*brand",
+        fields: "id,title,handle,thumbnail,variants.*,variants.prices.*,variants.options.*,+variants.calculated_price,options.*,options.values.*,*brand,metadata",
         order: sortOrder === "desc" ? `-${sortBy}` : sortBy,
       })
       if (selectedCategory) {

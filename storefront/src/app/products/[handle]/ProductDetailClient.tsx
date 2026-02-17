@@ -21,6 +21,11 @@ interface Variant {
   title: string
   options?: OptionValue[]
   prices?: Price[]
+  calculated_price?: {
+    calculated_amount?: number
+    original_amount?: number
+    currency_code?: string
+  }
   manage_inventory?: boolean
   inventory_quantity?: number
 }
@@ -48,6 +53,7 @@ interface Product {
   variants?: Variant[]
   brand?: { id: string; name: string } | null
   tags?: { id: string; value: string }[]
+  metadata?: Record<string, unknown> | null
 }
 
 export default function ProductDetailClient({ product }: { product: Product }) {
@@ -77,8 +83,23 @@ export default function ProductDetailClient({ product }: { product: Product }) {
   }, [product.variants, selectedOptions])
 
   const price = selectedVariant?.prices?.[0]
+  const cp = selectedVariant?.calculated_price
   const inStock = selectedVariant?.manage_inventory === false ||
     (selectedVariant?.inventory_quantity ?? 0) > 0
+
+  // Packaging info from metadata or variant options
+  const packaging = (() => {
+    if (product.metadata?.packaging) return String(product.metadata.packaging)
+    if (product.options) {
+      for (const opt of product.options) {
+        if (/pack|包装|规格|装/i.test(opt.title)) {
+          const val = selectedVariant?.options?.find((vo) => vo.option_id === opt.id)
+          if (val?.value) return val.value
+        }
+      }
+    }
+    return null
+  })()
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
@@ -134,12 +155,38 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
           {/* Price */}
           <div className="mb-6">
-            {price ? (
+            {cp && cp.calculated_amount != null && cp.currency_code ? (
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-2xl font-bold text-gold">
+                    {cp.currency_code.toUpperCase()} {cp.calculated_amount}
+                  </span>
+                  {cp.original_amount != null && cp.original_amount > cp.calculated_amount && (
+                    <>
+                      <span className="text-base text-muted line-through">
+                        {cp.currency_code.toUpperCase()} {cp.original_amount}
+                      </span>
+                      {(() => {
+                        const pct = Math.round((1 - cp.calculated_amount! / cp.original_amount!) * 100)
+                        return pct > 0 ? (
+                          <span className="rounded bg-red-500/20 px-1.5 py-0.5 text-xs font-medium text-red-400">
+                            -{pct}%
+                          </span>
+                        ) : null
+                      })()}
+                    </>
+                  )}
+                </div>
+              </div>
+            ) : price ? (
               <p className="text-2xl font-bold text-gold">
                 {price.currency_code.toUpperCase()} {price.amount}
               </p>
             ) : (
               <p className="text-lg text-muted">价格待定</p>
+            )}
+            {packaging && (
+              <p className="mt-1 text-sm text-muted">{packaging}</p>
             )}
             <p className={`mt-1 text-sm ${inStock ? "text-green-400" : "text-red-400"}`}>
               {inStock ? "有货" : "缺货"}

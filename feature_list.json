@@ -2438,7 +2438,7 @@
   },
   {
     "category": "functional",
-    "description": "F205 [规划中][前台] 商品卡片快速加入购物车",
+    "description": "F205 [已实现][前台] 商品卡片快速加入购物车",
     "steps": [
       "步骤1：在 ProductCard 组件上添加快速加购按钮（+ 图标或加入购物车）。",
       "步骤2：对于无变体或单变体商品，点击直接加入购物车并显示成功提示。",
@@ -2447,11 +2447,11 @@
       "步骤5：加购成功后更新 Header 购物车图标的数量角标。",
       "步骤6：在商品列表页、搜索结果页、品牌详情页的 ProductCard 上统一生效。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
-    "description": "F206 [规划中][前台] 商品原价/折扣价双价格展示",
+    "description": "F206 [已实现][前台] 商品原价/折扣价双价格展示",
     "steps": [
       "步骤1：修改 ProductCard 价格展示逻辑：当商品有 calculated_price（折扣价）时，同时显示原价（划线）和折扣价。",
       "步骤2：折扣价用醒目颜色（金色/红色），原价用灰色划线样式。",
@@ -2460,7 +2460,7 @@
       "步骤5：无折扣时只显示单一价格，不显示划线。",
       "步骤6：确认价格格式化正确（货币符号、千分位），支持多币种。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -2503,7 +2503,7 @@
   },
   {
     "category": "functional",
-    "description": "F210 [规划中][前台] 商品卡片包装规格信息展示",
+    "description": "F210 [已实现][前台] 商品卡片包装规格信息展示",
     "steps": [
       "步骤1：在 ProductCard 上展示商品包装规格信息（如盒装25支、单支）。",
       "步骤2：规格信息从商品 metadata 或 variant options 中读取。",
@@ -2512,7 +2512,7 @@
       "步骤5：无规格信息时不显示，不影响布局。",
       "步骤6：确认列表页和详情页规格展示一致。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
