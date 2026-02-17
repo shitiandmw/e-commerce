@@ -12,4 +12,6 @@ export const Popup = model.define("popup", {
   display_frequency: model.enum(["once", "once_per_session", "once_per_day"]).default("once"),
   target_page: model.text().nullable(),
   sort_order: model.number().default(0),
+  popup_type: model.enum(["general", "coupon"]).default("general"),
+  coupon_code: model.text().nullable(),
 })

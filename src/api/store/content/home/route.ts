@@ -54,6 +54,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
       "id", "title", "description", "image_url",
       "button_text", "button_link", "is_enabled",
       "trigger_type", "display_frequency", "target_page", "sort_order",
+      "popup_type", "coupon_code",
     ],
   })
 
