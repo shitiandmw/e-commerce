@@ -1,5 +1,37 @@
 ## 测试进度记录
 
+### 2026-02-17 Session - 商品比较功能 (F201-F202)
+
+开发功能: F201-F202 商品比较（共 2 个功能）
+
+#### 开发内容
+- 新增 `CompareProvider` 上下文（类似 CartProvider 模式），管理比较列表状态
+- 比较状态 localStorage 持久化，刷新不丢失，最多 4 个商品
+- ProductCard 添加比较复选框按钮（左上角），超过 4 个时提示
+- 页面底部浮动比较栏：已选商品缩略图 + 数量 + 清空/开始比较按钮
+- /compare 页面：表格形式对比（图片/名称/品牌/价格/规格/库存/描述），支持直接加购和移除
+- 响应式适配：桌面端表格布局，移动端横向滚动卡片
+- 空状态引导用户去商品列表选择
+- 修复 /login 页面 useSearchParams Suspense boundary 问题（pre-existing build blocker）
+
+#### 新增/修改文件
+- `storefront/src/components/CompareProvider.tsx` - 比较状态上下文
+- `storefront/src/components/CompareBar.tsx` - 浮动比较栏
+- `storefront/src/components/ProductCard.tsx` - 添加比较按钮
+- `storefront/src/app/layout.tsx` - 包裹 CompareProvider + CompareBar
+- `storefront/src/app/compare/page.tsx` - 比较页面路由
+- `storefront/src/app/compare/CompareClient.tsx` - 比较页面客户端组件
+- `storefront/src/app/login/page.tsx` - 拆分为 Suspense 包裹
+- `storefront/src/app/login/LoginClient.tsx` - 登录客户端组件
+
+#### 测试结果
+- F201 商品比较状态管理与比较栏 ✅ 通过
+- F202 商品比较结果页面 ✅ 通过
+
+#### 总结
+- 2/2 功能全部通过
+- npm run build 无报错
+
 ### 2026-02-17 Session - 购物车功能 (F175-F176)
 
 开发功能: F175-F176 购物车（共 2 个功能）
