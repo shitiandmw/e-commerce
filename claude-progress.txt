@@ -265,3 +265,45 @@ F108 设置页加载        ✅ PASS
 #### 总结
 - 7/7 功能全部通过
 - 无需修复已有代码，全部为新增 Store API 路由
+
+### 2026-02-17 Session - 前台文章/静态页/404/搜索 (F162-F166)
+
+测试功能: F162-F166 前台内容页面（共 5 个功能）
+
+#### 实现内容
+新增前台页面和组件：
+- `storefront/src/lib/api.ts` - 统一 API 请求工具，含 publishable API key 头
+- `storefront/src/app/articles/page.tsx` - 文章列表页，支持分类筛选和分页
+- `storefront/src/app/articles/[slug]/page.tsx` - 文章详情页，富文本渲染
+- `storefront/src/app/pages/[slug]/page.tsx` - 静态页面渲染，支持模板布局
+- `storefront/src/app/not-found.tsx` - 自定义 404 页面
+- `storefront/src/app/global-error.tsx` - 全局错误边界
+- `storefront/src/app/search/page.tsx` - 全站搜索页，支持商品搜索
+- `storefront/src/app/globals.css` - 新增 prose-content 富文本样式和 faq-layout 样式
+- 更新 `Header.tsx` 添加搜索入口图标
+- 更新 `Footer.tsx` 链接指向 /pages/ 路由
+
+#### 测试结果
+| Feature | 描述 | 状态 |
+|---------|------|------|
+| F162 | 文章列表页 /articles | ✅ PASS |
+| F163 | 文章详情页 /articles/:slug | ✅ PASS |
+| F164 | 静态页面 /pages/:slug | ✅ PASS |
+| F165 | 404 页面与全局错误处理 | ✅ PASS |
+| F166 | 全站搜索功能 | ✅ PASS |
+
+#### 验证详情
+- F162: 文章列表正常加载，分类筛选（全部/雪茄文化/技术/生活）工作正常，文章卡片显示封面图、标题、摘要、分类标签、发布日期
+- F163: 文章详情页正常渲染富文本内容，不存在的 slug 正确显示 404
+- F164: 静态页面（about/terms/faq）正常渲染，FAQ 页面使用专用布局样式
+- F165: 访问不存在路径显示自定义 404 页面（金色 404 标题 + "返回首页"按钮），全局错误边界组件就绪
+- F166: 搜索页面正常工作，输入关键词显示商品结果，无结果时显示空状态提示
+
+#### 遇到的问题及解决
+1. **端口冲突**: 端口 3000 被 OrbStack Docker 代理占用，改用端口 3001 启动前台
+2. **Publishable API Key**: Store API 路由需要 `x-publishable-api-key` 头，从数据库查询获取 key 并配置到 .env.local
+3. **后端不稳定**: Medusa 后端多次崩溃，需手动重启
+
+#### 总结
+- 5/5 功能全部通过
+- 全部为新增前台页面，无需修复已有代码
