@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useState, useRef, useEffect } from "react"
+import { useCart } from "@/components/CartProvider"
 
 type MenuItem = {
   id: string
@@ -162,7 +163,7 @@ function MobileMenuItem({ item, onClose }: { item: MenuItem; onClose: () => void
 
 export default function HeaderClient({ menuItems }: { menuItems: MenuItem[] }) {
   const [mobileOpen, setMobileOpen] = useState(false)
-  const cartCount = 0 // TODO: integrate with cart state
+  const { itemCount: cartCount } = useCart()
 
   return (
     <>
