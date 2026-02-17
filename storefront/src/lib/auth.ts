@@ -1,7 +1,5 @@
 "use client"
 
-import { sdk } from "./medusa"
-
 const TOKEN_KEY = "medusa_customer_token"
 
 export function getToken(): string | null {
@@ -28,41 +26,39 @@ export async function register(data: {
   last_name: string
 }): Promise<string> {
   // Step 1: Register auth identity
-  const token = await sdk.auth.register("customer", "emailpass", {
-    email: data.email,
-    password: data.password,
+  const res = await fetch("/api/auth?action=register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: data.email, password: data.password }),
   })
-
-  if (typeof token !== "string") {
-    throw new Error("注册失败")
-  }
-
+  if (!res.ok) throw new Error("注册失败")
+  const result = await res.json()
+  const token = result.token || result
+  if (typeof token !== "string") throw new Error("注册失败")
   setToken(token)
 
   // Step 2: Create customer profile
-  await sdk.store.customer.create(
-    {
-      email: data.email,
-      first_name: data.first_name,
-      last_name: data.last_name,
-    },
-    {},
-    { Authorization: `Bearer ${token}` }
-  )
+  await fetch("/api/auth?action=create-customer", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ email: data.email, first_name: data.first_name, last_name: data.last_name }),
+  })
 
-  return token
+  // Step 3: Re-login to get token with actor_id linked to customer
+  const freshToken = await login(data.email, data.password)
+  return freshToken
 }
 
 export async function login(email: string, password: string): Promise<string> {
-  const token = await sdk.auth.login("customer", "emailpass", {
-    email,
-    password,
+  const res = await fetch("/api/auth?action=login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
   })
-
-  if (typeof token !== "string") {
-    throw new Error("登录失败")
-  }
-
+  if (!res.ok) throw new Error("登录失败")
+  const result = await res.json()
+  const token = result.token || result
+  if (typeof token !== "string") throw new Error("登录失败")
   setToken(token)
   return token
 }
@@ -73,11 +69,13 @@ export async function logout() {
 
 export async function requestPasswordReset(email: string): Promise<void> {
   try {
-    await sdk.auth.resetPassword("customer", "emailpass", {
-      identifier: email,
+    await fetch("/api/auth?action=reset", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ identifier: email }),
     })
   } catch {
-    // Don't leak whether user exists - always succeed silently
+    // Don't leak whether user exists
   }
 }
 
@@ -85,11 +83,12 @@ export async function getCustomer() {
   const token = getToken()
   if (!token) return null
   try {
-    const { customer } = await sdk.store.customer.retrieve(
-      {},
-      { Authorization: `Bearer ${token}` }
-    )
-    return customer
+    const res = await fetch("/api/account/customer", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!res.ok) { removeToken(); return null }
+    const data = await res.json()
+    return data.customer
   } catch {
     removeToken()
     return null
