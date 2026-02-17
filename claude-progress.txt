@@ -266,33 +266,44 @@ F108 设置页加载        ✅ PASS
 - 7/7 功能全部通过
 - 无需修复已有代码，全部为新增 Store API 路由
 
-### 2026-02-17 Session - 前台首页区块 (F154-F157)
+### 2026-02-17 Session - 前台文章/静态页/404/搜索 (F162-F166)
 
-测试功能: F154-F157 前台首页四大区块（共 4 个功能）
+测试功能: F162-F166 前台内容页面（共 5 个功能）
 
 #### 实现内容
-新增 4 个首页组件 + 更新首页 page.tsx + 配置 SDK publishable API key：
-- `HeroBanner.tsx` - Banner 轮播组件，自动轮播(5s)+手动切换，单张隐藏控件，移动端自适应
-- `CuratedCollections.tsx` - 策展集合区，Tab 切换展示不同集合商品，商品卡片含图片/名称/价格
-- `BrandShowcase.tsx` - 品牌展示区，logo 网格布局，点击跳转品牌落地页
-- `LatestArticles.tsx` - 文章资讯区，封面/标题/摘要/分类标签，含「查看更多」链接
-- `medusa.ts` - 添加 publishable API key 配置和 fetchContent 服务端数据获取函数
-- `page.tsx` - 整合四个区块，服务端 Promise.all 并行获取数据
+新增前台页面和组件：
+- `storefront/src/lib/api.ts` - 统一 API 请求工具，含 publishable API key 头
+- `storefront/src/app/articles/page.tsx` - 文章列表页，支持分类筛选和分页
+- `storefront/src/app/articles/[slug]/page.tsx` - 文章详情页，富文本渲染
+- `storefront/src/app/pages/[slug]/page.tsx` - 静态页面渲染，支持模板布局
+- `storefront/src/app/not-found.tsx` - 自定义 404 页面
+- `storefront/src/app/global-error.tsx` - 全局错误边界
+- `storefront/src/app/search/page.tsx` - 全站搜索页，支持商品搜索
+- `storefront/src/app/globals.css` - 新增 prose-content 富文本样式和 faq-layout 样式
+- 更新 `Header.tsx` 添加搜索入口图标
+- 更新 `Footer.tsx` 链接指向 /pages/ 路由
 
 #### 测试结果
 | Feature | 描述 | 状态 |
 |---------|------|------|
-| F154 | 前台首页 Banner 轮播区 | ✅ PASS |
-| F155 | 前台首页策展集合区（商品推荐） | ✅ PASS |
-| F156 | 前台首页品牌展示区 | ✅ PASS |
-| F157 | 前台首页文章/资讯区 | ✅ PASS |
+| F162 | 文章列表页 /articles | ✅ PASS |
+| F163 | 文章详情页 /articles/:slug | ✅ PASS |
+| F164 | 静态页面 /pages/:slug | ✅ PASS |
+| F165 | 404 页面与全局错误处理 | ✅ PASS |
+| F166 | 全站搜索功能 | ✅ PASS |
 
 #### 验证详情
-- F154: Banner 从 /store/content/home 获取数据，3 张轮播正常，手动切换(上一张/下一张/指示器)正常，点击跳转链接正常，移动端(375px)自适应正常
-- F155: 策展集合从 /store/content/home 获取 collections，Tab 切换正常，空集合显示"暂无商品"友好提示
-- F156: 品牌从 /store/content/brands 获取，9 个品牌 logo 网格展示正常，点击跳转品牌落地页
-- F157: 文章从 /store/content/articles?limit=4 获取，4 篇文章展示封面/标题/摘要/分类标签，「查看更多」链接指向 /articles
+- F162: 文章列表正常加载，分类筛选（全部/雪茄文化/技术/生活）工作正常，文章卡片显示封面图、标题、摘要、分类标签、发布日期
+- F163: 文章详情页正常渲染富文本内容，不存在的 slug 正确显示 404
+- F164: 静态页面（about/terms/faq）正常渲染，FAQ 页面使用专用布局样式
+- F165: 访问不存在路径显示自定义 404 页面（金色 404 标题 + "返回首页"按钮），全局错误边界组件就绪
+- F166: 搜索页面正常工作，输入关键词显示商品结果，无结果时显示空状态提示
+
+#### 遇到的问题及解决
+1. **端口冲突**: 端口 3000 被 OrbStack Docker 代理占用，改用端口 3001 启动前台
+2. **Publishable API Key**: Store API 路由需要 `x-publishable-api-key` 头，从数据库查询获取 key 并配置到 .env.local
+3. **后端不稳定**: Medusa 后端多次崩溃，需手动重启
 
 #### 总结
-- 4/4 功能全部通过
-- 无需修复已有后端代码
+- 5/5 功能全部通过
+- 全部为新增前台页面，无需修复已有代码
