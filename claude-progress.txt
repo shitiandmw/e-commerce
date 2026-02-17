@@ -1,5 +1,26 @@
 ## 测试进度记录
 
+### 2026-02-17 Session - F150 Store 接口发布状态与时间窗过滤一致性
+
+测试功能: F150 Store 接口发布状态与时间窗过滤一致性
+
+#### 验证结果
+- F150 ✅ PASS - 所有 Store 接口过滤逻辑一致
+
+#### 验证详情
+- 文章列表 `/store/content/articles`: 只返回 status=published 的文章（9篇），草稿文章被过滤 ✅
+- 文章详情 `/store/content/articles/:slug`: 草稿文章 slug 返回 404 ✅
+- 页面详情 `/store/content/pages/:slug`: 草稿页面 slug 返回 404，已发布页面正常返回 ✅
+- 首页 Banner `/store/content/home`: 禁用 banner 不返回，starts_at 为未来时间的 banner 不返回 ✅
+- 首页公告 `/store/content/home`: 禁用公告不返回，ends_at 为过去时间的公告不返回 ✅
+- 首页弹窗 `/store/content/home`: 禁用弹窗不返回（popup 模型无时间窗字段，无需过滤） ✅
+- 菜单 `/store/content/menus`: 禁用菜单项不返回（buildTree 中 is_enabled 过滤） ✅
+- 品牌/集合: 无发布状态/时间窗字段，无需过滤 ✅
+
+#### 总结
+- 无需代码修复，所有接口过滤逻辑已一致
+- 通过 API 测试和浏览器 UI 端到端验证
+
 ### 2026-02-16 Session - 弹窗管理模块 (F033-F040)
 
 测试功能: F033-F040 弹窗管理模块（共 8 个功能）
