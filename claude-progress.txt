@@ -1,35 +1,46 @@
 ## 测试进度记录
 
-### 2026-02-17 Session - Mega Menu 多级分类导航 (F207-F208)
+### 2026-02-17 Session - 多语言路由与语言切换 (F203-F204)
 
-开发功能: F207-F208 Mega Menu（共 2 个功能）
+开发功能: F203-F204 多语言路由与 i18n 架构 + 语言切换 UI
 
 #### 开发内容
-- F208 后台: Menu 数据模型已支持 parent_id/children 递归嵌套（无需修改）
-- F208 后台: 菜单项通过 metadata.item_type 字段区分类型（category/brand/url）
-- F208 后台: Store Content API /store/content/menus 扩展，当 item_type=brand 时自动附带品牌列表数据
-- F208 后台: 后台管理界面已支持多级嵌套编辑（parent_id 选择器、树形编辑器）
-- F208 后台: 创建示例菜单 seed 脚本 src/scripts/seed-menu.ts
-- F207 前台: HeaderClient 改造为 Mega Menu
-  - 桌面端: hover 展开全宽面板，按列展示二级分类和三级子项
-  - 品牌分类: 按首字母分组的品牌 Logo 网格展示
-  - 移动端: 手风琴折叠展开，递归支持多级菜单
-  - 支持 ESC 关闭、鼠标离开延迟关闭
+- F203: Next.js App Router i18n 方案，使用 [locale] 动态路由段
+  - 创建 middleware.ts 处理语言检测（URL > Cookie > Accept-Language > zh-CN）
+  - 创建 i18n 工具函数（getDictionary, useLocale, getLocalizedField）
+  - 创建翻译文件 locales/{zh-CN,zh-TW,en}/common.json，包含 70+ 条翻译
+  - 所有现有页面迁移到 [locale] 路由下
+  - 语言信息通过 params/useLocale 传递到所有页面组件
+- F204: Header 语言切换下拉菜单（Globe 图标 + 三语选项）
+  - 切换语言时更新 URL 前缀 + 设置 NEXT_LOCALE cookie（1年有效期）
+  - Header/Footer 静态文案从翻译文件加载
+  - AccountSidebar 导航标签多语言化
+  - 所有页面内链接添加 locale 前缀
+  - getLocalizedField 工具函数支持多语言字段回退
 
-#### 新增/修改文件
-- `src/api/store/content/menus/route.ts` - 扩展支持品牌数据附带
-- `src/scripts/seed-menu.ts` - 示例菜单数据 seed 脚本
-- `storefront/src/components/Header.tsx` - 更新类型定义支持 brands/metadata
-- `storefront/src/components/HeaderClient.tsx` - 重写为 Mega Menu 组件
+#### 新增文件
+- `storefront/src/lib/i18n.ts` - i18n 配置、getDictionary、getLocalizedField
+- `storefront/src/lib/useLocale.ts` - 客户端 useLocale hook
+- `storefront/src/middleware.ts` - 语言检测和重定向中间件
+- `storefront/src/locales/zh-CN/common.json` - 简体中文翻译
+- `storefront/src/locales/zh-TW/common.json` - 繁体中文翻译
+- `storefront/src/locales/en/common.json` - 英文翻译
+- `storefront/src/app/[locale]/layout.tsx` - locale 路由布局
 
-#### 测试结果
-- F207 前台 Mega Menu 多级分类导航 ✅ 通过
-- F208 后台 Menu 模块支持多级嵌套与品牌关联 ✅ 通过
+#### 修改文件
+- `storefront/src/app/layout.tsx` - 精简为根布局（html/body）
+- `storefront/src/components/Header.tsx` - 接受 locale 参数，传递 dict
+- `storefront/src/components/HeaderClient.tsx` - 添加语言切换下拉、locale 前缀链接
+- `storefront/src/components/Footer.tsx` - 接受 locale 参数，多语言文案
+- `storefront/src/components/AccountSidebar.tsx` - 接受 locale 参数，多语言导航
+- `storefront/src/components/AuthGuard.tsx` - 支持 locale 前缀路径
+- `storefront/src/components/AuthLayout.tsx` - 支持 locale 参数
+- `storefront/src/components/MainLayout.tsx` - 支持 locale 参数
+- 所有 [locale] 下的页面和客户端组件 - 链接添加 locale 前缀
 
-#### 总结
-- 2/2 功能全部通过
-- storefront npm run build 无报错
-- 后端 medusa build 无新增报错（admin-ui 预存在的 TS 错误不影响）
+#### 构建结果
+- npm run build 通过，无类型错误
+- 三种语言路由均正确生成
 
 ### 2026-02-17 Session - 商品比较功能 (F201-F202)
 

@@ -1,11 +1,5 @@
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
-import AnnouncementBar from "@/components/AnnouncementBar"
-import Header from "@/components/Header"
-import Footer from "@/components/Footer"
-import { CartProvider } from "@/components/CartProvider"
-import { CompareProvider } from "@/components/CompareProvider"
-import CompareBar from "@/components/CompareBar"
 import "./globals.css"
 
 const geistSans = Geist({
@@ -36,17 +30,9 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="zh-CN">
+    <html lang="zh-CN" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <CartProvider>
-          <CompareProvider>
-            <AnnouncementBar />
-            <Header />
-            <main className="min-h-screen">{children}</main>
-            <Footer />
-            <CompareBar />
-          </CompareProvider>
-        </CartProvider>
+        {children}
       </body>
     </html>
   )
