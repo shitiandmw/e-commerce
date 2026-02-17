@@ -37,11 +37,19 @@ export default function ProductListClient() {
   const [selectedCategory, setSelectedCategory] = useState("")
   const [sortBy, setSortBy] = useState("created_at")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
+  const [regionId, setRegionId] = useState<string>("")
 
   useEffect(() => {
     fetch("/api/categories")
       .then((r) => r.json())
       .then((data) => setCategories(data.product_categories || []))
+      .catch(() => {})
+    fetch("/api/regions")
+      .then((r) => r.json())
+      .then((data) => {
+        const rid = data.regions?.[0]?.id
+        if (rid) setRegionId(rid)
+      })
       .catch(() => {})
   }, [])
 
@@ -57,6 +65,9 @@ export default function ProductListClient() {
       if (selectedCategory) {
         params.set("category_id[]", selectedCategory)
       }
+      if (regionId) {
+        params.set("region_id", regionId)
+      }
       const res = await fetch(`/api/products?${params}`)
       const data = await res.json()
       setProducts(data.products || [])
@@ -67,7 +78,7 @@ export default function ProductListClient() {
     } finally {
       setLoading(false)
     }
-  }, [offset, sortBy, sortOrder, selectedCategory])
+  }, [offset, sortBy, sortOrder, selectedCategory, regionId])
 
   useEffect(() => { fetchProducts() }, [fetchProducts])
 

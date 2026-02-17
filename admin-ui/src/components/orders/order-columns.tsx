@@ -77,9 +77,10 @@ export function getFulfillmentStatusBadge(status?: string, t?: TranslationFn) {
 }
 
 function formatCurrency(amount: number, currency: string) {
+  const cur = (currency || "USD").toUpperCase()
   return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: currency.toUpperCase(),
+    currency: cur,
   }).format(amount / 100)
 }
 

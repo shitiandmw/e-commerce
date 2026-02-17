@@ -28,6 +28,7 @@ function ResultContent() {
   const params = useSearchParams()
   const { locale } = useParams()
   const status = params.get("status")
+  const displayId = params.get("display_id")
   const isSuccess = status === "success"
 
   return (
@@ -36,6 +37,9 @@ function ResultContent() {
       <h1 className="mt-6 text-xl font-bold text-foreground md:text-2xl">
         {isSuccess ? "支付成功" : "支付失败"}
       </h1>
+      {isSuccess && displayId && (
+        <p className="mt-2 text-lg font-semibold text-foreground">订单号: #{displayId}</p>
+      )}
       <p className="mt-2 text-sm text-muted">
         {isSuccess
           ? "感谢您的购买，我们将尽快为您发货。"

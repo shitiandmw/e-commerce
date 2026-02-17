@@ -305,9 +305,10 @@ export default function CheckoutClient() {
 
   const handlePaymentSuccess = (orderId: string, displayId?: number) => {
     const params = new URLSearchParams()
+    params.set("status", "success")
     if (orderId) params.set("order_id", orderId)
     if (displayId) params.set("display_id", String(displayId))
-    router.push(`/checkout/success?${params.toString()}`)
+    router.push(`/${locale}/checkout/result?${params.toString()}`)
   }
 
   const handlePaymentCancel = () => {

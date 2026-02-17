@@ -448,3 +448,34 @@ F108 设置页加载        ✅ PASS
 #### 总结
 - 3/3 功能全部通过
 - 无需修复已有代码，全部为新增文件
+
+### 2026-02-17 Session - 支付订单联调 (F188)
+
+测试功能: F188 支付后订单入库并后台可见
+
+#### 修复内容
+1. `storefront/src/app/[locale]/checkout/CheckoutClient.tsx`: 支付成功后跳转路径从 `/checkout/success` 修复为 `/${locale}/checkout/result?status=success`
+2. `storefront/src/app/[locale]/checkout/result/page.tsx`: 支付结果页增加订单号 display_id 显示
+3. `storefront/src/app/[locale]/products/[handle]/page.tsx`: 商品详情页 API 请求增加 region_id 参数（修复 calculated_price 需要 pricing context 的 400 错误）
+4. `storefront/src/app/[locale]/products/ProductListClient.tsx`: 商品列表页同样增加 region_id 参数
+5. `admin-ui/src/components/orders/order-columns.tsx`: formatCurrency 函数增加 currency 空值保护（修复 toUpperCase 报错）
+
+#### 测试结果
+| 步骤 | 描述 | 状态 |
+|------|------|------|
+| 步骤1 | 前台完整购物流程（浏览→加购→结算→支付） | ✅ PASS |
+| 步骤2 | 登录后台管理系统 | ✅ PASS |
+| 步骤3 | 订单管理页面确认新订单出现 | ✅ PASS |
+| 步骤4 | 订单详情确认商品/金额/地址/支付状态 | ✅ PASS |
+
+#### 测试详情
+- 商品: Medusa Shorts (S) x1
+- 订单号: #5 (order_01KHP08K3CZZZSCA5Y4W61WWVC)
+- 金额: 商品 €0.10 + 运费 €0.10 = 合计 €0.20
+- 收货地址: Test User, 123 Test Street, Berlin 10115, Germany
+- 客户: testf188@example.com
+- 后台订单列表和详情页均正确显示
+
+#### 总结
+- 1/1 功能通过
+- 修复了 5 个 bug（支付跳转路径、结果页订单号、商品 API pricing context、后台 currency 空值保护）

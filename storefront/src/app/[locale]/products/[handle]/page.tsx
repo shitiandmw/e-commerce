@@ -9,10 +9,18 @@ interface Props {
 
 async function getProduct(handle: string) {
   try {
+    // Get default region for pricing context
+    let regionId: string | undefined
+    try {
+      const { regions } = await sdk.store.region.list({ limit: 1 })
+      regionId = regions?.[0]?.id
+    } catch {}
+
     const { products } = await sdk.store.product.list({
       handle,
       fields: "id,title,handle,subtitle,description,thumbnail,images.*,options.*,options.values.*,variants.*,variants.options.*,variants.prices.*,+variants.calculated_price,variants.inventory_quantity,*brand,tags.*,metadata",
       limit: 1,
+      ...(regionId ? { region_id: regionId } : {}),
     })
     return products?.[0] || null
   } catch {
