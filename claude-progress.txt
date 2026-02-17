@@ -1,25 +1,35 @@
 ## 测试进度记录
 
-### 2026-02-17 Session - F150 Store 接口发布状态与时间窗过滤一致性
+### 2026-02-17 Session - 购物车功能 (F175-F176)
 
-测试功能: F150 Store 接口发布状态与时间窗过滤一致性
+开发功能: F175-F176 购物车（共 2 个功能）
 
-#### 验证结果
-- F150 ✅ PASS - 所有 Store 接口过滤逻辑一致
+#### 开发内容
+- 购物车状态管理 (lib/cart.ts + CartProvider)
+- 购物车页面 /cart (空状态、商品列表、总计、去结算)
+- 商品详情页加购按钮集成
+- Header 购物车数量徽章
+- Next.js API 代理路由 (解决 CORS)
+- 购物车增删改操作 (加购、修改数量、删除、清空)
 
-#### 验证详情
-- 文章列表 `/store/content/articles`: 只返回 status=published 的文章（9篇），草稿文章被过滤 ✅
-- 文章详情 `/store/content/articles/:slug`: 草稿文章 slug 返回 404 ✅
-- 页面详情 `/store/content/pages/:slug`: 草稿页面 slug 返回 404，已发布页面正常返回 ✅
-- 首页 Banner `/store/content/home`: 禁用 banner 不返回，starts_at 为未来时间的 banner 不返回 ✅
-- 首页公告 `/store/content/home`: 禁用公告不返回，ends_at 为过去时间的公告不返回 ✅
-- 首页弹窗 `/store/content/home`: 禁用弹窗不返回（popup 模型无时间窗字段，无需过滤） ✅
-- 菜单 `/store/content/menus`: 禁用菜单项不返回（buildTree 中 is_enabled 过滤） ✅
-- 品牌/集合: 无发布状态/时间窗字段，无需过滤 ✅
+#### 测试结果
+- F175 前台购物车页面 ✅ 通过
+  - /cart 页面正常渲染
+  - 空状态显示"购物车为空"和"去购物"按钮
+  - 商品列表显示图片/名称/变体/单价/数量/小计
+  - 总计区域显示小计和总计
+  - 去结算按钮正常
+- F176 购物车增删改操作 ✅ 通过
+  - 商品详情页加购 + Header 数量徽章更新
+  - 修改数量实时更新价格和总计
+  - 删除商品正常
+  - 不同变体分别显示
+  - 清空购物车正常
 
 #### 总结
-- 无需代码修复，所有接口过滤逻辑已一致
-- 通过 API 测试和浏览器 UI 端到端验证
+- 2/2 功能全部通过
+- 使用 Medusa Store Cart API，通过 Next.js API 路由代理避免 CORS
+- 购物车状态通过 React Context 全局管理，localStorage 持久化 cart_id
 
 ### 2026-02-16 Session - 弹窗管理模块 (F033-F040)
 
@@ -316,33 +326,3 @@ F108 设置页加载        ✅ PASS
 #### 总结
 - 4/4 功能全部通过
 - 修复了 2 个 bug（校验提示、路由组冲突）
-
-### 2026-02-17 Session - 前台 SEO 头信息输出 (F192)
-
-测试功能: F192 前台 SEO 头信息输出
-
-#### 实现内容
-- `storefront/src/app/products/[handle]/page.tsx`: 添加 generateMetadata，从 product.metadata.seo 读取 SEO 数据
-- `storefront/src/app/articles/[slug]/page.tsx`: 添加 generateMetadata，从 article.seo 读取 SEO 数据
-- `storefront/src/app/pages/[slug]/page.tsx`: 添加 generateMetadata，从 page.seo 读取 SEO 数据
-- `storefront/src/app/layout.tsx`: 添加 metadataBase、title.template（"%s - TIMECIGAR"）、openGraph.siteName
-- `storefront/next.config.ts`: 添加 htmlLimitedBots: /.*/ 禁用 Next.js 16 流式 metadata
-- 自定义 SEO 标题使用 title: { absolute: ... } 绕过 template
-- 未配置 SEO 时自动使用 "页面标题 - TIMECIGAR" 格式
-
-#### 测试结果
-| 步骤 | 描述 | 状态 |
-|------|------|------|
-| 步骤1 | 商品详情页 meta title/description/og:image | ✅ PASS |
-| 步骤2 | 文章详情页 SEO 头信息 | ✅ PASS |
-| 步骤3 | 静态页 SEO 头信息 | ✅ PASS |
-| 步骤4 | curl 查看 HTML head 确认 meta 标签 | ✅ PASS |
-| 步骤5 | 未配置 SEO 时使用默认值 | ✅ PASS |
-
-#### 关键技术点
-- Next.js 16 默认将 metadata 流式传输到 body（非 bot UA），需配置 htmlLimitedBots 强制输出到 head
-- 后端 API 自动为文章/页面生成默认 SEO（meta_title=title），前端通过比较 seo.meta_title 与原标题判断是否为用户自定义
-
-#### 总结
-- 5/5 步骤全部通过
-- 浏览器截图已保存至 test-snap/F192/

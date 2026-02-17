@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useCart } from "@/components/CartProvider"
 
 interface Price {
   amount: number
@@ -50,6 +51,9 @@ interface Product {
 }
 
 export default function ProductDetailClient({ product }: { product: Product }) {
+  const { addItem, loading } = useCart()
+  const [adding, setAdding] = useState(false)
+  const [addedMsg, setAddedMsg] = useState("")
   const images = product.images?.length
     ? product.images
     : product.thumbnail
@@ -185,11 +189,30 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
           {/* Add to Cart */}
           <button
-            disabled={!inStock}
+            disabled={!inStock || adding || loading}
+            onClick={async () => {
+              if (!selectedVariant) return
+              setAdding(true)
+              setAddedMsg("")
+              try {
+                await addItem(selectedVariant.id, 1)
+                setAddedMsg("已加入购物车")
+                setTimeout(() => setAddedMsg(""), 2000)
+              } catch (e) {
+                setAddedMsg(e instanceof Error ? e.message : "添加失败")
+              } finally {
+                setAdding(false)
+              }
+            }}
             className="w-full rounded-md bg-gold px-6 py-3 text-sm font-semibold text-background transition-colors hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {inStock ? "加入购物车" : "暂时缺货"}
+            {adding ? "添加中..." : inStock ? "加入购物车" : "暂时缺货"}
           </button>
+          {addedMsg && (
+            <p className={`mt-2 text-center text-sm ${addedMsg === "已加入购物车" ? "text-green-400" : "text-red-400"}`}>
+              {addedMsg}
+            </p>
+          )}
 
           {/* Description */}
           {product.description && (
