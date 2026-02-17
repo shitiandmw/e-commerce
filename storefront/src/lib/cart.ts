@@ -39,6 +39,26 @@ export interface CartLineItem {
   variant_title?: string
 }
 
+export interface CartAddress {
+  first_name: string
+  last_name: string
+  phone?: string
+  address_1: string
+  address_2?: string
+  city: string
+  province?: string
+  postal_code: string
+  country_code: string
+}
+
+export interface ShippingOption {
+  id: string
+  name: string
+  amount: number
+  price_type?: string
+  provider_id?: string
+}
+
 export interface Cart {
   id: string
   items?: CartLineItem[]
@@ -50,6 +70,11 @@ export interface Cart {
   item_total?: number
   currency_code?: string
   region_id?: string
+  email?: string
+  shipping_address?: CartAddress | null
+  billing_address?: CartAddress | null
+  shipping_methods?: { shipping_option_id: string; amount: number; name?: string }[]
+  promotions?: { code: string }[]
 }
 
 const FIELDS = "fields=*items,*items.variant,*items.variant.product"
@@ -119,6 +144,53 @@ export async function removeLineItem(lineItemId: string): Promise<Cart> {
   const { parent: cart } = await apiFetch<{ parent: Cart }>(
     `/api/cart/${cartId}/line-items/${lineItemId}?${FIELDS}`,
     { method: "DELETE" }
+  )
+  return cart
+}
+
+export async function updateCartAddress(shippingAddress: CartAddress, email: string): Promise<Cart> {
+  const cartId = getCartId()
+  if (!cartId) throw new Error("No cart found")
+  const { cart } = await apiFetch<{ cart: Cart }>(
+    `/api/cart/${cartId}?${FIELDS}`,
+    { method: "POST", body: JSON.stringify({ shipping_address: shippingAddress, email }) }
+  )
+  return cart
+}
+
+export async function getShippingOptions(): Promise<ShippingOption[]> {
+  const cartId = getCartId()
+  if (!cartId) throw new Error("No cart found")
+  const data = await apiFetch<{ shipping_options: ShippingOption[] }>(`/api/cart/${cartId}/shipping-options`)
+  return data.shipping_options || []
+}
+
+export async function setShippingMethod(optionId: string): Promise<Cart> {
+  const cartId = getCartId()
+  if (!cartId) throw new Error("No cart found")
+  const { cart } = await apiFetch<{ cart: Cart }>(
+    `/api/cart/${cartId}/shipping-methods?${FIELDS}`,
+    { method: "POST", body: JSON.stringify({ option_id: optionId }) }
+  )
+  return cart
+}
+
+export async function applyPromoCode(code: string): Promise<Cart> {
+  const cartId = getCartId()
+  if (!cartId) throw new Error("No cart found")
+  const { cart } = await apiFetch<{ cart: Cart }>(
+    `/api/cart/${cartId}/promotions?${FIELDS}`,
+    { method: "POST", body: JSON.stringify({ promo_codes: [code] }) }
+  )
+  return cart
+}
+
+export async function removePromoCode(code: string): Promise<Cart> {
+  const cartId = getCartId()
+  if (!cartId) throw new Error("No cart found")
+  const { cart } = await apiFetch<{ cart: Cart }>(
+    `/api/cart/${cartId}/promotions?${FIELDS}`,
+    { method: "DELETE", body: JSON.stringify({ promo_codes: [code] }) }
   )
   return cart
 }

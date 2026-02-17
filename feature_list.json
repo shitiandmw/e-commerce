@@ -2123,7 +2123,7 @@
       "步骤5：优惠码输入区域。",
       "步骤6：底部显示订单总计（商品小计、运费、折扣、税费、总计）。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -2134,7 +2134,7 @@
       "步骤3：渲染配送方式列表（名称、价格），选择后运费更新。",
       "步骤4：无可用配送方式时显示提示。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -2145,7 +2145,7 @@
       "步骤3：无效优惠码：显示错误提示。",
       "步骤4：点击「移除」优惠码，折扣取消，总计恢复。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
