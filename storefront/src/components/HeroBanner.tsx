@@ -80,7 +80,7 @@ export default function HeroBanner({ banners }: { banners: BannerSlot[] }) {
           <button
             onClick={prev}
             aria-label="上一张"
-            className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white transition hover:bg-black/60"
+            className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-3 text-white transition hover:bg-black/60"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -89,7 +89,7 @@ export default function HeroBanner({ banners }: { banners: BannerSlot[] }) {
           <button
             onClick={next}
             aria-label="下一张"
-            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white transition hover:bg-black/60"
+            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-3 text-white transition hover:bg-black/60"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

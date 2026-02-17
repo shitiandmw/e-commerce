@@ -39,20 +39,20 @@ export default async function Home() {
       <HeroBanner banners={homeData.banners || []} />
 
       {(!homeData.banners || homeData.banners.length === 0) && (
-        <div className="flex flex-col items-center justify-center px-4 py-24">
-          <h1 className="mb-4 text-4xl font-bold tracking-wider text-gold">
+        <section className="flex flex-col items-center justify-center px-4 py-20 md:py-28">
+          <h1 className="mb-4 text-3xl font-bold tracking-wider text-gold md:text-5xl">
             TIMECIGAR
           </h1>
-          <p className="mb-8 max-w-md text-center text-lg text-muted">
+          <p className="mb-8 max-w-md text-center text-base text-muted md:text-lg">
             精选雪茄，品味生活。探索来自全球的优质雪茄。
           </p>
           <a
             href="/products"
-            className="rounded-md bg-gold px-8 py-3 text-sm font-semibold text-background transition-colors hover:bg-gold-light"
+            className="inline-flex min-h-[44px] items-center rounded-md bg-gold px-8 py-3 text-sm font-semibold text-background transition-colors hover:bg-gold-light"
           >
             浏览商品
           </a>
-        </div>
+        </section>
       )}
 
       <CuratedCollections collections={homeData.collections || []} />

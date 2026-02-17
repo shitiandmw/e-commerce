@@ -67,15 +67,15 @@ export default function ProductListClient() {
   const currentPage = Math.floor(offset / LIMIT) + 1
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold text-foreground">全部商品</h1>
+    <div className="mx-auto max-w-7xl px-4 py-8 md:py-12">
+      <h1 className="mb-6 text-xl font-bold text-foreground md:text-2xl">全部商品</h1>
 
       {/* Filters */}
-      <div className="mb-6 flex flex-wrap items-center gap-4">
+      <div className="mb-6 flex flex-wrap items-center gap-3 md:gap-4">
         <select
           value={selectedCategory}
           onChange={(e) => { setSelectedCategory(e.target.value); setOffset(0) }}
-          className="rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground"
+          className="min-h-[44px] rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground"
         >
           <option value="">全部分类</option>
           {categories.map((c) => (
@@ -91,7 +91,7 @@ export default function ProductListClient() {
             setSortOrder(order as "asc" | "desc")
             setOffset(0)
           }}
-          className="rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground"
+          className="min-h-[44px] rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground"
         >
           <option value="created_at-desc">最新上架</option>
           <option value="created_at-asc">最早上架</option>
@@ -106,11 +106,11 @@ export default function ProductListClient() {
 
       {/* Product Grid */}
       {loading ? (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 md:gap-6 md:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="animate-pulse rounded-lg border border-border bg-surface">
               <div className="aspect-square bg-surface-light" />
-              <div className="p-3 space-y-2">
+              <div className="space-y-2 p-3">
                 <div className="h-3 w-16 rounded bg-surface-light" />
                 <div className="h-4 w-full rounded bg-surface-light" />
                 <div className="h-4 w-20 rounded bg-surface-light" />
@@ -127,7 +127,7 @@ export default function ProductListClient() {
           <p className="mt-1 text-sm text-muted">请稍后再来查看</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 md:gap-6 md:grid-cols-3 lg:grid-cols-4">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
@@ -140,7 +140,7 @@ export default function ProductListClient() {
           <button
             onClick={() => setOffset(Math.max(0, offset - LIMIT))}
             disabled={offset === 0}
-            className="rounded-md border border-border px-3 py-2 text-sm text-foreground transition-colors hover:border-gold disabled:opacity-40"
+            className="min-h-[44px] rounded-md border border-border px-4 py-2 text-sm text-foreground transition-colors hover:border-gold disabled:opacity-40"
           >
             上一页
           </button>
@@ -150,7 +150,7 @@ export default function ProductListClient() {
           <button
             onClick={() => setOffset(offset + LIMIT)}
             disabled={offset + LIMIT >= count}
-            className="rounded-md border border-border px-3 py-2 text-sm text-foreground transition-colors hover:border-gold disabled:opacity-40"
+            className="min-h-[44px] rounded-md border border-border px-4 py-2 text-sm text-foreground transition-colors hover:border-gold disabled:opacity-40"
           >
             下一页
           </button>

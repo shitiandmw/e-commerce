@@ -11,13 +11,13 @@ export default function BrandShowcase({ brands }: { brands: Brand[] }) {
   if (!brands || brands.length === 0) return null
 
   return (
-    <section className="bg-surface py-16">
+    <section className="bg-surface py-12 md:py-20">
       <div className="mx-auto max-w-7xl px-4">
-        <h2 className="mb-2 text-center text-2xl font-bold text-gold">品牌精选</h2>
+        <h2 className="mb-2 text-center text-xl font-bold text-gold md:text-2xl">品牌精选</h2>
         <p className="mb-10 text-center text-sm text-muted">
           探索来自全球的优质雪茄品牌
         </p>
-        <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 md:gap-6">
           {brands.map((brand) => (
             <Link
               key={brand.id}

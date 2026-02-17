@@ -14,10 +14,10 @@ export default function LatestArticles({ articles }: { articles: Article[] }) {
   if (!articles || articles.length === 0) return null
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-16">
-      <div className="mb-10 flex items-center justify-between">
+    <section className="mx-auto max-w-7xl px-4 py-12 md:py-20">
+      <div className="mb-8 flex items-center justify-between md:mb-10">
         <div>
-          <h2 className="text-2xl font-bold text-gold">最新资讯</h2>
+          <h2 className="text-xl font-bold text-gold md:text-2xl">最新资讯</h2>
           <p className="mt-1 text-sm text-muted">了解雪茄文化与行业动态</p>
         </div>
         <Link
@@ -27,7 +27,7 @@ export default function LatestArticles({ articles }: { articles: Article[] }) {
           查看更多 →
         </Link>
       </div>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 md:gap-6">
         {articles.map((article) => (
           <Link
             key={article.id}
