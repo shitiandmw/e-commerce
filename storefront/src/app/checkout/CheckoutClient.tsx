@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { isLoggedIn, getCustomer, getToken } from "@/lib/auth"
 import {
-  getCartId, Cart, CartAddress, ShippingOption,
+  Cart, CartAddress, ShippingOption,
   getOrCreateCart, updateCartAddress, getShippingOptions, setShippingMethod,
   applyPromoCode as applyPromo, removePromoCode as removePromo,
+  initPaymentSessions, completeCart, removeCartId,
 } from "@/lib/cart"
 
 const EMPTY_ADDRESS: CartAddress = {
@@ -23,6 +24,138 @@ function formatPrice(amount: number | undefined, currency?: string) {
   return `${sym}${amount.toFixed(2)}`
 }
 
+/* ─── Test card validation (simulated Stripe) ─── */
+const TEST_CARDS: Record<string, { status: "success" | "decline"; message?: string }> = {
+  "4242424242424242": { status: "success" },
+  "4000000000000002": { status: "decline", message: "Your card was declined." },
+  "4000000000009995": { status: "decline", message: "Your card has insufficient funds." },
+  "4000000000000069": { status: "decline", message: "Your card has expired." },
+  "4000000000000127": { status: "decline", message: "Your card's security code is incorrect." },
+}
+
+function formatCardNumber(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 16)
+  return digits.replace(/(\d{4})(?=\d)/g, "$1 ")
+}
+
+function formatExpiry(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 4)
+  if (digits.length > 2) return digits.slice(0, 2) + " / " + digits.slice(2)
+  return digits
+}
+
+/* ─── Simulated Stripe Payment Form ─── */
+function SimulatedStripeForm({ cart, onSuccess, onCancel }: {
+  cart: Cart
+  onSuccess: (orderId: string, displayId?: number) => void
+  onCancel: () => void
+}) {
+  const [cardNumber, setCardNumber] = useState("")
+  const [expiry, setExpiry] = useState("")
+  const [cvc, setCvc] = useState("")
+  const [cardName, setCardName] = useState("")
+  const [paying, setPaying] = useState(false)
+  const [error, setError] = useState("")
+
+  const cardDigits = cardNumber.replace(/\s/g, "")
+  const expiryDigits = expiry.replace(/\D/g, "")
+  const isFormValid = cardDigits.length === 16 && expiryDigits.length === 4 && cvc.length >= 3 && cardName.trim().length > 0
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!isFormValid) return
+    setPaying(true)
+    setError("")
+
+    // Simulate network delay
+    await new Promise(r => setTimeout(r, 1500))
+
+    const testCard = TEST_CARDS[cardDigits]
+    if (!testCard) {
+      setError("无法识别的测试卡号。请使用 4242 4242 4242 4242 (成功) 或 4000 0000 0000 0002 (拒绝)")
+      setPaying(false)
+      return
+    }
+
+    if (testCard.status === "decline") {
+      setError(testCard.message || "支付被拒绝")
+      setPaying(false)
+      return
+    }
+
+    // Card accepted — complete the cart via Medusa
+    try {
+      const result = await completeCart()
+      if (result.type === "order" && result.order) {
+        removeCartId()
+        onSuccess(result.order.id, result.order.display_id)
+      } else {
+        removeCartId()
+        onSuccess("", undefined)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "完成订单失败，请重试")
+      setPaying(false)
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="rounded-lg border border-[#e0e0e0] bg-white p-4 space-y-3">
+        <div className="flex items-center gap-2 mb-2">
+          <svg width="32" height="20" viewBox="0 0 32 20" fill="none"><rect width="32" height="20" rx="3" fill="#635BFF"/><path d="M15.2 7.2c0-.8.7-1.1 1.7-1.1 1.5 0 3.4.5 4.9 1.3V3.8c-1.6-.7-3.3-1-4.9-1-4 0-6.7 2.1-6.7 5.6 0 5.5 7.5 4.6 7.5 7 0 .9-.8 1.2-1.9 1.2-1.6 0-3.7-.7-5.4-1.6v3.7c1.8.8 3.7 1.1 5.4 1.1 4.1 0 6.9-2 6.9-5.6-.1-5.9-7.5-4.9-7.5-7" fill="#fff"/></svg>
+          <span className="text-sm font-medium text-gray-500">Test Mode</span>
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-gray-500">卡号</label>
+          <input value={cardNumber} onChange={e => setCardNumber(formatCardNumber(e.target.value))}
+            placeholder="4242 4242 4242 4242" maxLength={19} data-testid="card-number"
+            className="w-full rounded border border-gray-300 px-3 py-2 text-sm font-mono focus:border-[#635BFF] focus:outline-none focus:ring-1 focus:ring-[#635BFF]" />
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-500">有效期</label>
+            <input value={expiry} onChange={e => setExpiry(formatExpiry(e.target.value))}
+              placeholder="MM / YY" maxLength={7} data-testid="card-expiry"
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm font-mono focus:border-[#635BFF] focus:outline-none focus:ring-1 focus:ring-[#635BFF]" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-500">CVC</label>
+            <input value={cvc} onChange={e => setCvc(e.target.value.replace(/\D/g, "").slice(0, 4))}
+              placeholder="123" maxLength={4} data-testid="card-cvc"
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm font-mono focus:border-[#635BFF] focus:outline-none focus:ring-1 focus:ring-[#635BFF]" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-500">持卡人</label>
+            <input value={cardName} onChange={e => setCardName(e.target.value)}
+              placeholder="姓名" data-testid="card-name"
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-[#635BFF] focus:outline-none focus:ring-1 focus:ring-[#635BFF]" />
+          </div>
+        </div>
+      </div>
+      {error && (
+        <div className="rounded bg-red-50 p-3 text-sm text-red-600" data-testid="payment-error">
+          {error}
+        </div>
+      )}
+      <div className="flex gap-3">
+        <button type="button" onClick={onCancel} disabled={paying}
+          className="rounded border border-border px-6 py-2 text-sm font-medium hover:bg-muted/20 disabled:opacity-50">
+          返回修改
+        </button>
+        <button type="submit" disabled={!isFormValid || paying}
+          className="flex-1 rounded bg-[#635BFF] px-6 py-2 text-sm font-medium text-white hover:bg-[#5851ea] disabled:opacity-50">
+          {paying ? "处理中..." : `支付 ${formatPrice(cart.total, cart.currency_code)}`}
+        </button>
+      </div>
+      <p className="text-xs text-gray-400 text-center">
+        测试卡号: 4242 4242 4242 4242 (成功) | 4000 0000 0000 0002 (拒绝)
+      </p>
+    </form>
+  )
+}
+
+/* ─── Main Checkout Component ─── */
 export default function CheckoutClient() {
   const router = useRouter()
   const [cart, setCart] = useState<Cart | null>(null)
@@ -48,6 +181,11 @@ export default function CheckoutClient() {
   const [promoLoading, setPromoLoading] = useState(false)
   const [appliedCodes, setAppliedCodes] = useState<string[]>([])
 
+  // Payment
+  const [paymentLoading, setPaymentLoading] = useState(false)
+  const [paymentError, setPaymentError] = useState("")
+  const [showPayment, setShowPayment] = useState(false)
+
   // Load cart and customer data
   useEffect(() => {
     async function init() {
@@ -59,7 +197,6 @@ export default function CheckoutClient() {
         if (c.shipping_address) { setAddress(c.shipping_address); setAddressConfirmed(true) }
         const customer = await getCustomer()
         if (customer?.email) setEmail(customer.email)
-        // Load saved addresses
         const token = getToken()
         if (token) {
           try {
@@ -91,7 +228,6 @@ export default function CheckoutClient() {
       .finally(() => setShippingLoading(false))
   }, [addressConfirmed, cart?.id])
 
-  // Validate and confirm address
   const validateAddress = useCallback(() => {
     const errs: Record<string, string> = {}
     if (!address.first_name.trim()) errs.first_name = "请填写姓"
@@ -117,7 +253,6 @@ export default function CheckoutClient() {
     setAddressSaving(false)
   }
 
-  // Select shipping method
   const handleSelectShipping = async (optionId: string) => {
     setSelectedShipping(optionId)
     try {
@@ -126,7 +261,6 @@ export default function CheckoutClient() {
     } catch (e) { console.error("Set shipping error:", e) }
   }
 
-  // Promo code
   const handleApplyPromo = async () => {
     if (!promoCode.trim()) return
     setPromoLoading(true); setPromoError("")
@@ -135,9 +269,7 @@ export default function CheckoutClient() {
       setCart(updated)
       setAppliedCodes(updated.promotions?.map(p => p.code) || [...appliedCodes, promoCode.trim()])
       setPromoCode("")
-    } catch {
-      setPromoError("优惠码无效或已过期")
-    }
+    } catch { setPromoError("优惠码无效或已过期") }
     setPromoLoading(false)
   }
 
@@ -149,11 +281,35 @@ export default function CheckoutClient() {
     } catch (e) { console.error("Remove promo error:", e) }
   }
 
-  // Use saved address
   const handleUseSavedAddress = (addr: CartAddress) => {
     setAddress({ ...addr })
     setAddressConfirmed(false)
     setAddressErrors({})
+  }
+
+  // Initialize payment session and show card form
+  const handleProceedToPayment = async () => {
+    if (!selectedShipping) return
+    setPaymentLoading(true)
+    setPaymentError("")
+    try {
+      await initPaymentSessions()
+      setShowPayment(true)
+    } catch (e) {
+      setPaymentError(e instanceof Error ? e.message : "初始化支付失败")
+    }
+    setPaymentLoading(false)
+  }
+
+  const handlePaymentSuccess = (orderId: string, displayId?: number) => {
+    const params = new URLSearchParams()
+    if (orderId) params.set("order_id", orderId)
+    if (displayId) params.set("display_id", String(displayId))
+    router.push(`/checkout/success?${params.toString()}`)
+  }
+
+  const handlePaymentCancel = () => {
+    setShowPayment(false)
   }
 
   if (loading) return <div className="flex min-h-[50vh] items-center justify-center"><p className="text-muted">加载中...</p></div>
@@ -168,15 +324,15 @@ export default function CheckoutClient() {
   }
 
   const currency = cart.currency_code
+  const canPay = addressConfirmed && selectedShipping && !showPayment
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <h1 className="mb-8 text-2xl font-bold text-foreground">结算</h1>
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        {/* Left: Forms */}
         <div className="lg:col-span-2 space-y-8">
           {/* Saved Addresses */}
-          {savedAddresses.length > 0 && !addressConfirmed && (
+          {savedAddresses.length > 0 && !addressConfirmed && !showPayment && (
             <section className="rounded-lg border border-border bg-card p-6">
               <h2 className="mb-4 text-lg font-semibold">已保存的地址</h2>
               <div className="space-y-2">
@@ -198,7 +354,7 @@ export default function CheckoutClient() {
               <div>
                 <p>{address.first_name} {address.last_name}</p>
                 <p className="text-sm text-muted">{address.address_1}, {address.city} {address.postal_code}</p>
-                <button onClick={() => setAddressConfirmed(false)} className="mt-2 text-sm text-accent hover:underline">修改地址</button>
+                {!showPayment && <button onClick={() => setAddressConfirmed(false)} className="mt-2 text-sm text-accent hover:underline">修改地址</button>}
               </div>
             ) : (
               <div className="space-y-4">
@@ -265,6 +421,8 @@ export default function CheckoutClient() {
               <p className="text-sm text-muted">加载配送方式...</p>
             ) : noShippingMsg ? (
               <p className="text-sm text-red-500">{noShippingMsg}</p>
+            ) : showPayment ? (
+              <p className="text-sm text-muted">{shippingOptions.find(o => o.id === selectedShipping)?.name || "已选择"}</p>
             ) : (
               <div className="space-y-2">
                 {shippingOptions.map(opt => (
@@ -282,28 +440,46 @@ export default function CheckoutClient() {
           </section>
 
           {/* Promo Code */}
-          <section className="rounded-lg border border-border bg-card p-6">
-            <h2 className="mb-4 text-lg font-semibold">优惠码</h2>
-            {appliedCodes.length > 0 && (
-              <div className="mb-4 space-y-2">
-                {appliedCodes.map(code => (
-                  <div key={code} className="flex items-center justify-between rounded bg-green-50 px-3 py-2 text-sm">
-                    <span className="font-medium text-green-700">已应用: {code}</span>
-                    <button onClick={() => handleRemovePromo(code)} className="text-red-500 hover:underline text-xs">移除</button>
-                  </div>
-                ))}
+          {!showPayment && (
+            <section className="rounded-lg border border-border bg-card p-6">
+              <h2 className="mb-4 text-lg font-semibold">优惠码</h2>
+              {appliedCodes.length > 0 && (
+                <div className="mb-4 space-y-2">
+                  {appliedCodes.map(code => (
+                    <div key={code} className="flex items-center justify-between rounded bg-green-50 px-3 py-2 text-sm">
+                      <span className="font-medium text-green-700">已应用: {code}</span>
+                      <button onClick={() => handleRemovePromo(code)} className="text-red-500 hover:underline text-xs">移除</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="flex gap-2">
+                <input value={promoCode} onChange={e => { setPromoCode(e.target.value); setPromoError("") }}
+                  placeholder="输入优惠码" className="flex-1 rounded border border-border bg-background px-3 py-2 text-sm" />
+                <button onClick={handleApplyPromo} disabled={promoLoading || !promoCode.trim()}
+                  className="rounded bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 disabled:opacity-50">
+                  {promoLoading ? "应用中..." : "应用"}
+                </button>
               </div>
-            )}
-            <div className="flex gap-2">
-              <input value={promoCode} onChange={e => { setPromoCode(e.target.value); setPromoError("") }}
-                placeholder="输入优惠码" className="flex-1 rounded border border-border bg-background px-3 py-2 text-sm" />
-              <button onClick={handleApplyPromo} disabled={promoLoading || !promoCode.trim()}
-                className="rounded bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 disabled:opacity-50">
-                {promoLoading ? "应用中..." : "应用"}
+              {promoError && <p className="mt-2 text-sm text-red-500">{promoError}</p>}
+            </section>
+          )}
+
+          {/* Payment Section */}
+          {showPayment ? (
+            <section className="rounded-lg border border-[#635BFF] bg-card p-6">
+              <h2 className="mb-4 text-lg font-semibold">支付信息</h2>
+              <SimulatedStripeForm cart={cart} onSuccess={handlePaymentSuccess} onCancel={handlePaymentCancel} />
+            </section>
+          ) : canPay ? (
+            <div>
+              {paymentError && <p className="mb-4 text-sm text-red-500">{paymentError}</p>}
+              <button onClick={handleProceedToPayment} disabled={paymentLoading}
+                className="w-full rounded bg-accent px-6 py-3 text-sm font-medium text-white hover:bg-accent/90 disabled:opacity-50">
+                {paymentLoading ? "初始化支付..." : "去支付"}
               </button>
             </div>
-            {promoError && <p className="mt-2 text-sm text-red-500">{promoError}</p>}
-          </section>
+          ) : null}
 
         </div>
 

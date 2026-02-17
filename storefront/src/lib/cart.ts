@@ -206,3 +206,30 @@ export async function clearCart(): Promise<Cart> {
   setCartId(cart.id)
   return cart
 }
+
+export interface PaymentSession {
+  id: string
+  provider_id: string
+  status: string
+  data?: Record<string, unknown>
+}
+
+export async function initPaymentSessions(): Promise<Cart & { payment_collection?: { payment_sessions?: PaymentSession[] } }> {
+  const cartId = getCartId()
+  if (!cartId) throw new Error("No cart found")
+  const data = await apiFetch<{ cart: Cart & { payment_collection?: { payment_sessions?: PaymentSession[] } } }>(
+    `/api/cart/${cartId}/payment-sessions`,
+    { method: "POST", body: JSON.stringify({ provider_id: "pp_system_default" }) }
+  )
+  return data.cart
+}
+
+export async function completeCart(): Promise<{ type: string; order?: { id: string; display_id?: number }; error?: string }> {
+  const cartId = getCartId()
+  if (!cartId) throw new Error("No cart found")
+  const data = await apiFetch<{ type: string; order?: { id: string; display_id?: number }; error?: string }>(
+    `/api/cart/${cartId}/complete`,
+    { method: "POST" }
+  )
+  return data
+}

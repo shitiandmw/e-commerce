@@ -34,6 +34,9 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/menu",
     },
+    {
+      resolve: "@medusajs/medusa/payment",
+    },
   ],
   projectConfig: {
     redisUrl: process.env.REDIS_URL,

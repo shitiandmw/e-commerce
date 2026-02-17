@@ -53,6 +53,7 @@ EOF
 cat > "$ROOT_DIR/storefront/.env.local" <<EOF
 NEXT_PUBLIC_MEDUSA_BACKEND_URL=http://localhost:$MEDUSA_PORT
 NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:-pk_test_51TestKeyForDevelopmentOnly000000000000000000000000000000}
 EOF
 
 # ---------- 环境变量配置 ----------
@@ -62,6 +63,10 @@ export REDIS_URL="redis://localhost:56739"
 export STORE_CORS="http://localhost:$STOREFRONT_PORT,http://localhost:8000,http://localhost:3000"
 export ADMIN_CORS="http://localhost:$ADMIN_PORT,http://localhost:$MEDUSA_PORT,http://localhost:5173,http://localhost:9000,http://localhost:3001,http://localhost:3002"
 export AUTH_CORS="http://localhost:$ADMIN_PORT,http://localhost:$MEDUSA_PORT,http://localhost:$STOREFRONT_PORT,http://localhost:5173,http://localhost:9000,http://localhost:8000,http://localhost:3001,http://localhost:3002"
+
+# Stripe 配置（Test Mode）
+export STRIPE_API_KEY="${STRIPE_API_KEY:-sk_test_51TestKeyForDevelopmentOnly000000000000000000000000000000}"
+export STRIPE_WEBHOOK_SECRET="${STRIPE_WEBHOOK_SECRET:-whsec_test_secret}"
 
 # ---------- 提高文件描述符限制 ----------
 CURRENT_LIMIT=$(ulimit -n)
