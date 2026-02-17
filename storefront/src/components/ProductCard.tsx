@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useCart } from "@/components/CartProvider"
+import { useCompare, type CompareProduct } from "@/components/CompareProvider"
 
 interface VariantOption {
   id: string
@@ -116,12 +117,31 @@ export default function ProductCard({ product }: ProductCardProps) {
   const hasMultipleVariants = variants.length > 1
   const brandName = product.brand?.name
   const packaging = getPackaging(product)
+  const { isInCompare, addToCompare, removeFromCompare, isFull } = useCompare()
+  const [showFullMsg, setShowFullMsg] = useState(false)
+  const inCompare = isInCompare(product.id)
+
+  const handleCompareToggle = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (inCompare) {
+      removeFromCompare(product.id)
+    } else {
+      const success = addToCompare(product as unknown as CompareProduct)
+      if (!success) {
+        setShowFullMsg(true)
+        setTimeout(() => setShowFullMsg(false), 2000)
+      }
+    }
+  }
 
   const handleQuickAdd = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
     if (adding) return
+
     if (hasMultipleVariants) {
+      // Init default selections
       const initial: Record<string, string> = {}
       product.options?.forEach((opt) => {
         if (opt.values?.[0]) initial[opt.id] = opt.values[0].value
@@ -130,12 +150,13 @@ export default function ProductCard({ product }: ProductCardProps) {
       setShowVariantModal(true)
       return
     }
+
     if (!firstVariant) return
     setAdding(true)
     try {
       await addItem(firstVariant.id, 1)
     } catch {
-      // cart provider handles errors
+      // silently fail - cart provider handles errors
     } finally {
       setAdding(false)
     }
@@ -163,10 +184,34 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <>
-      <Link
-        href={`/products/${product.handle}`}
-        className="group block overflow-hidden rounded-lg border border-border bg-surface transition-colors hover:border-gold/50"
-      >
+      <div className="group relative overflow-hidden rounded-lg border border-border bg-surface transition-colors hover:border-gold/50">
+        {/* Compare checkbox */}
+        <button
+          onClick={handleCompareToggle}
+          title={inCompare ? "取消比较" : isFull ? "最多比较4个商品" : "加入比较"}
+          className={`absolute top-2 left-2 z-10 flex h-7 w-7 items-center justify-center rounded border transition-colors ${
+            inCompare
+              ? "border-gold bg-gold text-background"
+              : "border-border bg-background/80 text-muted hover:border-gold hover:text-gold"
+          }`}
+        >
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            {inCompare ? (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M3 12h18M3 18h18" />
+            )}
+          </svg>
+        </button>
+        {showFullMsg && (
+          <div className="absolute top-10 left-2 z-10 rounded bg-red-900/90 px-2 py-1 text-xs text-red-200 whitespace-nowrap">
+            最多比较4个商品
+          </div>
+        )}
+        <Link
+          href={`/products/${product.handle}`}
+          className="block"
+        >
         <div className="relative aspect-square overflow-hidden bg-surface-light">
           {product.thumbnail ? (
             <Image
@@ -183,6 +228,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               </svg>
             </div>
           )}
+          {/* Quick add button */}
           <button
             onClick={handleQuickAdd}
             disabled={adding || !firstVariant}
@@ -214,6 +260,8 @@ export default function ProductCard({ product }: ProductCardProps) {
           <PriceDisplay variant={firstVariant} />
         </div>
       </Link>
+      </div>
+      {/* Variant selection modal */}
       {showVariantModal && (
         <div
           className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60"

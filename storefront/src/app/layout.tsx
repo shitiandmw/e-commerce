@@ -4,6 +4,8 @@ import AnnouncementBar from "@/components/AnnouncementBar"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import { CartProvider } from "@/components/CartProvider"
+import { CompareProvider } from "@/components/CompareProvider"
+import CompareBar from "@/components/CompareBar"
 import "./globals.css"
 
 const geistSans = Geist({
@@ -37,10 +39,13 @@ export default function RootLayout({
     <html lang="zh-CN">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <CartProvider>
-          <AnnouncementBar />
-          <Header />
-          <main className="min-h-screen">{children}</main>
-          <Footer />
+          <CompareProvider>
+            <AnnouncementBar />
+            <Header />
+            <main className="min-h-screen">{children}</main>
+            <Footer />
+            <CompareBar />
+          </CompareProvider>
         </CartProvider>
       </body>
     </html>

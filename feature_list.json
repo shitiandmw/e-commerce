@@ -2395,7 +2395,7 @@
       "步骤5：比较状态持久化到 localStorage，刷新页面不丢失。",
       "步骤6：超过 4 个商品时提示用户先移除已有商品。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
@@ -2408,7 +2408,7 @@
       "步骤5：无商品时显示空状态引导用户去商品列表选择。",
       "步骤6：响应式适配：移动端横向滚动或卡片堆叠。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
