@@ -2340,36 +2340,36 @@
   },
   {
     "category": "functional",
-    "description": "F197 [规划中][测试] 下单支付端到端自动化测试",
+    "description": "F197 [已实现][测试] 下单支付端到端自动化测试",
     "steps": [
       "步骤1：编写端到端测试，覆盖完整购物流程：注册→登录→浏览→加购→结算→支付→确认。",
       "步骤2：使用 agent-browser 执行测试，截图每个关键步骤。",
       "步骤3：确认测试可重复执行，无残留数据影响。",
       "步骤4：确认订单在后台可见。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
-    "description": "F198 [规划中][测试] Store 内容接口自动化测试",
+    "description": "F198 [已实现][测试] Store 内容接口自动化测试",
     "steps": [
       "步骤1：编写测试脚本，覆盖所有 Store 内容接口。",
       "步骤2：测试正常请求、分页、筛选、404、空数据等场景。",
       "步骤3：测试发布状态过滤和时间窗过滤。",
       "步骤4：确认所有接口返回格式一致。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
-    "description": "F199 [规划中][性能] 前台性能指标 LCP/CLS 达标",
+    "description": "F199 [已实现][性能] 前台性能指标 LCP/CLS 达标",
     "steps": [
       "步骤1：使用 Lighthouse 测试前台首页和商品详情页。",
       "步骤2：LCP < 2.5s，CLS < 0.1。",
       "步骤3：如不达标，优化图片加载（next/image）、字体加载、布局稳定性。",
       "步骤4：优化后重新测试确认达标。"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "functional",
