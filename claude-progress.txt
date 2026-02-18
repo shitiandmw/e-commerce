@@ -1,5 +1,45 @@
 ## 测试进度记录
 
+### 2026-02-17 Session - 测试与性能 (F197-F199)
+
+开发功能: F197 下单支付E2E测试, F198 Store内容接口测试, F199 前台性能LCP/CLS达标
+
+#### F197: 下单支付端到端自动化测试
+- 使用 agent-browser 完成完整购物流程: 注册→登录→浏览商品→加入购物车→结算→填写地址→选择配送→支付→订单确认
+- 测试卡号 4242424242424242 支付成功
+- 订单 order_01KHP30KVENZ62QAWKS8Y401WY (display_id=6) 已在数据库确认
+- 截图保存在 test-snap/F197/ (01-register ~ 11-order-confirmation)
+- 修复: checkout 成功跳转路径缺少 locale 前缀 (→ /{locale}/checkout/result?status=success)
+
+#### F198: Store 内容接口自动化测试
+- 创建 scripts/test-store-content-apis.sh 覆盖全部 7 个 Store 内容 API
+- 48/48 测试用例全部通过
+- 覆盖: 正常请求、分页、筛选、404、空数据、发布状态、时间窗口、响应格式一致性
+- 修复: popup 表缺少 popup_type/coupon_code 列 (ALTER TABLE)
+- 结果保存在 test-snap/F198/test-results.txt
+
+#### F199: 前台性能指标 LCP/CLS 达标
+- 首页: LCP=1.05s ✅, CLS=0.001 ✅
+- 产品详情页: LCP=1.17s ✅, CLS=0.000 ✅
+- 优化: 恢复产品详情页 SSR (Server Component 直接 fetch Medusa 后端)
+- LCP 从 4.34s 优化到 1.17s
+- Lighthouse JSON 和结果保存在 test-snap/F199/
+
+#### 修改文件
+- `storefront/src/app/[locale]/products/[handle]/page.tsx` - 恢复 SSR，直接 fetch Medusa 后端获取产品数据
+- `storefront/src/app/[locale]/products/[handle]/ProductDetailClient.tsx` - 修复 React Hooks 顺序问题，支持 SSR product prop 和客户端 handle fallback
+- `storefront/src/app/[locale]/checkout/CheckoutClient.tsx` - 修复支付成功跳转路径
+- `scripts/test-store-content-apis.sh` - 新增 Store 内容 API 测试脚本
+
+#### 新增文件
+- `scripts/test-store-content-apis.sh` - F198 测试脚本
+- `test-snap/F197/` - E2E 测试截图
+- `test-snap/F198/test-results.txt` - API 测试结果
+- `test-snap/F199/` - Lighthouse 测试结果
+
+#### 测试结果
+- feature_list.json: 204 passing, 7 failing (新增 F197, F198, F199 通过)
+
 ### 2026-02-17 Session - 多语言路由与语言切换 (F203-F204)
 
 开发功能: F203-F204 多语言路由与 i18n 架构 + 语言切换 UI

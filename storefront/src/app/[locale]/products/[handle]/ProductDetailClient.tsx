@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useCart } from "@/components/CartProvider"
@@ -56,31 +56,57 @@ interface Product {
   metadata?: Record<string, unknown> | null
 }
 
-export default function ProductDetailClient({ product }: { product: Product }) {
+export default function ProductDetailClient({ product: initialProduct, handle }: { product?: Product; handle?: string }) {
   const { addItem, loading } = useCart()
   const [adding, setAdding] = useState(false)
   const [addedMsg, setAddedMsg] = useState("")
-  const images = product.images?.length
+  const [product, setProduct] = useState<Product | null>(initialProduct || null)
+  const [fetchLoading, setFetchLoading] = useState(!initialProduct && !!handle)
+  const [selectedImage, setSelectedImage] = useState(0)
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    if (initialProduct || !handle) return
+    const fields = "id,title,handle,subtitle,description,thumbnail,images.*,options.*,options.values.*,variants.*,variants.options.*,variants.prices.*,variants.inventory_quantity,*brand,tags.*,metadata"
+    fetch(`/api/products?handle=${encodeURIComponent(handle)}&fields=${encodeURIComponent(fields)}&limit=1`)
+      .then(r => r.json())
+      .then(data => {
+        const p = data.products?.[0] || null
+        setProduct(p)
+        if (p?.options) {
+          const init: Record<string, string> = {}
+          p.options.forEach((opt: ProductOption) => {
+            if (opt.values?.[0]) init[opt.id] = opt.values[0].value
+          })
+          setSelectedOptions(init)
+        }
+        setFetchLoading(false)
+      })
+      .catch(() => setFetchLoading(false))
+  }, [handle, initialProduct])
+
+  // Initialize selectedOptions when product is passed as prop
+  useEffect(() => {
+    if (!initialProduct?.options) return
+    const init: Record<string, string> = {}
+    initialProduct.options.forEach((opt) => {
+      if (opt.values?.[0]) init[opt.id] = opt.values[0].value
+    })
+    setSelectedOptions(init)
+  }, [initialProduct])
+
+  const images = product?.images?.length
     ? product.images
-    : product.thumbnail
+    : product?.thumbnail
       ? [{ id: "thumb", url: product.thumbnail }]
       : []
 
-  const [selectedImage, setSelectedImage] = useState(0)
-  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() => {
-    const initial: Record<string, string> = {}
-    product.options?.forEach((opt) => {
-      if (opt.values?.[0]) initial[opt.id] = opt.values[0].value
-    })
-    return initial
-  })
-
   const selectedVariant = useMemo(() => {
-    if (!product.variants?.length) return null
+    if (!product?.variants?.length) return null
     return product.variants.find((v) =>
       v.options?.every((vo) => selectedOptions[vo.option_id] === vo.value)
     ) || product.variants[0]
-  }, [product.variants, selectedOptions])
+  }, [product?.variants, selectedOptions])
 
   const price = selectedVariant?.prices?.[0]
   const cp = selectedVariant?.calculated_price
@@ -88,7 +114,8 @@ export default function ProductDetailClient({ product }: { product: Product }) {
     (selectedVariant?.inventory_quantity ?? 0) > 0
 
   // Packaging info from metadata or variant options
-  const packaging = (() => {
+  const packaging = useMemo(() => {
+    if (!product) return null
     if (product.metadata?.packaging) return String(product.metadata.packaging)
     if (product.options) {
       for (const opt of product.options) {
@@ -99,7 +126,31 @@ export default function ProductDetailClient({ product }: { product: Product }) {
       }
     }
     return null
-  })()
+  }, [product, selectedVariant])
+
+  if (fetchLoading) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-8">
+        <div className="animate-pulse grid gap-8 md:grid-cols-2">
+          <div className="aspect-square rounded-lg bg-surface-light" />
+          <div className="space-y-4">
+            <div className="h-6 w-32 rounded bg-surface-light" />
+            <div className="h-8 w-64 rounded bg-surface-light" />
+            <div className="h-6 w-24 rounded bg-surface-light" />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!product) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-20 text-center">
+        <p className="text-lg text-muted">商品未找到</p>
+        <Link href="/products" className="mt-4 inline-block text-gold hover:underline">浏览全部商品</Link>
+      </div>
+    )
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
