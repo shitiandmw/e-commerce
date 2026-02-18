@@ -168,6 +168,12 @@ if [ "$DB_NEEDS_INIT" = true ]; then
     warn "默认账号: admin@test.com / admin123456"
   }
   log "✓ 管理员账号: admin@test.com / admin123456"
+
+  # 初始化 Mega Menu 种子数据
+  log "初始化菜单种子数据..."
+  npx medusa exec src/scripts/seed-menu.ts 2>/dev/null || {
+    warn "菜单种子数据初始化失败（可能已存在）"
+  }
 fi
 
 # ---------- 4. 启动 Medusa 后端 ----------
