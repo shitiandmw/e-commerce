@@ -1,8 +1,7 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import Image from "next/image"
 
 interface Brand {
   id: string
@@ -11,40 +10,32 @@ interface Brand {
   logo_url?: string | null
 }
 
-interface BrandsResponse {
-  brands: Brand[]
-  count: number
-  offset: number
-  limit: number
-}
-
-export default function BrandListClient() {
-  const [brands, setBrands] = useState<Brand[]>([])
-  const [loading, setLoading] = useState(true)
+export default function BrandListClient({ initialBrands }: { initialBrands: Brand[] }) {
   const [search, setSearch] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
+  const [searchResults, setSearchResults] = useState<Brand[] | null>(null)
+  const [searching, setSearching] = useState(false)
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(search), 300)
     return () => clearTimeout(timer)
   }, [search])
 
-  const fetchBrands = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ limit: "100" })
-      if (debouncedSearch) params.set("q", debouncedSearch)
-      const res = await fetch(`/api/brands?${params}`)
-      const data = await res.json()
-      setBrands(data?.brands || [])
-    } catch {
-      setBrands([])
-    } finally {
-      setLoading(false)
+  useEffect(() => {
+    if (!debouncedSearch) {
+      setSearchResults(null)
+      return
     }
+    setSearching(true)
+    const params = new URLSearchParams({ limit: "100", q: debouncedSearch })
+    fetch(`/api/brands?${params}`)
+      .then((r) => r.json())
+      .then((data) => setSearchResults(data?.brands || []))
+      .catch(() => setSearchResults([]))
+      .finally(() => setSearching(false))
   }, [debouncedSearch])
 
-  useEffect(() => { fetchBrands() }, [fetchBrands])
+  const brands = searchResults ?? initialBrands
 
   // Group brands by first letter
   const grouped = brands.reduce<Record<string, Brand[]>>((acc, brand) => {
@@ -70,7 +61,7 @@ export default function BrandListClient() {
         />
       </div>
 
-      {loading ? (
+      {searching ? (
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="animate-pulse rounded-lg border border-border bg-surface p-6">
@@ -102,7 +93,7 @@ export default function BrandListClient() {
                   >
                     {brand.logo_url ? (
                       <div className="relative mb-3 h-16 w-16 overflow-hidden rounded-full bg-surface-light">
-                        <Image src={brand.logo_url} alt={brand.name} fill className="object-cover" sizes="64px" />
+                        <img src={brand.logo_url} alt={brand.name} className="h-full w-full object-cover" />
                       </div>
                     ) : (
                       <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-surface-light text-xl font-bold text-gold">

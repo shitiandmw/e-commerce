@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { useCart } from "@/components/CartProvider"
 import { useCompare, type CompareProduct } from "@/components/CompareProvider"
 
@@ -214,12 +213,10 @@ export default function ProductCard({ product }: ProductCardProps) {
         >
         <div className="relative aspect-square overflow-hidden bg-surface-light">
           {product.thumbnail ? (
-            <Image
+            <img
               src={product.thumbnail}
               alt={product.title}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
             <div className="flex h-full items-center justify-center text-muted">

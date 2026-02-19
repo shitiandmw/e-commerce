@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useMemo, useEffect } from "react"
-import Image from "next/image"
 import Link from "next/link"
 import { useCart } from "@/components/CartProvider"
 
@@ -159,13 +158,10 @@ export default function ProductDetailClient({ product: initialProduct, handle }:
         <div>
           <div className="relative mb-4 aspect-square overflow-hidden rounded-lg bg-surface-light">
             {images.length > 0 ? (
-              <Image
+              <img
                 src={images[selectedImage].url}
                 alt={product.title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
-                priority
+                className="h-full w-full object-cover"
               />
             ) : (
               <div className="flex h-full items-center justify-center text-muted">
@@ -185,7 +181,7 @@ export default function ProductDetailClient({ product: initialProduct, handle }:
                     i === selectedImage ? "border-gold" : "border-border hover:border-gold/50"
                   }`}
                 >
-                  <Image src={img.url} alt="" fill className="object-cover" sizes="64px" />
+                  <img src={img.url} alt="" className="h-full w-full object-cover" />
                 </button>
               ))}
             </div>
