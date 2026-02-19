@@ -4,6 +4,7 @@ import Link from "next/link"
 interface Brand {
   id: string
   name: string
+  name_zh?: string
   description?: string
   logo_url?: string
 }
@@ -28,21 +29,21 @@ export default function BrandShowcase({ brands }: { brands: Brand[] }) {
             查看全部 &rarr;
           </Link>
         </div>
-        <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
           {brands.map((brand) => (
             <Link
               key={brand.id}
               href={`/brands/${brand.id}`}
-              className="group flex flex-col items-center gap-2 rounded-lg bg-background p-3 transition hover:ring-1 hover:ring-gold/30"
+              className="group flex flex-col items-center gap-2 rounded-lg border border-transparent bg-background p-3 transition-all hover:-translate-y-0.5 hover:border-gold/40 hover:shadow-lg"
             >
-              <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-surface-light transition-transform duration-300 group-hover:scale-110">
+              <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-lg bg-surface-light">
                 {brand.logo_url ? (
                   <Image
                     src={brand.logo_url}
                     alt={brand.name}
                     width={64}
                     height={64}
-                    className="h-full w-full object-contain p-2"
+                    className="h-full w-full object-contain p-1"
                   />
                 ) : (
                   <span className="text-xl font-bold text-gold">
@@ -50,7 +51,12 @@ export default function BrandShowcase({ brands }: { brands: Brand[] }) {
                   </span>
                 )}
               </div>
-              <span className="text-center text-xs font-medium text-foreground transition-colors group-hover:text-gold">
+              {brand.name_zh && (
+                <span className="text-center text-xs font-medium text-foreground transition-colors group-hover:text-gold">
+                  {brand.name_zh}
+                </span>
+              )}
+              <span className="text-center text-[11px] text-muted">
                 {brand.name}
               </span>
             </Link>

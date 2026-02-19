@@ -43,7 +43,7 @@ interface ProductCardProps {
     thumbnail: string | null
     variants?: ProductVariant[]
     options?: ProductOption[]
-    brand?: { name: string } | null
+    brand?: { name: string; name_zh?: string; logo_url?: string } | null
     metadata?: Record<string, unknown> | null
   }
 }
@@ -249,7 +249,19 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
         <div className="p-3">
           {brandName && (
-            <p className="mb-1 text-xs text-gold">{brandName}</p>
+            <div className="mb-1 flex items-center gap-1.5">
+              {product.brand?.logo_url ? (
+                <img src={product.brand.logo_url} alt={brandName} className="h-5 w-5 rounded object-contain" />
+              ) : (
+                <span className="flex h-5 w-5 items-center justify-center rounded bg-surface-light text-[9px] font-bold text-gold">
+                  {brandName.charAt(0)}
+                </span>
+              )}
+              <span className="text-xs text-gold">{product.brand?.name_zh || brandName}</span>
+              {product.brand?.name_zh && (
+                <span className="text-[10px] text-muted">{brandName}</span>
+              )}
+            </div>
           )}
           <h3 className="mb-1 text-sm font-medium text-foreground line-clamp-2 group-hover:text-gold transition-colors">
             {product.title}

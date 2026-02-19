@@ -64,61 +64,76 @@ function ChevronDown({ className }: { className?: string }) {
   )
 }
 
-// Group brands by first letter
-function groupBrandsByLetter(brands: Brand[]): Record<string, Brand[]> {
-  const groups: Record<string, Brand[]> = {}
-  for (const brand of brands) {
-    const letter = brand.name.charAt(0).toUpperCase()
-    if (!groups[letter]) groups[letter] = []
-    groups[letter].push(brand)
-  }
-  return groups
-}
-
-// Brand Logo Grid for Mega Menu
+// Brand Logo Grid for Mega Menu — flat grid with logo + bilingual name
 function BrandGrid({ brands }: { brands: Brand[] }) {
-  const grouped = groupBrandsByLetter(brands)
-  const letters = Object.keys(grouped).sort()
-
   return (
-    <div className="space-y-4">
-      {letters.map((letter) => (
-        <div key={letter}>
-          <div className="mb-2 text-xs font-semibold uppercase text-gold">{letter}</div>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {grouped[letter].map((brand) => (
-              <Link
-                key={brand.id}
-                href={`/brands/${brand.name.toLowerCase().replace(/\s+/g, "-")}`}
-                className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted transition-colors hover:bg-surface-light hover:text-gold"
-              >
-                {brand.logo_url ? (
-                  <img src={brand.logo_url} alt={brand.name} className="h-6 w-6 rounded object-contain" />
-                ) : (
-                  <span className="flex h-6 w-6 items-center justify-center rounded bg-surface-light text-[10px] font-bold text-gold">
-                    {brand.name.charAt(0)}
-                  </span>
-                )}
-                <span className="truncate">{brand.name}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      ))}
+    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-5">
+      {brands.map((brand) => {
+        const nameZh = (brand as any).name_zh || ""
+        const handle = brand.name.toLowerCase().replace(/\s+/g, "-")
+        return (
+          <Link
+            key={brand.id}
+            href={`/brands/${handle}`}
+            className="group/brand flex flex-col items-center gap-1.5 rounded-lg border border-transparent p-2 text-center transition-all hover:-translate-y-0.5 hover:border-gold/40 hover:shadow-md"
+          >
+            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-lg bg-surface-light">
+              {brand.logo_url ? (
+                <img src={brand.logo_url} alt={brand.name} className="h-full w-full object-contain p-1" />
+              ) : (
+                <span className="text-lg font-bold text-gold">{brand.name.charAt(0)}</span>
+              )}
+            </div>
+            {nameZh && <span className="text-xs font-medium text-foreground">{nameZh}</span>}
+            <span className="text-[11px] text-muted">{brand.name}</span>
+          </Link>
+        )
+      })}
     </div>
   )
 }
 
-// Mega Menu Panel for desktop
+// Mega Menu Panel for desktop — dual-column: left subcategories + right brand grid
 function MegaMenuPanel({ item, onClose }: { item: MenuItem; onClose: () => void }) {
-  const isBrandMenu = item.metadata?.item_type === "brand"
-  const hasBrands = isBrandMenu && item.brands && item.brands.length > 0
+  const hasBrands = item.brands && item.brands.length > 0
+  const hasChildren = item.children.length > 0
 
   return (
     <div className="border-b border-border bg-background/98 shadow-xl backdrop-blur">
       <div className="mx-auto max-w-7xl px-4 py-6">
-        {hasBrands ? (
-          /* Brand menu: show brand grid */
+        {hasChildren && hasBrands ? (
+          /* Dual-column: subcategories left + brand grid right */
+          <div className="flex gap-8">
+            <div className="w-48 shrink-0 border-r border-border pr-6">
+              <h3 className="mb-3 text-sm font-semibold text-gold">{item.label}</h3>
+              <ul className="space-y-1.5">
+                {item.children.map((child) => (
+                  <li key={child.id}>
+                    <Link
+                      href={child.url || "#"}
+                      onClick={onClose}
+                      className="block py-1 text-sm text-muted transition-colors hover:text-gold"
+                    >
+                      {child.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              {item.url && (
+                <Link href={item.url} onClick={onClose} className="mt-4 block text-xs text-gold transition-colors hover:text-gold-light">
+                  查看全部 →
+                </Link>
+              )}
+            </div>
+            <div className="flex-1">
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-gold">品牌</h3>
+              </div>
+              <BrandGrid brands={item.brands!} />
+            </div>
+          </div>
+        ) : hasBrands ? (
+          /* Brand-only: full-width brand grid */
           <div>
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-sm font-semibold text-gold">{item.label}</h3>
@@ -131,7 +146,7 @@ function MegaMenuPanel({ item, onClose }: { item: MenuItem; onClose: () => void 
             <BrandGrid brands={item.brands!} />
           </div>
         ) : (
-          /* Category menu: multi-column layout */
+          /* Category-only: multi-column layout */
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {item.children.map((col) => (
               <div key={col.id}>
@@ -173,7 +188,7 @@ function DesktopMenuItem({ item, onOpenMega, onCloseMega, isOpen }: {
   isOpen: boolean
 }) {
   const hasChildren = item.children.length > 0
-  const hasBrands = item.metadata?.item_type === "brand" && item.brands && item.brands.length > 0
+  const hasBrands = item.brands && item.brands.length > 0
   const showMega = hasChildren || hasBrands
 
   if (!showMega) {
@@ -205,7 +220,7 @@ function DesktopMenuItem({ item, onOpenMega, onCloseMega, isOpen }: {
 function MobileMenuItem({ item, onClose, depth = 0 }: { item: MenuItem; onClose: () => void; depth?: number }) {
   const [expanded, setExpanded] = useState(false)
   const hasChildren = item.children.length > 0
-  const hasBrands = item.metadata?.item_type === "brand" && item.brands && item.brands.length > 0
+  const hasBrands = item.brands && item.brands.length > 0
 
   if (!hasChildren && !hasBrands) {
     return (

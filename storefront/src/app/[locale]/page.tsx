@@ -1,5 +1,6 @@
 import { fetchContent } from "@/lib/medusa"
 import HeroBanner from "@/components/HeroBanner"
+import PromotionTabs from "@/components/PromotionTabs"
 import CuratedCollections from "@/components/CuratedCollections"
 import CategoryBanners from "@/components/CategoryBanners"
 import BrandShowcase from "@/components/BrandShowcase"
@@ -68,8 +69,9 @@ export default async function Home({
         </section>
       )}
 
-      <CuratedCollections collections={homeData.collections || []} />
+      <PromotionTabs collections={homeData.collections || []} />
       <CategoryBanners banners={categoryBannersData.banners || []} />
+      <CuratedCollections collections={homeData.collections || []} />
       <BrandShowcase brands={brandsData.brands || []} />
       <LatestArticles articles={articlesData.articles || []} />
       <PopupModal popups={(homeData.popups || []).filter((p: any) => p.popup_type !== "coupon")} />
