@@ -177,6 +177,9 @@ if [ "$DB_NEEDS_INIT" = true ]; then
 fi
 
 # ---------- 4. 启动 Medusa 后端 ----------
+# 确保 chokidar watcher 忽略 admin-ui/storefront（patch 可能因 npm install 跳过而丢失）
+node scripts/patch-watcher.js
+
 log "启动 Medusa 后端（端口 $MEDUSA_PORT）..."
 npx medusa develop --port $MEDUSA_PORT &
 BACKEND_PID=$!
