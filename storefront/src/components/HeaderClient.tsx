@@ -70,11 +70,10 @@ function BrandGrid({ brands }: { brands: Brand[] }) {
     <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-5">
       {brands.map((brand) => {
         const nameZh = (brand as any).name_zh || ""
-        const handle = brand.name.toLowerCase().replace(/\s+/g, "-")
         return (
           <Link
             key={brand.id}
-            href={`/brands/${handle}`}
+            href={`/brands/${brand.id}`}
             className="group/brand flex flex-col items-center gap-1.5 rounded-lg border border-transparent p-2 text-center transition-all hover:-translate-y-0.5 hover:border-gold/40 hover:shadow-md"
           >
             <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-lg bg-surface-light">
@@ -257,7 +256,7 @@ function MobileMenuItem({ item, onClose, depth = 0 }: { item: MenuItem; onClose:
               {item.brands!.map((brand) => (
                 <Link
                   key={brand.id}
-                  href={`/brands/${brand.name.toLowerCase().replace(/\s+/g, "-")}`}
+                  href={`/brands/${brand.id}`}
                   onClick={onClose}
                   className="flex items-center gap-2 py-1.5 text-sm text-muted transition-colors hover:text-gold"
                 >
