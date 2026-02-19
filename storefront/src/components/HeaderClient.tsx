@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useState, useRef, useEffect, useCallback } from "react"
 import { useCart } from "@/components/CartProvider"
 import type { MenuItem, Brand } from "./Header"
+import type { Locale } from "@/lib/i18n"
 
 // SVG Icons
 function SearchIcon() {
@@ -114,7 +115,7 @@ function MegaMenuPanel({ item, onClose }: { item: MenuItem; onClose: () => void 
   const hasBrands = isBrandMenu && item.brands && item.brands.length > 0
 
   return (
-    <div className="absolute left-0 right-0 top-full z-50 border-b border-border bg-background/98 shadow-xl backdrop-blur">
+    <div className="border-b border-border bg-background/98 shadow-xl backdrop-blur">
       <div className="mx-auto max-w-7xl px-4 py-6">
         {hasBrands ? (
           /* Brand menu: show brand grid */
@@ -266,11 +267,14 @@ function MobileMenuItem({ item, onClose, depth = 0 }: { item: MenuItem; onClose:
     </div>
   )
 }
-export default function HeaderClient({ menuItems }: { menuItems: MenuItem[] }) {
+export default function HeaderClient({ menuItems, locale, dict }: {
+  menuItems: MenuItem[]
+  locale: Locale
+  dict: Record<string, string>
+}) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openMegaId, setOpenMegaId] = useState<string | null>(null)
   const { itemCount: cartCount } = useCart()
-  const megaRef = useRef<HTMLDivElement>(null)
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const openMegaItem = menuItems.find((item) => item.id === openMegaId)
@@ -287,17 +291,6 @@ export default function HeaderClient({ menuItems }: { menuItems: MenuItem[] }) {
     closeTimerRef.current = setTimeout(() => {
       setOpenMegaId(null)
     }, 150)
-  }, [])
-
-  const handlePanelEnter = useCallback(() => {
-    if (closeTimerRef.current) {
-      clearTimeout(closeTimerRef.current)
-      closeTimerRef.current = null
-    }
-  }, [])
-
-  const handlePanelLeave = useCallback(() => {
-    setOpenMegaId(null)
   }, [])
 
   // Close mega menu on escape
@@ -318,18 +311,23 @@ export default function HeaderClient({ menuItems }: { menuItems: MenuItem[] }) {
 
   return (
     <>
-      {/* Desktop nav */}
-      <nav className="hidden items-center gap-8 md:flex" onMouseLeave={handleCloseMega}>
-        {menuItems.map((item) => (
-          <DesktopMenuItem
-            key={item.id}
-            item={item}
-            onOpenMega={handleOpenMega}
-            onCloseMega={handleCloseMega}
-            isOpen={openMegaId === item.id}
-          />
-        ))}
-      </nav>
+      {/* Desktop nav + mega panel wrapper: shared hover context */}
+      <div
+        className="hidden md:flex items-center gap-8"
+        onMouseLeave={handleCloseMega}
+      >
+        <nav className="flex items-center gap-8">
+          {menuItems.map((item) => (
+            <DesktopMenuItem
+              key={item.id}
+              item={item}
+              onOpenMega={handleOpenMega}
+              onCloseMega={handleCloseMega}
+              isOpen={openMegaId === item.id}
+            />
+          ))}
+        </nav>
+      </div>
 
       {/* Right side icons */}
       <div className="flex items-center gap-1 md:gap-3">
@@ -352,16 +350,25 @@ export default function HeaderClient({ menuItems }: { menuItems: MenuItem[] }) {
         </button>
       </div>
 
-      {/* Mega Menu Panel (desktop) */}
-      {openMegaItem && (
-        <div
-          ref={megaRef}
-          onMouseEnter={handlePanelEnter}
-          onMouseLeave={handlePanelLeave}
-        >
+      {/* Mega Menu Panel (desktop) — positioned relative to <header> */}
+      <div
+        className={`absolute left-0 right-0 top-full z-50 hidden md:block transition-all duration-200 ease-out ${
+          openMegaItem
+            ? "opacity-100 translate-y-0 pointer-events-auto"
+            : "opacity-0 -translate-y-1 pointer-events-none"
+        }`}
+        onMouseEnter={() => {
+          if (closeTimerRef.current) {
+            clearTimeout(closeTimerRef.current)
+            closeTimerRef.current = null
+          }
+        }}
+        onMouseLeave={() => setOpenMegaId(null)}
+      >
+        {openMegaItem && (
           <MegaMenuPanel item={openMegaItem} onClose={() => setOpenMegaId(null)} />
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Mobile sidebar overlay */}
       {mobileOpen && (
