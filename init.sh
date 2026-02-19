@@ -174,6 +174,30 @@ if [ "$DB_NEEDS_INIT" = true ]; then
   npx medusa exec src/scripts/seed-menu.ts 2>/dev/null || {
     warn "菜单种子数据初始化失败（可能已存在）"
   }
+
+  # 初始化分类种子数据
+  log "初始化分类种子数据..."
+  npx medusa exec src/scripts/seed-categories.ts 2>/dev/null || {
+    warn "分类种子数据初始化失败（可能已存在）"
+  }
+
+  # 初始化品牌种子数据
+  log "初始化品牌种子数据..."
+  npx medusa exec src/scripts/seed-brands.ts 2>/dev/null || {
+    warn "品牌种子数据初始化失败（可能已存在）"
+  }
+
+  # 初始化策展集合种子数据（含雪茄商品）
+  log "初始化策展集合种子数据..."
+  npx medusa exec src/scripts/seed-collections.ts 2>/dev/null || {
+    warn "策展集合种子数据初始化失败（可能已存在）"
+  }
+
+  # 初始化 Banner 种子数据
+  log "初始化 Banner 种子数据..."
+  npx medusa exec src/scripts/seed-banners.ts 2>/dev/null || {
+    warn "Banner 种子数据初始化失败（可能已存在）"
+  }
 fi
 
 # ---------- 4. 启动 Medusa 后端 ----------

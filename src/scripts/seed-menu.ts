@@ -25,32 +25,15 @@ export default async function seedMenu({ container }: ExecArgs) {
 
   const menuId = menu.id
 
-  // 1. 古巴雪茄 (category with subcategories)
-  const cuban = await menuService.createMenuItems({
+  // 1. 古巴雪茄 (brand type - will show brand grid via API)
+  await menuService.createMenuItems({
     label: "古巴雪茄",
     url: "/categories/cuban-cigars",
     sort_order: 0,
     is_enabled: true,
+    metadata: { item_type: "brand", brand_origin: "cuban" },
     menu_id: menuId,
   })
-
-  const cubanSubs = [
-    { label: "高希霸", url: "/categories/cohiba", sort_order: 0 },
-    { label: "蒙特克里斯托", url: "/categories/montecristo", sort_order: 1 },
-    { label: "帕塔加斯", url: "/categories/partagas", sort_order: 2 },
-    { label: "罗密欧与朱丽叶", url: "/categories/romeo-y-julieta", sort_order: 3 },
-    { label: "乌普曼", url: "/categories/h-upmann", sort_order: 4 },
-    { label: "玻利瓦尔", url: "/categories/bolivar", sort_order: 5 },
-  ]
-
-  for (const sub of cubanSubs) {
-    await menuService.createMenuItems({
-      ...sub,
-      is_enabled: true,
-      parent_id: cuban.id,
-      menu_id: menuId,
-    })
-  }
 
   // 2. 世界品牌 (brand type - will show brand grid)
   await menuService.createMenuItems({
@@ -58,7 +41,7 @@ export default async function seedMenu({ container }: ExecArgs) {
     url: "/brands",
     sort_order: 1,
     is_enabled: true,
-    metadata: { item_type: "brand" },
+    metadata: { item_type: "brand", brand_origin: "world" },
     menu_id: menuId,
   })
 
@@ -90,17 +73,26 @@ export default async function seedMenu({ container }: ExecArgs) {
   // 4. 新品上市 (simple link)
   await menuService.createMenuItems({
     label: "新品上市",
-    url: "/new-arrivals",
+    url: "/categories/new-arrivals",
     sort_order: 3,
     is_enabled: true,
     menu_id: menuId,
   })
 
-  // 5. 雪茄知识 (category with subcategories)
+  // 5. 特惠专区 (simple link)
+  await menuService.createMenuItems({
+    label: "特惠专区",
+    url: "/categories/deals",
+    sort_order: 4,
+    is_enabled: true,
+    menu_id: menuId,
+  })
+
+  // 6. 雪茄知识 (category with subcategories)
   const knowledge = await menuService.createMenuItems({
     label: "雪茄知识",
     url: "/articles",
-    sort_order: 4,
+    sort_order: 5,
     is_enabled: true,
     menu_id: menuId,
   })
