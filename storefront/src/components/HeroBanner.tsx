@@ -19,7 +19,8 @@ interface BannerSlot {
 }
 
 export default function HeroBanner({ banners }: { banners: BannerSlot[] }) {
-  const items = banners.flatMap((slot) => slot.items)
+  const heroSlot = banners.find((slot) => slot.key === "hero")
+  const items = heroSlot?.items || []
   const [current, setCurrent] = useState(0)
   const [paused, setPaused] = useState(false)
   const showControls = items.length > 1

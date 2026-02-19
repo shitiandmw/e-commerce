@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
 import Link from "next/link"
 import ProductCard from "@/components/ProductCard"
 import { useLocale } from "@/lib/useLocale"
@@ -29,7 +28,7 @@ export default function BrandDetailClient({ brand }: { brand: Brand }) {
       <div className="mb-8 flex items-center gap-6">
         {brand.logo_url ? (
           <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-full bg-surface-light">
-            <Image src={brand.logo_url} alt={brand.name} fill className="object-cover" sizes="80px" />
+            <img src={brand.logo_url} alt={brand.name} className="h-full w-full object-cover" />
           </div>
         ) : (
           <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-full bg-surface-light text-2xl font-bold text-gold">
