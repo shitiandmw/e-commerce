@@ -37,7 +37,13 @@ module.exports = defineConfig({
     {
       resolve: "@medusajs/medusa/payment",
     },
+    {
+      resolve: "@medusajs/medusa/translation",
+    },
   ],
+  featureFlags: {
+    translation: true,
+  },
   projectConfig: {
     redisUrl: process.env.REDIS_URL,
     databaseUrl: process.env.DATABASE_URL,

@@ -3,7 +3,7 @@ import { Menu } from "./menu"
 
 export const MenuItem = model.define("menu_item", {
   id: model.id().primaryKey(),
-  label: model.text(),
+  label: model.text().translatable(),
   url: model.text().nullable(),
   icon_url: model.text().nullable(),
   sort_order: model.number().default(0),

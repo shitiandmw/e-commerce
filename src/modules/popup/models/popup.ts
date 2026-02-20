@@ -2,10 +2,10 @@ import { model } from "@medusajs/framework/utils"
 
 export const Popup = model.define("popup", {
   id: model.id().primaryKey(),
-  title: model.text().nullable(),
-  description: model.text().nullable(),
+  title: model.text().translatable().nullable(),
+  description: model.text().translatable().nullable(),
   image_url: model.text().nullable(),
-  button_text: model.text().nullable(),
+  button_text: model.text().translatable().nullable(),
   button_link: model.text().nullable(),
   is_enabled: model.boolean().default(false),
   trigger_type: model.enum(["first_visit", "every_visit", "specific_page"]).default("first_visit"),

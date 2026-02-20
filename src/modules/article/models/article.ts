@@ -3,11 +3,11 @@ import { ArticleCategory } from "./article-category"
 
 export const Article = model.define("article", {
   id: model.id().primaryKey(),
-  title: model.text(),
+  title: model.text().translatable(),
   slug: model.text().unique(),
   cover_image: model.text().nullable(),
-  summary: model.text().nullable(),
-  content: model.text().nullable(),
+  summary: model.text().translatable().nullable(),
+  content: model.text().translatable().nullable(),
   status: model.enum(["draft", "published"]).default("draft"),
   published_at: model.dateTime().nullable(),
   sort_order: model.number().default(0),

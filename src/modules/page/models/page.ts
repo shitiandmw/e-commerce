@@ -2,9 +2,9 @@ import { model } from "@medusajs/framework/utils"
 
 export const Page = model.define("page", {
   id: model.id().primaryKey(),
-  title: model.text(),
+  title: model.text().translatable(),
   slug: model.text(),
-  content: model.text().nullable(),
+  content: model.text().translatable().nullable(),
   status: model.enum(["draft", "published"]).default("draft"),
   template: model.text().nullable(),
   sort_order: model.number().default(0),

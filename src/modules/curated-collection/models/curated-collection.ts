@@ -2,9 +2,9 @@ import { model } from "@medusajs/framework/utils"
 
 export const CuratedCollection = model.define("curated_collection", {
   id: model.id().primaryKey(),
-  name: model.text(),
+  name: model.text().translatable(),
   key: model.text().unique(),
-  description: model.text().nullable(),
+  description: model.text().translatable().nullable(),
   sort_order: model.number().default(0),
   tabs: model.hasMany(() => CollectionTab, {
     mappedBy: "collection",
