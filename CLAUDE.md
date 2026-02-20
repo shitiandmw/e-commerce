@@ -72,3 +72,15 @@ npm run test:integration:modules
 - 支付集成：Stripe（`@medusajs/payment-stripe`）
 - storefront-v2 是主力开发方向，storefront v1 仅维护不新增功能
 - storefront-v2 数据层尚未接入 Medusa API，当前使用本地 mock 数据，需要逐步替换
+
+## 已知问题
+
+### Chokidar 文件监视补丁
+
+Medusa 的 `develop` 命令用 chokidar 监视项目根目录，但只忽略根级 `node_modules`。子项目（admin-ui、storefront、storefront-v2）各自的 `node_modules` 包含数万文件，会导致 ENFILE（文件描述符耗尽）和误触发后端重启。
+
+`scripts/patch-watcher.js` 通过 `postinstall` 钩子自动将这些目录加入忽略列表，每次 `npm install` 后自动生效。如果新增子项目目录，需要同步更新此脚本。
+
+Medusa 官方暂未提供配置项（无 `.medusaignore`、无 `medusa-config.ts` 选项），ignored 列表硬编码在 `develop.js` 中（参考 [#9811](https://github.com/medusajs/medusa/issues/9811)）。postinstall patch 是当前唯一方案，Medusa 升级后需验证 patch 是否仍兼容。
+
+开发时建议提高文件描述符限制：`ulimit -n 65536`

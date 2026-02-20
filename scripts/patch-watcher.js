@@ -1,6 +1,6 @@
 /**
- * Patch Medusa develop command to ignore admin-ui and storefront directories
- * in file watcher.
+ * Patch Medusa develop command to ignore admin-ui, storefront and storefront-v2
+ * directories in file watcher.
  *
  * Problem: Medusa's chokidar watcher monitors the entire project root but only
  * ignores root-level node_modules. Our admin-ui/ and storefront/ directories
@@ -51,13 +51,22 @@ try {
     patched = true
   }
 
+  // Add "storefront-v2" to the ignored array
+  if (!content.includes('"storefront-v2"')) {
+    content = content.replace(
+      '"storefront",',
+      '"storefront",\n                    "storefront-v2",'
+    )
+    patched = true
+  }
+
   if (!patched) {
     console.log("[patch-watcher] Already patched, skipping.")
     process.exit(0)
   }
 
   fs.writeFileSync(developJsPath, content)
-  console.log("[patch-watcher] Patched: admin-ui + storefront added to watcher ignore list.")
+  console.log("[patch-watcher] Patched: admin-ui + storefront + storefront-v2 added to watcher ignore list.")
 } catch (err) {
   console.error("[patch-watcher] Failed to patch:", err.message)
   // Non-fatal — don't block npm install
