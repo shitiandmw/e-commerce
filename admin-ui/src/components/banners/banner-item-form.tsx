@@ -10,8 +10,6 @@ import {
   useCreateBannerItem,
   useUpdateBannerItem,
 } from "@/hooks/use-banners"
-import { useEntityTranslation } from "@/hooks/use-entity-translation"
-import { LocaleSwitcher } from "@/components/ui/locale-switcher"
 import {
   Dialog,
   DialogContent,
@@ -68,12 +66,6 @@ export function BannerItemForm({
   const isEdit = !!item
   const createItem = useCreateBannerItem()
   const updateItem = useUpdateBannerItem(item?.id || "")
-
-  const translation = useEntityTranslation({
-    reference: "banner_item",
-    referenceId: item?.id,
-    translatableFields: ["title", "subtitle"],
-  })
 
   const defaultValues: ItemFormData = item
     ? {
@@ -160,8 +152,6 @@ export function BannerItemForm({
         await createItem.mutateAsync({ ...payload, slot_id: slotId })
       }
 
-      await translation.saveAllTranslations()
-
       onOpenChange(false)
       onSuccess?.()
     } catch (err) {
@@ -188,14 +178,6 @@ export function BannerItemForm({
                 ? mutationError.message
                 : t("errorOccurred")}
             </div>
-          )}
-
-          {/* Locale Switcher */}
-          {isEdit && (
-            <LocaleSwitcher
-              activeLocale={translation.activeLocale}
-              onChange={translation.setActiveLocale}
-            />
           )}
 
           {/* Image URL + Preview */}
@@ -228,39 +210,21 @@ export function BannerItemForm({
           {/* Title */}
           <div className="space-y-2">
             <Label htmlFor="title">{t("itemForm.titleLabel")}</Label>
-            {translation.isDefaultLocale ? (
-              <Input
-                id="title"
-                {...register("title")}
-                placeholder={t("itemForm.titlePlaceholder")}
-              />
-            ) : (
-              <Input
-                id="title"
-                value={translation.getFieldValue("title", "")}
-                onChange={(e) => translation.setFieldValue("title", e.target.value)}
-                placeholder="尚未翻译"
-              />
-            )}
+            <Input
+              id="title"
+              {...register("title")}
+              placeholder={t("itemForm.titlePlaceholder")}
+            />
           </div>
 
           {/* Subtitle */}
           <div className="space-y-2">
             <Label htmlFor="subtitle">{t("itemForm.subtitleLabel")}</Label>
-            {translation.isDefaultLocale ? (
-              <Input
-                id="subtitle"
-                {...register("subtitle")}
-                placeholder={t("itemForm.subtitlePlaceholder")}
-              />
-            ) : (
-              <Input
-                id="subtitle"
-                value={translation.getFieldValue("subtitle", "")}
-                onChange={(e) => translation.setFieldValue("subtitle", e.target.value)}
-                placeholder="尚未翻译"
-              />
-            )}
+            <Input
+              id="subtitle"
+              {...register("subtitle")}
+              placeholder={t("itemForm.subtitlePlaceholder")}
+            />
           </div>
 
           {/* Link URL */}

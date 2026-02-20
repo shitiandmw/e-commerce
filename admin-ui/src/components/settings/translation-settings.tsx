@@ -616,12 +616,9 @@ function ProgressBar({
 function getOriginalValue(
   item: TranslatableResourceItem,
   field: string,
-  displayField: string
+  _displayField: string
 ): string {
-  // The original value is stored in the default locale or as the item's direct field
-  if (field === displayField) return item.displayValue || ""
-  // For other fields, check if there's a zh-CN translation or return empty
-  const defaultT = item.translations?.[DEFAULT_LOCALE]
-  if (defaultT?.[field]) return defaultT[field]
+  // Use originalValues from the API (contains all field values from the entity)
+  if (item.originalValues?.[field]) return item.originalValues[field]
   return ""
 }

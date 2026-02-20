@@ -21,8 +21,6 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor"
 import { MediaPicker } from "@/components/media/media-picker"
 import { SeoEditor, SeoData } from "@/components/ui/seo-editor"
 import { ArrowLeft, Save, Loader2, FolderOpen } from "lucide-react"
-import { useEntityTranslation } from "@/hooks/use-entity-translation"
-import { LocaleSwitcher } from "@/components/ui/locale-switcher"
 import Link from "next/link"
 
 const articleSchema = z.object({
@@ -64,12 +62,6 @@ export function ArticleForm({ article, mode }: ArticleFormProps) {
   const [coverPickerOpen, setCoverPickerOpen] = React.useState(false)
   const [autoSlug, setAutoSlug] = React.useState(mode === "create")
   const [seo, setSeo] = React.useState<SeoData>(article?.seo || {})
-
-  const translation = useEntityTranslation({
-    reference: "article",
-    referenceId: article?.id,
-    translatableFields: ["title", "summary", "content"],
-  })
 
   const defaultValues: ArticleFormData = article
     ? {
@@ -142,8 +134,6 @@ export function ArticleForm({ article, mode }: ArticleFormProps) {
         await updateArticle.mutateAsync(payload as any)
       }
 
-      await translation.saveAllTranslations()
-
       router.push("/articles")
     } catch (err) {
       // Error is handled by mutation state
@@ -188,14 +178,6 @@ export function ArticleForm({ article, mode }: ArticleFormProps) {
         </div>
       )}
 
-      {/* Locale Switcher */}
-      {mode === "edit" && (
-        <LocaleSwitcher
-          activeLocale={translation.activeLocale}
-          onChange={translation.setActiveLocale}
-        />
-      )}
-
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           {/* Basic Info */}
@@ -203,16 +185,7 @@ export function ArticleForm({ article, mode }: ArticleFormProps) {
             <h2 className="text-lg font-semibold">{t("form.basicInfo")}</h2>
             <div className="space-y-2">
               <Label htmlFor="title">{t("form.titleLabel")}</Label>
-              {translation.isDefaultLocale ? (
-                <Input id="title" {...register("title")} placeholder={t("form.titlePlaceholder")} />
-              ) : (
-                <Input
-                  id="title"
-                  value={translation.getFieldValue("title", "")}
-                  onChange={(e) => translation.setFieldValue("title", e.target.value)}
-                  placeholder="尚未翻译"
-                />
-              )}
+              <Input id="title" {...register("title")} placeholder={t("form.titlePlaceholder")} />
               {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
             </div>
             <div className="space-y-2">
@@ -223,31 +196,13 @@ export function ArticleForm({ article, mode }: ArticleFormProps) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="summary">{t("form.summaryLabel")}</Label>
-              {translation.isDefaultLocale ? (
-                <Textarea id="summary" {...register("summary")} placeholder={t("form.summaryPlaceholder")} rows={3} />
-              ) : (
-                <Textarea
-                  id="summary"
-                  value={translation.getFieldValue("summary", "")}
-                  onChange={(e) => translation.setFieldValue("summary", e.target.value)}
-                  placeholder="尚未翻译"
-                  rows={3}
-                />
-              )}
+              <Textarea id="summary" {...register("summary")} placeholder={t("form.summaryPlaceholder")} rows={3} />
             </div>
             <div className="space-y-2">
               <Label>{t("form.contentLabel")}</Label>
-              {translation.isDefaultLocale ? (
-                <Controller name="content" control={control} render={({ field }) => (
-                  <RichTextEditor content={field.value || ""} onChange={field.onChange} placeholder={t("form.contentPlaceholder")} />
-                )} />
-              ) : (
-                <RichTextEditor
-                  content={translation.getFieldValue("content", "")}
-                  onChange={(val) => translation.setFieldValue("content", val)}
-                  placeholder="尚未翻译"
-                />
-              )}
+              <Controller name="content" control={control} render={({ field }) => (
+                <RichTextEditor content={field.value || ""} onChange={field.onChange} placeholder={t("form.contentPlaceholder")} />
+              )} />
             </div>
           </div>
 

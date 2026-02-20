@@ -11,8 +11,6 @@ import {
   useCreatePopup,
   useUpdatePopup,
 } from "@/hooks/use-popups"
-import { useEntityTranslation } from "@/hooks/use-entity-translation"
-import { LocaleSwitcher } from "@/components/ui/locale-switcher"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -48,12 +46,6 @@ export function PopupForm({ popup, mode }: PopupFormProps) {
   const createPopup = useCreatePopup()
   const updatePopup = useUpdatePopup(popup?.id || "")
   const [showMediaPicker, setShowMediaPicker] = React.useState(false)
-
-  const translation = useEntityTranslation({
-    reference: "popup",
-    referenceId: popup?.id,
-    translatableFields: ["title", "description", "button_text"],
-  })
 
   const defaultValues: PopupFormData = popup
     ? {
@@ -117,8 +109,6 @@ export function PopupForm({ popup, mode }: PopupFormProps) {
         await updatePopup.mutateAsync(payload as any)
       }
 
-      await translation.saveAllTranslations()
-
       router.push("/popups")
     } catch (err) {
       // Error is handled by mutation state
@@ -173,14 +163,6 @@ export function PopupForm({ popup, mode }: PopupFormProps) {
         </div>
       )}
 
-      {/* Locale Switcher */}
-      {mode === "edit" && (
-        <LocaleSwitcher
-          activeLocale={translation.activeLocale}
-          onChange={translation.setActiveLocale}
-        />
-      )}
-
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Main Content */}
         <div className="space-y-6 lg:col-span-2">
@@ -190,40 +172,21 @@ export function PopupForm({ popup, mode }: PopupFormProps) {
 
             <div className="space-y-2">
               <Label htmlFor="title">{t("form.titleLabel")}</Label>
-              {translation.isDefaultLocale ? (
-                <Input
-                  id="title"
-                  {...register("title")}
-                  placeholder={t("form.titlePlaceholder")}
-                />
-              ) : (
-                <Input
-                  id="title"
-                  value={translation.getFieldValue("title", "")}
-                  onChange={(e) => translation.setFieldValue("title", e.target.value)}
-                  placeholder="尚未翻译"
-                />
-              )}
+              <Input
+                id="title"
+                {...register("title")}
+                placeholder={t("form.titlePlaceholder")}
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="description">{t("form.descriptionLabel")}</Label>
-              {translation.isDefaultLocale ? (
-                <Textarea
-                  id="description"
-                  {...register("description")}
-                  placeholder={t("form.descriptionPlaceholder")}
-                  rows={3}
-                />
-              ) : (
-                <Textarea
-                  id="description"
-                  value={translation.getFieldValue("description", "")}
-                  onChange={(e) => translation.setFieldValue("description", e.target.value)}
-                  placeholder="尚未翻译"
-                  rows={3}
-                />
-              )}
+              <Textarea
+                id="description"
+                {...register("description")}
+                placeholder={t("form.descriptionPlaceholder")}
+                rows={3}
+              />
             </div>
 
             <div className="space-y-2">
@@ -266,20 +229,11 @@ export function PopupForm({ popup, mode }: PopupFormProps) {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="button_text">{t("form.buttonTextLabel")}</Label>
-                {translation.isDefaultLocale ? (
-                  <Input
-                    id="button_text"
-                    {...register("button_text")}
-                    placeholder={t("form.buttonTextPlaceholder")}
-                  />
-                ) : (
-                  <Input
-                    id="button_text"
-                    value={translation.getFieldValue("button_text", "")}
-                    onChange={(e) => translation.setFieldValue("button_text", e.target.value)}
-                    placeholder="尚未翻译"
-                  />
-                )}
+                <Input
+                  id="button_text"
+                  {...register("button_text")}
+                  placeholder={t("form.buttonTextPlaceholder")}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="button_link">{t("form.buttonLinkLabel")}</Label>

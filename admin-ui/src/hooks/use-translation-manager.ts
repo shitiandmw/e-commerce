@@ -9,6 +9,7 @@ import { TRANSLATION_LOCALES, DEFAULT_LOCALE, type TranslationLocale } from "./u
 export interface TranslatableResourceItem {
   id: string
   displayValue: string
+  originalValues: Record<string, string>
   translations: Record<string, Record<string, string>>
 }
 

@@ -11,8 +11,6 @@ import {
   useCreateBrand,
   useUpdateBrand,
 } from "@/hooks/use-brands"
-import { useEntityTranslation } from "@/hooks/use-entity-translation"
-import { LocaleSwitcher } from "@/components/ui/locale-switcher"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -38,12 +36,6 @@ export function BrandForm({ brand, mode }: BrandFormProps) {
   const router = useRouter()
   const createBrand = useCreateBrand()
   const updateBrand = useUpdateBrand(brand?.id || "")
-
-  const translation = useEntityTranslation({
-    reference: "brand",
-    referenceId: brand?.id,
-    translatableFields: ["name", "description"],
-  })
 
   const defaultValues: BrandFormData = brand
     ? {
@@ -79,8 +71,6 @@ export function BrandForm({ brand, mode }: BrandFormProps) {
       } else {
         await updateBrand.mutateAsync(payload as any)
       }
-
-      await translation.saveAllTranslations()
 
       router.push("/brands")
     } catch (err) {
@@ -136,14 +126,6 @@ export function BrandForm({ brand, mode }: BrandFormProps) {
         </div>
       )}
 
-      {/* Locale Switcher */}
-      {mode === "edit" && (
-        <LocaleSwitcher
-          activeLocale={translation.activeLocale}
-          onChange={translation.setActiveLocale}
-        />
-      )}
-
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Main Content */}
         <div className="space-y-6 lg:col-span-2">
@@ -153,20 +135,11 @@ export function BrandForm({ brand, mode }: BrandFormProps) {
 
             <div className="space-y-2">
               <Label htmlFor="name">{t("form.nameLabel")}</Label>
-              {translation.isDefaultLocale ? (
-                <Input
-                  id="name"
-                  {...register("name")}
-                  placeholder={t("form.namePlaceholder")}
-                />
-              ) : (
-                <Input
-                  id="name"
-                  value={translation.getFieldValue("name", "")}
-                  onChange={(e) => translation.setFieldValue("name", e.target.value)}
-                  placeholder="尚未翻译"
-                />
-              )}
+              <Input
+                id="name"
+                {...register("name")}
+                placeholder={t("form.namePlaceholder")}
+              />
               {errors.name && (
                 <p className="text-sm text-destructive">
                   {errors.name.message}
@@ -176,22 +149,12 @@ export function BrandForm({ brand, mode }: BrandFormProps) {
 
             <div className="space-y-2">
               <Label htmlFor="description">{t("form.descriptionLabel")}</Label>
-              {translation.isDefaultLocale ? (
-                <Textarea
-                  id="description"
-                  {...register("description")}
-                  placeholder={t("form.descriptionPlaceholder")}
-                  rows={4}
-                />
-              ) : (
-                <Textarea
-                  id="description"
-                  value={translation.getFieldValue("description", "")}
-                  onChange={(e) => translation.setFieldValue("description", e.target.value)}
-                  placeholder="尚未翻译"
-                  rows={4}
-                />
-              )}
+              <Textarea
+                id="description"
+                {...register("description")}
+                placeholder={t("form.descriptionPlaceholder")}
+                rows={4}
+              />
             </div>
           </div>
         </div>

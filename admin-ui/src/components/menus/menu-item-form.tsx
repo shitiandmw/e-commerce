@@ -6,8 +6,6 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { MenuItem } from "@/hooks/use-menus"
-import { useEntityTranslation, DEFAULT_LOCALE } from "@/hooks/use-entity-translation"
-import { LocaleSwitcher } from "@/components/ui/locale-switcher"
 import {
   Dialog,
   DialogContent,
@@ -90,12 +88,6 @@ export function MenuItemForm({
   const t = useTranslations("menus")
   const isEdit = !!item
 
-  const translation = useEntityTranslation({
-    reference: "menu_item",
-    referenceId: item?.id,
-    translatableFields: ["label"],
-  })
-
   const parentOptions = React.useMemo(
     () => flattenMenuItems(allItems, 0, item?.id),
     [allItems, item?.id]
@@ -161,9 +153,6 @@ export function MenuItemForm({
       parent_id: data.parent_id || null,
       metadata,
     })
-
-    // Save translations for non-default locales
-    await translation.saveAllTranslations()
   }
 
   return (
@@ -179,31 +168,14 @@ export function MenuItemForm({
           onSubmit={handleSubmit(handleFormSubmit)}
           className="space-y-4 mt-4"
         >
-          {/* Locale Switcher */}
-          {isEdit && (
-            <LocaleSwitcher
-              activeLocale={translation.activeLocale}
-              onChange={translation.setActiveLocale}
-            />
-          )}
-
           {/* Label */}
           <div className="space-y-2">
             <Label htmlFor="item-label">{t("itemForm.labelField")}</Label>
-            {translation.isDefaultLocale ? (
-              <Input
-                id="item-label"
-                {...register("label")}
-                placeholder={t("itemForm.labelPlaceholder")}
-              />
-            ) : (
-              <Input
-                id="item-label"
-                value={translation.getFieldValue("label", "")}
-                onChange={(e) => translation.setFieldValue("label", e.target.value)}
-                placeholder="尚未翻译"
-              />
-            )}
+            <Input
+              id="item-label"
+              {...register("label")}
+              placeholder={t("itemForm.labelPlaceholder")}
+            />
             {errors.label && (
               <p className="text-sm text-destructive">
                 {errors.label.message}

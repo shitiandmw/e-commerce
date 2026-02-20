@@ -16,7 +16,6 @@ const TRANSLATABLE_RESOURCES = [
     labelEn: "Articles",
     fields: ["title", "summary", "content"],
     displayField: "title",
-    queryFields: ["id", "title", "translations"],
   },
   {
     reference: "page",
@@ -25,7 +24,6 @@ const TRANSLATABLE_RESOURCES = [
     labelEn: "Pages",
     fields: ["title", "content"],
     displayField: "title",
-    queryFields: ["id", "title", "translations"],
   },
   {
     reference: "brand",
@@ -34,7 +32,6 @@ const TRANSLATABLE_RESOURCES = [
     labelEn: "Brands",
     fields: ["name", "description"],
     displayField: "name",
-    queryFields: ["id", "name"],
   },
   {
     reference: "menu_item",
@@ -43,7 +40,6 @@ const TRANSLATABLE_RESOURCES = [
     labelEn: "Menu Items",
     fields: ["label"],
     displayField: "label",
-    queryFields: ["id", "label"],
   },
   {
     reference: "banner_item",
@@ -52,7 +48,6 @@ const TRANSLATABLE_RESOURCES = [
     labelEn: "Banners",
     fields: ["title", "subtitle"],
     displayField: "title",
-    queryFields: ["id", "title", "subtitle"],
   },
 ] as const
 
@@ -67,9 +62,11 @@ export const GET = async (
 
   for (const resource of TRANSLATABLE_RESOURCES) {
     try {
+      // Query all translatable fields + translations JSON
+      const queryFields = ["id", ...resource.fields, "translations"]
       const { data: items } = await query.graph({
         entity: resource.entity,
-        fields: resource.queryFields as unknown as string[],
+        fields: queryFields,
       })
 
       const totalItems = items.length
@@ -97,11 +94,19 @@ export const GET = async (
         displayField: resource.displayField,
         totalItems,
         translatedCount,
-        items: items.map((item: any) => ({
-          id: item.id,
-          displayValue: item[resource.displayField] || item.id,
-          translations: item.translations || {},
-        })),
+        items: items.map((item: any) => {
+          // Collect original field values for display
+          const originalValues: Record<string, string> = {}
+          for (const f of resource.fields) {
+            originalValues[f] = item[f] || ""
+          }
+          return {
+            id: item.id,
+            displayValue: item[resource.displayField] || item.id,
+            originalValues,
+            translations: item.translations || {},
+          }
+        }),
       })
     } catch {
       // If entity query fails, skip it
