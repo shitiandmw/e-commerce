@@ -16,7 +16,7 @@ interface BannerSlot {
   items: BannerItem[]
 }
 
-export default function CategoryBanners({ banners }: { banners: BannerSlot[] }) {
+export default function CategoryBanners({ banners, dict }: { banners: BannerSlot[]; dict: Record<string, string> }) {
   // Find the home_category slot
   const slot = banners.find((s) => s.key === "home_category")
   const items = slot?.items || []
@@ -26,9 +26,9 @@ export default function CategoryBanners({ banners }: { banners: BannerSlot[] }) 
   return (
     <section className="bg-background py-16">
       <div className="mx-auto max-w-7xl px-4">
-        <h2 className="mb-2 text-center text-2xl font-bold text-gold">精选分类</h2>
+        <h2 className="mb-2 text-center text-2xl font-bold text-gold">{dict.category_banners_title || "精选分类"}</h2>
         <p className="mb-10 text-center text-sm text-muted">
-          探索不同系列，找到您的心仪之选
+          {dict.category_banners_desc || "探索不同系列，找到您的心仪之选"}
         </p>
         <div
           className={`grid gap-4 ${
@@ -61,7 +61,7 @@ export default function CategoryBanners({ banners }: { banners: BannerSlot[] }) 
                   <p className="mb-3 text-sm text-white/80">{item.subtitle}</p>
                 )}
                 <span className="inline-block rounded bg-gold px-4 py-1.5 text-xs font-semibold text-background transition-colors group-hover:bg-gold-light">
-                  立即选购
+                  {dict.shop_now || "立即选购"}
                 </span>
               </div>
             </Link>

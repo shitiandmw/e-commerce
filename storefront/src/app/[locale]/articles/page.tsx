@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { fetchContent } from "@/lib/api"
+import { getDictionary, type Locale } from "@/lib/i18n"
 
 interface Article {
   id: string
@@ -34,6 +35,7 @@ export default async function ArticlesPage({
   searchParams: Promise<{ category?: string; page?: string }>
 }) {
   const { locale } = await paramsPromise
+  const dict = await getDictionary(locale as Locale)
   const params = await searchParams
   const currentPage = parseInt(params.page || "1", 10)
   const offset = (currentPage - 1) * PAGE_SIZE
@@ -43,6 +45,7 @@ export default async function ArticlesPage({
     data = await fetchContent<ArticlesResponse>("/store/content/articles", {
       offset,
       limit: PAGE_SIZE,
+      locale,
       ...(params.category ? { category: params.category } : {}),
     })
   } catch {
@@ -52,7 +55,7 @@ export default async function ArticlesPage({
   // Fetch all articles to extract unique categories for filter
   let allCategories: CategoryItem[] = []
   try {
-    const allData = await fetchContent<ArticlesResponse>("/store/content/articles", { limit: 100 })
+    const allData = await fetchContent<ArticlesResponse>("/store/content/articles", { limit: 100, locale })
     const catMap = new Map<string, CategoryItem>()
     allData.articles.forEach((a) => {
       if (a.category) catMap.set(a.category.id, a.category)
@@ -66,7 +69,7 @@ export default async function ArticlesPage({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12">
-      <h1 className="mb-8 text-3xl font-bold text-gold">资讯文章</h1>
+      <h1 className="mb-8 text-3xl font-bold text-gold">{dict.articles_title || "资讯文章"}</h1>
 
       {/* Category filter */}
       {allCategories.length > 0 && (
@@ -79,7 +82,7 @@ export default async function ArticlesPage({
                 : "border border-border text-muted hover:text-gold"
             }`}
           >
-            全部
+            {dict.all_categories || "全部"}
           </Link>
           {allCategories.map((cat) => (
             <Link
@@ -100,8 +103,8 @@ export default async function ArticlesPage({
       {/* Article cards */}
       {data.articles.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <p className="mb-2 text-lg text-muted">暂无文章</p>
-          <p className="text-sm text-muted">请稍后再来查看最新资讯</p>
+          <p className="mb-2 text-lg text-muted">{dict.no_articles || "暂无文章"}</p>
+          <p className="text-sm text-muted">{dict.no_articles_desc || "请稍后再来查看最新资讯"}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -133,7 +136,7 @@ export default async function ArticlesPage({
                   )}
                   {article.published_at && (
                     <span className="text-xs text-muted">
-                      {new Date(article.published_at).toLocaleDateString("zh-CN")}
+                      {new Date(article.published_at).toLocaleDateString(locale)}
                     </span>
                   )}
                 </div>
@@ -157,7 +160,7 @@ export default async function ArticlesPage({
               href={`/${locale}/articles?page=${currentPage - 1}${params.category ? `&category=${params.category}` : ""}`}
               className="rounded border border-border px-4 py-2 text-sm text-muted hover:text-gold"
             >
-              上一页
+              {dict.prev_page || "上一页"}
             </Link>
           )}
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
@@ -178,7 +181,7 @@ export default async function ArticlesPage({
               href={`/${locale}/articles?page=${currentPage + 1}${params.category ? `&category=${params.category}` : ""}`}
               className="rounded border border-border px-4 py-2 text-sm text-muted hover:text-gold"
             >
-              下一页
+              {dict.next_page || "下一页"}
             </Link>
           )}
         </div>

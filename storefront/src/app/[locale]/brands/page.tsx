@@ -21,10 +21,15 @@ interface BrandsResponse {
   limit: number
 }
 
-export default async function BrandsPage() {
+export default async function BrandsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
   let brands: Brand[] = []
   try {
-    const data = await fetchContent<BrandsResponse>("/store/content/brands", { limit: "100" })
+    const data = await fetchContent<BrandsResponse>("/store/content/brands", { limit: "100", locale })
     brands = data?.brands || []
   } catch (e) {
     console.error("Failed to fetch brands:", e)

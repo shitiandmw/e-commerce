@@ -17,6 +17,7 @@ type CreateBannerItemInput = {
   is_enabled?: boolean
   starts_at?: string | Date | null
   ends_at?: string | Date | null
+  translations?: Record<string, any> | null
 }
 
 const createBannerItemStep = createStep(

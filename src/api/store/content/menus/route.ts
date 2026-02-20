@@ -6,6 +6,7 @@ interface BrandRecord {
   id: string
   name: string
   logo_url: string | null
+  origin: string | null
 }
 
 interface MenuItemRecord {
@@ -60,13 +61,22 @@ function hasBrandItems(items: MenuItemRecord[]): boolean {
   return false
 }
 
-// Attach brand data to items with item_type=brand
+// Attach brand data to items with item_type=brand, filtered by brand_origin
 function attachBrands(items: MenuItemRecord[], brands: BrandRecord[]): MenuItemRecord[] {
-  return items.map((item) => ({
-    ...item,
-    brands: item.metadata?.item_type === "brand" ? brands : undefined,
-    children: item.children ? attachBrands(item.children, brands) : [],
-  }))
+  return items.map((item) => {
+    let itemBrands: BrandRecord[] | undefined
+    if (item.metadata?.item_type === "brand") {
+      const origin = item.metadata?.brand_origin as string | undefined
+      itemBrands = origin
+        ? brands.filter((b) => b.origin === origin)
+        : brands
+    }
+    return {
+      ...item,
+      brands: itemBrands,
+      children: item.children ? attachBrands(item.children, brands) : [],
+    }
+  })
 }
 
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
@@ -104,7 +114,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
         const { data: brands } = await query.graph(
           {
             entity: "brand",
-            fields: ["id", "name", "logo_url"],
+            fields: ["id", "name", "logo_url", "origin"],
             pagination: { order: { name: "ASC" } },
           },
           { locale },

@@ -13,6 +13,7 @@ type UpdateCollectionInput = {
   key?: string
   description?: string | null
   sort_order?: number
+  translations?: Record<string, any> | null
 }
 
 const updateCollectionStep = createStep(

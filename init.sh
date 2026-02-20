@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # ============================================================================
-# init.sh — 一键启动开发环境（基础设施 + 后端 + 前端）
-# 用法: bash init.sh 或 ./init.sh
+# init.sh — 一键启动开发环境（基础设施检查 + 依赖安装 + 服务启动）
+# 用法: bash init.sh
+# 数据库重置/种子数据请使用: bash reset-db.sh
 # 支持多 worktree 并行开发，应用端口基于目录路径自动派生
 # ============================================================================
 set -e
@@ -14,14 +15,13 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 log()  { echo -e "${GREEN}[init]${NC} $1"; }
 warn() { echo -e "${YELLOW}[init]${NC} $1"; }
 err()  { echo -e "${RED}[init]${NC} $1"; }
 
 # ---------- 端口自动派生 ----------
-# 基于目录路径哈希生成稳定偏移量，同一目录始终得到相同端口
 if [ -n "$PORT_OFFSET" ]; then
   OFFSET=$PORT_OFFSET
 else
@@ -50,8 +50,7 @@ cat > "$ROOT_DIR/admin-ui/.env.local" <<EOF
 NEXT_PUBLIC_MEDUSA_BACKEND_URL=http://localhost:$MEDUSA_PORT
 EOF
 
-# 生成 storefront/.env.local
-# Publishable key 在后端就绪后自动获取，此处先写占位
+# 生成 storefront/.env.local（Publishable key 在后端就绪后自动获取）
 cat > "$ROOT_DIR/storefront/.env.local" <<EOF
 NEXT_PUBLIC_MEDUSA_BACKEND_URL=http://localhost:$MEDUSA_PORT
 NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=
@@ -61,7 +60,6 @@ EOF
 export DATABASE_URL="postgres://medusa:medusa_password@localhost:55432/medusa_ecommerce"
 export REDIS_URL="redis://localhost:56739"
 
-# 动态 CORS：包含当前 worktree 的端口
 export STORE_CORS="http://localhost:$STOREFRONT_PORT,http://localhost:8000,http://localhost:3000"
 export ADMIN_CORS="http://localhost:$ADMIN_PORT,http://localhost:$MEDUSA_PORT,http://localhost:5173,http://localhost:9000,http://localhost:3001,http://localhost:3002"
 export AUTH_CORS="http://localhost:$ADMIN_PORT,http://localhost:$MEDUSA_PORT,http://localhost:$STOREFRONT_PORT,http://localhost:5173,http://localhost:9000,http://localhost:8000,http://localhost:3001,http://localhost:3002"
@@ -72,13 +70,11 @@ if [ ! -d "node_modules" ]; then
   npm install
 fi
 
-# ---------- 安装 Admin UI 依赖 ----------
 if [ ! -d "admin-ui/node_modules" ]; then
   log "安装 Admin UI 依赖..."
   cd "$ROOT_DIR/admin-ui" && npm install && cd "$ROOT_DIR"
 fi
 
-# ---------- 安装 Storefront 依赖 ----------
 if [ ! -d "storefront/node_modules" ]; then
   log "安装 Storefront 依赖..."
   cd "$ROOT_DIR/storefront" && npm install && cd "$ROOT_DIR"
@@ -108,7 +104,6 @@ cleanup() {
   [ -n "$STOREFRONT_PID" ] && kill $STOREFRONT_PID 2>/dev/null && log "Storefront 已停止"
   [ -n "$FRONTEND_PID" ] && kill $FRONTEND_PID 2>/dev/null && log "前端已停止"
   [ -n "$BACKEND_PID" ]  && kill $BACKEND_PID 2>/dev/null  && log "后端已停止"
-  # 确保子进程也被终止
   jobs -p | xargs -r kill 2>/dev/null
   log "开发环境已关闭"
   exit 0
@@ -125,7 +120,6 @@ if command -v docker &>/dev/null; then
     docker compose up -d 2>&1 | grep -v "^time=" || true
     log "等待数据库就绪..."
     sleep 5
-    # 等待 PostgreSQL 健康
     for i in $(seq 1 10); do
       if docker exec ecommerce-postgres pg_isready -U medusa -d medusa_ecommerce &>/dev/null; then
         log "PostgreSQL 就绪"
@@ -142,66 +136,13 @@ else
   warn "请确保 PostgreSQL 和 Redis 已手动启动"
 fi
 
-# ---------- 2. 初始化数据库 ----------
-log "检查数据库迁移状态..."
-DB_NEEDS_INIT=false
-if ! npx medusa db:migrate 2>&1 | grep -q "No pending migrations"; then
-  log "运行数据库迁移..."
-  npx medusa db:migrate || {
-    warn "迁移失败，尝试完整初始化..."
-    npx medusa db:setup || {
-      err "数据库初始化失败"
-      exit 1
-    }
-  }
-  log "数据库迁移完成"
-  DB_NEEDS_INIT=true
-else
-  log "数据库已是最新状态"
-fi
+# ---------- 2. 数据库迁移（仅同步 schema，不做种子数据） ----------
+log "同步数据库 schema..."
+npx medusa db:migrate 2>&1 | tail -3 || {
+  warn "数据库迁移失败，如果是全新环境请先执行: bash reset-db.sh"
+}
 
-# ---------- 3. 创建默认管理员账号 ----------
-if [ "$DB_NEEDS_INIT" = true ]; then
-  log "创建默认管理员账号..."
-  npx medusa user -e admin@test.com -p admin123456 2>/dev/null || {
-    warn "管理员账号可能已存在或创建失败"
-    warn "默认账号: admin@test.com / admin123456"
-  }
-  log "✓ 管理员账号: admin@test.com / admin123456"
-
-  # 初始化 Mega Menu 种子数据
-  log "初始化菜单种子数据..."
-  npx medusa exec src/scripts/seed-menu.ts 2>/dev/null || {
-    warn "菜单种子数据初始化失败（可能已存在）"
-  }
-
-  # 初始化分类种子数据
-  log "初始化分类种子数据..."
-  npx medusa exec src/scripts/seed-categories.ts 2>/dev/null || {
-    warn "分类种子数据初始化失败（可能已存在）"
-  }
-
-  # 初始化品牌种子数据
-  log "初始化品牌种子数据..."
-  npx medusa exec src/scripts/seed-brands.ts 2>/dev/null || {
-    warn "品牌种子数据初始化失败（可能已存在）"
-  }
-
-  # 初始化策展集合种子数据（含雪茄商品）
-  log "初始化策展集合种子数据..."
-  npx medusa exec src/scripts/seed-collections.ts 2>/dev/null || {
-    warn "策展集合种子数据初始化失败（可能已存在）"
-  }
-
-  # 初始化 Banner 种子数据
-  log "初始化 Banner 种子数据..."
-  npx medusa exec src/scripts/seed-banners.ts 2>/dev/null || {
-    warn "Banner 种子数据初始化失败（可能已存在）"
-  }
-fi
-
-# ---------- 4. 启动 Medusa 后端 ----------
-# 确保 chokidar watcher 忽略 admin-ui/storefront（patch 可能因 npm install 跳过而丢失）
+# ---------- 3. 启动 Medusa 后端 ----------
 node scripts/patch-watcher.js
 
 log "启动 Medusa 后端（端口 $MEDUSA_PORT）..."
@@ -219,7 +160,7 @@ for i in $(seq 1 30); do
   sleep 1
 done
 
-# ---------- 4.1 获取 Publishable API Key 写入 storefront/.env.local ----------
+# ---------- 4. 获取 Publishable API Key 写入 storefront/.env.local ----------
 log "获取 Publishable API Key..."
 ADMIN_TOKEN=$(curl -s http://localhost:$MEDUSA_PORT/auth/user/emailpass \
   -X POST -H "Content-Type: application/json" \

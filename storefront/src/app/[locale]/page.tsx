@@ -1,4 +1,5 @@
 import { fetchContent } from "@/lib/medusa"
+import { getDictionary, type Locale } from "@/lib/i18n"
 import HeroBanner from "@/components/HeroBanner"
 import PromotionTabs from "@/components/PromotionTabs"
 import CuratedCollections from "@/components/CuratedCollections"
@@ -32,6 +33,7 @@ export default async function Home({
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params
+  const dict = await getDictionary(locale as Locale)
   let homeData: HomeData = { banners: [], collections: [], popups: [] }
   let categoryBannersData: BannersData = { banners: [] }
   let brandsData: BrandsData = { brands: [] }
@@ -39,10 +41,10 @@ export default async function Home({
 
   try {
     ;[homeData, categoryBannersData, brandsData, articlesData] = await Promise.all([
-      fetchContent<HomeData>("/store/content/home"),
-      fetchContent<BannersData>("/store/content/banners", { position: "home_category" }),
-      fetchContent<BrandsData>("/store/content/brands"),
-      fetchContent<ArticlesData>("/store/content/articles?limit=4"),
+      fetchContent<HomeData>("/store/content/home", { locale }),
+      fetchContent<BannersData>("/store/content/banners", { position: "home_category", locale }),
+      fetchContent<BrandsData>("/store/content/brands", { locale }),
+      fetchContent<ArticlesData>("/store/content/articles", { limit: "4", locale }),
     ])
   } catch (e) {
     console.error("Failed to fetch homepage data:", e)
@@ -70,10 +72,10 @@ export default async function Home({
       )}
 
       <PromotionTabs collections={homeData.collections || []} />
-      <CategoryBanners banners={categoryBannersData.banners || []} />
+      <CategoryBanners banners={categoryBannersData.banners || []} dict={dict} />
       <CuratedCollections collections={homeData.collections || []} />
-      <BrandShowcase brands={brandsData.brands || []} />
-      <LatestArticles articles={articlesData.articles || []} />
+      <BrandShowcase brands={brandsData.brands || []} locale={locale} dict={dict} />
+      <LatestArticles articles={articlesData.articles || []} locale={locale} dict={dict} />
       <PopupModal popups={(homeData.popups || []).filter((p: any) => p.popup_type !== "coupon")} />
       <CouponPopup popups={(homeData.popups || []).filter((p: any) => p.popup_type === "coupon")} />
     </>

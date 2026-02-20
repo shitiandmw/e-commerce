@@ -8,10 +8,13 @@ export async function GET(
   { params }: { params: Promise<{ handle: string }> }
 ) {
   const { handle } = await params
+  const { searchParams } = request.nextUrl
+  const brandUrl = new URL(`${MEDUSA_BACKEND_URL}/store/content/brands/${handle}`)
+  searchParams.forEach((v, k) => brandUrl.searchParams.set(k, v))
   const headers: Record<string, string> = { "content-type": "application/json" }
   if (PUBLISHABLE_KEY) headers["x-publishable-api-key"] = PUBLISHABLE_KEY
 
-  const res = await fetch(`${MEDUSA_BACKEND_URL}/store/content/brands/${handle}`, { headers })
+  const res = await fetch(brandUrl.toString(), { headers })
   if (!res.ok) return NextResponse.json({ brand: null }, { status: res.status })
   const data = await res.json()
   return NextResponse.json(data)

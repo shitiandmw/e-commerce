@@ -20,6 +20,7 @@ type CreatePopupInput = {
   sort_order?: number
   popup_type?: "general" | "coupon"
   coupon_code?: string | null
+  translations?: Record<string, any> | null
 }
 
 const createPopupStep = createStep(

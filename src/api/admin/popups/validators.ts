@@ -1,5 +1,11 @@
 import { z } from "zod"
 
+const TranslationsSchema = z.record(z.string(), z.object({
+  title: z.string().optional(),
+  description: z.string().optional(),
+  button_text: z.string().optional(),
+})).nullable().optional()
+
 export const PostAdminCreatePopup = z.object({
   title: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
@@ -13,6 +19,7 @@ export const PostAdminCreatePopup = z.object({
   sort_order: z.number().optional(),
   popup_type: z.enum(["general", "coupon"]).optional(),
   coupon_code: z.string().nullable().optional(),
+  translations: TranslationsSchema,
 })
 
 export const PostAdminUpdatePopup = z.object({
@@ -28,6 +35,7 @@ export const PostAdminUpdatePopup = z.object({
   sort_order: z.number().optional(),
   popup_type: z.enum(["general", "coupon"]).optional(),
   coupon_code: z.string().nullable().optional(),
+  translations: TranslationsSchema,
 })
 
 export type PostAdminCreatePopupType = z.infer<typeof PostAdminCreatePopup>

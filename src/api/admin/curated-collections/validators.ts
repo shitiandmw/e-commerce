@@ -1,11 +1,17 @@
 import { z } from "zod"
 
+const TranslationsSchema = z.record(z.string(), z.object({
+  name: z.string().optional(),
+  description: z.string().optional(),
+})).nullable().optional()
+
 // Collection validators
 export const PostAdminCreateCuratedCollection = z.object({
   name: z.string().min(1),
   key: z.string().min(1),
   description: z.string().optional(),
   sort_order: z.number().int().optional(),
+  translations: TranslationsSchema,
 })
 
 export const PostAdminUpdateCuratedCollection = z.object({
@@ -13,6 +19,7 @@ export const PostAdminUpdateCuratedCollection = z.object({
   key: z.string().min(1).optional(),
   description: z.string().nullable().optional(),
   sort_order: z.number().int().optional(),
+  translations: TranslationsSchema,
 })
 
 // Tab validators

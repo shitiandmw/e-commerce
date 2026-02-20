@@ -1,5 +1,9 @@
 import { z } from "zod"
 
+const TranslationsSchema = z.record(z.string(), z.object({
+  label: z.string().optional(),
+})).nullable().optional()
+
 export const PostAdminCreateMenuItem = z.object({
   label: z.string().min(1),
   url: z.string().nullable().optional(),
@@ -8,6 +12,7 @@ export const PostAdminCreateMenuItem = z.object({
   is_enabled: z.boolean().default(true),
   metadata: z.record(z.unknown()).nullable().optional(),
   parent_id: z.string().nullable().optional(),
+  translations: TranslationsSchema,
 })
 
 export const PostAdminUpdateMenuItem = z.object({
@@ -18,6 +23,7 @@ export const PostAdminUpdateMenuItem = z.object({
   is_enabled: z.boolean().optional(),
   metadata: z.record(z.unknown()).nullable().optional(),
   parent_id: z.string().nullable().optional(),
+  translations: TranslationsSchema,
 })
 
 export const PostAdminReorderMenuItems = z.object({

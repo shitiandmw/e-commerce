@@ -1,5 +1,10 @@
 import { z } from "zod"
 
+const TranslationsSchema = z.record(z.string(), z.object({
+  title: z.string().optional(),
+  subtitle: z.string().optional(),
+})).nullable().optional()
+
 export const PostAdminCreateBannerItem = z.object({
   slot_id: z.string().min(1),
   image_url: z.string().url(),
@@ -10,6 +15,7 @@ export const PostAdminCreateBannerItem = z.object({
   is_enabled: z.boolean().optional(),
   starts_at: z.string().datetime().nullable().optional(),
   ends_at: z.string().datetime().nullable().optional(),
+  translations: TranslationsSchema,
 })
 
 export const PostAdminUpdateBannerItem = z.object({
@@ -22,6 +28,7 @@ export const PostAdminUpdateBannerItem = z.object({
   is_enabled: z.boolean().optional(),
   starts_at: z.string().datetime().nullable().optional(),
   ends_at: z.string().datetime().nullable().optional(),
+  translations: TranslationsSchema,
 })
 
 export type PostAdminCreateBannerItemType = z.infer<typeof PostAdminCreateBannerItem>

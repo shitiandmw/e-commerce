@@ -22,7 +22,7 @@ export default async function LocaleLayout({
   return (
     <CartProvider>
       <CompareProvider>
-        <AnnouncementBar />
+        <AnnouncementBar locale={locale as Locale} />
         <Header locale={locale as Locale} />
         <main className="min-h-screen">{children}</main>
         <Footer locale={locale as Locale} />

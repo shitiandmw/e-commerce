@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import type { Metadata } from "next"
 import { fetchContent } from "@/lib/api"
+import { getDictionary, type Locale } from "@/lib/i18n"
 
 interface SeoData {
   meta_title?: string
@@ -19,10 +20,13 @@ interface Page {
   seo?: SeoData | null
 }
 
-async function getPage(slug: string): Promise<Page | null> {
+async function getPage(slug: string, locale?: string): Promise<Page | null> {
   try {
+    const params: Record<string, string> = {}
+    if (locale) params.locale = locale
     const data = await fetchContent<{ page: Page }>(
-      `/store/content/pages/${slug}`
+      `/store/content/pages/${slug}`,
+      Object.keys(params).length > 0 ? params : undefined
     )
     return data.page
   } catch {
@@ -35,8 +39,8 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string; slug: string }>
 }): Promise<Metadata> {
-  const { slug } = await params
-  const page = await getPage(slug)
+  const { slug, locale } = await params
+  const page = await getPage(slug, locale)
   if (!page) return { title: "页面未找到" }
 
   const seo = page.seo
@@ -64,7 +68,10 @@ export default async function StaticPage({
   params: Promise<{ locale: string; slug: string }>
 }) {
   const { locale, slug } = await params
-  const page = await getPage(slug)
+  const [page, dict] = await Promise.all([
+    getPage(slug, locale),
+    getDictionary(locale as Locale),
+  ])
   if (!page) notFound()
 
   const isFaqTemplate = page.template === "faq"
@@ -76,7 +83,7 @@ export default async function StaticPage({
           href={`/${locale}`}
           className="text-sm text-muted hover:text-gold transition-colors"
         >
-          ← 返回首页
+          {dict.back_to_home || "← 返回首页"}
         </Link>
       </div>
 

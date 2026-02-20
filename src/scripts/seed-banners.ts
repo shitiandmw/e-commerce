@@ -60,7 +60,7 @@ export default async function seedBanners({ container }: ExecArgs) {
   // 2. Category banners
   const catBanner = await bannerService.createBannerSlots({
     name: "分类横幅",
-    key: "category-banner",
+    key: "home_category",
     description: "分类页面顶部横幅",
   })
 

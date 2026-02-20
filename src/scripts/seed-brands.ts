@@ -97,14 +97,18 @@ export default async function seedBrands({ container }: ExecArgs) {
 
   console.log("Seeding cigar brands...")
 
-  const allBrands = [...cubanBrands, ...worldBrands]
+  const allBrands: Array<BrandDef & { origin: string }> = [
+    ...cubanBrands.map((b) => ({ ...b, origin: "cuban" })),
+    ...worldBrands.map((b) => ({ ...b, origin: "world" })),
+  ]
 
   for (const brand of allBrands) {
     await brandService.createBrands({
       name: brand.name,
       description: `${brand.nameCn} - ${brand.description}`,
       logo_url: logoUrl(brand.name),
-    })
+      origin: brand.origin,
+    } as any)
   }
 
   console.log(

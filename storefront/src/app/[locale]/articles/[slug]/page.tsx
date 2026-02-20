@@ -2,6 +2,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { fetchContent } from "@/lib/api"
+import { getDictionary, type Locale } from "@/lib/i18n"
 
 interface SeoData {
   meta_title?: string
@@ -22,10 +23,13 @@ interface Article {
   category?: { id: string; name: string; handle: string } | null
 }
 
-async function getArticle(slug: string): Promise<Article | null> {
+async function getArticle(slug: string, locale?: string): Promise<Article | null> {
   try {
+    const params: Record<string, string> = {}
+    if (locale) params.locale = locale
     const data = await fetchContent<{ article: Article }>(
-      `/store/content/articles/${slug}`
+      `/store/content/articles/${slug}`,
+      Object.keys(params).length > 0 ? params : undefined
     )
     return data.article
   } catch {
@@ -38,8 +42,8 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string; slug: string }>
 }): Promise<Metadata> {
-  const { slug } = await params
-  const article = await getArticle(slug)
+  const { locale, slug } = await params
+  const article = await getArticle(slug, locale)
   if (!article) return { title: "文章未找到" }
 
   const seo = article.seo
@@ -68,7 +72,10 @@ export default async function ArticleDetailPage({
   params: Promise<{ locale: string; slug: string }>
 }) {
   const { locale, slug } = await params
-  const article = await getArticle(slug)
+  const [article, dict] = await Promise.all([
+    getArticle(slug, locale),
+    getDictionary(locale as Locale),
+  ])
   if (!article) notFound()
 
   return (
@@ -78,7 +85,7 @@ export default async function ArticleDetailPage({
           href={`/${locale}/articles`}
           className="text-sm text-muted hover:text-gold transition-colors"
         >
-          ← 返回文章列表
+          {dict.back_to_articles || "← 返回文章列表"}
         </Link>
       </div>
 
@@ -94,7 +101,7 @@ export default async function ArticleDetailPage({
           )}
           {article.published_at && (
             <span className="text-sm text-muted">
-              {new Date(article.published_at).toLocaleDateString("zh-CN", {
+              {new Date(article.published_at).toLocaleDateString(locale, {
                 year: "numeric",
                 month: "long",
                 day: "numeric",

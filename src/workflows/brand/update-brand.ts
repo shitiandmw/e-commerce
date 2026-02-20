@@ -12,6 +12,7 @@ type UpdateBrandInput = {
   name?: string
   description?: string | null
   logo_url?: string | null
+  translations?: Record<string, any> | null
 }
 
 const updateBrandStep = createStep(

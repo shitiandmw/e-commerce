@@ -15,6 +15,7 @@ type UpdateAnnouncementInput = {
   is_enabled?: boolean
   starts_at?: string | null
   ends_at?: string | null
+  translations?: Record<string, any> | null
 }
 
 const updateAnnouncementStep = createStep(

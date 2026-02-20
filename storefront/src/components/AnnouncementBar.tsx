@@ -1,4 +1,5 @@
 import { sdk } from "@/lib/medusa"
+import type { Locale } from "@/lib/i18n"
 import AnnouncementBarClient from "./AnnouncementBarClient"
 
 type Announcement = {
@@ -8,10 +9,10 @@ type Announcement = {
   sort_order: number
 }
 
-async function getAnnouncements(): Promise<Announcement[]> {
+async function getAnnouncements(locale: Locale): Promise<Announcement[]> {
   try {
     const data = await sdk.client.fetch<{ announcements: Announcement[] }>(
-      "/store/content/home",
+      `/store/content/home?locale=${locale}`,
       { method: "GET" }
     )
     return data.announcements || []
@@ -20,8 +21,8 @@ async function getAnnouncements(): Promise<Announcement[]> {
   }
 }
 
-export default async function AnnouncementBar() {
-  const announcements = await getAnnouncements()
+export default async function AnnouncementBar({ locale }: { locale: Locale }) {
+  const announcements = await getAnnouncements(locale)
   if (announcements.length === 0) return null
   return <AnnouncementBarClient announcements={announcements} />
 }

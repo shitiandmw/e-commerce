@@ -16,6 +16,7 @@ type UpdateMenuItemInput = {
   is_enabled?: boolean
   metadata?: Record<string, unknown> | null
   parent_id?: string | null
+  translations?: Record<string, any> | null
 }
 
 const updateMenuItemStep = createStep(
