@@ -97,5 +97,10 @@
   "back_to_articles": "← 返回文章列表",
   "brand_not_found": "品牌未找到",
   "page_not_found": "页面未找到",
-  "article_not_found": "文章未找到"
+  "article_not_found": "文章未找到",
+  "welcome_brand_subtitle": "精 选 雪 茄 · 品 味 生 活",
+  "age_question": "您是否已年满18周岁？",
+  "confirm": "是的，进入网站",
+  "tobacco_disclaimer": "本网站包含烟草相关内容，仅面向法定吸烟年龄以上的成年人。进入本网站即表示您确认已达到所在地区的法定吸烟年龄。",
+  "smoking_warning": "吸烟有害健康"
 }

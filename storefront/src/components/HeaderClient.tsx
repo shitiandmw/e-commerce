@@ -281,6 +281,70 @@ function MobileMenuItem({ item, onClose, depth = 0 }: { item: MenuItem; onClose:
     </div>
   )
 }
+function GlobeIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+      <path d="M2 12h20" />
+    </svg>
+  )
+}
+
+const LOCALE_LABELS: Record<string, { short: string; full: string }> = {
+  "zh-CN": { short: "中", full: "简体中文" },
+  "zh-TW": { short: "繁", full: "繁體中文" },
+  en: { short: "EN", full: "English" },
+}
+
+function LanguageSwitcher({ locale }: { locale: Locale }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  const switchLocale = (target: string) => {
+    document.cookie = `NEXT_LOCALE=${target}; path=/; max-age=${365 * 24 * 60 * 60}`
+    const path = window.location.pathname.replace(`/${locale}`, `/${target}`)
+    window.location.href = path || `/${target}`
+  }
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex h-11 items-center gap-1 px-2 text-muted transition-colors hover:text-gold"
+        aria-label="Switch language"
+      >
+        <GlobeIcon />
+        <span className="hidden text-xs font-medium sm:inline">{LOCALE_LABELS[locale]?.short}</span>
+      </button>
+      {open && (
+        <div className="absolute right-0 top-full z-50 mt-1 min-w-[140px] rounded-lg border border-border bg-background py-1 shadow-xl">
+          {Object.entries(LOCALE_LABELS).map(([key, val]) => (
+            <button
+              key={key}
+              onClick={() => { switchLocale(key); setOpen(false) }}
+              className={`flex w-full items-center gap-2 px-4 py-2 text-sm transition-colors ${
+                key === locale ? "text-gold font-medium" : "text-muted hover:text-gold hover:bg-surface"
+              }`}
+            >
+              {val.full}
+              {key === locale && <span className="ml-auto text-xs">✓</span>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function HeaderClient({ menuItems, locale, dict }: {
   menuItems: MenuItem[]
   locale: Locale
@@ -345,13 +409,14 @@ export default function HeaderClient({ menuItems, locale, dict }: {
 
       {/* Right side icons */}
       <div className="flex items-center gap-1 md:gap-3">
-        <Link href="/search" className="flex h-11 w-11 items-center justify-center text-muted transition-colors hover:text-gold" aria-label="搜索">
+        <LanguageSwitcher locale={locale} />
+        <Link href={`/${locale}/search`} className="flex h-11 w-11 items-center justify-center text-muted transition-colors hover:text-gold" aria-label={dict.search || "搜索"}>
           <SearchIcon />
         </Link>
-        <Link href="/account" className="flex h-11 w-11 items-center justify-center text-muted transition-colors hover:text-gold" aria-label="账户">
+        <Link href={`/${locale}/account`} className="flex h-11 w-11 items-center justify-center text-muted transition-colors hover:text-gold" aria-label={dict.account || "账户"}>
           <UserIcon />
         </Link>
-        <Link href="/cart" className="flex h-11 w-11 items-center justify-center text-muted transition-colors hover:text-gold" aria-label="购物车">
+        <Link href={`/${locale}/cart`} className="flex h-11 w-11 items-center justify-center text-muted transition-colors hover:text-gold" aria-label={dict.cart || "购物车"}>
           <CartIcon count={cartCount} />
         </Link>
         {/* Mobile hamburger */}
@@ -401,15 +466,35 @@ export default function HeaderClient({ menuItems, locale, dict }: {
               ))}
             </nav>
             <div className="mt-6 space-y-3 border-t border-border pt-6">
-              <Link href="/search" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 text-sm text-muted hover:text-gold">
-                <SearchIcon /> 搜索
+              <Link href={`/${locale}/search`} onClick={() => setMobileOpen(false)} className="flex items-center gap-3 text-sm text-muted hover:text-gold">
+                <SearchIcon /> {dict.search || "搜索"}
               </Link>
-              <Link href="/account" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 text-sm text-muted hover:text-gold">
-                <UserIcon /> 我的账户
+              <Link href={`/${locale}/account`} onClick={() => setMobileOpen(false)} className="flex items-center gap-3 text-sm text-muted hover:text-gold">
+                <UserIcon /> {dict.my_account || "我的账户"}
               </Link>
-              <Link href="/cart" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 text-sm text-muted hover:text-gold">
-                <CartIcon count={cartCount} /> 购物车
+              <Link href={`/${locale}/cart`} onClick={() => setMobileOpen(false)} className="flex items-center gap-3 text-sm text-muted hover:text-gold">
+                <CartIcon count={cartCount} /> {dict.cart || "购物车"}
               </Link>
+            </div>
+            {/* Mobile language switcher */}
+            <div className="mt-4 border-t border-border pt-4">
+              <p className="mb-2 text-xs text-muted">{dict.language || "语言"}</p>
+              <div className="flex gap-2">
+                {Object.entries(LOCALE_LABELS).map(([key, val]) => (
+                  <button
+                    key={key}
+                    onClick={() => {
+                      document.cookie = `NEXT_LOCALE=${key}; path=/; max-age=${365 * 24 * 60 * 60}`
+                      window.location.href = window.location.pathname.replace(`/${locale}`, `/${key}`) || `/${key}`
+                    }}
+                    className={`rounded-full px-3 py-1 text-xs transition-colors ${
+                      key === locale ? "bg-gold text-background font-medium" : "border border-border text-muted hover:border-gold hover:text-gold"
+                    }`}
+                  >
+                    {val.short}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>

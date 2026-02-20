@@ -97,5 +97,10 @@
   "back_to_articles": "← Back to Articles",
   "brand_not_found": "Brand not found",
   "page_not_found": "Page not found",
-  "article_not_found": "Article not found"
+  "article_not_found": "Article not found",
+  "welcome_brand_subtitle": "PREMIUM CIGARS · REFINED LIVING",
+  "age_question": "Are you 18 years of age or older?",
+  "confirm": "Yes, Enter Site",
+  "tobacco_disclaimer": "This website contains tobacco-related content and is intended for adults of legal smoking age only. By entering this site, you confirm that you have reached the legal smoking age in your region.",
+  "smoking_warning": "Smoking is harmful to your health"
 }

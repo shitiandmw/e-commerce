@@ -1,10 +1,11 @@
 import AnnouncementBar from "@/components/AnnouncementBar"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
+import WelcomeGate from "@/components/WelcomeGate"
 import { CartProvider } from "@/components/CartProvider"
 import { CompareProvider } from "@/components/CompareProvider"
 import CompareBar from "@/components/CompareBar"
-import { isValidLocale, type Locale } from "@/lib/i18n"
+import { isValidLocale, getDictionary, type Locale } from "@/lib/i18n"
 import { notFound } from "next/navigation"
 
 export const dynamic = "force-dynamic"
@@ -18,10 +19,12 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params
   if (!isValidLocale(locale)) notFound()
+  const dict = await getDictionary(locale as Locale)
 
   return (
     <CartProvider>
       <CompareProvider>
+        <WelcomeGate locale={locale as Locale} dict={dict} />
         <AnnouncementBar locale={locale as Locale} />
         <Header locale={locale as Locale} />
         <main className="min-h-screen">{children}</main>
