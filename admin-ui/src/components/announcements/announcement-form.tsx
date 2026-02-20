@@ -10,6 +10,8 @@ import {
   useCreateAnnouncement,
   useUpdateAnnouncement,
 } from "@/hooks/use-announcements"
+import { useEntityTranslation } from "@/hooks/use-entity-translation"
+import { LocaleSwitcher } from "@/components/ui/locale-switcher"
 import {
   Dialog,
   DialogContent,
@@ -51,6 +53,12 @@ export function AnnouncementForm({
   const isEdit = !!announcement
   const createAnnouncement = useCreateAnnouncement()
   const updateAnnouncement = useUpdateAnnouncement(announcement?.id || "")
+
+  const translation = useEntityTranslation({
+    reference: "announcement",
+    referenceId: announcement?.id,
+    translatableFields: ["content", "link_text"],
+  })
 
   const formatDateForInput = (dateStr?: string | null) => {
     if (!dateStr) return ""
@@ -135,6 +143,8 @@ export function AnnouncementForm({
         await createAnnouncement.mutateAsync(payload as any)
       }
 
+      await translation.saveAllTranslations()
+
       onOpenChange(false)
     } catch {
       // Error handled by mutation state
@@ -166,15 +176,33 @@ export function AnnouncementForm({
             </div>
           )}
 
+          {/* Locale Switcher */}
+          {isEdit && (
+            <LocaleSwitcher
+              activeLocale={translation.activeLocale}
+              onChange={translation.setActiveLocale}
+            />
+          )}
+
           {/* Text */}
           <div className="space-y-2">
             <Label htmlFor="text">{t("form.textLabel")}</Label>
-            <Textarea
-              id="text"
-              {...register("text")}
-              placeholder={t("form.textPlaceholder")}
-              rows={3}
-            />
+            {translation.isDefaultLocale ? (
+              <Textarea
+                id="text"
+                {...register("text")}
+                placeholder={t("form.textPlaceholder")}
+                rows={3}
+              />
+            ) : (
+              <Textarea
+                id="text"
+                value={translation.getFieldValue("content", "")}
+                onChange={(e) => translation.setFieldValue("content", e.target.value)}
+                placeholder="尚未翻译"
+                rows={3}
+              />
+            )}
             {errors.text && (
               <p className="text-sm text-destructive">{errors.text.message}</p>
             )}

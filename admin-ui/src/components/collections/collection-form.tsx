@@ -11,6 +11,8 @@ import {
   useCreateCollection,
   useUpdateCollection,
 } from "@/hooks/use-curated-collections"
+import { useEntityTranslation } from "@/hooks/use-entity-translation"
+import { LocaleSwitcher } from "@/components/ui/locale-switcher"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -43,6 +45,12 @@ export function CollectionForm({ collection, mode }: CollectionFormProps) {
   const router = useRouter()
   const createCollection = useCreateCollection()
   const updateCollection = useUpdateCollection(collection?.id || "")
+
+  const translation = useEntityTranslation({
+    reference: "curated_collection",
+    referenceId: collection?.id,
+    translatableFields: ["title", "description"],
+  })
 
   const defaultValues: CollectionFormData = collection
     ? {
@@ -81,6 +89,8 @@ export function CollectionForm({ collection, mode }: CollectionFormProps) {
       } else {
         await updateCollection.mutateAsync(payload)
       }
+
+      await translation.saveAllTranslations()
 
       router.push("/collections")
     } catch (err) {
@@ -138,6 +148,14 @@ export function CollectionForm({ collection, mode }: CollectionFormProps) {
         </div>
       )}
 
+      {/* Locale Switcher */}
+      {mode === "edit" && (
+        <LocaleSwitcher
+          activeLocale={translation.activeLocale}
+          onChange={translation.setActiveLocale}
+        />
+      )}
+
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Main Content */}
         <div className="space-y-6 lg:col-span-2">
@@ -147,11 +165,20 @@ export function CollectionForm({ collection, mode }: CollectionFormProps) {
 
             <div className="space-y-2">
               <Label htmlFor="name">{t("form.nameLabel")}</Label>
-              <Input
-                id="name"
-                {...register("name")}
-                placeholder={t("form.namePlaceholder")}
-              />
+              {translation.isDefaultLocale ? (
+                <Input
+                  id="name"
+                  {...register("name")}
+                  placeholder={t("form.namePlaceholder")}
+                />
+              ) : (
+                <Input
+                  id="name"
+                  value={translation.getFieldValue("title", "")}
+                  onChange={(e) => translation.setFieldValue("title", e.target.value)}
+                  placeholder="尚未翻译"
+                />
+              )}
               {errors.name && (
                 <p className="text-sm text-destructive">
                   {errors.name.message}
@@ -180,12 +207,22 @@ export function CollectionForm({ collection, mode }: CollectionFormProps) {
               <Label htmlFor="description">
                 {t("form.descriptionLabel")}
               </Label>
-              <Textarea
-                id="description"
-                {...register("description")}
-                placeholder={t("form.descriptionPlaceholder")}
-                rows={4}
-              />
+              {translation.isDefaultLocale ? (
+                <Textarea
+                  id="description"
+                  {...register("description")}
+                  placeholder={t("form.descriptionPlaceholder")}
+                  rows={4}
+                />
+              ) : (
+                <Textarea
+                  id="description"
+                  value={translation.getFieldValue("description", "")}
+                  onChange={(e) => translation.setFieldValue("description", e.target.value)}
+                  placeholder="尚未翻译"
+                  rows={4}
+                />
+              )}
             </div>
           </div>
         </div>
