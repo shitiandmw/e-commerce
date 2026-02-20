@@ -10,9 +10,9 @@ export const BannerItem = model.define("banner_item", {
   title: model.text().translatable().nullable(),
   subtitle: model.text().translatable().nullable(),
   link_url: model.text().nullable(),
+  cta_text: model.text().translatable().nullable(),
   sort_order: model.number().default(0),
   is_enabled: model.boolean().default(true),
   starts_at: model.dateTime().nullable(),
   ends_at: model.dateTime().nullable(),
-  translations: model.json().nullable(),
 })

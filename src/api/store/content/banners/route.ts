@@ -12,7 +12,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
       fields: [
         "id", "name", "key", "description",
         "items.id", "items.image_url", "items.title", "items.subtitle",
-        "items.link_url", "items.sort_order", "items.is_enabled",
+        "items.link_url", "items.cta_text", "items.sort_order", "items.is_enabled",
         "items.starts_at", "items.ends_at",
       ],
       filters: position ? { key: position } : undefined,

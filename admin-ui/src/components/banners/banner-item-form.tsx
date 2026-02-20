@@ -20,13 +20,15 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { Loader2, ImageIcon } from "lucide-react"
+import { MediaPicker } from "@/components/media/media-picker"
+import { Loader2, ImageIcon, X } from "lucide-react"
 
 const itemSchema = z.object({
   image_url: z.string().min(1, "Image URL is required"),
   title: z.string().optional(),
   subtitle: z.string().optional(),
   link_url: z.string().optional(),
+  cta_text: z.string().optional(),
   sort_order: z.coerce.number().int().min(0).default(0),
   is_enabled: z.boolean().default(true),
   starts_at: z.string().optional(),
@@ -73,6 +75,7 @@ export function BannerItemForm({
         title: item.title || "",
         subtitle: item.subtitle || "",
         link_url: item.link_url || "",
+        cta_text: item.cta_text || "",
         sort_order: item.sort_order,
         is_enabled: item.is_enabled,
         starts_at: toDatetimeLocal(item.starts_at),
@@ -83,6 +86,7 @@ export function BannerItemForm({
         title: "",
         subtitle: "",
         link_url: "",
+        cta_text: "",
         sort_order: 0,
         is_enabled: true,
         starts_at: "",
@@ -111,6 +115,7 @@ export function BannerItemForm({
               title: item.title || "",
               subtitle: item.subtitle || "",
               link_url: item.link_url || "",
+              cta_text: item.cta_text || "",
               sort_order: item.sort_order,
               is_enabled: item.is_enabled,
               starts_at: toDatetimeLocal(item.starts_at),
@@ -121,6 +126,7 @@ export function BannerItemForm({
               title: "",
               subtitle: "",
               link_url: "",
+              cta_text: "",
               sort_order: 0,
               is_enabled: true,
               starts_at: "",
@@ -132,6 +138,7 @@ export function BannerItemForm({
 
   const isEnabled = watch("is_enabled")
   const imageUrl = watch("image_url")
+  const [mediaPickerOpen, setMediaPickerOpen] = React.useState(false)
 
   const onSubmit = async (data: ItemFormData) => {
     try {
@@ -140,6 +147,7 @@ export function BannerItemForm({
         title: data.title || null,
         subtitle: data.subtitle || null,
         link_url: data.link_url || null,
+        cta_text: data.cta_text || null,
         sort_order: data.sort_order,
         is_enabled: data.is_enabled,
         starts_at: data.starts_at ? new Date(data.starts_at).toISOString() : null,
@@ -182,19 +190,9 @@ export function BannerItemForm({
 
           {/* Image URL + Preview */}
           <div className="space-y-2">
-            <Label htmlFor="image_url">{t("itemForm.imageUrlLabel")}</Label>
-            <Input
-              id="image_url"
-              {...register("image_url")}
-              placeholder={t("itemForm.imageUrlPlaceholder")}
-            />
-            {errors.image_url && (
-              <p className="text-sm text-destructive">
-                {errors.image_url.message}
-              </p>
-            )}
-            {imageUrl && (
-              <div className="mt-2 rounded-lg border overflow-hidden bg-muted aspect-[16/9] max-h-40 flex items-center justify-center">
+            <Label>{t("itemForm.imageUrlLabel")}</Label>
+            {imageUrl ? (
+              <div className="relative rounded-lg border overflow-hidden bg-muted aspect-[16/9] max-h-40 flex items-center justify-center group">
                 <img
                   src={imageUrl}
                   alt="Preview"
@@ -203,8 +201,51 @@ export function BannerItemForm({
                     ;(e.target as HTMLImageElement).style.display = "none"
                   }}
                 />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => setMediaPickerOpen(true)}
+                  >
+                    {t("itemForm.changeImage")}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => setValue("image_url", "")}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setMediaPickerOpen(true)}
+                className="w-full rounded-lg border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors aspect-[16/9] max-h-40 flex flex-col items-center justify-center gap-2 text-muted-foreground"
+              >
+                <ImageIcon className="h-8 w-8" />
+                <span className="text-sm">{t("itemForm.selectImage")}</span>
+              </button>
             )}
+            {errors.image_url && (
+              <p className="text-sm text-destructive">
+                {errors.image_url.message}
+              </p>
+            )}
+            <input type="hidden" {...register("image_url")} />
+            <MediaPicker
+              open={mediaPickerOpen}
+              onOpenChange={setMediaPickerOpen}
+              onSelect={(urls) => {
+                if (urls.length > 0) {
+                  setValue("image_url", urls[0], { shouldValidate: true })
+                }
+              }}
+              selectedUrls={imageUrl ? [imageUrl] : []}
+            />
           </div>
 
           {/* Title */}
@@ -234,6 +275,16 @@ export function BannerItemForm({
               id="link_url"
               {...register("link_url")}
               placeholder={t("itemForm.linkUrlPlaceholder")}
+            />
+          </div>
+
+          {/* CTA Text */}
+          <div className="space-y-2">
+            <Label htmlFor="cta_text">{t("itemForm.ctaTextLabel")}</Label>
+            <Input
+              id="cta_text"
+              {...register("cta_text")}
+              placeholder={t("itemForm.ctaTextPlaceholder")}
             />
           </div>
 

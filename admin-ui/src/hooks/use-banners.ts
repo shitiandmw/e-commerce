@@ -11,6 +11,7 @@ export interface BannerItem {
   title?: string | null
   subtitle?: string | null
   link_url?: string | null
+  cta_text?: string | null
   sort_order: number
   is_enabled: boolean
   starts_at?: string | null
