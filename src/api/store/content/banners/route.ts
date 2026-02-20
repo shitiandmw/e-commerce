@@ -4,17 +4,21 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const query = req.scope.resolve("query")
   const now = new Date().toISOString()
   const position = (req.query.position as string) || ""
+  const locale = req.query.locale as string | undefined
 
-  const { data: bannerSlots } = await query.graph({
-    entity: "banner_slot",
-    fields: [
-      "id", "name", "key", "description",
-      "items.id", "items.image_url", "items.title", "items.subtitle",
-      "items.link_url", "items.sort_order", "items.is_enabled",
-      "items.starts_at", "items.ends_at",
-    ],
-    filters: position ? { key: position } : undefined,
-  })
+  const { data: bannerSlots } = await query.graph(
+    {
+      entity: "banner_slot",
+      fields: [
+        "id", "name", "key", "description",
+        "items.id", "items.image_url", "items.title", "items.subtitle",
+        "items.link_url", "items.sort_order", "items.is_enabled",
+        "items.starts_at", "items.ends_at",
+      ],
+      filters: position ? { key: position } : undefined,
+    },
+    { locale },
+  )
 
   const banners = (bannerSlots || []).map((slot: any) => ({
     ...slot,

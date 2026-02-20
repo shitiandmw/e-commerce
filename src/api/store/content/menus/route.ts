@@ -71,6 +71,7 @@ function attachBrands(items: MenuItemRecord[], brands: BrandRecord[]): MenuItemR
 
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const key = req.query.key as string | undefined
+  const locale = req.query.locale as string | undefined
   const query = req.scope.resolve("query")
 
   const filters: Record<string, any> = {}
@@ -78,11 +79,14 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     filters.key = key
   }
 
-  const { data: menus } = await query.graph({
-    entity: "menu",
-    fields: ["id", "name", "key", "description"],
-    filters,
-  })
+  const { data: menus } = await query.graph(
+    {
+      entity: "menu",
+      fields: ["id", "name", "key", "description"],
+      filters,
+    },
+    { locale },
+  )
 
   // For each menu, load items and build tree
   const menuService: MenuModuleService = req.scope.resolve(MENU_MODULE)
@@ -97,11 +101,14 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
       // If any item has item_type=brand, load brands and attach
       let finalTree = tree
       if (hasBrandItems(tree)) {
-        const { data: brands } = await query.graph({
-          entity: "brand",
-          fields: ["id", "name", "logo_url"],
-          pagination: { order: { name: "ASC" } },
-        })
+        const { data: brands } = await query.graph(
+          {
+            entity: "brand",
+            fields: ["id", "name", "logo_url"],
+            pagination: { order: { name: "ASC" } },
+          },
+          { locale },
+        )
         finalTree = attachBrands(tree, (brands || []) as unknown as BrandRecord[])
       }
 

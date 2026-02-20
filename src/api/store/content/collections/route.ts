@@ -4,21 +4,25 @@ import { Modules } from "@medusajs/framework/utils"
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const query = req.scope.resolve("query")
   const key = req.query.key as string | undefined
+  const locale = req.query.locale as string | undefined
 
   const filters: Record<string, any> = {}
   if (key) {
     filters.key = key
   }
 
-  const { data: collections } = await query.graph({
-    entity: "curated_collection",
-    fields: [
-      "id", "name", "key", "description", "sort_order",
-      "tabs.id", "tabs.name", "tabs.key", "tabs.sort_order",
-      "items.id", "items.product_id", "items.tab_id", "items.sort_order",
-    ],
-    filters,
-  })
+  const { data: collections } = await query.graph(
+    {
+      entity: "curated_collection",
+      fields: [
+        "id", "name", "key", "description", "sort_order",
+        "tabs.id", "tabs.name", "tabs.key", "tabs.sort_order",
+        "items.id", "items.product_id", "items.tab_id", "items.sort_order",
+      ],
+      filters,
+    },
+    { locale },
+  )
 
   // Collect all product_ids
   const productIds = new Set<string>()

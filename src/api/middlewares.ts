@@ -98,7 +98,7 @@ export default defineMiddlewares({
             defaults: [
               "id", "title", "slug", "cover_image", "summary",
               "status", "published_at", "sort_order", "is_pinned",
-              "category_id", "category.*", "translations", "seo",
+              "category_id", "category.*", "seo",
               "created_at", "updated_at",
             ],
             isList: true,
@@ -116,7 +116,7 @@ export default defineMiddlewares({
             defaults: [
               "id", "title", "slug", "cover_image", "summary", "content",
               "status", "published_at", "sort_order", "is_pinned",
-              "category_id", "category.*", "translations", "seo",
+              "category_id", "category.*", "seo",
               "created_at", "updated_at",
             ],
             isList: false,
@@ -133,7 +133,7 @@ export default defineMiddlewares({
           {
             defaults: [
               "id", "title", "slug", "content", "status", "template",
-              "sort_order", "translations", "seo", "created_at", "updated_at",
+              "sort_order", "seo", "created_at", "updated_at",
             ],
             isList: true,
           }
@@ -149,7 +149,7 @@ export default defineMiddlewares({
           {
             defaults: [
               "id", "title", "slug", "content", "status", "template",
-              "sort_order", "translations", "seo", "created_at", "updated_at",
+              "sort_order", "seo", "created_at", "updated_at",
             ],
             isList: false,
           }

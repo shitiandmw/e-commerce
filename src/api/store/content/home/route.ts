@@ -4,17 +4,21 @@ import { Modules } from "@medusajs/framework/utils"
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const query = req.scope.resolve("query")
   const now = new Date().toISOString()
+  const locale = req.query.locale as string | undefined
 
   // Fetch active banners (enabled + within time window)
-  const { data: bannerSlots } = await query.graph({
-    entity: "banner_slot",
-    fields: [
-      "id", "name", "key", "description",
-      "items.id", "items.image_url", "items.title", "items.subtitle",
-      "items.link_url", "items.sort_order", "items.is_enabled",
-      "items.starts_at", "items.ends_at",
-    ],
-  })
+  const { data: bannerSlots } = await query.graph(
+    {
+      entity: "banner_slot",
+      fields: [
+        "id", "name", "key", "description",
+        "items.id", "items.image_url", "items.title", "items.subtitle",
+        "items.link_url", "items.sort_order", "items.is_enabled",
+        "items.starts_at", "items.ends_at",
+      ],
+    },
+    { locale },
+  )
 
   // Filter banner items: enabled + time window
   const banners = (bannerSlots || []).map((slot: any) => ({
@@ -30,13 +34,16 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   }))
 
   // Fetch active announcements
-  const { data: allAnnouncements } = await query.graph({
-    entity: "announcement",
-    fields: [
-      "id", "text", "link_url", "sort_order",
-      "is_enabled", "starts_at", "ends_at",
-    ],
-  })
+  const { data: allAnnouncements } = await query.graph(
+    {
+      entity: "announcement",
+      fields: [
+        "id", "text", "link_url", "sort_order",
+        "is_enabled", "starts_at", "ends_at",
+      ],
+    },
+    { locale },
+  )
 
   const announcements = (allAnnouncements || [])
     .filter((a: any) => {
@@ -48,35 +55,40 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     .sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0))
 
   // Fetch active popups
-  const { data: allPopups } = await query.graph({
-    entity: "popup",
-    fields: [
-      "id", "title", "description", "image_url",
-      "button_text", "button_link", "is_enabled",
-      "trigger_type", "display_frequency", "target_page", "sort_order",
-      "popup_type", "coupon_code",
-    ],
-  })
+  const { data: allPopups } = await query.graph(
+    {
+      entity: "popup",
+      fields: [
+        "id", "title", "description", "image_url",
+        "button_text", "button_link", "is_enabled",
+        "trigger_type", "display_frequency", "target_page", "sort_order",
+        "popup_type", "coupon_code",
+      ],
+    },
+    { locale },
+  )
 
-  // PLACEHOLDER_POPUPS_AND_COLLECTIONS
   const popups = (allPopups || [])
     .filter((p: any) => p.is_enabled)
     .sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0))
 
   // Fetch curated collections with tabs and items
-  const { data: allCollections } = await query.graph({
-    entity: "curated_collection",
-    fields: [
-      "id", "name", "key", "description", "sort_order",
-      "tabs.id", "tabs.name", "tabs.key", "tabs.sort_order",
-      "items.id", "items.product_id", "items.tab_id", "items.sort_order",
-    ],
-  })
+  const { data: allCollections } = await query.graph(
+    {
+      entity: "curated_collection",
+      fields: [
+        "id", "name", "key", "description", "sort_order",
+        "tabs.id", "tabs.name", "tabs.key", "tabs.sort_order",
+        "items.id", "items.product_id", "items.tab_id", "items.sort_order",
+      ],
+    },
+    { locale },
+  )
 
   // Collect all product_ids from collection items
   const productIds = new Set<string>()
   for (const c of allCollections || []) {
-    for (const item of c.items || []) {
+    for (const item of (c as any).items || []) {
       if (item.product_id) productIds.add(item.product_id)
     }
   }
