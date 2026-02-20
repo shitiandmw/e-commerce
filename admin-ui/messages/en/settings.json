@@ -15,7 +15,8 @@
       "shipping": "Shipping",
       "payments": "Payments",
       "team": "Team",
-      "apiKeys": "API Keys"
+      "apiKeys": "API Keys",
+      "translations": "Translations"
     },
 
     "storeInfo": {

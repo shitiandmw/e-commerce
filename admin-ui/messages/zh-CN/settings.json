@@ -15,7 +15,8 @@
       "shipping": "配送",
       "payments": "支付",
       "team": "团队",
-      "apiKeys": "API 密钥"
+      "apiKeys": "API 密钥",
+      "translations": "翻译"
     },
 
     "storeInfo": {

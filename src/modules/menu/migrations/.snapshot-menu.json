@@ -75,20 +75,29 @@
           "mappedType": "datetime"
         }
       },
-      "name": "banner_slot",
+      "name": "menu",
       "schema": "public",
       "indexes": [
         {
-          "keyName": "IDX_banner_slot_deleted_at",
+          "keyName": "IDX_menu_key_unique",
           "columnNames": [],
           "composite": false,
           "constraint": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_banner_slot_deleted_at\" ON \"banner_slot\" (\"deleted_at\") WHERE deleted_at IS NULL"
+          "expression": "CREATE UNIQUE INDEX IF NOT EXISTS \"IDX_menu_key_unique\" ON \"menu\" (\"key\") WHERE deleted_at IS NULL"
         },
         {
-          "keyName": "banner_slot_pkey",
+          "keyName": "IDX_menu_deleted_at",
+          "columnNames": [],
+          "composite": false,
+          "constraint": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_menu_deleted_at\" ON \"menu\" (\"deleted_at\") WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "menu_pkey",
           "columnNames": [
             "id"
           ],
@@ -113,8 +122,8 @@
           "nullable": false,
           "mappedType": "text"
         },
-        "slot_id": {
-          "name": "slot_id",
+        "label": {
+          "name": "label",
           "type": "text",
           "unsigned": false,
           "autoincrement": false,
@@ -122,17 +131,8 @@
           "nullable": false,
           "mappedType": "text"
         },
-        "image_url": {
-          "name": "image_url",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "text"
-        },
-        "title": {
-          "name": "title",
+        "url": {
+          "name": "url",
           "type": "text",
           "unsigned": false,
           "autoincrement": false,
@@ -140,17 +140,8 @@
           "nullable": true,
           "mappedType": "text"
         },
-        "subtitle": {
-          "name": "subtitle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "text"
-        },
-        "link_url": {
-          "name": "link_url",
+        "icon_url": {
+          "name": "icon_url",
           "type": "text",
           "unsigned": false,
           "autoincrement": false,
@@ -178,25 +169,14 @@
           "default": "true",
           "mappedType": "boolean"
         },
-        "starts_at": {
-          "name": "starts_at",
-          "type": "timestamptz",
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": 6,
-          "mappedType": "datetime"
-        },
-        "ends_at": {
-          "name": "ends_at",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 6,
-          "mappedType": "datetime"
+          "mappedType": "json"
         },
         "translations": {
           "name": "translations",
@@ -206,6 +186,24 @@
           "primary": false,
           "nullable": true,
           "mappedType": "json"
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "text"
+        },
+        "menu_id": {
+          "name": "menu_id",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "text"
         },
         "created_at": {
           "name": "created_at",
@@ -240,29 +238,29 @@
           "mappedType": "datetime"
         }
       },
-      "name": "banner_item",
+      "name": "menu_item",
       "schema": "public",
       "indexes": [
         {
-          "keyName": "IDX_banner_item_slot_id",
+          "keyName": "IDX_menu_item_menu_id",
           "columnNames": [],
           "composite": false,
           "constraint": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_banner_item_slot_id\" ON \"banner_item\" (\"slot_id\") WHERE deleted_at IS NULL"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_menu_item_menu_id\" ON \"menu_item\" (\"menu_id\") WHERE deleted_at IS NULL"
         },
         {
-          "keyName": "IDX_banner_item_deleted_at",
+          "keyName": "IDX_menu_item_deleted_at",
           "columnNames": [],
           "composite": false,
           "constraint": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_banner_item_deleted_at\" ON \"banner_item\" (\"deleted_at\") WHERE deleted_at IS NULL"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_menu_item_deleted_at\" ON \"menu_item\" (\"deleted_at\") WHERE deleted_at IS NULL"
         },
         {
-          "keyName": "banner_item_pkey",
+          "keyName": "menu_item_pkey",
           "columnNames": [
             "id"
           ],
@@ -274,16 +272,16 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "banner_item_slot_id_foreign": {
-          "constraintName": "banner_item_slot_id_foreign",
+        "menu_item_menu_id_foreign": {
+          "constraintName": "menu_item_menu_id_foreign",
           "columnNames": [
-            "slot_id"
+            "menu_id"
           ],
-          "localTableName": "public.banner_item",
+          "localTableName": "public.menu_item",
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "public.banner_slot",
+          "referencedTableName": "public.menu",
           "updateRule": "cascade"
         }
       },

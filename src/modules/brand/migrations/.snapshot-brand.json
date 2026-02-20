@@ -42,6 +42,15 @@
           "nullable": true,
           "mappedType": "text"
         },
+        "translations": {
+          "name": "translations",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamptz",

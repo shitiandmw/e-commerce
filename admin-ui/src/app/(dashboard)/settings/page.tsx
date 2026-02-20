@@ -10,6 +10,7 @@ import { ShippingSettings } from "@/components/settings/shipping-settings"
 import { PaymentSettings } from "@/components/settings/payment-settings"
 import { UserSettings } from "@/components/settings/user-settings"
 import { ApiKeySettings } from "@/components/settings/api-key-settings"
+import { TranslationSettings } from "@/components/settings/translation-settings"
 import {
   Store,
   Globe,
@@ -18,9 +19,10 @@ import {
   CreditCard,
   Users,
   Key,
+  Languages,
 } from "lucide-react"
 
-const tabIds = ["store", "regions", "channels", "shipping", "payments", "team", "api-keys"] as const
+const tabIds = ["store", "regions", "channels", "shipping", "payments", "team", "api-keys", "translations"] as const
 type TabId = (typeof tabIds)[number]
 
 const tabIcons: Record<TabId, typeof Store> = {
@@ -31,6 +33,7 @@ const tabIcons: Record<TabId, typeof Store> = {
   payments: CreditCard,
   team: Users,
   "api-keys": Key,
+  translations: Languages,
 }
 
 const tabLabelKeys: Record<TabId, string> = {
@@ -41,6 +44,7 @@ const tabLabelKeys: Record<TabId, string> = {
   payments: "tabs.payments",
   team: "tabs.team",
   "api-keys": "tabs.apiKeys",
+  translations: "tabs.translations",
 }
 
 export default function SettingsPage() {
@@ -91,6 +95,7 @@ export default function SettingsPage() {
           {activeTab === "payments" && <PaymentSettings />}
           {activeTab === "team" && <UserSettings />}
           {activeTab === "api-keys" && <ApiKeySettings />}
+          {activeTab === "translations" && <TranslationSettings />}
         </div>
       </div>
     </div>

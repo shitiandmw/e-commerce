@@ -14,4 +14,5 @@ export const BannerItem = model.define("banner_item", {
   is_enabled: model.boolean().default(true),
   starts_at: model.dateTime().nullable(),
   ends_at: model.dateTime().nullable(),
+  translations: model.json().nullable(),
 })

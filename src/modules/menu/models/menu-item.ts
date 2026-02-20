@@ -9,6 +9,7 @@ export const MenuItem = model.define("menu_item", {
   sort_order: model.number().default(0),
   is_enabled: model.boolean().default(true),
   metadata: model.json().nullable(),
+  translations: model.json().nullable(),
   parent_id: model.text().nullable(),
   menu: model.belongsTo(() => Menu, {
     mappedBy: "items",
