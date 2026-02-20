@@ -71,9 +71,9 @@ export default async function Home({
         </section>
       )}
 
-      <PromotionTabs collections={homeData.collections || []} />
+      <PromotionTabs collections={homeData.collections || []} locale={locale} />
       <CategoryBanners banners={categoryBannersData.banners || []} dict={dict} />
-      <CuratedCollections collections={homeData.collections || []} />
+      <CuratedCollections collections={homeData.collections || []} locale={locale} />
       <BrandShowcase brands={brandsData.brands || []} locale={locale} dict={dict} />
       <LatestArticles articles={articlesData.articles || []} locale={locale} dict={dict} />
       <PopupModal popups={(homeData.popups || []).filter((p: any) => p.popup_type !== "coupon")} />

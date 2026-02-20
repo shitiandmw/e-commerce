@@ -63,7 +63,7 @@ export default function BrandDetailClient({ brand }: { brand: Brand }) {
         <>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
             {visibleProducts.map((product: any) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} locale={locale} />
             ))}
           </div>
 

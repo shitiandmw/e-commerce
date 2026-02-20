@@ -87,7 +87,7 @@ function ProductCarousel({ items }: { items: CollectionItem[] }) {
           return (
             <Link
               key={item.id}
-              href={`/products/${p.handle}`}
+              href={`${locale ? `/${locale}` : ""}/products/${p.handle}`}
               className="group flex w-40 shrink-0 flex-col overflow-hidden rounded-lg border border-border bg-surface transition-colors hover:border-gold/50 sm:w-48"
             >
               <div className="relative aspect-square overflow-hidden bg-surface-light">
@@ -129,7 +129,7 @@ function ProductCarousel({ items }: { items: CollectionItem[] }) {
   )
 }
 
-export default function PromotionTabs({ collections }: { collections: CuratedCollection[] }) {
+export default function PromotionTabs({ collections, locale }: { collections: CuratedCollection[]; locale?: string }) {
   // Flatten all tabs from all collections into a single tab bar
   const allTabs = collections.flatMap((c) =>
     c.tabs.map((t) => ({ ...t, collectionId: c.id }))

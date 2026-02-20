@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import ProductCard from "@/components/ProductCard"
+import { useLocale } from "@/lib/useLocale"
 
 interface Category {
   id: string
@@ -29,6 +30,7 @@ interface Product {
 const LIMIT = 12
 
 export default function ProductListClient() {
+  const locale = useLocale()
   const [products, setProducts] = useState<Product[]>([])
   const [count, setCount] = useState(0)
   const [offset, setOffset] = useState(0)
@@ -148,7 +150,7 @@ export default function ProductListClient() {
       ) : (
         <div className="grid grid-cols-2 gap-3 md:gap-6 md:grid-cols-3 lg:grid-cols-4">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.id} product={product} locale={locale} />
           ))}
         </div>
       )}

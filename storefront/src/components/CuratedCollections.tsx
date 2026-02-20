@@ -35,21 +35,23 @@ interface CuratedCollection {
 
 export default function CuratedCollections({
   collections,
+  locale,
 }: {
   collections: CuratedCollection[]
+  locale?: string
 }) {
   if (!collections || collections.length === 0) return null
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-12 md:py-20">
       {collections.map((collection) => (
-        <CollectionBlock key={collection.id} collection={collection} />
+        <CollectionBlock key={collection.id} collection={collection} locale={locale} />
       ))}
     </section>
   )
 }
 
-function CollectionBlock({ collection }: { collection: CuratedCollection }) {
+function CollectionBlock({ collection, locale }: { collection: CuratedCollection; locale?: string }) {
   const tabs = [...collection.tabs].sort((a, b) => a.sort_order - b.sort_order)
   const [activeTab, setActiveTab] = useState<string | null>(
     tabs.length > 0 ? tabs[0].id : null
@@ -97,7 +99,7 @@ function CollectionBlock({ collection }: { collection: CuratedCollection }) {
       ) : (
         <div className="grid grid-cols-2 gap-3 md:gap-6 md:grid-cols-4">
           {sortedItems.map((item) => (
-            <ProductCard key={item.id} item={item} />
+            <ProductCard key={item.id} item={item} locale={locale} />
           ))}
         </div>
       )}
@@ -105,12 +107,12 @@ function CollectionBlock({ collection }: { collection: CuratedCollection }) {
   )
 }
 
-function ProductCard({ item }: { item: CollectionItem }) {
+function ProductCard({ item, locale }: { item: CollectionItem; locale?: string }) {
   const product = item.product
   if (!product) return null
 
   const price = product.variants?.[0]?.calculated_price
-  const href = `/products/${product.handle}`
+  const href = `${locale ? `/${locale}` : ""}/products/${product.handle}`
 
   return (
     <Link href={href} className="group block overflow-hidden rounded-lg bg-surface transition hover:ring-1 hover:ring-gold/30">

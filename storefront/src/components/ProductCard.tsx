@@ -45,6 +45,7 @@ interface ProductCardProps {
     brand?: { name: string; name_zh?: string; logo_url?: string } | null
     metadata?: Record<string, unknown> | null
   }
+  locale?: string
 }
 
 function getPackaging(product: ProductCardProps["product"]): string | null {
@@ -105,7 +106,7 @@ function PriceDisplay({ variant }: { variant?: ProductVariant }) {
   return null
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, locale }: ProductCardProps) {
   const { addItem } = useCart()
   const [adding, setAdding] = useState(false)
   const [showVariantModal, setShowVariantModal] = useState(false)
@@ -208,7 +209,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
         <Link
-          href={`/products/${product.handle}`}
+          href={`${locale ? `/${locale}` : ""}/products/${product.handle}`}
           className="block"
         >
         <div className="relative aspect-square overflow-hidden bg-surface-light">

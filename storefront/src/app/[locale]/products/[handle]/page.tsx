@@ -16,9 +16,14 @@ async function getProduct(handle: string) {
       regionId = regions?.[0]?.id
     } catch {}
 
+    const baseFields = "id,title,handle,subtitle,description,thumbnail,images.*,options.*,options.values.*,variants.*,variants.options.*,variants.prices.*,variants.inventory_quantity,tags.*,metadata"
+    const fields = regionId
+      ? `${baseFields},+variants.calculated_price`
+      : baseFields
+
     const { products } = await sdk.store.product.list({
       handle,
-      fields: "id,title,handle,subtitle,description,thumbnail,images.*,options.*,options.values.*,variants.*,variants.options.*,variants.prices.*,+variants.calculated_price,variants.inventory_quantity,*brand,tags.*,metadata",
+      fields,
       limit: 1,
       ...(regionId ? { region_id: regionId } : {}),
     })
