@@ -7,11 +7,43 @@ import { BrandSpotlight } from "@/components/home/brand-spotlight"
 import { ServiceBar } from "@/components/home/service-bar"
 import { BlogPreview } from "@/components/home/blog-preview"
 import { RegisterCTA } from "@/components/home/register-cta"
+import { fetchContent } from "@/lib/medusa"
 
-export default function HomePage() {
+interface BannerItem {
+  id: string
+  image_url: string
+  title?: string | null
+  subtitle?: string | null
+  link_url?: string | null
+  cta_text?: string | null
+  sort_order: number
+  is_enabled: boolean
+}
+
+interface BannerSlot {
+  id: string
+  key: string
+  items: BannerItem[]
+}
+
+interface BannersResponse {
+  banners: BannerSlot[]
+}
+
+export default async function HomePage() {
+  let bannerSlides: BannerItem[] = []
+  try {
+    const data = await fetchContent<BannersResponse>("/store/content/banners", {
+      position: "homepage-hero",
+    })
+    bannerSlides = data?.banners?.[0]?.items ?? []
+  } catch {
+    // API 不可用时 fallback 为空，HeroCarousel 会显示占位
+  }
+
   return (
     <>
-      <HeroCarousel />
+      <HeroCarousel slides={bannerSlides} />
       <HotPicks />
       <FeaturedCuban />
       <LimitedEditions />

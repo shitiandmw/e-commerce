@@ -4,7 +4,13 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: true,
+    dangerouslyAllowLocalIP: true,
+    remotePatterns: [
+      { protocol: "https", hostname: "**" },
+      { protocol: "http", hostname: "localhost", port: "" },
+      { protocol: "http", hostname: "localhost", port: "9437" },
+      { protocol: "http", hostname: "localhost", port: "9000" },
+    ],
   },
 }
 
