@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Noto_Serif_SC, Geist } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { LayoutShell } from '@/components/layout/layout-shell'
+import { AnnouncementBarServer } from '@/components/layout/announcement-bar-server'
 import { AgeVerification } from '@/components/age-verification'
 import './globals.css'
 
@@ -36,6 +37,7 @@ export default function RootLayout({
     <html lang="zh-Hant" className={`${notoSerifSC.variable} ${geist.variable}`}>
       <body className="font-sans antialiased bg-background text-foreground">
         <AgeVerification />
+        <AnnouncementBarServer />
         <LayoutShell>{children}</LayoutShell>
         <Analytics />
       </body>
