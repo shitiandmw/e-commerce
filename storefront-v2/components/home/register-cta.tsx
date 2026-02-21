@@ -1,7 +1,16 @@
+"use client"
+
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
+import { isLoggedIn } from "@/lib/auth"
+import { useEffect, useState } from "react"
 
 export function RegisterCTA() {
+  const [loggedIn, setLoggedIn] = useState(false)
+  useEffect(() => { setLoggedIn(isLoggedIn()) }, [])
+
+  if (loggedIn) return null
+
   return (
     <section className="py-20 px-4 lg:px-6">
       <div className="mx-auto max-w-7xl">
@@ -17,20 +26,20 @@ export function RegisterCTA() {
             立即加入 TIMECIGAR
           </h2>
           <p className="mt-4 text-muted-foreground max-w-md mx-auto leading-relaxed">
-            註冊成為會員，即可享受首單 9 折優惠、專屬積分回饋、新品搶先通知等多重禮遇。
+            註冊成為會員，即可享受多重專屬禮遇，開啟您的雪茄品鑑之旅。
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link
-              href="#"
+              href="/register"
               className="inline-flex items-center gap-2 bg-gold text-primary-foreground px-8 py-3 text-sm font-medium tracking-wide hover:bg-gold-dark transition-colors"
             >
               免費註冊 <ArrowRight className="size-4" />
             </Link>
             <Link
-              href="#"
+              href="/login"
               className="inline-flex items-center gap-2 border border-border text-foreground/70 px-8 py-3 text-sm tracking-wide hover:border-gold hover:text-gold transition-colors"
             >
-              了解會員權益
+              已有帳戶？登入
             </Link>
           </div>
         </div>

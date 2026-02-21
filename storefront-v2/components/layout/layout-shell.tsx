@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation"
 import { SiteHeader } from "@/components/layout/header"
 import { SiteFooter } from "@/components/layout/footer"
+import AuthGuard from "@/components/auth-guard"
 import type { MenuItem } from "@/lib/data/menu"
 
 export function LayoutShell({ children, navItems }: { children: React.ReactNode; navItems: MenuItem[] }) {
@@ -10,13 +11,15 @@ export function LayoutShell({ children, navItems }: { children: React.ReactNode;
   const isCheckout = pathname.startsWith("/checkout")
 
   if (isCheckout) {
-    return <>{children}</>
+    return <AuthGuard>{children}</AuthGuard>
   }
 
   return (
     <>
       <SiteHeader navItems={navItems} />
-      <main className="min-h-screen">{children}</main>
+      <main className="min-h-screen">
+        <AuthGuard>{children}</AuthGuard>
+      </main>
       <SiteFooter />
     </>
   )

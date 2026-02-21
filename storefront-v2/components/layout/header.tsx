@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useRef, useCallback } from "react"
+import { useState, useRef, useCallback, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Search, User, ShoppingBag, Menu, ChevronDown, ChevronRight, Globe, Check } from "lucide-react"
+import { Search, User, ShoppingBag, Menu, ChevronDown, ChevronRight, Globe, Check, LogIn } from "lucide-react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { useCart, selectTotalItems } from "@/lib/cart-store"
+import { isLoggedIn } from "@/lib/auth"
 import { cn } from "@/lib/utils"
 import type { MenuItem, MenuBrand } from "@/lib/data/menu"
 
@@ -268,6 +269,8 @@ export function SiteHeader({ navItems }: { navItems: MenuItem[] }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const cartCount = useCart(selectTotalItems)
+  const [loggedIn, setLoggedIn] = useState(false)
+  useEffect(() => { setLoggedIn(isLoggedIn()) }, [])
 
   const openMenu = useCallback((id: string) => {
     if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null }
@@ -359,8 +362,8 @@ export function SiteHeader({ navItems }: { navItems: MenuItem[] }) {
               <button className="p-2 text-foreground/60 hover:text-gold transition-colors" aria-label="搜尋">
                 <Search className="size-[18px]" />
               </button>
-              <Link href="/cart" className="p-2 text-foreground/60 hover:text-gold transition-colors" aria-label="帳戶">
-                <User className="size-[18px]" />
+              <Link href={loggedIn ? "/account" : "/login"} className="p-2 text-foreground/60 hover:text-gold transition-colors" aria-label={loggedIn ? "帳戶" : "登入"}>
+                {loggedIn ? <User className="size-[18px]" /> : <LogIn className="size-[18px]" />}
               </Link>
               <Link href="/cart" className="relative p-2 text-foreground/60 hover:text-gold transition-colors" aria-label="購物車">
                 <ShoppingBag className="size-[18px]" />
