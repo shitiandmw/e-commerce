@@ -94,6 +94,24 @@ function BrandGridPanel({ item, onNavigate }: { item: MenuItem; onNavigate?: () 
   )
 }
 
+/* ─── menu item icon ─── */
+function MenuIcon({ item, size = "sm" }: { item: MenuItem; size?: "sm" | "md" }) {
+  const dim = size === "md" ? "size-9" : "size-7"
+  const text = size === "md" ? "text-[10px]" : "text-[8px]"
+  if (item.icon_url) {
+    return (
+      <span className={cn(dim, "shrink-0 inline-flex items-center justify-center rounded overflow-hidden")}>
+        <Image src={item.icon_url} alt={item.label} width={size === "md" ? 36 : 28} height={size === "md" ? 36 : 28} className="object-contain" />
+      </span>
+    )
+  }
+  return (
+    <span className={cn(dim, "shrink-0 inline-flex items-center justify-center rounded bg-gold/10 border border-gold/20 text-gold font-bold uppercase", text)}>
+      {item.label.charAt(0)}
+    </span>
+  )
+}
+
 /* ─── mega menu: generic links panel ─── */
 function LinksPanel({ item, onNavigate }: { item: MenuItem; onNavigate?: () => void }) {
   return (
@@ -107,9 +125,7 @@ function LinksPanel({ item, onNavigate }: { item: MenuItem; onNavigate?: () => v
               onClick={onNavigate}
               className="group flex items-center gap-2.5 rounded-md px-2 py-2.5 hover:bg-secondary/40 transition-colors"
             >
-              <span className="size-7 shrink-0 inline-flex items-center justify-center rounded bg-gold/10 border border-gold/20 text-gold font-bold uppercase text-[8px]">
-                {child.label.charAt(0)}
-              </span>
+              <MenuIcon item={child} />
               <span className="text-sm text-foreground/80 group-hover:text-gold transition-colors">{child.label}</span>
             </Link>
           ))}
