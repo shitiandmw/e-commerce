@@ -328,3 +328,158 @@ export function getFeaturedProducts(): Product[] {
 export function getLimitedProducts(): Product[] {
   return products.filter(p => p.isLimited)
 }
+
+/* ========== Medusa Store API types & fetchers ========== */
+
+const MEDUSA_BACKEND_URL =
+  process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+const PUBLISHABLE_KEY =
+  process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
+
+interface MedusaImage {
+  id: string
+  url: string
+  rank?: number
+}
+
+interface MedusaOptionValue {
+  id: string
+  value: string
+  option_id: string
+  option?: { id: string; title: string }
+}
+
+interface MedusaPrice {
+  amount: number
+  currency_code: string
+}
+
+interface MedusaVariant {
+  id: string
+  title: string
+  sku: string | null
+  prices: MedusaPrice[]
+  options?: MedusaOptionValue[]
+  inventory_quantity?: number
+  manage_inventory?: boolean
+}
+
+interface MedusaProductOption {
+  id: string
+  title: string
+  values: { id: string; value: string }[]
+}
+
+interface MedusaCategory {
+  id: string
+  name: string
+  handle: string
+}
+
+export interface MedusaProduct {
+  id: string
+  title: string
+  handle: string
+  subtitle: string | null
+  description: string | null
+  thumbnail: string | null
+  images: MedusaImage[]
+  options: MedusaProductOption[]
+  variants: MedusaVariant[]
+  categories?: MedusaCategory[]
+  collection_id: string | null
+  metadata: Record<string, unknown> | null
+  tags?: { id: string; value: string }[]
+}
+
+interface StoreProductResponse {
+  products: MedusaProduct[]
+}
+
+async function medusaFetch<T>(path: string, params?: Record<string, string>): Promise<T> {
+  const url = new URL(`${MEDUSA_BACKEND_URL}${path}`)
+  if (params) {
+    Object.entries(params).forEach(([k, v]) => {
+      if (v !== undefined && v !== "") url.searchParams.set(k, v)
+    })
+  }
+  const headers: Record<string, string> = {}
+  if (PUBLISHABLE_KEY) {
+    headers["x-publishable-api-key"] = PUBLISHABLE_KEY
+  }
+  const res = await fetch(url.toString(), {
+    headers,
+    next: { revalidate: 30 },
+  })
+  if (!res.ok) {
+    throw new Error(`Medusa API error: ${res.status}`)
+  }
+  return res.json()
+}
+
+/**
+ * Fetch a single product by handle from Medusa Store API.
+ */
+export async function fetchProduct(handle: string): Promise<MedusaProduct | null> {
+  try {
+    const data = await medusaFetch<StoreProductResponse>("/store/products", {
+      handle,
+      fields: "*variants,*variants.prices,*variants.options,*options,*options.values,*images,*categories",
+    })
+    return data?.products?.[0] ?? null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Fetch related products from the same category.
+ * Falls back to latest products if no category or no results.
+ */
+export async function fetchRelatedProducts(
+  product: MedusaProduct,
+  limit = 4,
+): Promise<MedusaProduct[]> {
+  const fields = "id,title,handle,thumbnail,*variants,*variants.prices"
+  const categoryId = product.categories?.[0]?.id
+
+  try {
+    // 优先查同分类商品
+    if (categoryId) {
+      const data = await medusaFetch<StoreProductResponse>("/store/products", {
+        category_id: categoryId,
+        limit: String(limit + 1),
+        fields,
+      })
+      const results = (data?.products ?? []).filter((p) => p.id !== product.id).slice(0, limit)
+      if (results.length > 0) return results
+    }
+
+    // Fallback: 最新商品
+    const data = await medusaFetch<StoreProductResponse>("/store/products", {
+      limit: String(limit + 1),
+      order: "-created_at",
+      fields,
+    })
+    return (data?.products ?? []).filter((p) => p.id !== product.id).slice(0, limit)
+  } catch {
+    return []
+  }
+}
+
+/* ---- Helpers for extracting display data from MedusaProduct ---- */
+
+export function getMedusaPrice(product: MedusaProduct): { amount: number; currency_code: string } | null {
+  const price = product.variants
+    ?.flatMap((v) => v.prices ?? [])
+    .sort((a, b) => a.amount - b.amount)[0]
+  return price ? { amount: price.amount, currency_code: price.currency_code } : null
+}
+
+export function getMedusaImages(product: MedusaProduct): string[] {
+  const imgs = product.images
+    ?.sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
+    .map((img) => img.url) ?? []
+  if (imgs.length === 0 && product.thumbnail) return [product.thumbnail]
+  return imgs
+}

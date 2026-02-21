@@ -3,20 +3,23 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Minus, Plus, X, ShoppingBag, ArrowRight, Truck, Shield, RotateCcw } from "lucide-react"
-import { useCart, type CartItem } from "@/lib/cart-store"
+import { useCart, type CartItem, getCartProductName, getCartProductImage } from "@/lib/cart-store"
 import { products } from "@/lib/data/products"
 
 function CartItemRow({ item }: { item: CartItem }) {
   const { updateQuantity, removeItem } = useCart()
+  const productName = getCartProductName(item.product)
+  const productImage = getCartProductImage(item.product)
+  const productLink = item.product.handle ? `/product/${item.product.handle}` : `/product/${item.product.id}`
 
   return (
     <div className="flex gap-4 py-6 border-b border-border/30 last:border-b-0">
       {/* product image */}
-      <Link href={`/product/${item.product.id}`} className="shrink-0">
+      <Link href={productLink} className="shrink-0">
         <div className="relative size-24 sm:size-28 bg-secondary/30 overflow-hidden">
           <Image
-            src={item.product.image}
-            alt={item.product.name}
+            src={productImage}
+            alt={productName}
             fill
             className="object-cover hover:scale-105 transition-transform duration-300"
           />
@@ -27,11 +30,12 @@ function CartItemRow({ item }: { item: CartItem }) {
       <div className="flex flex-1 flex-col min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className="text-[10px] text-gold tracking-[0.15em] uppercase">{item.product.brandEn}</p>
-            <Link href={`/product/${item.product.id}`} className="text-sm font-medium text-foreground hover:text-gold transition-colors line-clamp-2 leading-snug mt-0.5">
-              {item.product.name}
+            {item.product.brandEn && (
+              <p className="text-[10px] text-gold tracking-[0.15em] uppercase">{item.product.brandEn}</p>
+            )}
+            <Link href={productLink} className="text-sm font-medium text-foreground hover:text-gold transition-colors line-clamp-2 leading-snug mt-0.5">
+              {productName}
             </Link>
-            <p className="text-xs text-muted-foreground mt-0.5">{item.product.nameEn}</p>
           </div>
           <button
             onClick={() => removeItem(item.product.id)}

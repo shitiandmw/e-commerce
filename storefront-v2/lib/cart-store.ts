@@ -1,14 +1,35 @@
 import { create } from "zustand"
-import { type Product } from "@/lib/data/products"
+
+/**
+ * Unified cart product type that works with both mock and Medusa products.
+ * When adding from mock Product, pass the Product directly (has `id`, `price`, `name`, `image`).
+ * When adding from MedusaProduct, pass a normalized object with these fields.
+ */
+export interface CartProduct {
+  id: string
+  /** Display name — mock uses `name`, Medusa uses `title` */
+  name?: string
+  title?: string
+  handle?: string
+  /** Image URL — mock uses `image`, Medusa uses `thumbnail` */
+  image?: string
+  thumbnail?: string | null
+  price: number
+  currency_code?: string
+  brandEn?: string
+  packSize?: number
+  variant_id?: string
+  variant_title?: string
+}
 
 export interface CartItem {
-  product: Product
+  product: CartProduct
   quantity: number
 }
 
 interface CartState {
   items: CartItem[]
-  addItem: (product: Product, qty?: number) => void
+  addItem: (product: CartProduct, qty?: number) => void
   removeItem: (productId: string) => void
   updateQuantity: (productId: string, qty: number) => void
   clearCart: () => void
@@ -60,4 +81,14 @@ export function selectTotalItems(state: CartState) {
 }
 export function selectTotalPrice(state: CartState) {
   return state.items.reduce((sum, i) => sum + i.product.price * i.quantity, 0)
+}
+
+/* helper to get display name from cart product */
+export function getCartProductName(p: CartProduct): string {
+  return p.title || p.name || ""
+}
+
+/* helper to get display image from cart product */
+export function getCartProductImage(p: CartProduct): string {
+  return p.image || p.thumbnail || "/images/placeholder.jpg"
 }

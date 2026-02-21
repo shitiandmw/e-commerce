@@ -13,7 +13,7 @@ import {
   Shield,
   CheckCircle2,
 } from "lucide-react"
-import { useCart } from "@/lib/cart-store"
+import { useCart, getCartProductName, getCartProductImage } from "@/lib/cart-store"
 import { cn } from "@/lib/utils"
 
 /* ─── step definitions ─── */
@@ -469,8 +469,8 @@ export default function CheckoutPage() {
                     <div key={item.product.id} className="flex gap-3">
                       <div className="relative size-14 bg-secondary/30 shrink-0">
                         <Image
-                          src={item.product.image}
-                          alt={item.product.name}
+                          src={getCartProductImage(item.product)}
+                          alt={getCartProductName(item.product)}
                           fill
                           className="object-cover"
                         />
@@ -479,8 +479,10 @@ export default function CheckoutPage() {
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-foreground line-clamp-1">{item.product.name}</p>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">{item.product.brandEn}</p>
+                        <p className="text-xs text-foreground line-clamp-1">{getCartProductName(item.product)}</p>
+                        {item.product.brandEn && (
+                          <p className="text-[10px] text-muted-foreground mt-0.5">{item.product.brandEn}</p>
+                        )}
                         <p className="text-xs text-gold mt-1">
                           HK${(item.product.price * item.quantity).toLocaleString()}
                         </p>

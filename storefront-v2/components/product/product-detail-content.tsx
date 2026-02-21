@@ -1,25 +1,95 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Minus, Plus, ShoppingBag, Heart, Share2, ChevronRight } from "lucide-react"
-import { type Product } from "@/lib/data/products"
+import { type MedusaProduct, getMedusaImages } from "@/lib/data/products"
 import { useCart } from "@/lib/cart-store"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ProductCard } from "@/components/product/product-card"
+import { cn } from "@/lib/utils"
 
 export function ProductDetailContent({
   product,
   relatedProducts,
 }: {
-  product: Product
-  relatedProducts: Product[]
+  product: MedusaProduct
+  relatedProducts: MedusaProduct[]
 }) {
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() => {
+    // Auto-select if only one variant
+    if (product.variants?.length === 1 && product.options) {
+      const init: Record<string, string> = {}
+      for (const opt of product.options) {
+        if (opt.values?.length === 1) init[opt.id] = opt.values[0].value
+      }
+      return init
+    }
+    return {}
+  })
   const addItem = useCart((s) => s.addItem)
-  const images = product.images || [product.image]
+  const images = getMedusaImages(product)
+  const meta = (product.metadata ?? {}) as Record<string, string | undefined>
+  const categoryName = product.categories?.[0]?.name ?? ""
+  const categoryHandle = product.categories?.[0]?.handle ?? ""
+
+  const hasMultipleVariants = (product.variants?.length ?? 0) > 1
+  const hasOptions = (product.options?.length ?? 0) > 0 && hasMultipleVariants
+
+  // Find selected variant based on option selections (Medusa official pattern)
+  const selectedVariant = useMemo(() => {
+    if (!product.variants?.length) return undefined
+    // Single variant → always selected
+    if (product.variants.length === 1) return product.variants[0]
+    // Need all options selected
+    if (!product.options || Object.keys(selectedOptions).length !== product.options.length) return undefined
+    return product.variants.find((variant) =>
+      variant.options?.every(
+        (optionValue) => selectedOptions[optionValue.option_id] === optionValue.value
+      )
+    )
+  }, [selectedOptions, product])
+
+  // Price from selected variant, or cheapest variant as fallback
+  const variantPrice = useMemo(() => {
+    const v = selectedVariant
+    if (v?.prices?.length) {
+      const p = v.prices[0]
+      return { amount: p.amount, currency_code: p.currency_code }
+    }
+    // Fallback: cheapest across all variants
+    const cheapest = product.variants
+      ?.flatMap((vr) => vr.prices ?? [])
+      .sort((a, b) => a.amount - b.amount)[0]
+    return cheapest ? { amount: cheapest.amount, currency_code: cheapest.currency_code } : null
+  }, [selectedVariant, product])
+
+  // Inventory
+  const inventory = selectedVariant?.inventory_quantity
+  const manageInventory = selectedVariant?.manage_inventory !== false
+  const isOutOfStock = manageInventory && inventory !== undefined && inventory <= 0
+  const isLowStock = manageInventory && inventory !== undefined && inventory > 0 && inventory <= 5
+  const canAddToCart = !!selectedVariant && !isOutOfStock
+
+  // Cigar-specific metadata (may or may not exist)
+  const origin = meta.origin
+  const wrapper = meta.wrapper
+  const binder = meta.binder
+  const filler = meta.filler
+  const strength = meta.strength as "輕" | "中" | "中強" | "強" | undefined
+  const cigarLength = meta.length
+  const ringGauge = meta.ring_gauge
+  const packSize = meta.pack_size
+  const tastingNotes = meta.tasting_notes
+  const pairingNotes = meta.pairing_notes
+  const brandName = meta.brand_name
+  const brandNameEn = meta.brand_name_en
+  const isLimited = meta.is_limited === "true"
+
+  const hasSpecs = origin || wrapper || binder || filler || cigarLength || ringGauge || strength
 
   return (
     <div>
@@ -28,11 +98,15 @@ export function ProductDetailContent({
         <ol className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <li><Link href="/" className="hover:text-gold transition-colors">首頁</Link></li>
           <li><ChevronRight className="size-3" /></li>
-          <li><Link href={`/category/${product.category}`} className="hover:text-gold transition-colors">
-            {product.category === "cuban-cigars" ? "古巴雪茄" : product.category === "world-cigars" ? "非古雪茄" : "迷你雪茄"}
-          </Link></li>
-          <li><ChevronRight className="size-3" /></li>
-          <li className="text-foreground/60">{product.name}</li>
+          {categoryHandle && (
+            <>
+              <li><Link href={`/category/${categoryHandle}`} className="hover:text-gold transition-colors">
+                {categoryName}
+              </Link></li>
+              <li><ChevronRight className="size-3" /></li>
+            </>
+          )}
+          <li className="text-foreground/60">{product.title}</li>
         </ol>
       </nav>
 
@@ -41,7 +115,6 @@ export function ProductDetailContent({
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-16">
           {/* Image Gallery */}
           <div className="flex flex-col-reverse sm:flex-row gap-4">
-            {/* Thumbnails */}
             {images.length > 1 && (
               <div className="flex sm:flex-col gap-2 sm:w-20 shrink-0">
                 {images.map((img, i) => (
@@ -52,21 +125,20 @@ export function ProductDetailContent({
                       selectedImage === i ? "border-gold" : "border-border/30 hover:border-border"
                     }`}
                   >
-                    <Image src={img} alt={`${product.name} - ${i + 1}`} fill className="object-cover" />
+                    <Image src={img} alt={`${product.title} - ${i + 1}`} fill className="object-cover" />
                   </button>
                 ))}
               </div>
             )}
-            {/* Main Image */}
             <div className="relative aspect-square flex-1 overflow-hidden bg-card">
               <Image
-                src={images[selectedImage]}
-                alt={product.name}
+                src={images[selectedImage] || "/images/placeholder.jpg"}
+                alt={product.title}
                 fill
                 className="object-cover"
                 priority
               />
-              {product.isLimited && (
+              {isLimited && (
                 <div className="absolute top-4 left-4 bg-gold/90 text-primary-foreground text-xs font-bold px-3 py-1.5 tracking-wider">
                   LIMITED EDITION
                 </div>
@@ -76,23 +148,92 @@ export function ProductDetailContent({
 
           {/* Product Info */}
           <div className="flex flex-col">
-            <p className="text-gold text-xs tracking-[0.3em] uppercase">{product.brandEn}</p>
-            <h1 className="mt-2 text-2xl md:text-3xl font-serif font-bold text-foreground leading-tight">{product.name}</h1>
-            <p className="mt-1 text-base text-muted-foreground">{product.nameEn}</p>
+            {brandNameEn && (
+              <p className="text-gold text-xs tracking-[0.3em] uppercase">{brandNameEn}</p>
+            )}
+            <h1 className="mt-2 text-2xl md:text-3xl font-serif font-bold text-foreground leading-tight">{product.title}</h1>
+            {product.subtitle && (
+              <p className="mt-1 text-base text-muted-foreground">{product.subtitle}</p>
+            )}
 
             {/* Price */}
             <div className="mt-6 pb-6 border-b border-border/30">
               <div className="flex items-baseline gap-3">
-                <span className="text-3xl font-bold text-gold">HK${product.price.toLocaleString()}</span>
-                {product.originalPrice && (
-                  <span className="text-lg text-muted-foreground/50 line-through">HK${product.originalPrice.toLocaleString()}</span>
+                {variantPrice ? (
+                  <span className="text-3xl font-bold text-gold">
+                    {!selectedVariant && hasMultipleVariants && <span className="text-lg font-normal text-muted-foreground mr-1">從</span>}
+                    {variantPrice.currency_code === "hkd" ? "HK$" : variantPrice.currency_code.toUpperCase() + " "}
+                    {variantPrice.amount.toLocaleString()}
+                  </span>
+                ) : (
+                  <span className="text-3xl font-bold text-muted-foreground">價格待定</span>
                 )}
               </div>
-              <p className="mt-1.5 text-xs text-muted-foreground">{product.packSize} 支裝 / 盒</p>
+              {packSize && (
+                <p className="mt-1.5 text-xs text-muted-foreground">{packSize} 支裝 / 盒</p>
+              )}
+              {/* Stock status */}
+              {selectedVariant && (
+                <div className="mt-2 flex items-center gap-2">
+                  {isOutOfStock ? (
+                    <>
+                      <span className="size-1.5 rounded-full bg-destructive" />
+                      <span className="text-xs text-destructive">缺貨</span>
+                    </>
+                  ) : isLowStock ? (
+                    <>
+                      <span className="size-1.5 rounded-full bg-amber-500" />
+                      <span className="text-xs text-amber-600">僅剩 {inventory} 件</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="size-1.5 rounded-full bg-green-500" />
+                      <span className="text-xs text-muted-foreground">有貨</span>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Description */}
-            <p className="mt-6 text-sm text-muted-foreground leading-relaxed">{product.description}</p>
+            {product.description && (
+              <p className="mt-6 text-sm text-muted-foreground leading-relaxed">{product.description}</p>
+            )}
+
+            {/* Variant / Option Selection */}
+            {hasOptions && (
+              <div className="mt-6 flex flex-col gap-5" role="group" aria-label="商品規格選擇">
+                {product.options!.map((option) => (
+                  <div key={option.id}>
+                    <p className="text-sm font-medium text-foreground mb-2.5">
+                      {option.title}
+                      {selectedOptions[option.id] && (
+                        <span className="ml-2 font-normal text-muted-foreground">: {selectedOptions[option.id]}</span>
+                      )}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {option.values?.map((optionValue) => {
+                        const isSelected = selectedOptions[option.id] === optionValue.value
+                        return (
+                          <button
+                            key={optionValue.id}
+                            onClick={() => setSelectedOptions((prev) => ({ ...prev, [option.id]: optionValue.value }))}
+                            className={cn(
+                              "px-4 py-2 text-sm border transition-colors min-w-[48px]",
+                              isSelected
+                                ? "border-gold text-gold bg-gold/5"
+                                : "border-border/50 text-muted-foreground hover:border-gold/50 hover:text-foreground"
+                            )}
+                          >
+                            {optionValue.value}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Quantity & Add to Cart */}
             <div className="mt-8 flex flex-col gap-4">
@@ -119,11 +260,29 @@ export function ProductDetailContent({
 
               <div className="flex gap-3">
                 <button
-                  onClick={() => addItem(product, quantity)}
-                  className="flex-1 flex items-center justify-center gap-2 bg-gold text-primary-foreground py-3.5 text-sm font-medium tracking-wide hover:bg-gold-dark transition-colors"
+                  disabled={!canAddToCart}
+                  onClick={() => {
+                    if (!canAddToCart) return
+                    addItem({
+                      id: product.id,
+                      title: product.title,
+                      handle: product.handle,
+                      thumbnail: product.thumbnail,
+                      price: variantPrice?.amount ?? 0,
+                      currency_code: variantPrice?.currency_code ?? "hkd",
+                      variant_id: selectedVariant?.id,
+                      variant_title: selectedVariant?.title,
+                    }, quantity)
+                  }}
+                  className={cn(
+                    "flex-1 flex items-center justify-center gap-2 py-3.5 text-sm font-medium tracking-wide transition-colors",
+                    canAddToCart
+                      ? "bg-gold text-primary-foreground hover:bg-gold-dark"
+                      : "bg-muted text-muted-foreground cursor-not-allowed"
+                  )}
                 >
                   <ShoppingBag className="size-4" />
-                  加入購物車
+                  {isOutOfStock ? "缺貨中" : !selectedVariant && hasOptions ? "請選擇規格" : "加入購物車"}
                 </button>
                 <button
                   className="flex size-12 items-center justify-center border border-border/50 text-muted-foreground hover:text-gold hover:border-gold transition-colors"
@@ -145,131 +304,146 @@ export function ProductDetailContent({
             </div>
 
             {/* Quick Specs */}
-            <div className="mt-8 grid grid-cols-2 gap-x-8 gap-y-3 text-sm border-t border-border/30 pt-6">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">產地</span>
-                <span className="text-foreground">{product.origin}</span>
+            {hasSpecs && (
+              <div className="mt-8 grid grid-cols-2 gap-x-8 gap-y-3 text-sm border-t border-border/30 pt-6">
+                {origin && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">產地</span>
+                    <span className="text-foreground">{origin}</span>
+                  </div>
+                )}
+                {strength && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">強度</span>
+                    <span className="text-foreground">{strength}</span>
+                  </div>
+                )}
+                {cigarLength && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">長度</span>
+                    <span className="text-foreground">{cigarLength}</span>
+                  </div>
+                )}
+                {ringGauge && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">環徑</span>
+                    <span className="text-foreground">{ringGauge}</span>
+                  </div>
+                )}
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">強度</span>
-                <span className="text-foreground">{product.strength}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">長度</span>
-                <span className="text-foreground">{product.length}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">環徑</span>
-                <span className="text-foreground">{product.ringGauge}</span>
-              </div>
-            </div>
+            )}
           </div>
+
         </div>
 
         {/* Brand Story Banner */}
-        <div className="mt-16 border border-border/30 bg-card p-8 lg:p-12">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8">
-            <div className="flex-1">
-              <p className="text-gold text-xs tracking-[0.3em] uppercase mb-2">Brand Heritage</p>
-              <h2 className="text-xl font-serif font-bold text-foreground">{product.brand}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">{product.brandEn}</p>
-              <p className="mt-4 text-sm text-muted-foreground leading-relaxed max-w-xl">
-                {product.brandEn === "Cohiba"
-                  ? "高希霸是古巴最負盛名的雪茄品牌，創立於 1966 年，最初僅供古巴政府作為國禮使用。其獨特的雙重發酵工藝造就了無與倫比的順滑口感。"
-                  : product.brandEn === "Montecristo"
-                  ? "蒙特克里斯托以大仲馬的經典小說命名，自 1935 年創立以來一直是全球最暢銷的古巴雪茄品牌之一。"
-                  : `${product.brand}是享譽全球的頂級雪茄品牌，以卓越的製茄工藝和獨特的風味特性著稱。`}
-              </p>
+        {brandName && (
+          <div className="mt-16 border border-border/30 bg-card p-8 lg:p-12">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8">
+              <div className="flex-1">
+                <p className="text-gold text-xs tracking-[0.3em] uppercase mb-2">Brand Heritage</p>
+                <h2 className="text-xl font-serif font-bold text-foreground">{brandName}</h2>
+                {brandNameEn && <p className="mt-1 text-sm text-muted-foreground">{brandNameEn}</p>}
+              </div>
+              {categoryHandle && (
+                <Link
+                  href={`/category/${categoryHandle}`}
+                  className="inline-flex items-center gap-2 border border-gold/50 text-gold px-6 py-2.5 text-sm tracking-wide hover:bg-gold hover:text-primary-foreground transition-all shrink-0"
+                >
+                  探索更多 {brandName} 雪茄
+                </Link>
+              )}
             </div>
-            <Link
-              href={`/category/${product.category}`}
-              className="inline-flex items-center gap-2 border border-gold/50 text-gold px-6 py-2.5 text-sm tracking-wide hover:bg-gold hover:text-primary-foreground transition-all shrink-0"
-            >
-              探索更多 {product.brand} 雪茄
-            </Link>
           </div>
-        </div>
+        )}
 
         {/* Product Tabs */}
-        <div className="mt-12">
-          <Tabs defaultValue="specs" className="w-full">
-            <TabsList className="w-full justify-start bg-transparent border-b border-border/30 rounded-none p-0 h-auto gap-0">
-              <TabsTrigger
-                value="specs"
-                className="data-[state=active]:bg-transparent data-[state=active]:text-gold data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-gold rounded-none px-6 py-3 text-sm"
-              >
-                雪茄資料
-              </TabsTrigger>
-              <TabsTrigger
-                value="tasting"
-                className="data-[state=active]:bg-transparent data-[state=active]:text-gold data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-gold rounded-none px-6 py-3 text-sm"
-              >
-                品鑑筆記
-              </TabsTrigger>
-              <TabsTrigger
-                value="pairing"
-                className="data-[state=active]:bg-transparent data-[state=active]:text-gold data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-gold rounded-none px-6 py-3 text-sm"
-              >
-                配對建議
-              </TabsTrigger>
-            </TabsList>
+        {hasSpecs && (
+          <div className="mt-12">
+            <Tabs defaultValue="specs" className="w-full">
+              <TabsList className="w-full justify-start bg-transparent border-b border-border/30 rounded-none p-0 h-auto gap-0">
+                <TabsTrigger
+                  value="specs"
+                  className="data-[state=active]:bg-transparent data-[state=active]:text-gold data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-gold rounded-none px-6 py-3 text-sm"
+                >
+                  雪茄資料
+                </TabsTrigger>
+                {tastingNotes && (
+                  <TabsTrigger
+                    value="tasting"
+                    className="data-[state=active]:bg-transparent data-[state=active]:text-gold data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-gold rounded-none px-6 py-3 text-sm"
+                  >
+                    品鑑筆記
+                  </TabsTrigger>
+                )}
+                {pairingNotes && (
+                  <TabsTrigger
+                    value="pairing"
+                    className="data-[state=active]:bg-transparent data-[state=active]:text-gold data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-gold rounded-none px-6 py-3 text-sm"
+                  >
+                    配對建議
+                  </TabsTrigger>
+                )}
+              </TabsList>
 
-            <TabsContent value="specs" className="mt-8">
-              <div className="grid md:grid-cols-2 gap-6 max-w-2xl">
-                {[
-                  { label: "產地", value: product.origin },
-                  { label: "茄衣", value: product.wrapper },
-                  { label: "茄套", value: product.binder },
-                  { label: "茄芯", value: product.filler },
-                  { label: "長度", value: product.length },
-                  { label: "環徑", value: product.ringGauge },
-                  { label: "強度", value: product.strength },
-                  { label: "包裝", value: `${product.packSize} 支裝` },
-                ].map((spec) => (
-                  <div key={spec.label} className="flex items-center justify-between py-3 border-b border-border/20">
-                    <span className="text-sm text-muted-foreground">{spec.label}</span>
-                    <span className="text-sm font-medium text-foreground">{spec.value}</span>
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="tasting" className="mt-8">
-              <div className="max-w-2xl">
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {product.tastingNotes || "品鑑筆記即將更新，敬請期待。"}
-                </p>
-                {/* Strength Meter */}
-                <div className="mt-8">
-                  <p className="text-sm font-medium text-foreground mb-3">強度等級</p>
-                  <div className="flex gap-1.5">
-                    {["輕", "中", "中強", "強"].map((level, i) => (
-                      <div key={level} className="flex-1 flex flex-col items-center gap-2">
-                        <div className={`h-2 w-full ${
-                          (product.strength === "輕" && i === 0) ||
-                          (product.strength === "中" && i <= 1) ||
-                          (product.strength === "中強" && i <= 2) ||
-                          (product.strength === "強")
-                            ? "bg-gold"
-                            : "bg-border/30"
-                        }`} />
-                        <span className="text-[10px] text-muted-foreground">{level}</span>
-                      </div>
-                    ))}
-                  </div>
+              <TabsContent value="specs" className="mt-8">
+                <div className="grid md:grid-cols-2 gap-6 max-w-2xl">
+                  {[
+                    { label: "產地", value: origin },
+                    { label: "茄衣", value: wrapper },
+                    { label: "茄套", value: binder },
+                    { label: "茄芯", value: filler },
+                    { label: "長度", value: cigarLength },
+                    { label: "環徑", value: ringGauge },
+                    { label: "強度", value: strength },
+                    { label: "包裝", value: packSize ? `${packSize} 支裝` : undefined },
+                  ].filter((s) => s.value).map((spec) => (
+                    <div key={spec.label} className="flex items-center justify-between py-3 border-b border-border/20">
+                      <span className="text-sm text-muted-foreground">{spec.label}</span>
+                      <span className="text-sm font-medium text-foreground">{spec.value}</span>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            </TabsContent>
+              </TabsContent>
 
-            <TabsContent value="pairing" className="mt-8">
-              <div className="max-w-2xl">
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {product.pairingNotes || "配對建議即將更新，敬請期待。"}
-                </p>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
+              {tastingNotes && (
+                <TabsContent value="tasting" className="mt-8">
+                  <div className="max-w-2xl">
+                    <p className="text-sm text-muted-foreground leading-relaxed">{tastingNotes}</p>
+                    {strength && (
+                      <div className="mt-8">
+                        <p className="text-sm font-medium text-foreground mb-3">強度等級</p>
+                        <div className="flex gap-1.5">
+                          {(["輕", "中", "中強", "強"] as const).map((level, i) => (
+                            <div key={level} className="flex-1 flex flex-col items-center gap-2">
+                              <div className={`h-2 w-full ${
+                                (strength === "輕" && i === 0) ||
+                                (strength === "中" && i <= 1) ||
+                                (strength === "中強" && i <= 2) ||
+                                (strength === "強")
+                                  ? "bg-gold"
+                                  : "bg-border/30"
+                              }`} />
+                              <span className="text-[10px] text-muted-foreground">{level}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+              )}
+
+              {pairingNotes && (
+                <TabsContent value="pairing" className="mt-8">
+                  <div className="max-w-2xl">
+                    <p className="text-sm text-muted-foreground leading-relaxed">{pairingNotes}</p>
+                  </div>
+                </TabsContent>
+              )}
+            </Tabs>
+          </div>
+        )}
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (

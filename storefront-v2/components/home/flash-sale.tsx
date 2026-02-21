@@ -65,23 +65,11 @@ export function HotPicks({ products }: HotPicksProps) {
                       e.preventDefault()
                       addItem({
                         id: product.id,
-                        name: product.title,
-                        nameEn: product.title,
-                        brand: "",
-                        brandEn: "",
-                        category: "",
+                        title: product.title,
+                        handle: product.handle,
+                        thumbnail: product.thumbnail,
                         price: product.price ?? 0,
-                        image: product.thumbnail ?? "",
-                        description: "",
-                        origin: "",
-                        wrapper: "",
-                        binder: "",
-                        filler: "",
-                        strength: "中",
-                        length: "",
-                        ringGauge: "",
-                        packSize: 1,
-                        inStock: true,
+                        currency_code: product.currency_code ?? "hkd",
                       })
                     }}
                   >
