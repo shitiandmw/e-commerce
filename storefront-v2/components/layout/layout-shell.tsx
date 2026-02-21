@@ -3,8 +3,9 @@
 import { usePathname } from "next/navigation"
 import { SiteHeader } from "@/components/layout/header"
 import { SiteFooter } from "@/components/layout/footer"
+import type { MenuItem } from "@/lib/data/menu"
 
-export function LayoutShell({ children }: { children: React.ReactNode }) {
+export function LayoutShell({ children, navItems }: { children: React.ReactNode; navItems: MenuItem[] }) {
   const pathname = usePathname()
   const isCheckout = pathname.startsWith("/checkout")
 
@@ -14,7 +15,7 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <SiteHeader />
+      <SiteHeader navItems={navItems} />
       <main className="min-h-screen">{children}</main>
       <SiteFooter />
     </>

@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { LayoutShell } from '@/components/layout/layout-shell'
 import { AnnouncementBarServer } from '@/components/layout/announcement-bar-server'
 import { AgeVerification } from '@/components/age-verification'
+import { getMainNav } from '@/lib/data/menu'
 import './globals.css'
 
 const notoSerifSC = Noto_Serif_SC({
@@ -28,17 +29,19 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const navItems = await getMainNav()
+
   return (
     <html lang="zh-Hant" className={`${notoSerifSC.variable} ${geist.variable}`}>
       <body className="font-sans antialiased bg-background text-foreground">
         <AgeVerification />
         <AnnouncementBarServer />
-        <LayoutShell>{children}</LayoutShell>
+        <LayoutShell navItems={navItems}>{children}</LayoutShell>
         <Analytics />
       </body>
     </html>

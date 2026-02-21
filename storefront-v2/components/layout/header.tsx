@@ -2,34 +2,28 @@
 
 import { useState, useRef, useCallback } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Search, User, ShoppingBag, Menu, ChevronDown, ChevronRight, Globe, Check } from "lucide-react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import {
-  categories,
-  promotionLinks,
-  vipLinks,
-  brandPromoLinks,
-  cigarFeatureLinks,
-  newArrivalLinks,
-  accessorySubItems,
-  type Category,
-} from "@/lib/data/categories"
 import { useCart, selectTotalItems } from "@/lib/cart-store"
 import { cn } from "@/lib/utils"
+import type { MenuItem, MenuBrand } from "@/lib/data/menu"
 
-/* ─── brand logo placeholder ─── */
-function BrandLogo({ letter, size = "sm" }: { letter?: string; size?: "sm" | "md" }) {
+/* ─── brand logo ─── */
+function BrandLogo({ brand, size = "sm" }: { brand: MenuBrand; size?: "sm" | "md" }) {
   const dim = size === "md" ? "size-9" : "size-7"
+  if (brand.logo_url) {
+    return (
+      <span className={cn(dim, "shrink-0 inline-flex items-center justify-center rounded bg-gold/10 border border-gold/20 overflow-hidden")}>
+        <Image src={brand.logo_url} alt={brand.name} width={size === "md" ? 36 : 28} height={size === "md" ? 36 : 28} className="object-contain" />
+      </span>
+    )
+  }
   const text = size === "md" ? "text-[10px]" : "text-[8px]"
+  const letter = brand.name.charAt(0).toUpperCase()
   return (
-    <span
-      className={cn(
-        dim,
-        "shrink-0 inline-flex items-center justify-center rounded bg-gold/10 border border-gold/20 text-gold font-bold uppercase",
-        text
-      )}
-    >
-      {letter ?? "?"}
+    <span className={cn(dim, "shrink-0 inline-flex items-center justify-center rounded bg-gold/10 border border-gold/20 text-gold font-bold uppercase", text)}>
+      {letter}
     </span>
   )
 }
@@ -41,183 +35,110 @@ const languages = [
   { code: "en", label: "English", short: "EN" },
 ]
 
-/* ─── navigation structure ─── */
-interface NavItem {
-  label: string
-  href: string
-  megaKey?: string
-  categorySlug?: string
-}
-
-const navItems: NavItem[] = [
-  { label: "最新推廣", href: "#", megaKey: "promos" },
-  { label: "古巴雪茄", href: "/category/cuban-cigars", megaKey: "brands", categorySlug: "cuban-cigars" },
-  { label: "世界品牌", href: "/category/world-cigars", megaKey: "brands", categorySlug: "world-cigars" },
-  { label: "古巴小雪茄", href: "/category/mini-cigars", megaKey: "brands", categorySlug: "mini-cigars" },
-  { label: "煙斗煙絲", href: "/category/pipe-tobacco", megaKey: "brands", categorySlug: "pipe-tobacco" },
-  { label: "雪茄配件", href: "/category/accessories", megaKey: "accessories" },
-  { label: "茄時分享", href: "/articles", megaKey: "articles" },
-]
-
-/* ─── mega menu panels ─── */
-function PromoColumn({ title, links, onNavigate }: { title: string; links: { label: string; href: string }[]; onNavigate?: () => void }) {
-  return (
-    <div className="min-w-[170px]">
-      <h4 className="text-gold text-xs font-semibold uppercase tracking-widest mb-3">{title}</h4>
-      <ul className="flex flex-col gap-1.5">
-        {links.map((l) => (
-          <li key={l.label}>
-            <Link href={l.href} onClick={onNavigate} className="text-sm text-foreground/70 hover:text-gold transition-colors leading-relaxed">
-              {l.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
-
-function PromoPanel({ onNavigate }: { onNavigate?: () => void }) {
+/* ─── mega menu: columns panel (links grouped by children) ─── */
+function ColumnsPanel({ item, onNavigate }: { item: MenuItem; onNavigate?: () => void }) {
   return (
     <div className="flex gap-8 p-6 overflow-x-auto">
-      <PromoColumn title="新年推廣" links={promotionLinks} onNavigate={onNavigate} />
-      <PromoColumn title="VIP 尊享" links={vipLinks} onNavigate={onNavigate} />
-      <PromoColumn title="品牌推薦" links={brandPromoLinks} onNavigate={onNavigate} />
-      <PromoColumn title="精選專題" links={cigarFeatureLinks} onNavigate={onNavigate} />
-      <PromoColumn title="新品 / 到貨" links={newArrivalLinks} onNavigate={onNavigate} />
+      {item.children.map((group) => (
+        <div key={group.id} className="min-w-[170px]">
+          <h4 className="text-gold text-xs font-semibold uppercase tracking-widest mb-3">{group.label}</h4>
+          <ul className="flex flex-col gap-1.5">
+            {group.children.map((link) => (
+              <li key={link.id}>
+                <Link href={link.url || "#"} onClick={onNavigate} className="text-sm text-foreground/70 hover:text-gold transition-colors leading-relaxed">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
   )
 }
 
-function BrandPanel({ category, onNavigate }: { category: Category; onNavigate?: () => void }) {
+/* ─── mega menu: brand grid panel ─── */
+function BrandGridPanel({ item, onNavigate }: { item: MenuItem; onNavigate?: () => void }) {
+  // Collect sub-links (non-brand children) and brand items
+  const subLinks = item.children.filter((c) => c.metadata?.item_type !== "brand")
+  const brandItems = item.children.filter((c) => c.metadata?.item_type === "brand")
+
   return (
     <div className="p-6">
-      {category.subLinks && category.subLinks.length > 0 && (
+      {subLinks.length > 0 && (
         <div className="flex items-center gap-4 mb-5 pb-4 border-b border-border/40">
-          {category.subLinks.map((sl) => (
-            <Link key={sl.label} href={sl.href} onClick={onNavigate} className="text-xs text-foreground/60 hover:text-gold transition-colors tracking-wide">
+          {subLinks.map((sl) => (
+            <Link key={sl.id} href={sl.url || "#"} onClick={onNavigate} className="text-xs text-foreground/60 hover:text-gold transition-colors tracking-wide">
               {sl.label}
             </Link>
           ))}
         </div>
       )}
       <div className="grid grid-cols-3 gap-x-8 gap-y-1 xl:grid-cols-4">
-        {category.brands.map((brand) => (
-          <Link
-            key={brand.slug}
-            href={`/category/${category.slug}?brand=${brand.slug}`}
-            onClick={onNavigate}
-            className="group flex items-center gap-2.5 rounded-md px-2 py-2 hover:bg-secondary/40 transition-colors"
-          >
-            <BrandLogo letter={brand.logo} />
-            <div className="flex flex-col leading-tight">
+        {brandItems.map((bi) => {
+          const brands = bi.brands || []
+          return brands.map((brand) => (
+            <Link
+              key={brand.id}
+              href={bi.url ? `${bi.url}?brand=${brand.id}` : `#`}
+              onClick={onNavigate}
+              className="group flex items-center gap-2.5 rounded-md px-2 py-2 hover:bg-secondary/40 transition-colors"
+            >
+              <BrandLogo brand={brand} />
               <span className="text-sm text-foreground/80 group-hover:text-gold transition-colors">{brand.name}</span>
-              <span className="text-[10px] text-muted-foreground">{brand.nameEn}</span>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          ))
+        })}
       </div>
     </div>
   )
 }
 
-function AccessoryPanel({ onNavigate }: { onNavigate?: () => void }) {
+/* ─── mega menu: generic links panel ─── */
+function LinksPanel({ item, onNavigate }: { item: MenuItem; onNavigate?: () => void }) {
   return (
     <div className="p-6">
-      <div className="flex items-center gap-4 mb-5 pb-4 border-b border-border/40">
-        <Link href="/category/accessories" onClick={onNavigate} className="text-xs text-foreground/60 hover:text-gold transition-colors tracking-wide">
-          所有商品
-        </Link>
-      </div>
-      <div className="grid grid-cols-4 gap-x-6 gap-y-1">
-        {accessorySubItems.map((item) => (
-          <Link
-            key={item.slug}
-            href={`/category/accessories?type=${item.slug}`}
-            onClick={onNavigate}
-            className="group flex items-center gap-2.5 rounded-md px-2 py-2.5 hover:bg-secondary/40 transition-colors"
-          >
-            <span className="size-7 shrink-0 inline-flex items-center justify-center rounded bg-gold/10 border border-gold/20 text-gold font-bold uppercase text-[8px]">
-              {item.label.charAt(0)}
-            </span>
-            <div className="flex flex-col leading-tight">
-              <span className="text-sm text-foreground/80 group-hover:text-gold transition-colors">{item.labelZh}</span>
-              <span className="text-[10px] text-muted-foreground">{item.label}</span>
-            </div>
-          </Link>
-        ))}
-      </div>
+      {item.children.length > 0 && (
+        <div className="grid grid-cols-4 gap-x-6 gap-y-1">
+          {item.children.map((child) => (
+            <Link
+              key={child.id}
+              href={child.url || "#"}
+              onClick={onNavigate}
+              className="group flex items-center gap-2.5 rounded-md px-2 py-2.5 hover:bg-secondary/40 transition-colors"
+            >
+              <span className="size-7 shrink-0 inline-flex items-center justify-center rounded bg-gold/10 border border-gold/20 text-gold font-bold uppercase text-[8px]">
+                {child.label.charAt(0)}
+              </span>
+              <span className="text-sm text-foreground/80 group-hover:text-gold transition-colors">{child.label}</span>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
 
-function ArticlesPanel({ onNavigate }: { onNavigate?: () => void }) {
-  const articleLinks = [
-    { label: "全部文章", href: "/articles" },
-    { label: "雪茄快訊", href: "/articles?tag=news" },
-    { label: "品味生活", href: "/articles?tag=lifestyle" },
-    { label: "茄時在線", href: "/articles?tag=online" },
-  ]
-  const infoLinks = [
-    { label: "關於雪茄時間", href: "/about" },
-    { label: "服務條款", href: "/terms" },
-    { label: "私隱政策", href: "/privacy" },
-  ]
-  const clubLinks = [
-    { label: "TIME Club", href: "/club" },
-    { label: "古巴小雪茄獎賞計劃", href: "/club/rewards" },
-    { label: "新會員推薦計劃", href: "/club/referral" },
-  ]
-  return (
-    <div className="flex gap-10 p-6">
-      <div className="min-w-[150px]">
-        <h4 className="text-gold text-xs font-semibold uppercase tracking-widest mb-3">茄時分享</h4>
-        <ul className="flex flex-col gap-1.5">
-          {articleLinks.map((l) => (
-            <li key={l.label}>
-              <Link href={l.href} onClick={onNavigate} className="text-sm text-foreground/70 hover:text-gold transition-colors">{l.label}</Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="min-w-[150px]">
-        <h4 className="text-gold text-xs font-semibold uppercase tracking-widest mb-3">關於我們</h4>
-        <ul className="flex flex-col gap-1.5">
-          {infoLinks.map((l) => (
-            <li key={l.label}>
-              <Link href={l.href} onClick={onNavigate} className="text-sm text-foreground/70 hover:text-gold transition-colors">{l.label}</Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="min-w-[150px]">
-        <h4 className="text-gold text-xs font-semibold uppercase tracking-widest mb-3">會員專屬</h4>
-        <ul className="flex flex-col gap-1.5">
-          {clubLinks.map((l) => (
-            <li key={l.label}>
-              <Link href={l.href} onClick={onNavigate} className="text-sm text-foreground/70 hover:text-gold transition-colors">{l.label}</Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  )
+/* ─── resolve which panel to render ─── */
+function MegaPanel({ item, onNavigate }: { item: MenuItem; onNavigate?: () => void }) {
+  const hasBrandChildren = item.children.some((c) => c.metadata?.item_type === "brand")
+  const hasGroupedColumns = !hasBrandChildren && item.children.some((c) => c.children.length > 0)
+
+  if (hasBrandChildren) return <BrandGridPanel item={item} onNavigate={onNavigate} />
+  if (hasGroupedColumns) return <ColumnsPanel item={item} onNavigate={onNavigate} />
+  if (item.children.length > 0) return <LinksPanel item={item} onNavigate={onNavigate} />
+  return null
 }
 
 /* ─── mobile accordion ─── */
-function MobileNavSection({ item, onNavigate }: { item: NavItem; onNavigate: () => void }) {
+function MobileNavSection({ item, onNavigate }: { item: MenuItem; onNavigate: () => void }) {
   const [open, setOpen] = useState(false)
-  const cat = item.categorySlug ? categories.find((c) => c.slug === item.categorySlug) : null
-  const hasBrandSub = item.megaKey === "brands" && cat && cat.brands.length > 0
-  const hasPromoSub = item.megaKey === "promos"
-  const hasArticleSub = item.megaKey === "articles"
-  const hasAccessorySub = item.megaKey === "accessories"
-  const hasSub = hasBrandSub || hasPromoSub || hasArticleSub || hasAccessorySub
+  const hasSub = item.children.length > 0
 
   if (!hasSub) {
     return (
       <Link
-        href={item.href}
+        href={item.url || "#"}
         onClick={onNavigate}
         className="flex items-center justify-between px-3 py-3 text-sm text-foreground/80 hover:text-gold hover:bg-secondary/50 rounded-md transition-colors"
       >
@@ -225,6 +146,10 @@ function MobileNavSection({ item, onNavigate }: { item: NavItem; onNavigate: () 
       </Link>
     )
   }
+
+  const hasBrandChildren = item.children.some((c) => c.metadata?.item_type === "brand")
+  const subLinks = item.children.filter((c) => c.metadata?.item_type !== "brand")
+  const brandItems = item.children.filter((c) => c.metadata?.item_type === "brand")
 
   return (
     <div>
@@ -237,49 +162,36 @@ function MobileNavSection({ item, onNavigate }: { item: NavItem; onNavigate: () 
       </button>
       {open && (
         <div className="ml-3 border-l border-border/30 pl-3 pb-2">
-          {hasBrandSub && cat && (
+          {hasBrandChildren ? (
             <>
-              {cat.subLinks?.map((sl) => (
-                <Link key={sl.label} href={sl.href} onClick={onNavigate} className="block px-2 py-1.5 text-xs text-gold/70 hover:text-gold transition-colors">{sl.label}</Link>
+              {subLinks.map((sl) => (
+                <Link key={sl.id} href={sl.url || "#"} onClick={onNavigate} className="block px-2 py-1.5 text-xs text-gold/70 hover:text-gold transition-colors">{sl.label}</Link>
               ))}
               <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 mt-1">
-                {cat.brands.map((brand) => (
-                  <Link key={brand.slug} href={`/category/${cat.slug}?brand=${brand.slug}`} onClick={onNavigate} className="flex items-center gap-2 px-2 py-1.5 text-xs text-foreground/70 hover:text-gold rounded transition-colors">
-                    <BrandLogo letter={brand.logo} />
-                    <span className="truncate">{brand.name}</span>
-                  </Link>
-                ))}
+                {brandItems.flatMap((bi) =>
+                  (bi.brands || []).map((brand) => (
+                    <Link key={brand.id} href={bi.url ? `${bi.url}?brand=${brand.id}` : "#"} onClick={onNavigate} className="flex items-center gap-2 px-2 py-1.5 text-xs text-foreground/70 hover:text-gold rounded transition-colors">
+                      <BrandLogo brand={brand} />
+                      <span className="truncate">{brand.name}</span>
+                    </Link>
+                  ))
+                )}
               </div>
             </>
-          )}
-          {hasPromoSub && (
+          ) : (
             <>
-              <p className="px-2 pt-1 pb-1 text-[10px] text-gold/50 uppercase tracking-widest">推廣活動</p>
-              {promotionLinks.map((l) => (
-                <Link key={l.label} href={l.href} onClick={onNavigate} className="block px-2 py-1.5 text-xs text-foreground/70 hover:text-gold transition-colors">{l.label}</Link>
-              ))}
-              <p className="px-2 pt-2 pb-1 text-[10px] text-gold/50 uppercase tracking-widest">VIP</p>
-              {vipLinks.map((l) => (
-                <Link key={l.label} href={l.href} onClick={onNavigate} className="block px-2 py-1.5 text-xs text-foreground/70 hover:text-gold transition-colors">{l.label}</Link>
-              ))}
-            </>
-          )}
-          {hasAccessorySub && (
-            <>
-              <Link href="/category/accessories" onClick={onNavigate} className="block px-2 py-1.5 text-xs text-gold/70 hover:text-gold transition-colors">所有商品</Link>
-              {accessorySubItems.map((a) => (
-                <Link key={a.slug} href={`/category/accessories?type=${a.slug}`} onClick={onNavigate} className="flex items-center gap-2 px-2 py-1.5 text-xs text-foreground/70 hover:text-gold transition-colors">
-                  <BrandLogo letter={a.label.charAt(0)} />
-                  <span>{a.labelZh}</span>
-                </Link>
-              ))}
-            </>
-          )}
-          {hasArticleSub && (
-            <>
-              {[{ label: "全部文章", href: "/articles" }, { label: "雪茄快訊", href: "/articles?tag=news" }, { label: "品味生活", href: "/articles?tag=lifestyle" }].map((l) => (
-                <Link key={l.label} href={l.href} onClick={onNavigate} className="block px-2 py-1.5 text-xs text-foreground/70 hover:text-gold transition-colors">{l.label}</Link>
-              ))}
+              {item.children.map((child) =>
+                child.children.length > 0 ? (
+                  <div key={child.id}>
+                    <p className="px-2 pt-2 pb-1 text-[10px] text-gold/50 uppercase tracking-widest">{child.label}</p>
+                    {child.children.map((link) => (
+                      <Link key={link.id} href={link.url || "#"} onClick={onNavigate} className="block px-2 py-1.5 text-xs text-foreground/70 hover:text-gold transition-colors">{link.label}</Link>
+                    ))}
+                  </div>
+                ) : (
+                  <Link key={child.id} href={child.url || "#"} onClick={onNavigate} className="block px-2 py-1.5 text-xs text-foreground/70 hover:text-gold transition-colors">{child.label}</Link>
+                )
+              )}
             </>
           )}
         </div>
@@ -335,15 +247,15 @@ function LanguageSwitcher() {
 }
 
 /* ═══════════════════════════ HEADER ═══════════════════════════ */
-export function SiteHeader() {
+export function SiteHeader({ navItems }: { navItems: MenuItem[] }) {
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
   const [mobileOpen, setMobileOpen] = useState(false)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const cartCount = useCart(selectTotalItems)
 
-  const openMenu = useCallback((key: string) => {
+  const openMenu = useCallback((id: string) => {
     if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null }
-    setActiveMenu(key)
+    setActiveMenu(id)
   }, [])
 
   const scheduleClose = useCallback(() => {
@@ -355,13 +267,8 @@ export function SiteHeader() {
     if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null }
   }, [])
 
-  const activeCategorySlug = navItems.find(
-    (n) => n.megaKey === "brands" && activeMenu === n.categorySlug
-  )?.categorySlug
-  const activeCategory = activeCategorySlug
-    ? categories.find((c) => c.slug === activeCategorySlug)
-    : null
-  const showMega = activeMenu !== null
+  const activeItem = navItems.find((n) => n.id === activeMenu)
+  const showMega = activeItem != null && activeItem.children.length > 0
 
   return (
     <header className="sticky top-0 z-50">
@@ -381,7 +288,7 @@ export function SiteHeader() {
                 </SheetHeader>
                 <nav className="flex flex-col gap-0.5 mt-4">
                   {navItems.map((item) => (
-                    <MobileNavSection key={item.label} item={item} onNavigate={() => setMobileOpen(false)} />
+                    <MobileNavSection key={item.id} item={item} onNavigate={() => setMobileOpen(false)} />
                   ))}
                   {/* mobile language */}
                   <div className="mt-4 pt-4 border-t border-border/30">
@@ -405,16 +312,16 @@ export function SiteHeader() {
               </span>
             </Link>
 
-            {/* desktop nav -- scrollable on medium screens */}
+            {/* desktop nav */}
             <nav className="hidden lg:flex items-center flex-1 min-w-0">
               <div className="flex items-center overflow-x-auto scrollbar-none">
                 {navItems.map((item) => {
-                  const key = item.megaKey === "brands" ? item.categorySlug! : item.megaKey!
-                  const isActive = activeMenu === key
+                  const isActive = activeMenu === item.id
+                  const hasChildren = item.children.length > 0
                   return (
-                    <div key={item.label} className="shrink-0" onMouseEnter={() => openMenu(key)}>
+                    <div key={item.id} className="shrink-0" onMouseEnter={() => hasChildren ? openMenu(item.id) : setActiveMenu(null)}>
                       <Link
-                        href={item.href}
+                        href={item.url || "#"}
                         onClick={() => setActiveMenu(null)}
                         className={cn(
                           "flex items-center gap-0.5 whitespace-nowrap px-2.5 py-2 text-[13px] tracking-wide transition-colors xl:px-3",
@@ -422,7 +329,7 @@ export function SiteHeader() {
                         )}
                       >
                         {item.label}
-                        {item.megaKey && <ChevronDown className={cn("size-3 opacity-40 transition-transform duration-200", isActive && "rotate-180")} />}
+                        {hasChildren && <ChevronDown className={cn("size-3 opacity-40 transition-transform duration-200", isActive && "rotate-180")} />}
                       </Link>
                     </div>
                   )
@@ -462,10 +369,7 @@ export function SiteHeader() {
           onMouseEnter={cancelClose}
         >
           <div className="mx-auto max-w-[1400px]">
-            {activeMenu === "promos" && <PromoPanel onNavigate={() => setActiveMenu(null)} />}
-            {activeMenu === "accessories" && <AccessoryPanel onNavigate={() => setActiveMenu(null)} />}
-            {activeMenu === "articles" && <ArticlesPanel onNavigate={() => setActiveMenu(null)} />}
-            {activeCategory && <BrandPanel category={activeCategory} onNavigate={() => setActiveMenu(null)} />}
+            {activeItem && <MegaPanel item={activeItem} onNavigate={() => setActiveMenu(null)} />}
           </div>
         </div>
       </div>
