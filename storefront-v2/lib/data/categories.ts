@@ -15,6 +15,59 @@ export interface Category {
   brands: Brand[]
 }
 
+/* ---------- API types ---------- */
+
+export interface MedusaCategory {
+  id: string
+  name: string
+  handle: string
+  description: string | null
+  parent_category: MedusaCategory | null
+  category_children: MedusaCategory[]
+  metadata: Record<string, unknown> | null
+}
+
+interface CategoryListResponse {
+  product_categories: MedusaCategory[]
+  count: number
+  offset: number
+  limit: number
+}
+
+/* ---------- API fetchers ---------- */
+
+const MEDUSA_BACKEND_URL =
+  process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+const PUBLISHABLE_KEY =
+  process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
+
+async function medusaFetch<T>(path: string): Promise<T> {
+  const headers: Record<string, string> = {}
+  if (PUBLISHABLE_KEY) {
+    headers["x-publishable-api-key"] = PUBLISHABLE_KEY
+  }
+  const res = await fetch(`${MEDUSA_BACKEND_URL}${path}`, {
+    headers,
+    next: { revalidate: 30 },
+  })
+  if (!res.ok) throw new Error(`API error: ${res.status}`)
+  return res.json()
+}
+
+/**
+ * Fetch a product category by handle from Medusa Store API.
+ */
+export async function fetchCategoryByHandle(handle: string): Promise<MedusaCategory | null> {
+  try {
+    const data = await medusaFetch<CategoryListResponse>(
+      `/store/product-categories?handle=${encodeURIComponent(handle)}&fields=id,name,handle,description,metadata`
+    )
+    return data?.product_categories?.[0] ?? null
+  } catch {
+    return null
+  }
+}
+
 export const categories: Category[] = [
   {
     slug: "cuban-cigars",
