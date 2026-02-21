@@ -71,7 +71,7 @@ npm run test:integration:modules
 - Medusa 内置 admin 已禁用（`admin.disable: true`），使用独立 admin-ui
 - 支付集成：Stripe（`@medusajs/payment-stripe`）
 - storefront-v2 是主力开发方向，storefront v1 仅维护不新增功能
-- storefront-v2 数据层尚未接入 Medusa API，当前使用本地 mock 数据，需要逐步替换
+- storefront-v2 大部分页面已对接 Medusa API（商品、分类、文章、认证、账户），购物车和结账流程待对接
 - Page 模块已废弃，内容统一通过 Article + ArticleCategory 管理；"页面"是 handle 为 `page` 的 ArticleCategory，Store 端 `/store/content/pages` 路由查 article 表
 
 ## 已知问题
