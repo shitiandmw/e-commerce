@@ -2,6 +2,7 @@ import {
   MedusaRequest,
   MedusaResponse,
 } from "@medusajs/framework/http"
+import { Modules } from "@medusajs/framework/utils"
 import { CURATED_COLLECTION_MODULE } from "../../../../../modules/curated-collection"
 import CuratedCollectionModuleService from "../../../../../modules/curated-collection/service"
 import { addCollectionItemWorkflow } from "../../../../../workflows/curated-collection/add-collection-item"
@@ -13,8 +14,6 @@ export const GET = async (
 ) => {
   const { id: collection_id } = req.params
   const tab_id = req.query.tab_id as string | undefined
-
-  const query = req.scope.resolve("query")
 
   const filters: Record<string, unknown> = { collection_id }
   if (tab_id) {
@@ -33,18 +32,33 @@ export const GET = async (
     }
   )
 
-  // Fetch with product info via query graph
-  const itemIds = items.map((i) => i.id)
-  if (itemIds.length === 0) {
+  if (items.length === 0) {
     res.json({ items: [] })
     return
   }
 
-  const { data: enrichedItems } = await query.graph({
-    entity: "collection_item",
-    fields: ["*", "product.*"],
-    filters: { id: itemIds },
-  })
+  // Batch fetch product details
+  const productIds = new Set<string>()
+  for (const item of items) {
+    if (item.product_id) productIds.add(item.product_id)
+  }
+
+  const productMap = new Map<string, any>()
+  if (productIds.size > 0) {
+    const productService = req.scope.resolve(Modules.PRODUCT)
+    const products = await productService.listProducts(
+      { id: Array.from(productIds) },
+      { select: ["id", "title", "handle", "thumbnail"] }
+    )
+    for (const p of products) {
+      productMap.set(p.id, p)
+    }
+  }
+
+  const enrichedItems = items.map((item) => ({
+    ...item,
+    product: productMap.get(item.product_id) || null,
+  }))
 
   res.json({ items: enrichedItems })
 }

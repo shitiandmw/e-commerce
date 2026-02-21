@@ -2,6 +2,7 @@ import {
   MedusaRequest,
   MedusaResponse,
 } from "@medusajs/framework/http"
+import { Modules } from "@medusajs/framework/utils"
 import { updateCuratedCollectionWorkflow } from "../../../../workflows/curated-collection/update-collection"
 import { deleteCuratedCollectionWorkflow } from "../../../../workflows/curated-collection/delete-collection"
 import { PostAdminUpdateCuratedCollectionType } from "../validators"
@@ -19,7 +20,6 @@ export const GET = async (
       "*",
       "tabs.*",
       "items.*",
-      "items.product.*",
     ],
     filters: { id },
   })
@@ -27,6 +27,24 @@ export const GET = async (
   if (!collection) {
     res.status(404).json({ message: "Curated collection not found" })
     return
+  }
+
+  // Batch fetch product details for items
+  const productIds = new Set<string>()
+  for (const item of (collection as any).items || []) {
+    if (item.product_id) productIds.add(item.product_id)
+  }
+
+  if (productIds.size > 0) {
+    const productService = req.scope.resolve(Modules.PRODUCT)
+    const products = await productService.listProducts(
+      { id: Array.from(productIds) },
+      { select: ["id", "title", "handle", "thumbnail"] }
+    )
+    const productMap = new Map(products.map((p: any) => [p.id, p]))
+    for (const item of (collection as any).items || []) {
+      item.product = productMap.get(item.product_id) || null
+    }
   }
 
   res.json({ collection })
