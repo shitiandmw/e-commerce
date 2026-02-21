@@ -28,13 +28,18 @@
 
 ## 实施步骤
 
-### 第一步：Medusa API 接入
+### 第一步：Medusa API 接入 ✅ 已完成
 
 建立与后端的通信通道。
 
-- 移植 `lib/medusa.ts`（SDK 初始化）和 `lib/api.ts`（请求工具）
-- 移植 `app/api/` 下的代理路由（products、categories、brands、cart、auth 等）
-- 配置环境变量（`MEDUSA_BACKEND_URL`、`NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`）
+- [x] 安装 `@medusajs/js-sdk@2.13.1`
+- [x] 创建 `.env.local`（`NEXT_PUBLIC_MEDUSA_BACKEND_URL`、`NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`）
+- [x] 移植 `lib/medusa.ts`（SDK 初始化 + `fetchContent` 服务端数据获取）
+- [x] 移植 `lib/medusa-proxy.ts`（通用 API 代理）
+- [x] 移植 `lib/proxy.ts`（认证代理）
+- [x] 移植 API 代理路由：`app/api/products/route.ts`、`app/api/categories/route.ts`、`app/api/brands/route.ts`、`app/api/brands/[handle]/route.ts`、`app/api/regions/route.ts`
+- [x] 更新 `next.config.mjs` images 配置为 `remotePatterns`
+- [ ] Cart、auth、account、webhook 代理路由（延后到对应步骤）
 
 ### 第二步：数据源替换
 
@@ -81,7 +86,9 @@
 ```
 v1 → v2 文件映射：
 
-lib/medusa.ts          → lib/medusa.ts          # SDK 初始化
+lib/medusa.ts          → lib/medusa.ts          # SDK 初始化 ✅
+lib/medusa-proxy.ts    → lib/medusa-proxy.ts    # 通用 API 代理 ✅
+lib/proxy.ts           → lib/proxy.ts           # 认证代理 ✅
 lib/api.ts             → lib/api.ts             # API 工具
 lib/cart.ts            → lib/cart.ts            # 购物车逻辑（融合 Zustand）
 lib/auth.ts            → lib/auth.ts            # 认证逻辑
@@ -89,7 +96,7 @@ lib/i18n.ts            → lib/i18n.ts            # 国际化
 lib/useLocale.ts       → hooks/useLocale.ts     # 语言 hook
 middleware.ts          → middleware.ts           # 语言路由中间件
 locales/*              → locales/*              # 翻译文件
-app/api/*              → app/api/*              # API 代理路由
+app/api/*              → app/api/*              # API 代理路由（部分完成 ✅）
 ```
 
 ## 可选功能（按需添加）

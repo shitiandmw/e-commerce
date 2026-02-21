@@ -60,14 +60,14 @@ const navItems: NavItem[] = [
 ]
 
 /* ─── mega menu panels ─── */
-function PromoColumn({ title, links }: { title: string; links: { label: string; href: string }[] }) {
+function PromoColumn({ title, links, onNavigate }: { title: string; links: { label: string; href: string }[]; onNavigate?: () => void }) {
   return (
     <div className="min-w-[170px]">
       <h4 className="text-gold text-xs font-semibold uppercase tracking-widest mb-3">{title}</h4>
       <ul className="flex flex-col gap-1.5">
         {links.map((l) => (
           <li key={l.label}>
-            <Link href={l.href} className="text-sm text-foreground/70 hover:text-gold transition-colors leading-relaxed">
+            <Link href={l.href} onClick={onNavigate} className="text-sm text-foreground/70 hover:text-gold transition-colors leading-relaxed">
               {l.label}
             </Link>
           </li>
@@ -77,25 +77,25 @@ function PromoColumn({ title, links }: { title: string; links: { label: string; 
   )
 }
 
-function PromoPanel() {
+function PromoPanel({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="flex gap-8 p-6 overflow-x-auto">
-      <PromoColumn title="新年推廣" links={promotionLinks} />
-      <PromoColumn title="VIP 尊享" links={vipLinks} />
-      <PromoColumn title="品牌推薦" links={brandPromoLinks} />
-      <PromoColumn title="精選專題" links={cigarFeatureLinks} />
-      <PromoColumn title="新品 / 到貨" links={newArrivalLinks} />
+      <PromoColumn title="新年推廣" links={promotionLinks} onNavigate={onNavigate} />
+      <PromoColumn title="VIP 尊享" links={vipLinks} onNavigate={onNavigate} />
+      <PromoColumn title="品牌推薦" links={brandPromoLinks} onNavigate={onNavigate} />
+      <PromoColumn title="精選專題" links={cigarFeatureLinks} onNavigate={onNavigate} />
+      <PromoColumn title="新品 / 到貨" links={newArrivalLinks} onNavigate={onNavigate} />
     </div>
   )
 }
 
-function BrandPanel({ category }: { category: Category }) {
+function BrandPanel({ category, onNavigate }: { category: Category; onNavigate?: () => void }) {
   return (
     <div className="p-6">
       {category.subLinks && category.subLinks.length > 0 && (
         <div className="flex items-center gap-4 mb-5 pb-4 border-b border-border/40">
           {category.subLinks.map((sl) => (
-            <Link key={sl.label} href={sl.href} className="text-xs text-foreground/60 hover:text-gold transition-colors tracking-wide">
+            <Link key={sl.label} href={sl.href} onClick={onNavigate} className="text-xs text-foreground/60 hover:text-gold transition-colors tracking-wide">
               {sl.label}
             </Link>
           ))}
@@ -106,6 +106,7 @@ function BrandPanel({ category }: { category: Category }) {
           <Link
             key={brand.slug}
             href={`/category/${category.slug}?brand=${brand.slug}`}
+            onClick={onNavigate}
             className="group flex items-center gap-2.5 rounded-md px-2 py-2 hover:bg-secondary/40 transition-colors"
           >
             <BrandLogo letter={brand.logo} />
@@ -120,11 +121,11 @@ function BrandPanel({ category }: { category: Category }) {
   )
 }
 
-function AccessoryPanel() {
+function AccessoryPanel({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="p-6">
       <div className="flex items-center gap-4 mb-5 pb-4 border-b border-border/40">
-        <Link href="/category/accessories" className="text-xs text-foreground/60 hover:text-gold transition-colors tracking-wide">
+        <Link href="/category/accessories" onClick={onNavigate} className="text-xs text-foreground/60 hover:text-gold transition-colors tracking-wide">
           所有商品
         </Link>
       </div>
@@ -133,6 +134,7 @@ function AccessoryPanel() {
           <Link
             key={item.slug}
             href={`/category/accessories?type=${item.slug}`}
+            onClick={onNavigate}
             className="group flex items-center gap-2.5 rounded-md px-2 py-2.5 hover:bg-secondary/40 transition-colors"
           >
             <span className="size-7 shrink-0 inline-flex items-center justify-center rounded bg-gold/10 border border-gold/20 text-gold font-bold uppercase text-[8px]">
@@ -149,7 +151,7 @@ function AccessoryPanel() {
   )
 }
 
-function ArticlesPanel() {
+function ArticlesPanel({ onNavigate }: { onNavigate?: () => void }) {
   const articleLinks = [
     { label: "全部文章", href: "/articles" },
     { label: "雪茄快訊", href: "/articles?tag=news" },
@@ -173,7 +175,7 @@ function ArticlesPanel() {
         <ul className="flex flex-col gap-1.5">
           {articleLinks.map((l) => (
             <li key={l.label}>
-              <Link href={l.href} className="text-sm text-foreground/70 hover:text-gold transition-colors">{l.label}</Link>
+              <Link href={l.href} onClick={onNavigate} className="text-sm text-foreground/70 hover:text-gold transition-colors">{l.label}</Link>
             </li>
           ))}
         </ul>
@@ -183,7 +185,7 @@ function ArticlesPanel() {
         <ul className="flex flex-col gap-1.5">
           {infoLinks.map((l) => (
             <li key={l.label}>
-              <Link href={l.href} className="text-sm text-foreground/70 hover:text-gold transition-colors">{l.label}</Link>
+              <Link href={l.href} onClick={onNavigate} className="text-sm text-foreground/70 hover:text-gold transition-colors">{l.label}</Link>
             </li>
           ))}
         </ul>
@@ -193,7 +195,7 @@ function ArticlesPanel() {
         <ul className="flex flex-col gap-1.5">
           {clubLinks.map((l) => (
             <li key={l.label}>
-              <Link href={l.href} className="text-sm text-foreground/70 hover:text-gold transition-colors">{l.label}</Link>
+              <Link href={l.href} onClick={onNavigate} className="text-sm text-foreground/70 hover:text-gold transition-colors">{l.label}</Link>
             </li>
           ))}
         </ul>
@@ -475,10 +477,10 @@ export function SiteHeader() {
           onMouseEnter={cancelClose}
         >
           <div className="mx-auto max-w-[1400px]">
-            {activeMenu === "promos" && <PromoPanel />}
-            {activeMenu === "accessories" && <AccessoryPanel />}
-            {activeMenu === "articles" && <ArticlesPanel />}
-            {activeCategory && <BrandPanel category={activeCategory} />}
+            {activeMenu === "promos" && <PromoPanel onNavigate={() => setActiveMenu(null)} />}
+            {activeMenu === "accessories" && <AccessoryPanel onNavigate={() => setActiveMenu(null)} />}
+            {activeMenu === "articles" && <ArticlesPanel onNavigate={() => setActiveMenu(null)} />}
+            {activeCategory && <BrandPanel category={activeCategory} onNavigate={() => setActiveMenu(null)} />}
           </div>
         </div>
       </div>
