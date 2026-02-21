@@ -434,6 +434,7 @@ export default defineMiddlewares({
             defaults: [
               "id", "name", "key", "description",
               "sort_order", "created_at", "updated_at",
+              "items.id",
             ],
             isList: true,
           }
