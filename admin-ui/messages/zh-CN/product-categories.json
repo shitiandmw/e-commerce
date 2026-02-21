@@ -1,0 +1,29 @@
+{
+  "productCategories": {
+    "title": "商品分类",
+    "subtitle": "管理商品分类层级结构",
+    "noCategories": "暂无分类，请创建第一个分类。",
+    "addCategory": "新增分类",
+    "editCategory": "编辑分类",
+    "deleteTitle": "删除分类",
+    "deleteDescription": "确定要删除「{name}」吗？此操作不可撤销。",
+    "nameLabel": "名称",
+    "namePlaceholder": "分类名称",
+    "handleLabel": "标识",
+    "handlePlaceholder": "category-handle",
+    "descriptionLabel": "描述",
+    "descriptionPlaceholder": "可选描述",
+    "parentLabel": "父分类",
+    "noParent": "无（顶级分类）",
+    "rankLabel": "排序",
+    "rankPlaceholder": "0",
+    "isActiveLabel": "启用",
+    "cancel": "取消",
+    "save": "保存",
+    "saving": "保存中...",
+    "delete": "删除",
+    "deleting": "删除中...",
+    "active": "已启用",
+    "inactive": "已停用"
+  }
+}

@@ -28,6 +28,7 @@ import {
   FileText,
   List,
   ChevronDown,
+  FolderTree,
 } from "lucide-react"
 import { LanguageSwitcher } from "@/components/language-switcher"
 
@@ -58,6 +59,7 @@ const navigation: NavEntry[] = [
       { key: "products", href: "/products", icon: Package },
       { key: "brands", href: "/brands", icon: Tag },
       { key: "tags", href: "/tags", icon: Bookmark },
+      { key: "productCategories", href: "/product-categories", icon: FolderTree },
       { key: "collections", href: "/collections", icon: LayoutGrid },
       { key: "inventory", href: "/inventory", icon: Warehouse },
     ],

@@ -47,6 +47,9 @@ export interface ProductCategory {
   parent_category_id?: string | null
   parent_category?: ProductCategory | null
   category_children?: ProductCategory[]
+  is_active?: boolean
+  is_internal?: boolean
+  rank?: number
   created_at?: string
   updated_at?: string
 }
@@ -191,6 +194,16 @@ export function useCategories() {
       ),
   })
 }
+
+// Re-export full CRUD hooks from dedicated file
+export {
+  useProductCategories,
+  useProductCategory,
+  useCreateProductCategory,
+  useUpdateProductCategory,
+  useDeleteProductCategory,
+  buildProductCategoryTree,
+} from "./use-product-categories"
 
 export function useLinkProductCategory() {
   const queryClient = useQueryClient()

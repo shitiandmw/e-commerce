@@ -1,0 +1,29 @@
+{
+  "productCategories": {
+    "title": "Product Categories",
+    "subtitle": "Manage product category hierarchy",
+    "noCategories": "No categories yet. Create your first category.",
+    "addCategory": "Add Category",
+    "editCategory": "Edit Category",
+    "deleteTitle": "Delete Category",
+    "deleteDescription": "Are you sure you want to delete \"{name}\"? This action cannot be undone.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Category name",
+    "handleLabel": "Handle",
+    "handlePlaceholder": "category-handle",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Optional description",
+    "parentLabel": "Parent Category",
+    "noParent": "None (top level)",
+    "rankLabel": "Sort Order",
+    "rankPlaceholder": "0",
+    "isActiveLabel": "Active",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "active": "Active",
+    "inactive": "Inactive"
+  }
+}

@@ -6,6 +6,7 @@
     "products": "商品管理",
     "brands": "品牌管理",
     "tags": "标签管理",
+    "productCategories": "商品分类",
     "collections": "商品集合",
     "inventory": "库存管理",
     "sales": "销售",

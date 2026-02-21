@@ -32,6 +32,7 @@ const namespaces = [
   "articles",
   "collections",
   "menus",
+  "product-categories",
 ] as const
 
 async function loadMessages(locale: string) {
