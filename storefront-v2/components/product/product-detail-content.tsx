@@ -95,7 +95,14 @@ export function ProductDetailContent({
   const brandNameEn = meta.brand_name_en
   const isLimited = meta.is_limited === "true"
 
-  const hasSpecs = origin || wrapper || binder || filler || cigarLength || ringGauge || strength
+  // Custom attributes from admin editor (metadata.attributes)
+  const rawAttrs = (product.metadata as Record<string, unknown> | null)?.attributes
+  const customAttributes = Array.isArray(rawAttrs)
+    ? (rawAttrs as { key: string; value: string }[]).filter((a) => a.key && a.value)
+    : []
+
+  const hasCigarSpecs = !!(origin || wrapper || binder || filler || cigarLength || ringGauge || strength)
+  const hasSpecs = hasCigarSpecs || customAttributes.length > 0
 
   return (
     <div>
@@ -356,6 +363,12 @@ export function ProductDetailContent({
                     <span className="text-foreground">{ringGauge}</span>
                   </div>
                 )}
+                {customAttributes.map((attr) => (
+                  <div key={attr.key} className="flex justify-between">
+                    <span className="text-muted-foreground">{attr.key}</span>
+                    <span className="text-foreground">{attr.value}</span>
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -384,7 +397,7 @@ export function ProductDetailContent({
         )}
 
         {/* Product Tabs */}
-        {hasSpecs && (
+        {(hasCigarSpecs || tastingNotes || pairingNotes) && (
           <div className="mt-12">
             <Tabs defaultValue="specs" className="w-full">
               <TabsList className="w-full justify-start bg-transparent border-b border-border/30 rounded-none p-0 h-auto gap-0">

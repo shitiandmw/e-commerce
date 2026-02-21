@@ -461,7 +461,7 @@ export async function fetchProduct(handle: string): Promise<MedusaProduct | null
   try {
     const data = await medusaFetch<StoreProductResponse>("/store/products", {
       handle,
-      fields: "*variants,*variants.prices,*variants.options,*options,*options.values,*images,*categories",
+      fields: "*variants,*variants.prices,*variants.options,*options,*options.values,*images,*categories,metadata",
     })
     return data?.products?.[0] ?? null
   } catch {

@@ -45,6 +45,10 @@ import {
 import Link from "next/link"
 import { MediaPicker } from "@/components/media/media-picker"
 import { SeoEditor, type SeoData } from "@/components/ui/seo-editor"
+import {
+  ProductAttributesEditor,
+  type AttributeItem,
+} from "@/components/products/product-attributes-editor"
 import { toSlug } from "@/lib/slug"
 
 const variantSchema = z.object({
@@ -212,6 +216,16 @@ export function ProductForm({ product, mode }: ProductFormProps) {
     }
   })
 
+  // Attributes state – stored in product.metadata.attributes
+  const [attributesData, setAttributesData] = React.useState<AttributeItem[]>(
+    () => {
+      const attrs = product?.metadata?.attributes as
+        | AttributeItem[]
+        | undefined
+      return Array.isArray(attrs) ? attrs : []
+    }
+  )
+
   const onSubmit = async (data: ProductFormData) => {
     try {
       // Build the API payload
@@ -236,6 +250,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
         metadata: {
           ...(product?.metadata ?? {}),
           seo: seoData,
+          attributes: attributesData,
         },
       }
 
@@ -785,6 +800,12 @@ export function ProductForm({ product, mode }: ProductFormProps) {
             autoTitle={watch("title")}
             autoDescription={watch("description")}
             slug={watch("handle")}
+          />
+
+          {/* Product Attributes */}
+          <ProductAttributesEditor
+            value={attributesData}
+            onChange={setAttributesData}
           />
         </div>
 

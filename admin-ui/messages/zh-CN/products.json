@@ -147,6 +147,18 @@
     "sku": "SKU",
     "category": "分类",
     "collection": "系列",
-    "thumbnail": "缩略图"
+    "thumbnail": "缩略图",
+    "attributes": {
+      "title": "商品属性",
+      "selectTemplate": "属性模板",
+      "selectTemplatePlaceholder": "选择模板...",
+      "addKeys": "添加属性名",
+      "addKeysPlaceholder": "例如 产地, 强度, 长度（逗号分隔）",
+      "valuePlaceholder": "输入属性值",
+      "saveAsTemplate": "保存为模板",
+      "templateNamePlaceholder": "模板名称",
+      "save": "保存",
+      "cancel": "取消"
+    }
   }
 }

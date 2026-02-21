@@ -147,6 +147,18 @@
     "sku": "SKU",
     "category": "Category",
     "collection": "Collection",
-    "thumbnail": "Thumbnail"
+    "thumbnail": "Thumbnail",
+    "attributes": {
+      "title": "Product Attributes",
+      "selectTemplate": "Attribute Template",
+      "selectTemplatePlaceholder": "Select a template...",
+      "addKeys": "Add Attribute Names",
+      "addKeysPlaceholder": "e.g. Origin, Strength, Length (comma separated)",
+      "valuePlaceholder": "Enter value",
+      "saveAsTemplate": "Save as Template",
+      "templateNamePlaceholder": "Template name",
+      "save": "Save",
+      "cancel": "Cancel"
+    }
   }
 }

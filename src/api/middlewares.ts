@@ -56,6 +56,10 @@ import {
   PostAdminReorderMenuItems,
 } from "./admin/menu-items/validators"
 import {
+  PostAdminCreateAttributeTemplate,
+  PostAdminUpdateAttributeTemplate,
+} from "./admin/attribute-templates/validators"
+import {
   couponMiddlewares,
 } from "./store/content/coupon/validators"
 
@@ -73,6 +77,7 @@ export const GetArticlesSchema = createFindParams().merge(z.object({
 export const GetArticleCategoriesSchema = createFindParams()
 export const GetCuratedCollectionsSchema = createFindParams()
 export const GetMenusSchema = createFindParams()
+export const GetAttributeTemplatesSchema = createFindParams()
 
 export const GetStoreContentSchema = createFindParams().merge(z.object({
   locale: z.string().optional(),
@@ -537,5 +542,33 @@ export default defineMiddlewares({
     },
     // Coupon claim route
     ...couponMiddlewares,
+    // Attribute Template routes
+    {
+      matcher: "/admin/attribute-templates",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(
+          GetAttributeTemplatesSchema,
+          {
+            defaults: ["id", "name", "attributes", "created_at", "updated_at"],
+            isList: true,
+          }
+        ),
+      ],
+    },
+    {
+      matcher: "/admin/attribute-templates",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminCreateAttributeTemplate),
+      ],
+    },
+    {
+      matcher: "/admin/attribute-templates/:id",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminUpdateAttributeTemplate),
+      ],
+    },
   ],
 })
