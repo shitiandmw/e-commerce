@@ -36,10 +36,12 @@ export function MediaPicker({
   const [selectedUrls, setSelectedUrls] = React.useState<string[]>(initialSelectedUrls)
 
   // Reset selection when dialog opens
+  const prevOpenRef = React.useRef(false)
   React.useEffect(() => {
-    if (open) {
+    if (open && !prevOpenRef.current) {
       setSelectedUrls(initialSelectedUrls)
     }
+    prevOpenRef.current = open
   }, [open, initialSelectedUrls])
 
   const files = data?.files ?? []

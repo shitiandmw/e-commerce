@@ -23,7 +23,7 @@ const menuSchema = z.object({
   key: z
     .string()
     .min(1, "Key is required")
-    .regex(/^[a-z0-9_]+$/, "Key must be lowercase letters, numbers, and underscores only"),
+    .regex(/^[a-z0-9_-]+$/, "Key must be lowercase letters, numbers, hyphens, and underscores only"),
   description: z.string().optional(),
 })
 
@@ -155,7 +155,7 @@ export function MenuForm({ menu, mode }: MenuFormProps) {
                 id="key"
                 {...register("key")}
                 placeholder={t("form.keyPlaceholder")}
-                disabled={mode === "edit"}
+                disabled={false}
               />
               <p className="text-xs text-muted-foreground">
                 {t("form.keyHint")}

@@ -18,7 +18,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select } from "@/components/ui/select"
-import { Loader2 } from "lucide-react"
+import { Loader2, ImageIcon, X } from "lucide-react"
+import { MediaPicker } from "@/components/media/media-picker"
 
 const menuItemSchema = z.object({
   label: z.string().min(1, "Label is required"),
@@ -97,6 +98,8 @@ export function MenuItemForm({
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<MenuItemFormData>({
     resolver: zodResolver(menuItemSchema),
@@ -134,6 +137,9 @@ export function MenuItemForm({
       }
     }
   }, [open, item, defaultParentId, reset])
+
+  const iconUrl = watch("icon_url")
+  const [mediaPickerOpen, setMediaPickerOpen] = React.useState(false)
 
   const handleFormSubmit = async (data: MenuItemFormData) => {
     let metadata: Record<string, unknown> | undefined
@@ -198,14 +204,44 @@ export function MenuItemForm({
             )}
           </div>
 
-          {/* Icon URL */}
+          {/* Icon */}
           <div className="space-y-2">
-            <Label htmlFor="item-icon-url">{t("itemForm.iconUrlField")}</Label>
-            <Input
-              id="item-icon-url"
-              {...register("icon_url")}
-              placeholder={t("itemForm.iconUrlPlaceholder")}
-            />
+            <Label>{t("itemForm.iconUrlField")}</Label>
+            {iconUrl ? (
+              <div className="relative group w-16 h-16 rounded-md overflow-hidden border border-border">
+                <img src={iconUrl} alt="" className="w-full h-full object-contain" />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="secondary"
+                    className="h-6 w-6"
+                    onClick={() => setMediaPickerOpen(true)}
+                  >
+                    <ImageIcon className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="destructive"
+                    className="h-6 w-6"
+                    onClick={() => setValue("icon_url", "", { shouldValidate: true })}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setMediaPickerOpen(true)}
+                className="w-16 h-16 rounded-md border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors flex flex-col items-center justify-center gap-1 text-muted-foreground"
+              >
+                <ImageIcon className="h-5 w-5" />
+                <span className="text-[10px]">圖標</span>
+              </button>
+            )}
+            <input type="hidden" {...register("icon_url")} />
           </div>
 
           {/* Parent */}
@@ -267,6 +303,16 @@ export function MenuItemForm({
             </Button>
           </DialogFooter>
         </form>
+
+        <MediaPicker
+          open={mediaPickerOpen}
+          onOpenChange={setMediaPickerOpen}
+          onSelect={(urls) => {
+            if (urls.length > 0) {
+              setValue("icon_url", urls[0], { shouldValidate: true })
+            }
+          }}
+        />
       </DialogContent>
     </Dialog>
   )

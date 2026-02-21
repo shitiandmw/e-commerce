@@ -10,7 +10,12 @@ interface DialogProps {
   children: React.ReactNode
 }
 
+const DialogContext = React.createContext(0)
+
 function Dialog({ open, onOpenChange, children }: DialogProps) {
+  const parentDepth = React.useContext(DialogContext)
+  const depth = parentDepth + 1
+
   React.useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden"
@@ -25,15 +30,19 @@ function Dialog({ open, onOpenChange, children }: DialogProps) {
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50">
-      <div
-        className="fixed inset-0 bg-black/80 animate-in fade-in-0"
-        onClick={() => onOpenChange(false)}
-      />
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
-        {children}
+    <DialogContext.Provider value={depth}>
+      <div className="fixed inset-0" style={{ zIndex: 50 + depth * 10 }}>
+        <div
+          className="fixed inset-0 bg-black/80 animate-in fade-in-0"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) onOpenChange(false)
+          }}
+        />
+        <div className="fixed inset-0 flex items-center justify-center" style={{ zIndex: 50 + depth * 10 + 1 }}>
+          {children}
+        </div>
       </div>
-    </div>
+    </DialogContext.Provider>
   )
 }
 

@@ -1,4 +1,9 @@
-import { fetchContent, sdk } from "@/lib/medusa"
+import { fetchContent } from "@/lib/medusa"
+
+const MEDUSA_BACKEND_URL =
+  process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+const PUBLISHABLE_KEY =
+  process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
 
 /* ---------- Types ---------- */
 
@@ -98,10 +103,24 @@ export async function fetchProductPrices(
   if (productIds.length === 0) return priceMap
 
   try {
-    const data = await fetchContent<StoreProductsResponse>(
-      "/store/products",
-      { id: productIds.join(","), fields: "id,variants.prices" },
-    )
+    const url = new URL(`${MEDUSA_BACKEND_URL}/store/products`)
+    for (const id of productIds) {
+      url.searchParams.append("id[]", id)
+    }
+    url.searchParams.set("fields", "id,variants.prices.*")
+
+    const headers: Record<string, string> = {}
+    if (PUBLISHABLE_KEY) {
+      headers["x-publishable-api-key"] = PUBLISHABLE_KEY
+    }
+
+    const res = await fetch(url.toString(), {
+      headers,
+      next: { revalidate: 30 },
+    })
+    if (!res.ok) return priceMap
+
+    const data: StoreProductsResponse = await res.json()
     for (const product of data?.products ?? []) {
       const cheapest = product.variants
         ?.flatMap((v) => v.prices ?? [])
