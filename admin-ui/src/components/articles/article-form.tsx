@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select } from "@/components/ui/select"
+import { TreePicker } from "@/components/ui/tree-picker"
 import { RichTextEditor } from "@/components/ui/rich-text-editor"
 import { MediaPicker } from "@/components/media/media-picker"
 import { SeoEditor, SeoData } from "@/components/ui/seo-editor"
@@ -250,14 +251,18 @@ export function ArticleForm({ article, mode }: ArticleFormProps) {
           </div>
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <h2 className="text-lg font-semibold">{t("form.categoryLabel")}</h2>
-            <Select {...register("category_id")}>
-              <option value="">{t("form.noCategory")}</option>
-              {categoryTree.map(({ category: cat, depth }) => (
-                <option key={cat.id} value={cat.id}>
-                  {"—".repeat(depth)} {cat.name}
-                </option>
-              ))}
-            </Select>
+            <Controller
+              name="category_id"
+              control={control}
+              render={({ field }) => (
+                <TreePicker
+                  items={categoryTree}
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                  placeholder={t("form.noCategory")}
+                />
+              )}
+            />
           </div>
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <h2 className="text-lg font-semibold">{t("form.sorting")}</h2>

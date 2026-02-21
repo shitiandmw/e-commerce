@@ -101,6 +101,8 @@
       "categories": "分类",
       "noCategories": "暂无可用分类。",
       "selectCategory": "选择分类...",
+      "searchCategory": "搜索分类...",
+      "selectedCount": "已选 {count} 个分类",
       "dimensions": "尺寸",
       "weight": "重量 (g)",
       "length": "长度 (mm)",

@@ -101,6 +101,8 @@
       "categories": "Categories",
       "noCategories": "No categories available.",
       "selectCategory": "Select a category...",
+      "searchCategory": "Search categories...",
+      "selectedCount": "{count} categories selected",
       "dimensions": "Dimensions",
       "weight": "Weight (g)",
       "length": "Length (mm)",

@@ -23,6 +23,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Skeleton } from "@/components/ui/skeleton"
+import { TreePicker } from "@/components/ui/tree-picker"
 import {
   Plus,
   Pencil,
@@ -324,18 +325,12 @@ function CategoryFormDialog({
 
           <div className="space-y-2">
             <Label>{t("parentLabel")}</Label>
-            <select
+            <TreePicker
+              items={parentOptions}
               value={parentId}
-              onChange={(e) => setParentId(e.target.value)}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
-              <option value="">{t("noParent")}</option>
-              {parentOptions.map(({ category: c, depth }) => (
-                <option key={c.id} value={c.id}>
-                  {"—".repeat(depth)} {c.name}
-                </option>
-              ))}
-            </select>
+              onChange={setParentId}
+              placeholder={t("noParent")}
+            />
           </div>
 
           <DialogFooter>

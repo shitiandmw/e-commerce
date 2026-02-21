@@ -31,6 +31,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { RichTextEditor } from "@/components/ui/rich-text-editor"
 import { Select } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
+import { CategoryTreeSelect } from "@/components/ui/category-tree-select"
 import {
   ArrowLeft,
   Plus,
@@ -890,48 +891,12 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                 name="category_ids"
                 control={control}
                 render={({ field }) => (
-                  <div className="space-y-2">
-                    {field.value.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mb-2">
-                        {field.value.map((catId) => {
-                          const cat = categories.find((c) => c.id === catId)
-                          return (
-                            <Badge
-                              key={catId}
-                              variant="secondary"
-                              className="cursor-pointer"
-                              onClick={() =>
-                                field.onChange(
-                                  field.value.filter((id) => id !== catId)
-                                )
-                              }
-                            >
-                              {cat?.name || catId}
-                              <X className="ml-1 h-3 w-3" />
-                            </Badge>
-                          )
-                        })}
-                      </div>
-                    )}
-                    <Select
-                      value=""
-                      onChange={(e) => {
-                        const val = e.target.value
-                        if (val && !field.value.includes(val)) {
-                          field.onChange([...field.value, val])
-                        }
-                      }}
-                    >
-                      <option value="">{t("form.selectCategory")}</option>
-                      {categories
-                        .filter((c) => !field.value.includes(c.id))
-                        .map((cat) => (
-                          <option key={cat.id} value={cat.id}>
-                            {cat.name}
-                          </option>
-                        ))}
-                    </Select>
-                  </div>
+                  <CategoryTreeSelect
+                    categories={categories}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder={t("form.selectCategory")}
+                  />
                 )}
               />
             )}
