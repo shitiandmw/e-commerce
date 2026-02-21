@@ -1,45 +1,49 @@
 "use client"
 
+import { useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Minus, Plus, X, ShoppingBag, ArrowRight, Truck, Shield, RotateCcw } from "lucide-react"
-import { useCart, type CartItem, getCartProductName, getCartProductImage } from "@/lib/cart-store"
+import { Minus, Plus, X, ShoppingBag, ArrowRight, Truck, Shield, RotateCcw, Loader2 } from "lucide-react"
+import { useCart, selectTotalItems, selectTotalPrice, getCartProductName, getCartProductImage } from "@/lib/cart-store"
+import type { CartLineItem } from "@/lib/cart"
 import { products } from "@/lib/data/products"
 
-function CartItemRow({ item }: { item: CartItem }) {
-  const { updateQuantity, removeItem } = useCart()
-  const productName = getCartProductName(item.product)
-  const productImage = getCartProductImage(item.product)
-  const productLink = item.product.handle ? `/product/${item.product.handle}` : `/product/${item.product.id}`
+function formatPrice(amount: number, currencyCode?: string) {
+  const prefix = currencyCode === "hkd" || !currencyCode ? "HK$" : currencyCode.toUpperCase() + " "
+  return `${prefix}${(amount / 100).toLocaleString()}`
+}
+
+function CartItemRow({ item, currencyCode }: { item: CartLineItem; currencyCode?: string }) {
+  const { updateItem, removeItem, loading } = useCart()
+  const productName = getCartProductName(item)
+  const productImage = getCartProductImage(item)
+  const productLink = item.variant?.product?.handle
+    ? `/product/${item.variant.product.handle}`
+    : "#"
+  const variantLabel = item.variant_title || item.variant?.title
 
   return (
     <div className="flex gap-4 py-6 border-b border-border/30 last:border-b-0">
-      {/* product image */}
       <Link href={productLink} className="shrink-0">
         <div className="relative size-24 sm:size-28 bg-secondary/30 overflow-hidden">
-          <Image
-            src={productImage}
-            alt={productName}
-            fill
-            className="object-cover hover:scale-105 transition-transform duration-300"
-          />
+          <Image src={productImage} alt={productName} fill className="object-cover hover:scale-105 transition-transform duration-300" />
         </div>
       </Link>
 
-      {/* info */}
       <div className="flex flex-1 flex-col min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div>
-            {item.product.brandEn && (
-              <p className="text-[10px] text-gold tracking-[0.15em] uppercase">{item.product.brandEn}</p>
-            )}
-            <Link href={productLink} className="text-sm font-medium text-foreground hover:text-gold transition-colors line-clamp-2 leading-snug mt-0.5">
+            <Link href={productLink} className="text-sm font-medium text-foreground hover:text-gold transition-colors line-clamp-2 leading-snug">
               {productName}
             </Link>
+            {variantLabel && (
+              <p className="text-xs text-muted-foreground mt-0.5">{variantLabel}</p>
+            )}
           </div>
           <button
-            onClick={() => removeItem(item.product.id)}
-            className="p-1 text-muted-foreground/50 hover:text-destructive transition-colors shrink-0"
+            onClick={() => removeItem(item.id)}
+            disabled={loading}
+            className="p-1 text-muted-foreground/50 hover:text-destructive transition-colors shrink-0 disabled:opacity-50"
             aria-label="移除商品"
           >
             <X className="size-4" />
@@ -47,11 +51,11 @@ function CartItemRow({ item }: { item: CartItem }) {
         </div>
 
         <div className="flex items-end justify-between mt-auto pt-3">
-          {/* quantity controls */}
           <div className="flex items-center border border-border/50">
             <button
-              onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-              className="flex items-center justify-center size-8 text-foreground/60 hover:text-gold hover:bg-secondary/30 transition-colors"
+              onClick={() => updateItem(item.id, item.quantity - 1)}
+              disabled={loading}
+              className="flex items-center justify-center size-8 text-foreground/60 hover:text-gold hover:bg-secondary/30 transition-colors disabled:opacity-50"
               aria-label="減少數量"
             >
               <Minus className="size-3" />
@@ -60,23 +64,23 @@ function CartItemRow({ item }: { item: CartItem }) {
               {item.quantity}
             </span>
             <button
-              onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-              className="flex items-center justify-center size-8 text-foreground/60 hover:text-gold hover:bg-secondary/30 transition-colors"
+              onClick={() => updateItem(item.id, item.quantity + 1)}
+              disabled={loading}
+              className="flex items-center justify-center size-8 text-foreground/60 hover:text-gold hover:bg-secondary/30 transition-colors disabled:opacity-50"
               aria-label="增加數量"
             >
               <Plus className="size-3" />
             </button>
           </div>
 
-          {/* price */}
           <div className="text-right">
             {item.quantity > 1 && (
               <p className="text-[10px] text-muted-foreground">
-                HK${item.product.price.toLocaleString()} x {item.quantity}
+                {formatPrice(item.unit_price, currencyCode)} x {item.quantity}
               </p>
             )}
             <p className="text-gold font-bold">
-              HK${(item.product.price * item.quantity).toLocaleString()}
+              {formatPrice(item.total, currencyCode)}
             </p>
           </div>
         </div>
@@ -84,7 +88,6 @@ function CartItemRow({ item }: { item: CartItem }) {
     </div>
   )
 }
-
 function EmptyCart() {
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center">
@@ -113,18 +116,9 @@ function RecommendedProducts() {
       <h3 className="text-lg font-serif text-foreground mb-6">您可能也喜歡</h3>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {featured.map((product) => (
-          <Link
-            key={product.id}
-            href={`/product/${product.id}`}
-            className="group"
-          >
+          <Link key={product.id} href={`/product/${product.id}`} className="group">
             <div className="relative aspect-square bg-secondary/30 overflow-hidden mb-3">
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
-              />
+              <Image src={product.image} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
             </div>
             <p className="text-[10px] text-gold tracking-[0.15em] uppercase">{product.brandEn}</p>
             <p className="text-xs text-foreground mt-0.5 line-clamp-1 group-hover:text-gold transition-colors">{product.name}</p>
@@ -135,14 +129,27 @@ function RecommendedProducts() {
     </section>
   )
 }
-
 export default function CartPage() {
-  const { items, clearCart } = useCart()
-  const itemCount = items.reduce((s, i) => s + i.quantity, 0)
-  const subtotal = items.reduce((s, i) => s + i.product.price * i.quantity, 0)
-  const freeShippingThreshold = 2000
+  const { cart, loading, initCart, clear } = useCart()
+  const itemCount = useCart(selectTotalItems)
+  const subtotal = useCart(selectTotalPrice)
+  const currencyCode = cart?.currency_code
+  const items = cart?.items ?? []
+  const freeShippingThreshold = 200000 // in cents (HK$2000)
   const shippingProgress = Math.min((subtotal / freeShippingThreshold) * 100, 100)
   const shippingRemaining = Math.max(freeShippingThreshold - subtotal, 0)
+
+  useEffect(() => {
+    initCart()
+  }, [initCart])
+
+  if (loading && !cart) {
+    return (
+      <div className="mx-auto max-w-5xl px-4 py-24 lg:px-6 flex items-center justify-center">
+        <Loader2 className="size-6 animate-spin text-gold" />
+      </div>
+    )
+  }
 
   if (items.length === 0) {
     return (
@@ -155,7 +162,6 @@ export default function CartPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 lg:py-12 lg:px-6">
-      {/* breadcrumb */}
       <nav className="flex items-center gap-2 text-xs text-muted-foreground mb-8">
         <Link href="/" className="hover:text-gold transition-colors">首頁</Link>
         <span className="text-border">/</span>
@@ -163,46 +169,39 @@ export default function CartPage() {
       </nav>
 
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-        {/* left: cart items */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-xl font-serif text-foreground">購物車</h1>
             <button
-              onClick={clearCart}
-              className="text-xs text-muted-foreground hover:text-destructive transition-colors"
+              onClick={() => clear()}
+              disabled={loading}
+              className="text-xs text-muted-foreground hover:text-destructive transition-colors disabled:opacity-50"
             >
               清空購物車
             </button>
           </div>
-
-          {/* free shipping bar */}
           {subtotal < freeShippingThreshold && (
             <div className="mb-6 p-4 bg-secondary/30 border border-border/30">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2 text-xs text-foreground/70">
                   <Truck className="size-3.5 text-gold" />
-                  <span>再消費 <span className="text-gold font-medium">HK${shippingRemaining.toLocaleString()}</span> 即享免運費</span>
+                  <span>再消費 <span className="text-gold font-medium">{formatPrice(shippingRemaining, currencyCode)}</span> 即享免運費</span>
                 </div>
                 <span className="text-[10px] text-muted-foreground">{Math.round(shippingProgress)}%</span>
               </div>
               <div className="h-1 bg-border/50 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gold rounded-full transition-all duration-500"
-                  style={{ width: `${shippingProgress}%` }}
-                />
+                <div className="h-full bg-gold rounded-full transition-all duration-500" style={{ width: `${shippingProgress}%` }} />
               </div>
             </div>
           )}
 
-          {/* items list */}
           <div>
             {items.map((item) => (
-              <CartItemRow key={item.product.id} item={item} />
+              <CartItemRow key={item.id} item={item} currencyCode={currencyCode} />
             ))}
           </div>
         </div>
 
-        {/* right: order summary */}
         <div className="lg:w-[380px] shrink-0">
           <div className="sticky top-24 bg-card border border-border/30 p-6">
             <h2 className="text-sm font-medium text-foreground mb-6 tracking-wide">訂單摘要</h2>
@@ -210,7 +209,7 @@ export default function CartPage() {
             <div className="flex flex-col gap-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">小計 ({itemCount} 件商品)</span>
-                <span className="text-foreground">HK${subtotal.toLocaleString()}</span>
+                <span className="text-foreground">{formatPrice(subtotal, currencyCode)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">運費</span>
@@ -223,11 +222,10 @@ export default function CartPage() {
             <div className="border-t border-border/30 mt-4 pt-4">
               <div className="flex justify-between items-baseline">
                 <span className="text-sm text-foreground">總計</span>
-                <span className="text-xl font-bold text-gold">HK${subtotal.toLocaleString()}</span>
+                <span className="text-xl font-bold text-gold">{formatPrice(subtotal, currencyCode)}</span>
               </div>
             </div>
 
-            {/* promo code */}
             <div className="mt-5">
               <div className="flex gap-2">
                 <input
@@ -241,7 +239,6 @@ export default function CartPage() {
               </div>
             </div>
 
-            {/* checkout button */}
             <Link
               href="/checkout"
               className="mt-6 w-full flex items-center justify-center gap-2 bg-gold text-primary-foreground h-12 text-sm font-medium tracking-wide hover:bg-gold-light transition-colors"
@@ -250,7 +247,6 @@ export default function CartPage() {
               <ArrowRight className="size-4" />
             </Link>
 
-            {/* trust badges */}
             <div className="mt-6 pt-5 border-t border-border/20 flex flex-col gap-3">
               <div className="flex items-center gap-3 text-xs text-muted-foreground">
                 <Shield className="size-4 text-gold/60 shrink-0" />

@@ -13,7 +13,7 @@ import {
   Shield,
   CheckCircle2,
 } from "lucide-react"
-import { useCart, getCartProductName, getCartProductImage } from "@/lib/cart-store"
+import { useCart, selectTotalItems, selectTotalPrice, getCartProductName, getCartProductImage } from "@/lib/cart-store"
 import { cn } from "@/lib/utils"
 
 /* ─── step definitions ─── */
@@ -134,16 +134,17 @@ const paymentMethods = [
 /* ═══════════════ CHECKOUT PAGE ═══════════════ */
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items, clearCart } = useCart()
+  const { cart, clear } = useCart()
+  const items = cart?.items ?? []
   const [step, setStep] = useState<Step>("info")
   const [shippingMethod, setShippingMethod] = useState("standard")
   const [paymentMethod, setPaymentMethod] = useState("card")
   const [showOrderSummary, setShowOrderSummary] = useState(false)
 
-  const subtotal = items.reduce((s, i) => s + i.product.price * i.quantity, 0)
+  const subtotal = cart?.item_total ?? 0
   const selectedShipping = shippingMethods.find((m) => m.id === shippingMethod)
   const shippingCost =
-    shippingMethod === "free" && subtotal >= 2000
+    shippingMethod === "free" && subtotal >= 200000
       ? 0
       : selectedShipping?.price ?? 120
   const total = subtotal + shippingCost
@@ -172,7 +173,7 @@ export default function CheckoutPage() {
     } else if (step === "shipping") {
       setStep("payment")
     } else {
-      clearCart()
+      clear()
       router.push("/checkout/success")
     }
   }
@@ -466,11 +467,11 @@ export default function CheckoutPage() {
                 {/* items */}
                 <div className="flex flex-col gap-4 max-h-[320px] overflow-y-auto pr-1">
                   {items.map((item) => (
-                    <div key={item.product.id} className="flex gap-3">
+                    <div key={item.id} className="flex gap-3">
                       <div className="relative size-14 bg-secondary/30 shrink-0">
                         <Image
-                          src={getCartProductImage(item.product)}
-                          alt={getCartProductName(item.product)}
+                          src={getCartProductImage(item)}
+                          alt={getCartProductName(item)}
                           fill
                           className="object-cover"
                         />
@@ -479,12 +480,12 @@ export default function CheckoutPage() {
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-foreground line-clamp-1">{getCartProductName(item.product)}</p>
-                        {item.product.brandEn && (
-                          <p className="text-[10px] text-muted-foreground mt-0.5">{item.product.brandEn}</p>
+                        <p className="text-xs text-foreground line-clamp-1">{getCartProductName(item)}</p>
+                        {item.variant_title && (
+                          <p className="text-[10px] text-muted-foreground mt-0.5">{item.variant_title}</p>
                         )}
                         <p className="text-xs text-gold mt-1">
-                          HK${(item.product.price * item.quantity).toLocaleString()}
+                          HK${(item.total / 100).toLocaleString()}
                         </p>
                       </div>
                     </div>
@@ -495,7 +496,7 @@ export default function CheckoutPage() {
                 <div className="border-t border-border/30 mt-4 pt-4 flex flex-col gap-2 text-xs">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">小計</span>
-                    <span className="text-foreground">HK${subtotal.toLocaleString()}</span>
+                    <span className="text-foreground">HK${(subtotal / 100).toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">運費</span>
@@ -508,7 +509,7 @@ export default function CheckoutPage() {
                 <div className="border-t border-border/30 mt-3 pt-3">
                   <div className="flex justify-between items-baseline">
                     <span className="text-sm text-foreground">總計</span>
-                    <span className="text-lg font-bold text-gold">HK${total.toLocaleString()}</span>
+                    <span className="text-lg font-bold text-gold">HK${(total / 100).toLocaleString()}</span>
                   </div>
                 </div>
               </div>

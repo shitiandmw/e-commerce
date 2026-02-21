@@ -1,94 +1,99 @@
 import { create } from "zustand"
-
-/**
- * Unified cart product type that works with both mock and Medusa products.
- * When adding from mock Product, pass the Product directly (has `id`, `price`, `name`, `image`).
- * When adding from MedusaProduct, pass a normalized object with these fields.
- */
-export interface CartProduct {
-  id: string
-  /** Display name — mock uses `name`, Medusa uses `title` */
-  name?: string
-  title?: string
-  handle?: string
-  /** Image URL — mock uses `image`, Medusa uses `thumbnail` */
-  image?: string
-  thumbnail?: string | null
-  price: number
-  currency_code?: string
-  brandEn?: string
-  packSize?: number
-  variant_id?: string
-  variant_title?: string
-}
-
-export interface CartItem {
-  product: CartProduct
-  quantity: number
-}
+import {
+  type Cart,
+  type CartLineItem,
+  getOrCreateCart,
+  addToCart,
+  updateLineItem,
+  removeLineItem,
+  clearCart as clearCartApi,
+} from "./cart"
 
 interface CartState {
-  items: CartItem[]
-  addItem: (product: CartProduct, qty?: number) => void
-  removeItem: (productId: string) => void
-  updateQuantity: (productId: string, qty: number) => void
-  clearCart: () => void
+  cart: Cart | null
+  loading: boolean
+  initCart: () => Promise<void>
+  addItem: (variantId: string, qty?: number) => Promise<void>
+  updateItem: (lineItemId: string, qty: number) => Promise<void>
+  removeItem: (lineItemId: string) => Promise<void>
+  clear: () => Promise<void>
 }
 
-export const useCart = create<CartState>((set, get) => ({
-  items: [],
+export const useCart = create<CartState>((set) => ({
+  cart: null,
+  loading: false,
 
-  addItem: (product, qty = 1) => {
-    set((state) => {
-      const existing = state.items.find((i) => i.product.id === product.id)
-      if (existing) {
-        return {
-          items: state.items.map((i) =>
-            i.product.id === product.id
-              ? { ...i, quantity: i.quantity + qty }
-              : i
-          ),
-        }
-      }
-      return { items: [...state.items, { product, quantity: qty }] }
-    })
+  initCart: async () => {
+    set({ loading: true })
+    try {
+      const cart = await getOrCreateCart()
+      set({ cart })
+    } catch {
+      set({ cart: null })
+    } finally {
+      set({ loading: false })
+    }
   },
 
-  removeItem: (productId) => {
-    set((state) => ({
-      items: state.items.filter((i) => i.product.id !== productId),
-    }))
+  addItem: async (variantId, qty = 1) => {
+    set({ loading: true })
+    try {
+      const cart = await addToCart(variantId, qty)
+      set({ cart })
+    } finally {
+      set({ loading: false })
+    }
   },
 
-  updateQuantity: (productId, qty) => {
+  updateItem: async (lineItemId, qty) => {
     if (qty <= 0) {
-      get().removeItem(productId)
+      await useCart.getState().removeItem(lineItemId)
       return
     }
-    set((state) => ({
-      items: state.items.map((i) =>
-        i.product.id === productId ? { ...i, quantity: qty } : i
-      ),
-    }))
+    set({ loading: true })
+    try {
+      const cart = await updateLineItem(lineItemId, qty)
+      set({ cart })
+    } finally {
+      set({ loading: false })
+    }
   },
 
-  clearCart: () => set({ items: [] }),
+  removeItem: async (lineItemId) => {
+    set({ loading: true })
+    try {
+      const cart = await removeLineItem(lineItemId)
+      set({ cart })
+    } finally {
+      set({ loading: false })
+    }
+  },
+
+  clear: async () => {
+    set({ loading: true })
+    try {
+      const cart = await clearCartApi()
+      set({ cart })
+    } finally {
+      set({ loading: false })
+    }
+  },
 }))
 
-/* derived helpers (pure functions, safe for SSR) */
+/* derived selectors */
 export function selectTotalItems(state: CartState) {
-  return state.items.reduce((sum, i) => sum + i.quantity, 0)
+  return state.cart?.items?.reduce((sum, i) => sum + i.quantity, 0) ?? 0
 }
+
 export function selectTotalPrice(state: CartState) {
-  return state.items.reduce((sum, i) => sum + i.product.price * i.quantity, 0)
+  return state.cart?.item_total ?? state.cart?.total ?? 0
 }
 
-/* helper to get display name from cart product */
-export function getCartProductName(p: CartProduct): string {
-  return p.title || p.name || ""
+/* compat helpers for checkout page (temporary) */
+export function getCartProductName(item: CartLineItem): string {
+  return item.product_title || item.variant?.product?.title || item.title || ""
 }
 
-/* helper to get display image from cart product */
-export function getCartProductImage(p: CartProduct): string {
-  return p.image || p.thumbnail || "/images/placeholder.jpg"
+export function getCartProductImage(item: CartLineItem): string {
+  return item.thumbnail || item.variant?.product?.thumbnail || "/images/placeholder.jpg"
 }

@@ -1,10 +1,12 @@
 "use client"
 
+import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ShoppingBag, Heart } from "lucide-react"
+import { ShoppingBag, Heart, Loader2 } from "lucide-react"
 import { type Product, type MedusaProduct, getMedusaPrice } from "@/lib/data/products"
-import { useCart, type CartProduct } from "@/lib/cart-store"
+import { useCart } from "@/lib/cart-store"
+import { toast } from "sonner"
 
 function isMedusaProduct(p: Product | MedusaProduct): p is MedusaProduct {
   return "handle" in p && "variants" in p
@@ -17,7 +19,7 @@ export function ProductCard({ product }: { product: Product | MedusaProduct }) {
     return <MedusaProductCard product={product} addItem={addItem} />
   }
 
-  return <MockProductCard product={product} addItem={addItem} />
+  return <MockProductCard product={product} />
 }
 
 function MedusaProductCard({
@@ -25,12 +27,29 @@ function MedusaProductCard({
   addItem,
 }: {
   product: MedusaProduct
-  addItem: (item: CartProduct, qty?: number) => void
+  addItem: (variantId: string, qty?: number) => Promise<void>
 }) {
+  const [adding, setAdding] = useState(false)
   const priceInfo = getMedusaPrice(product)
   const meta = (product.metadata ?? {}) as Record<string, string | undefined>
   const isLimited = meta.is_limited === "true"
   const brandNameEn = meta.brand_name_en
+  const hasSingleVariant = (product.variants?.length ?? 0) === 1
+  const firstVariantId = product.variants?.[0]?.id
+
+  const handleQuickAdd = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (!firstVariantId || adding) return
+    setAdding(true)
+    try {
+      await addItem(firstVariantId)
+      toast.success("已加入購物車")
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "加入購物車失敗")
+    } finally {
+      setAdding(false)
+    }
+  }
 
   return (
     <Link
@@ -58,25 +77,18 @@ function MedusaProductCard({
         >
           <Heart className="size-4" />
         </button>
-        <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-          <button
-            className="w-full flex items-center justify-center gap-2 bg-gold/90 text-primary-foreground py-3 text-xs font-medium tracking-wide hover:bg-gold transition-colors"
-            onClick={(e) => {
-              e.preventDefault()
-              addItem({
-                id: product.id,
-                title: product.title,
-                handle: product.handle,
-                thumbnail: product.thumbnail,
-                price: priceInfo?.amount ?? 0,
-                currency_code: priceInfo?.currency_code ?? "hkd",
-              })
-            }}
-          >
-            <ShoppingBag className="size-3.5" />
-            加入購物車
-          </button>
-        </div>
+        {hasSingleVariant && firstVariantId && (
+          <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+            <button
+              className="w-full flex items-center justify-center gap-2 bg-gold/90 text-primary-foreground py-3 text-xs font-medium tracking-wide hover:bg-gold transition-colors disabled:opacity-70"
+              onClick={handleQuickAdd}
+              disabled={adding}
+            >
+              {adding ? <Loader2 className="size-3.5 animate-spin" /> : <ShoppingBag className="size-3.5" />}
+              {adding ? "加入中..." : "加入購物車"}
+            </button>
+          </div>
+        )}
       </div>
       <div className="p-4">
         {brandNameEn && (
@@ -105,10 +117,8 @@ function MedusaProductCard({
 
 function MockProductCard({
   product,
-  addItem,
 }: {
   product: Product
-  addItem: (item: CartProduct, qty?: number) => void
 }) {
   return (
     <Link
@@ -141,18 +151,6 @@ function MockProductCard({
         >
           <Heart className="size-4" />
         </button>
-        <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-          <button
-            className="w-full flex items-center justify-center gap-2 bg-gold/90 text-primary-foreground py-3 text-xs font-medium tracking-wide hover:bg-gold transition-colors"
-            onClick={(e) => {
-              e.preventDefault()
-              addItem(product)
-            }}
-          >
-            <ShoppingBag className="size-3.5" />
-            加入購物車
-          </button>
-        </div>
       </div>
       <div className="p-4">
         <p className="text-[10px] text-gold tracking-[0.15em] uppercase">{product.brandEn}</p>

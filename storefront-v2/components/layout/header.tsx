@@ -269,6 +269,16 @@ export function SiteHeader({ navItems }: { navItems: MenuItem[] }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const cartCount = useCart(selectTotalItems)
+  const [cartBounce, setCartBounce] = useState(false)
+  const prevCartCount = useRef(cartCount)
+  useEffect(() => {
+    if (cartCount > prevCartCount.current) {
+      setCartBounce(true)
+      const t = setTimeout(() => setCartBounce(false), 300)
+      return () => clearTimeout(t)
+    }
+    prevCartCount.current = cartCount
+  }, [cartCount])
   const [loggedIn, setLoggedIn] = useState(false)
   useEffect(() => {
     const sync = () => setLoggedIn(isLoggedIn())
@@ -373,7 +383,10 @@ export function SiteHeader({ navItems }: { navItems: MenuItem[] }) {
               <Link href="/cart" className="relative p-2 text-foreground/60 hover:text-gold transition-colors" aria-label="購物車">
                 <ShoppingBag className="size-[18px]" />
                 {cartCount > 0 && (
-                  <span className="absolute top-0 right-0 flex size-3.5 items-center justify-center rounded-full bg-gold text-[9px] font-bold text-primary-foreground">
+                  <span className={cn(
+                    "absolute top-0 right-0 flex size-3.5 items-center justify-center rounded-full bg-gold text-[9px] font-bold text-primary-foreground transition-transform",
+                    cartBounce && "animate-[cart-bounce_0.3s_ease-out]"
+                  )}>
                     {cartCount > 99 ? "99+" : cartCount}
                   </span>
                 )}

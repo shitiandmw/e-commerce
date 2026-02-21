@@ -3,7 +3,6 @@
 import Image from "next/image"
 import Link from "next/link"
 import { ShoppingBag, Flame } from "lucide-react"
-import { useCart } from "@/lib/cart-store"
 import type { CollectionProductWithPrice } from "@/lib/data/collections"
 
 interface HotPicksProps {
@@ -11,8 +10,6 @@ interface HotPicksProps {
 }
 
 export function HotPicks({ products }: HotPicksProps) {
-  const addItem = useCart((s) => s.addItem)
-
   if (products.length === 0) return null
 
   return (
@@ -57,25 +54,14 @@ export function HotPicks({ products }: HotPicksProps) {
                   <Flame className="size-3" />
                   HOT
                 </div>
-                {/* Quick add overlay — 后续对接购物车 API 时替换 */}
+                {/* Quick add — links to product page for variant selection */}
                 <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                  <button
+                  <span
                     className="w-full flex items-center justify-center gap-2 bg-gold/90 text-primary-foreground py-3 text-xs font-medium tracking-wide hover:bg-gold transition-colors"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      addItem({
-                        id: product.id,
-                        title: product.title,
-                        handle: product.handle,
-                        thumbnail: product.thumbnail,
-                        price: product.price ?? 0,
-                        currency_code: product.currency_code ?? "hkd",
-                      })
-                    }}
                   >
                     <ShoppingBag className="size-3.5" />
-                    加入購物車
-                  </button>
+                    查看詳情
+                  </span>
                 </div>
               </div>
               <div className="p-4">

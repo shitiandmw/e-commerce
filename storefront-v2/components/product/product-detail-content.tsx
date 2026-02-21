@@ -3,12 +3,14 @@
 import { useState, useMemo } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Minus, Plus, ShoppingBag, Heart, Share2, ChevronRight } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { Minus, Plus, ShoppingBag, Heart, Share2, ChevronRight, Loader2 } from "lucide-react"
 import { type MedusaProduct, getMedusaImages } from "@/lib/data/products"
 import { useCart } from "@/lib/cart-store"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ProductCard } from "@/components/product/product-card"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 
 export function ProductDetailContent({
   product,
@@ -31,6 +33,10 @@ export function ProductDetailContent({
     return {}
   })
   const addItem = useCart((s) => s.addItem)
+  const clearCart = useCart((s) => s.clear)
+  const [adding, setAdding] = useState(false)
+  const [buyingNow, setBuyingNow] = useState(false)
+  const router = useRouter()
   const images = getMedusaImages(product)
   const meta = (product.metadata ?? {}) as Record<string, string | undefined>
   const categoryName = product.categories?.[0]?.name ?? ""
@@ -260,29 +266,28 @@ export function ProductDetailContent({
 
               <div className="flex gap-3">
                 <button
-                  disabled={!canAddToCart}
-                  onClick={() => {
-                    if (!canAddToCart) return
-                    addItem({
-                      id: product.id,
-                      title: product.title,
-                      handle: product.handle,
-                      thumbnail: product.thumbnail,
-                      price: variantPrice?.amount ?? 0,
-                      currency_code: variantPrice?.currency_code ?? "hkd",
-                      variant_id: selectedVariant?.id,
-                      variant_title: selectedVariant?.title,
-                    }, quantity)
+                  disabled={!canAddToCart || adding}
+                  onClick={async () => {
+                    if (!canAddToCart || !selectedVariant) return
+                    setAdding(true)
+                    try {
+                      await addItem(selectedVariant.id, quantity)
+                      toast.success("已加入購物車")
+                    } catch (err) {
+                      toast.error(err instanceof Error ? err.message : "加入購物車失敗")
+                    } finally {
+                      setAdding(false)
+                    }
                   }}
                   className={cn(
                     "flex-1 flex items-center justify-center gap-2 py-3.5 text-sm font-medium tracking-wide transition-colors",
-                    canAddToCart
+                    canAddToCart && !adding
                       ? "bg-gold text-primary-foreground hover:bg-gold-dark"
                       : "bg-muted text-muted-foreground cursor-not-allowed"
                   )}
                 >
-                  <ShoppingBag className="size-4" />
-                  {isOutOfStock ? "缺貨中" : !selectedVariant && hasOptions ? "請選擇規格" : "加入購物車"}
+                  {adding ? <Loader2 className="size-4 animate-spin" /> : <ShoppingBag className="size-4" />}
+                  {isOutOfStock ? "缺貨中" : !selectedVariant && hasOptions ? "請選擇規格" : adding ? "加入中..." : "加入購物車"}
                 </button>
                 <button
                   className="flex size-12 items-center justify-center border border-border/50 text-muted-foreground hover:text-gold hover:border-gold transition-colors"
@@ -298,8 +303,29 @@ export function ProductDetailContent({
                 </button>
               </div>
 
-              <button className="w-full border border-gold text-gold py-3.5 text-sm font-medium tracking-wide hover:bg-gold hover:text-primary-foreground transition-all">
-                立即購買
+              <button
+                disabled={!canAddToCart || buyingNow}
+                onClick={async () => {
+                  if (!canAddToCart || !selectedVariant) return
+                  setBuyingNow(true)
+                  try {
+                    await clearCart()
+                    await addItem(selectedVariant.id, quantity)
+                    router.push("/checkout")
+                  } catch (err) {
+                    toast.error(err instanceof Error ? err.message : "操作失敗")
+                    setBuyingNow(false)
+                  }
+                }}
+                className={cn(
+                  "w-full flex items-center justify-center gap-2 border border-gold py-3.5 text-sm font-medium tracking-wide transition-all",
+                  canAddToCart && !buyingNow
+                    ? "text-gold hover:bg-gold hover:text-primary-foreground"
+                    : "text-muted-foreground border-muted cursor-not-allowed"
+                )}
+              >
+                {buyingNow ? <Loader2 className="size-4 animate-spin" /> : null}
+                {buyingNow ? "處理中..." : "立即購買"}
               </button>
             </div>
 

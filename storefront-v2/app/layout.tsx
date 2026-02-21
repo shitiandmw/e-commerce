@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Noto_Serif_SC, Geist } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { Toaster } from 'sonner'
 import { LayoutShell } from '@/components/layout/layout-shell'
 import { AnnouncementBarServer } from '@/components/layout/announcement-bar-server'
 import { AgeVerification } from '@/components/age-verification'
@@ -42,6 +43,7 @@ export default async function RootLayout({
         <AgeVerification />
         <AnnouncementBarServer />
         <LayoutShell navItems={navItems}>{children}</LayoutShell>
+        <Toaster position="top-center" richColors />
         <Analytics />
       </body>
     </html>
