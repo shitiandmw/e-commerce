@@ -1,19 +1,46 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { articles } from "@/lib/data/articles"
+import { useRouter, useSearchParams } from "next/navigation"
+import type { Article } from "@/lib/data/articles"
 import { cn } from "@/lib/utils"
 
-const categoryFilters = ["全部", "雪茄快訊", "品味生活", "品鑑指南", "Podcast"] as const
+interface ArticleListContentProps {
+  articles: Article[]
+  categories: { id: string; name: string }[]
+  activeCategory?: string
+}
 
-export function ArticleListContent() {
-  const [activeCategory, setActiveCategory] = useState<string>("全部")
+export function ArticleListContent({
+  articles,
+  categories,
+  activeCategory,
+}: ArticleListContentProps) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
-  const filteredArticles = activeCategory === "全部"
-    ? articles
-    : articles.filter(a => a.category === activeCategory)
+  const filteredArticles = useMemo(() => {
+    if (!activeCategory) return articles
+    return articles.filter((a) => a.category_id === activeCategory)
+  }, [articles, activeCategory])
+
+  function handleCategoryChange(categoryId?: string) {
+    const params = new URLSearchParams(searchParams.toString())
+    if (categoryId) {
+      params.set("category", categoryId)
+    } else {
+      params.delete("category")
+    }
+    const qs = params.toString()
+    router.push(qs ? `/articles?${qs}` : "/articles")
+  }
+
+  function formatDate(dateStr?: string | null) {
+    if (!dateStr) return ""
+    return new Date(dateStr).toLocaleDateString("zh-TW")
+  }
 
   return (
     <div>
@@ -34,18 +61,29 @@ export function ArticleListContent() {
       <div className="mx-auto max-w-7xl px-4 py-8 lg:px-6">
         {/* Category Filters */}
         <div className="flex items-center gap-2 overflow-x-auto pb-4 border-b border-border/30 mb-8 scrollbar-hide">
-          {categoryFilters.map((cat) => (
+          <button
+            onClick={() => handleCategoryChange()}
+            className={cn(
+              "px-4 py-2 text-sm whitespace-nowrap transition-colors shrink-0",
+              !activeCategory
+                ? "bg-gold/10 text-gold border border-gold/30"
+                : "text-muted-foreground hover:text-foreground border border-transparent"
+            )}
+          >
+            全部
+          </button>
+          {categories.map((cat) => (
             <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
+              key={cat.id}
+              onClick={() => handleCategoryChange(cat.id)}
               className={cn(
                 "px-4 py-2 text-sm whitespace-nowrap transition-colors shrink-0",
-                activeCategory === cat
+                activeCategory === cat.id
                   ? "bg-gold/10 text-gold border border-gold/30"
                   : "text-muted-foreground hover:text-foreground border border-transparent"
               )}
             >
-              {cat}
+              {cat.name}
             </button>
           ))}
         </div>
@@ -53,68 +91,72 @@ export function ArticleListContent() {
         {/* Articles Grid */}
         {filteredArticles.length > 0 ? (
           <div className="grid md:grid-cols-2 gap-8">
-            {filteredArticles.map((article, index) => (
-              <Link
-                key={article.slug}
-                href={`/articles/${article.slug}`}
-                className={cn(
-                  "group",
-                  index === 0 && activeCategory === "全部" && "md:col-span-2"
-                )}
-              >
-                <div className={cn(
-                  index === 0 && activeCategory === "全部"
-                    ? "grid md:grid-cols-2 gap-6"
-                    : "flex flex-col"
-                )}>
+            {filteredArticles.map((article, index) => {
+              const isHero = index === 0 && !activeCategory
+              return (
+                <Link
+                  key={article.id}
+                  href={`/articles/${article.slug}`}
+                  className={cn("group", isHero && "md:col-span-2")}
+                >
                   <div className={cn(
-                    "relative overflow-hidden",
-                    index === 0 && activeCategory === "全部" ? "aspect-[16/10]" : "aspect-[16/9]"
+                    isHero ? "grid md:grid-cols-2 gap-6" : "flex flex-col"
                   )}>
-                    <Image
-                      src={article.image}
-                      alt={article.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent" />
-                    <div className="absolute top-3 left-3">
-                      <span className="bg-gold/90 text-primary-foreground text-[10px] font-medium px-2 py-1 tracking-wider">
-                        {article.category}
-                      </span>
-                    </div>
-                  </div>
-                  <div className={cn(
-                    "flex flex-col justify-center",
-                    index === 0 && activeCategory === "全部" ? "py-4" : "mt-4"
-                  )}>
-                    <div className="flex items-center gap-3 text-[11px] text-muted-foreground mb-2">
-                      <span>{article.date}</span>
-                      <span className="text-border">|</span>
-                      <span>{article.readTime}</span>
-                    </div>
-                    <h2 className={cn(
-                      "font-serif font-bold text-foreground leading-snug group-hover:text-gold transition-colors",
-                      index === 0 && activeCategory === "全部" ? "text-xl md:text-2xl" : "text-base"
+                    <div className={cn(
+                      "relative overflow-hidden",
+                      isHero ? "aspect-[16/10]" : "aspect-[16/9]"
                     )}>
-                      {article.title}
-                    </h2>
-                    <p className="mt-2 text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-                      {article.excerpt}
-                    </p>
-                    <div className="mt-4 text-xs text-gold group-hover:text-gold-light transition-colors">
-                      閱讀全文 &rarr;
+                      {article.cover_image ? (
+                        <Image
+                          src={article.cover_image}
+                          alt={article.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 bg-muted" />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent" />
+                      {article.category?.name && (
+                        <div className="absolute top-3 left-3">
+                          <span className="bg-gold/90 text-primary-foreground text-[10px] font-medium px-2 py-1 tracking-wider">
+                            {article.category.name}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className={cn(
+                      "flex flex-col justify-center",
+                      isHero ? "py-4" : "mt-4"
+                    )}>
+                      <div className="flex items-center gap-3 text-[11px] text-muted-foreground mb-2">
+                        <span>{formatDate(article.published_at)}</span>
+                      </div>
+                      <h2 className={cn(
+                        "font-serif font-bold text-foreground leading-snug group-hover:text-gold transition-colors",
+                        isHero ? "text-xl md:text-2xl" : "text-base"
+                      )}>
+                        {article.title}
+                      </h2>
+                      {article.summary && (
+                        <p className="mt-2 text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                          {article.summary}
+                        </p>
+                      )}
+                      <div className="mt-4 text-xs text-gold group-hover:text-gold-light transition-colors">
+                        閱讀全文 &rarr;
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              )
+            })}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <p className="text-muted-foreground">此分類暫無文章</p>
             <button
-              onClick={() => setActiveCategory("全部")}
+              onClick={() => handleCategoryChange()}
               className="mt-4 text-sm text-gold hover:text-gold-light transition-colors"
             >
               查看全部文章
