@@ -8,6 +8,7 @@ import { ServiceBar } from "@/components/home/service-bar"
 import { BlogPreview, type ArticleItem } from "@/components/home/blog-preview"
 import { RegisterCTA } from "@/components/home/register-cta"
 import { fetchContent } from "@/lib/medusa"
+import { fetchCollectionWithPrices } from "@/lib/data/collections"
 
 interface BannerItem {
   id: string
@@ -38,33 +39,47 @@ interface ArticlesResponse {
 }
 
 export default async function HomePage() {
-  let bannerSlides: BannerItem[] = []
-  let articles: ArticleItem[] = []
-
-  try {
-    const data = await fetchContent<BannersResponse>("/store/content/banners", {
+  // 并行获取所有首页数据
+  const [
+    bannerResult,
+    hotPicksProducts,
+    featuredCubanProducts,
+    limitedEditionsProducts,
+    articlesResult,
+  ] = await Promise.allSettled([
+    fetchContent<BannersResponse>("/store/content/banners", {
       position: "homepage-hero",
-    })
-    bannerSlides = data?.banners?.[0]?.items ?? []
-  } catch {
-    // API 不可用时 fallback 为空，HeroCarousel 会显示占位
-  }
-
-  try {
-    const data = await fetchContent<ArticlesResponse>("/store/content/articles", {
+    }),
+    fetchCollectionWithPrices("hot-picks"),
+    fetchCollectionWithPrices("featured-cuban"),
+    fetchCollectionWithPrices("limited-editions"),
+    fetchContent<ArticlesResponse>("/store/content/articles", {
       limit: "3",
-    })
-    articles = data?.articles ?? []
-  } catch {
-    // API 不可用时 fallback 为空，BlogPreview 不渲染
-  }
+    }),
+  ])
+
+  const bannerSlides =
+    bannerResult.status === "fulfilled"
+      ? bannerResult.value?.banners?.[0]?.items ?? []
+      : []
+
+  const articles =
+    articlesResult.status === "fulfilled"
+      ? articlesResult.value?.articles ?? []
+      : []
 
   return (
     <>
       <HeroCarousel slides={bannerSlides} />
-      <HotPicks />
-      <FeaturedCuban />
-      <LimitedEditions />
+      <HotPicks
+        products={hotPicksProducts.status === "fulfilled" ? hotPicksProducts.value : []}
+      />
+      <FeaturedCuban
+        products={featuredCubanProducts.status === "fulfilled" ? featuredCubanProducts.value : []}
+      />
+      <LimitedEditions
+        products={limitedEditionsProducts.status === "fulfilled" ? limitedEditionsProducts.value : []}
+      />
       <BeginnerSection />
       <BrandSpotlight />
       <ServiceBar />

@@ -1,10 +1,14 @@
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
-import { getLimitedProducts } from "@/lib/data/products"
+import type { CollectionProductWithPrice } from "@/lib/data/collections"
 
-export function LimitedEditions() {
-  const limited = getLimitedProducts()
+interface LimitedEditionsProps {
+  products: CollectionProductWithPrice[]
+}
+
+export function LimitedEditions({ products }: LimitedEditionsProps) {
+  if (products.length === 0) return null
 
   return (
     <section className="py-16 px-4 lg:px-6">
@@ -29,27 +33,36 @@ export function LimitedEditions() {
 
           {/* Right: Cards */}
           <div className="grid grid-cols-2 gap-4">
-            {limited.slice(0, 2).map((product) => (
+            {products.slice(0, 2).map((product) => (
               <Link
                 key={product.id}
-                href={`/product/${product.id}`}
+                href={`/product/${product.handle}`}
                 className="group relative overflow-hidden bg-card border border-border/30 hover:border-gold/30 transition-all"
               >
                 <div className="relative aspect-[3/4] overflow-hidden">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
+                  {product.thumbnail ? (
+                    <Image
+                      src={product.thumbnail}
+                      alt={product.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground text-xs">
+                      No Image
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
                   <div className="absolute top-3 left-3 bg-gold/90 text-primary-foreground text-[10px] font-bold px-2 py-1 tracking-wider">
                     LIMITED
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <p className="text-gold/80 text-[10px] tracking-wider uppercase">{product.brandEn}</p>
-                    <h3 className="mt-1 text-sm font-serif font-medium text-foreground">{product.name}</h3>
-                    <p className="mt-2 text-gold font-bold text-sm">HK${product.price.toLocaleString()}</p>
+                    <h3 className="mt-1 text-sm font-serif font-medium text-foreground">{product.title}</h3>
+                    {product.price !== null ? (
+                      <p className="mt-2 text-gold font-bold text-sm">HK${product.price.toLocaleString()}</p>
+                    ) : (
+                      <p className="mt-2 text-muted-foreground text-xs">價格待定</p>
+                    )}
                   </div>
                 </div>
               </Link>

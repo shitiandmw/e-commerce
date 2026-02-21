@@ -2,13 +2,18 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { products } from "@/lib/data/products"
 import { ShoppingBag, Flame } from "lucide-react"
 import { useCart } from "@/lib/cart-store"
+import type { CollectionProductWithPrice } from "@/lib/data/collections"
 
-export function HotPicks() {
-  const hotProducts = products.slice(0, 4)
+interface HotPicksProps {
+  products: CollectionProductWithPrice[]
+}
+
+export function HotPicks({ products }: HotPicksProps) {
   const addItem = useCart((s) => s.addItem)
+
+  if (products.length === 0) return null
 
   return (
     <section className="py-16 px-4 lg:px-6">
@@ -29,30 +34,55 @@ export function HotPicks() {
 
         {/* Product Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-          {hotProducts.map((product) => (
+          {products.slice(0, 4).map((product) => (
             <Link
               key={product.id}
-              href={`/product/${product.id}`}
+              href={`/product/${product.handle}`}
               className="group bg-card border border-border/30 hover:border-gold/30 transition-all duration-300"
             >
               <div className="relative aspect-square overflow-hidden">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+                {product.thumbnail ? (
+                  <Image
+                    src={product.thumbnail}
+                    alt={product.title}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground text-xs">
+                    No Image
+                  </div>
+                )}
                 <div className="absolute top-3 left-3 flex items-center gap-1 bg-gold/90 text-primary-foreground text-[10px] font-bold px-2 py-1 tracking-wider">
                   <Flame className="size-3" />
                   HOT
                 </div>
-                {/* Quick add overlay */}
+                {/* Quick add overlay — 后续对接购物车 API 时替换 */}
                 <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                   <button
                     className="w-full flex items-center justify-center gap-2 bg-gold/90 text-primary-foreground py-3 text-xs font-medium tracking-wide hover:bg-gold transition-colors"
                     onClick={(e) => {
                       e.preventDefault()
-                      addItem(product)
+                      addItem({
+                        id: product.id,
+                        name: product.title,
+                        nameEn: product.title,
+                        brand: "",
+                        brandEn: "",
+                        category: "",
+                        price: product.price ?? 0,
+                        image: product.thumbnail ?? "",
+                        description: "",
+                        origin: "",
+                        wrapper: "",
+                        binder: "",
+                        filler: "",
+                        strength: "中",
+                        length: "",
+                        ringGauge: "",
+                        packSize: 1,
+                        inStock: true,
+                      })
                     }}
                   >
                     <ShoppingBag className="size-3.5" />
@@ -61,10 +91,13 @@ export function HotPicks() {
                 </div>
               </div>
               <div className="p-4">
-                <p className="text-[10px] text-gold tracking-wider uppercase">{product.brandEn}</p>
-                <h3 className="mt-1 text-sm font-medium text-foreground leading-snug line-clamp-2">{product.name}</h3>
+                <h3 className="mt-1 text-sm font-medium text-foreground leading-snug line-clamp-2">{product.title}</h3>
                 <div className="mt-3">
-                  <span className="text-gold font-bold text-base">HK${product.price.toLocaleString()}</span>
+                  {product.price !== null ? (
+                    <span className="text-gold font-bold text-base">HK${product.price.toLocaleString()}</span>
+                  ) : (
+                    <span className="text-muted-foreground text-sm">價格待定</span>
+                  )}
                 </div>
               </div>
             </Link>
