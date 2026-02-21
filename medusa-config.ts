@@ -11,9 +11,6 @@ module.exports = defineConfig({
       resolve: "./src/modules/brand",
     },
     {
-      resolve: "./src/modules/page",
-    },
-    {
       resolve: "./src/modules/tag",
     },
     {

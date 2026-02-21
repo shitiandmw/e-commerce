@@ -111,6 +111,8 @@
       "descriptionPlaceholder": "分类描述...",
       "sortOrderLabel": "排序值",
       "sortOrderPlaceholder": "0",
+      "parentLabel": "父分类",
+      "noParent": "无（顶级分类）",
       "save": "保存",
       "saving": "保存中...",
       "cancel": "取消",

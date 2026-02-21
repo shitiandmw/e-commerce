@@ -46,7 +46,8 @@
       "descriptionPlaceholder": "Describe the brand...",
       "logo": "Logo",
       "logoUrlLabel": "Logo URL",
-      "logoUrlPlaceholder": "https://example.com/logo.png"
+      "logoUrlPlaceholder": "https://example.com/logo.png",
+      "browseMedia": "Browse Media"
     },
     "detail": {
       "brandDetails": "Brand Details",

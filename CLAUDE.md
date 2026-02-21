@@ -40,7 +40,7 @@ npm run test:integration:modules
 
 新模块必须在 `medusa-config.ts` 的 `modules` 数组中注册。
 
-现有模块：brand, page, tag, announcement, popup, banner, article, curated-collection, menu
+现有模块：brand, tag, announcement, popup, banner, article, curated-collection, menu
 
 ### API 路由 (`src/api/`)
 
@@ -72,6 +72,7 @@ npm run test:integration:modules
 - 支付集成：Stripe（`@medusajs/payment-stripe`）
 - storefront-v2 是主力开发方向，storefront v1 仅维护不新增功能
 - storefront-v2 数据层尚未接入 Medusa API，当前使用本地 mock 数据，需要逐步替换
+- Page 模块已废弃，内容统一通过 Article + ArticleCategory 管理；"页面"是 handle 为 `page` 的 ArticleCategory，Store 端 `/store/content/pages` 路由查 article 表
 
 ## 已知问题
 

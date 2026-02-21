@@ -10,6 +10,9 @@ export interface ArticleCategory {
   handle: string
   description?: string | null
   sort_order?: number
+  parent_id?: string | null
+  parent?: ArticleCategory | null
+  children?: ArticleCategory[]
   created_at: string
   updated_at: string
 }
@@ -27,7 +30,6 @@ export interface Article {
   is_pinned?: boolean
   category_id?: string | null
   category?: ArticleCategory | null
-  translations?: Record<string, { title?: string; summary?: string; content?: string }> | null
   seo?: { meta_title?: string; meta_description?: string; og_image?: string; keywords?: string } | null
   created_at: string
   updated_at: string
@@ -45,6 +47,29 @@ export interface ArticleCategoriesResponse {
   count: number
   offset: number
   limit: number
+}
+
+/** Build a flat list sorted by tree hierarchy with depth info */
+export function buildCategoryTreeList(categories: ArticleCategory[]): { category: ArticleCategory; depth: number }[] {
+  const result: { category: ArticleCategory; depth: number }[] = []
+  const childrenMap = new Map<string | null, ArticleCategory[]>()
+
+  for (const cat of categories) {
+    const pid = cat.parent_id ?? null
+    if (!childrenMap.has(pid)) childrenMap.set(pid, [])
+    childrenMap.get(pid)!.push(cat)
+  }
+
+  function walk(parentId: string | null, depth: number) {
+    const children = childrenMap.get(parentId) ?? []
+    for (const child of children.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))) {
+      result.push({ category: child, depth })
+      walk(child.id, depth + 1)
+    }
+  }
+
+  walk(null, 0)
+  return result
 }
 
 export interface ArticlesQueryParams {
@@ -66,7 +91,7 @@ export function useArticles(params: ArticlesQueryParams = {}) {
       const queryParams: Record<string, string> = {
         offset: String(offset),
         limit: String(limit),
-        fields: "id,title,slug,cover_image,summary,status,published_at,sort_order,is_pinned,category_id,category.*,translations,seo,created_at,updated_at",
+        fields: "id,title,slug,cover_image,summary,status,published_at,sort_order,is_pinned,category_id,category.*,seo,created_at,updated_at",
       }
       if (q) queryParams.q = q
       if (status) queryParams.status = status
@@ -102,7 +127,6 @@ export function useCreateArticle() {
       sort_order?: number
       is_pinned?: boolean
       category_id?: string
-      translations?: Record<string, any> | null
       seo?: Record<string, any> | null
     }) =>
       adminFetch<{ article: Article }>("/admin/articles", {
@@ -130,7 +154,6 @@ export function useUpdateArticle(id: string) {
       sort_order?: number
       is_pinned?: boolean
       category_id?: string | null
-      translations?: Record<string, any> | null
       seo?: Record<string, any> | null
     }) =>
       adminFetch<{ article: Article }>(`/admin/articles/${id}`, {
@@ -165,7 +188,10 @@ export function useArticleCategories() {
     queryKey: ["article-categories"],
     queryFn: () =>
       adminFetch<ArticleCategoriesResponse>("/admin/article-categories", {
-        params: { limit: "100" },
+        params: {
+          limit: "100",
+          fields: "id,name,handle,description,sort_order,parent_id,parent.*,children.*,created_at,updated_at",
+        },
       }),
   })
 }
@@ -190,6 +216,7 @@ export function useCreateArticleCategory() {
       handle: string
       description?: string
       sort_order?: number
+      parent_id?: string | null
     }) =>
       adminFetch<{ article_category: ArticleCategory }>(
         "/admin/article-categories",
@@ -213,6 +240,7 @@ export function useUpdateArticleCategory(id: string) {
       handle?: string
       description?: string | null
       sort_order?: number
+      parent_id?: string | null
     }) =>
       adminFetch<{ article_category: ArticleCategory }>(
         `/admin/article-categories/${id}`,

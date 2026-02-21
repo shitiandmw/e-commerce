@@ -46,7 +46,8 @@
       "descriptionPlaceholder": "描述该品牌...",
       "logo": "Logo",
       "logoUrlLabel": "Logo 链接",
-      "logoUrlPlaceholder": "https://example.com/logo.png"
+      "logoUrlPlaceholder": "https://example.com/logo.png",
+      "browseMedia": "从媒体库选取"
     },
     "detail": {
       "brandDetails": "品牌详情",

@@ -111,6 +111,8 @@
       "descriptionPlaceholder": "Category description...",
       "sortOrderLabel": "Sort Order",
       "sortOrderPlaceholder": "0",
+      "parentLabel": "Parent Category",
+      "noParent": "None (top-level)",
       "save": "Save",
       "saving": "Saving...",
       "cancel": "Cancel",

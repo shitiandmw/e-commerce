@@ -10,10 +10,6 @@ import {
   PostAdminUpdateBrand,
 } from "./admin/brands/validators"
 import {
-  PostAdminCreatePage,
-  PostAdminUpdatePage,
-} from "./admin/pages/validators"
-import {
   PostAdminCreateTag,
   PostAdminUpdateTag,
   PostAdminLinkProductTag,
@@ -64,7 +60,6 @@ import {
 } from "./store/content/coupon/validators"
 
 export const GetBrandsSchema = createFindParams().merge(z.object({ q: z.string().optional() }))
-export const GetPagesSchema = createFindParams()
 export const GetTagsSchema = createFindParams()
 export const GetAnnouncementsSchema = createFindParams()
 export const GetPopupsSchema = createFindParams()
@@ -124,6 +119,7 @@ export default defineMiddlewares({
         ),
       ],
     },
+    // Store content pages routes (backed by article table)
     {
       matcher: "/store/content/pages",
       method: "GET",
@@ -132,8 +128,10 @@ export default defineMiddlewares({
           GetStoreContentSchema,
           {
             defaults: [
-              "id", "title", "slug", "content", "status", "template",
-              "sort_order", "seo", "created_at", "updated_at",
+              "id", "title", "slug", "cover_image", "summary", "content",
+              "status", "published_at", "sort_order", "is_pinned",
+              "category_id", "category.*", "seo",
+              "created_at", "updated_at",
             ],
             isList: true,
           }
@@ -148,8 +146,10 @@ export default defineMiddlewares({
           GetStoreContentSchema,
           {
             defaults: [
-              "id", "title", "slug", "content", "status", "template",
-              "sort_order", "seo", "created_at", "updated_at",
+              "id", "title", "slug", "cover_image", "summary", "content",
+              "status", "published_at", "sort_order", "is_pinned",
+              "category_id", "category.*", "seo",
+              "created_at", "updated_at",
             ],
             isList: false,
           }
@@ -182,34 +182,6 @@ export default defineMiddlewares({
       method: "POST",
       middlewares: [
         validateAndTransformBody(PostAdminUpdateBrand),
-      ],
-    },
-    // Page routes
-    {
-      matcher: "/admin/pages",
-      method: "GET",
-      middlewares: [
-        validateAndTransformQuery(
-          GetPagesSchema,
-          {
-            defaults: ["id", "title", "slug", "content", "status", "template", "sort_order", "translations", "seo", "created_at", "updated_at"],
-            isList: true,
-          }
-        ),
-      ],
-    },
-    {
-      matcher: "/admin/pages",
-      method: "POST",
-      middlewares: [
-        validateAndTransformBody(PostAdminCreatePage),
-      ],
-    },
-    {
-      matcher: "/admin/pages/:id",
-      method: "POST",
-      middlewares: [
-        validateAndTransformBody(PostAdminUpdatePage),
       ],
     },
     // Tag routes
@@ -364,7 +336,7 @@ export default defineMiddlewares({
           {
             defaults: [
               "id", "slot_id", "image_url", "title", "subtitle",
-              "link_url", "sort_order", "is_enabled",
+              "link_url", "cta_text", "sort_order", "is_enabled",
               "starts_at", "ends_at", "created_at", "updated_at",
             ],
             isList: true,
@@ -397,7 +369,7 @@ export default defineMiddlewares({
             defaults: [
               "id", "title", "slug", "cover_image", "summary",
               "status", "published_at", "sort_order", "is_pinned",
-              "category_id", "category.*", "translations", "seo",
+              "category_id", "category.*", "seo",
               "created_at", "updated_at",
             ],
             isList: true,
@@ -429,7 +401,8 @@ export default defineMiddlewares({
           {
             defaults: [
               "id", "name", "handle", "description",
-              "sort_order", "created_at", "updated_at",
+              "sort_order", "parent_id", "parent.*", "children.*",
+              "created_at", "updated_at",
             ],
             isList: true,
           }

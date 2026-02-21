@@ -44,23 +44,7 @@ import {
 import Link from "next/link"
 import { MediaPicker } from "@/components/media/media-picker"
 import { SeoEditor, type SeoData } from "@/components/ui/seo-editor"
-
-/**
- * Generate a URL-safe handle (slug) from a product title.
- * Strips non-ASCII chars (e.g. Chinese), keeps alphanumeric + hyphens,
- * and falls back to a timestamp-based slug when nothing usable remains.
- */
-function generateHandle(title: string): string {
-  const slug = title
-    .toLowerCase()
-    .trim()
-    .replace(/[\s_]+/g, "-")        // spaces / underscores → hyphens
-    .replace(/[^a-z0-9-]/g, "")     // strip everything non-URL-safe
-    .replace(/-+/g, "-")            // collapse consecutive hyphens
-    .replace(/^-|-$/g, "")          // trim leading/trailing hyphens
-
-  return slug || `product-${Date.now()}`
-}
+import { toSlug } from "@/lib/slug"
 
 const variantSchema = z.object({
   title: z.string().min(1, "Variant title is required"),
@@ -234,7 +218,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
       // contains non-URL-safe characters (e.g. Chinese, special symbols).
       const rawHandle = data.handle?.trim() || ""
       const isUrlSafe = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(rawHandle)
-      const handle = rawHandle && isUrlSafe ? rawHandle : generateHandle(data.title)
+      const handle = rawHandle && isUrlSafe ? rawHandle : toSlug(data.title) || `product-${Date.now()}`
 
       const payload: Record<string, any> = {
         title: data.title,

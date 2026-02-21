@@ -15,6 +15,7 @@ import {
   useArticleCategories,
   Article,
   useDeleteArticle,
+  buildCategoryTreeList,
 } from "@/hooks/use-articles"
 import { getArticleColumns } from "./article-columns"
 import { DeleteArticleDialog } from "./delete-article-dialog"
@@ -75,6 +76,7 @@ export function ArticleTable({ onManageCategories }: ArticleTableProps) {
 
   const { data: categoriesData } = useArticleCategories()
   const categories = categoriesData?.article_categories ?? []
+  const categoryTree = React.useMemo(() => buildCategoryTreeList(categories), [categories])
 
   const deleteArticle = useDeleteArticle()
   const [articleToDelete, setArticleToDelete] = React.useState<Article | null>(
@@ -136,9 +138,9 @@ export function ArticleTable({ onManageCategories }: ArticleTableProps) {
             className="w-40"
           >
             <option value="">{t("filters.allCategories")}</option>
-            {categories.map((cat) => (
+            {categoryTree.map(({ category: cat, depth }) => (
               <option key={cat.id} value={cat.id}>
-                {cat.name}
+                {"—".repeat(depth)} {cat.name}
               </option>
             ))}
           </Select>

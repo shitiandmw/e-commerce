@@ -15,7 +15,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowLeft, Save, Loader2 } from "lucide-react"
+import { MediaPicker } from "@/components/media/media-picker"
+import { ArrowLeft, Save, Loader2, FolderOpen } from "lucide-react"
 import Link from "next/link"
 
 const brandSchema = z.object({
@@ -52,11 +53,15 @@ export function BrandForm({ brand, mode }: BrandFormProps) {
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<BrandFormData>({
     resolver: zodResolver(brandSchema),
     defaultValues,
   })
+
+  const [logoPickerOpen, setLogoPickerOpen] = React.useState(false)
 
   const onSubmit = async (data: BrandFormData) => {
     try {
@@ -166,18 +171,35 @@ export function BrandForm({ brand, mode }: BrandFormProps) {
             <h2 className="text-lg font-semibold">{t("form.logo")}</h2>
             <div className="space-y-2">
               <Label htmlFor="logo_url">{t("form.logoUrlLabel")}</Label>
-              <Input
-                id="logo_url"
-                {...register("logo_url")}
-                placeholder={t("form.logoUrlPlaceholder")}
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="logo_url"
+                  {...register("logo_url")}
+                  placeholder={t("form.logoUrlPlaceholder")}
+                  className="flex-1"
+                />
+                <Button type="button" variant="outline" size="sm" onClick={() => setLogoPickerOpen(true)} className="flex-shrink-0">
+                  <FolderOpen className="h-4 w-4 mr-2" />{t("form.browseMedia")}
+                </Button>
+              </div>
               {errors.logo_url && (
                 <p className="text-sm text-destructive">
                   {errors.logo_url.message}
                 </p>
               )}
+              {watch("logo_url") && (
+                <div className="mt-2 w-24 h-24 rounded-md overflow-hidden border bg-muted flex items-center justify-center">
+                  <img src={watch("logo_url") as string} alt="Logo preview" className="max-w-full max-h-full object-contain" />
+                </div>
+              )}
             </div>
           </div>
+          <MediaPicker
+            open={logoPickerOpen}
+            onOpenChange={setLogoPickerOpen}
+            selectedUrls={watch("logo_url") ? [watch("logo_url") as string] : []}
+            onSelect={(urls) => { if (urls.length > 0) setValue("logo_url", urls[0], { shouldValidate: true }) }}
+          />
         </div>
       </div>
     </form>

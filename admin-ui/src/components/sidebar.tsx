@@ -22,7 +22,6 @@ import {
   BarChart3,
   Percent,
   Truck,
-  BookOpen,
   Megaphone,
   Maximize2,
   Layers,
@@ -78,7 +77,6 @@ const navigation: NavEntry[] = [
     icon: FileText,
     children: [
       { key: "articles", href: "/articles", icon: FileText },
-      { key: "pages", href: "/pages", icon: BookOpen },
       { key: "banners", href: "/banners", icon: Layers },
       { key: "media", href: "/media", icon: ImageIcon },
     ],

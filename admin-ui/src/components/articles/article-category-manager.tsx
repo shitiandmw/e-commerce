@@ -8,6 +8,7 @@ import {
   useCreateArticleCategory,
   useUpdateArticleCategory,
   useDeleteArticleCategory,
+  buildCategoryTreeList,
 } from "@/hooks/use-articles"
 import {
   Dialog,
@@ -29,7 +30,9 @@ import {
   AlertTriangle,
   Loader2,
   FolderOpen,
+  ChevronRight,
 } from "lucide-react"
+import { toSlug } from "@/lib/slug"
 
 interface ArticleCategoryManagerProps {
   open: boolean
@@ -43,6 +46,7 @@ export function ArticleCategoryManager({
   const t = useTranslations("articles.categories")
   const { data, isLoading } = useArticleCategories()
   const categories = data?.article_categories ?? []
+  const treeList = React.useMemo(() => buildCategoryTreeList(categories), [categories])
 
   const [editingCategory, setEditingCategory] =
     React.useState<ArticleCategory | null>(null)
@@ -82,29 +86,35 @@ export function ArticleCategoryManager({
             <DialogDescription>{t("subtitle")}</DialogDescription>
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto space-y-3 py-2 min-h-0">
+          <div className="flex-1 overflow-y-auto space-y-1 py-2 min-h-0">
             {isLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
                 <Skeleton key={i} className="h-16 w-full rounded-md" />
               ))
-            ) : categories.length === 0 ? (
+            ) : treeList.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">
                 {t("noCategories")}
               </p>
             ) : (
-              categories.map((category) => (
+              treeList.map(({ category, depth }) => (
                 <div
                   key={category.id}
                   className="flex items-center justify-between rounded-md border p-3"
+                  style={{ marginLeft: depth * 24 }}
                 >
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate">
-                      {category.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {category.handle}
-                      {category.description && ` — ${category.description}`}
-                    </p>
+                  <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                    {depth > 0 && (
+                      <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />
+                    )}
+                    <div className="min-w-0">
+                      <p className="font-medium text-sm truncate">
+                        {category.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {category.handle}
+                        {category.description && ` — ${category.description}`}
+                      </p>
+                    </div>
                   </div>
                   <div className="flex items-center gap-1 ml-2">
                     <Button
@@ -147,6 +157,7 @@ export function ArticleCategoryManager({
       {showForm && (
         <CategoryFormDialog
           category={editingCategory}
+          allCategories={categories}
           open={showForm}
           onOpenChange={(open) => {
             if (!open) handleCloseForm()
@@ -172,10 +183,12 @@ export function ArticleCategoryManager({
 
 function CategoryFormDialog({
   category,
+  allCategories,
   open,
   onOpenChange,
 }: {
   category: ArticleCategory | null
+  allCategories: ArticleCategory[]
   open: boolean
   onOpenChange: (open: boolean) => void
 }) {
@@ -192,17 +205,32 @@ function CategoryFormDialog({
   const [sortOrder, setSortOrder] = React.useState(
     String(category?.sort_order ?? 0)
   )
+  const [parentId, setParentId] = React.useState<string>(
+    category?.parent_id || ""
+  )
   const [autoHandle, setAutoHandle] = React.useState(!isEdit)
+
+  // Build parent options excluding self and descendants
+  const parentOptions = React.useMemo(() => {
+    if (!isEdit) return buildCategoryTreeList(allCategories)
+    // Collect self + all descendant IDs to exclude
+    const excludeIds = new Set<string>()
+    function collectDescendants(id: string) {
+      excludeIds.add(id)
+      for (const cat of allCategories) {
+        if (cat.parent_id === id) collectDescendants(cat.id)
+      }
+    }
+    collectDescendants(category!.id)
+    return buildCategoryTreeList(allCategories).filter(
+      ({ category: c }) => !excludeIds.has(c.id)
+    )
+  }, [allCategories, category, isEdit])
 
   // Auto-generate handle from name
   React.useEffect(() => {
     if (autoHandle && name) {
-      setHandle(
-        name
-          .toLowerCase()
-          .replace(/[^a-z0-9\u4e00-\u9fff]+/g, "-")
-          .replace(/^-|-$/g, "")
-      )
+      setHandle(toSlug(name))
     }
   }, [name, autoHandle])
 
@@ -219,6 +247,7 @@ function CategoryFormDialog({
         handle: handle.trim(),
         description: description.trim() || undefined,
         sort_order: sortOrder ? Number(sortOrder) : undefined,
+        parent_id: parentId || null,
       }
 
       if (isEdit) {
@@ -291,6 +320,22 @@ function CategoryFormDialog({
               onChange={(e) => setSortOrder(e.target.value)}
               placeholder={t("sortOrderPlaceholder")}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t("parentLabel")}</Label>
+            <select
+              value={parentId}
+              onChange={(e) => setParentId(e.target.value)}
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <option value="">{t("noParent")}</option>
+              {parentOptions.map(({ category: c, depth }) => (
+                <option key={c.id} value={c.id}>
+                  {"—".repeat(depth)} {c.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <DialogFooter>

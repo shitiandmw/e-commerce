@@ -5,6 +5,7 @@ export const PostAdminCreateArticleCategory = z.object({
   handle: z.string().min(1),
   description: z.string().optional(),
   sort_order: z.number().optional(),
+  parent_id: z.string().nullable().optional(),
 })
 
 export const PostAdminUpdateArticleCategory = z.object({
@@ -12,6 +13,7 @@ export const PostAdminUpdateArticleCategory = z.object({
   handle: z.string().min(1).optional(),
   description: z.string().nullable().optional(),
   sort_order: z.number().optional(),
+  parent_id: z.string().nullable().optional(),
 })
 
 export type PostAdminCreateArticleCategoryType = z.infer<typeof PostAdminCreateArticleCategory>

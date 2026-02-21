@@ -11,6 +11,7 @@ import {
   useCreateArticle,
   useUpdateArticle,
   useArticleCategories,
+  buildCategoryTreeList,
 } from "@/hooks/use-articles"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,6 +23,7 @@ import { MediaPicker } from "@/components/media/media-picker"
 import { SeoEditor, SeoData } from "@/components/ui/seo-editor"
 import { ArrowLeft, Save, Loader2, FolderOpen } from "lucide-react"
 import Link from "next/link"
+import { toSlug } from "@/lib/slug"
 
 const articleSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -43,14 +45,6 @@ interface ArticleFormProps {
   mode: "create" | "edit"
 }
 
-function toSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff]+/g, "-")
-    .replace(/^-|-$/g, "")
-}
-
 export function ArticleForm({ article, mode }: ArticleFormProps) {
   const t = useTranslations("articles")
   const router = useRouter()
@@ -58,6 +52,7 @@ export function ArticleForm({ article, mode }: ArticleFormProps) {
   const updateArticle = useUpdateArticle(article?.id || "")
   const { data: categoriesData } = useArticleCategories()
   const categories = categoriesData?.article_categories ?? []
+  const categoryTree = React.useMemo(() => buildCategoryTreeList(categories), [categories])
 
   const [coverPickerOpen, setCoverPickerOpen] = React.useState(false)
   const [autoSlug, setAutoSlug] = React.useState(mode === "create")
@@ -257,8 +252,10 @@ export function ArticleForm({ article, mode }: ArticleFormProps) {
             <h2 className="text-lg font-semibold">{t("form.categoryLabel")}</h2>
             <Select {...register("category_id")}>
               <option value="">{t("form.noCategory")}</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              {categoryTree.map(({ category: cat, depth }) => (
+                <option key={cat.id} value={cat.id}>
+                  {"—".repeat(depth)} {cat.name}
+                </option>
               ))}
             </Select>
           </div>
