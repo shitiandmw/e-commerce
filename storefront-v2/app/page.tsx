@@ -5,7 +5,7 @@ import { LimitedEditions } from "@/components/home/limited-editions"
 import { BeginnerSection } from "@/components/home/beginner-section"
 import { BrandSpotlight } from "@/components/home/brand-spotlight"
 import { ServiceBar } from "@/components/home/service-bar"
-import { BlogPreview } from "@/components/home/blog-preview"
+import { BlogPreview, type ArticleItem } from "@/components/home/blog-preview"
 import { RegisterCTA } from "@/components/home/register-cta"
 import { fetchContent } from "@/lib/medusa"
 
@@ -30,8 +30,17 @@ interface BannersResponse {
   banners: BannerSlot[]
 }
 
+interface ArticlesResponse {
+  articles: ArticleItem[]
+  count: number
+  offset: number
+  limit: number
+}
+
 export default async function HomePage() {
   let bannerSlides: BannerItem[] = []
+  let articles: ArticleItem[] = []
+
   try {
     const data = await fetchContent<BannersResponse>("/store/content/banners", {
       position: "homepage-hero",
@@ -39,6 +48,15 @@ export default async function HomePage() {
     bannerSlides = data?.banners?.[0]?.items ?? []
   } catch {
     // API 不可用时 fallback 为空，HeroCarousel 会显示占位
+  }
+
+  try {
+    const data = await fetchContent<ArticlesResponse>("/store/content/articles", {
+      limit: "3",
+    })
+    articles = data?.articles ?? []
+  } catch {
+    // API 不可用时 fallback 为空，BlogPreview 不渲染
   }
 
   return (
@@ -50,7 +68,7 @@ export default async function HomePage() {
       <BeginnerSection />
       <BrandSpotlight />
       <ServiceBar />
-      <BlogPreview />
+      <BlogPreview articles={articles} />
       <RegisterCTA />
     </>
   )

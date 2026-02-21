@@ -1,10 +1,23 @@
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
-import { articles } from "@/lib/data/articles"
 
-export function BlogPreview() {
-  const recentArticles = articles.slice(0, 3)
+export interface ArticleItem {
+  id: string
+  title: string
+  slug: string
+  cover_image?: string | null
+  summary?: string | null
+  published_at?: string | null
+  category?: { id: string; name: string } | null
+}
+
+interface BlogPreviewProps {
+  articles?: ArticleItem[]
+}
+
+export function BlogPreview({ articles = [] }: BlogPreviewProps) {
+  if (articles.length === 0) return null
 
   return (
     <section className="py-16 px-4 lg:px-6 bg-card">
@@ -23,34 +36,46 @@ export function BlogPreview() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
-          {recentArticles.map((article) => (
+          {articles.map((article) => (
             <Link
-              key={article.slug}
+              key={article.id}
               href={`/articles/${article.slug}`}
               className="group"
             >
               <div className="relative aspect-[16/10] overflow-hidden">
-                <Image
-                  src={article.image}
-                  alt={article.title}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+                {article.cover_image ? (
+                  <Image
+                    src={article.cover_image}
+                    alt={article.title}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-muted" />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
-                <div className="absolute top-3 left-3">
-                  <span className="bg-gold/90 text-primary-foreground text-[10px] font-medium px-2 py-1 tracking-wider">
-                    {article.category}
-                  </span>
-                </div>
+                {article.category?.name && (
+                  <div className="absolute top-3 left-3">
+                    <span className="bg-gold/90 text-primary-foreground text-[10px] font-medium px-2 py-1 tracking-wider">
+                      {article.category.name}
+                    </span>
+                  </div>
+                )}
               </div>
               <div className="mt-4">
-                <p className="text-[11px] text-muted-foreground">{article.date}</p>
+                {article.published_at && (
+                  <p className="text-[11px] text-muted-foreground">
+                    {new Date(article.published_at).toLocaleDateString("zh-TW")}
+                  </p>
+                )}
                 <h3 className="mt-1.5 text-base font-serif font-medium text-foreground leading-snug group-hover:text-gold transition-colors line-clamp-2">
                   {article.title}
                 </h3>
-                <p className="mt-2 text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                  {article.excerpt}
-                </p>
+                {article.summary && (
+                  <p className="mt-2 text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                    {article.summary}
+                  </p>
+                )}
               </div>
             </Link>
           ))}
