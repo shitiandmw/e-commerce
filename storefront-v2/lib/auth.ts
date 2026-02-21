@@ -9,10 +9,12 @@ export function getToken(): string | null {
 
 export function setToken(token: string) {
   localStorage.setItem(TOKEN_KEY, token)
+  window.dispatchEvent(new Event("auth-change"))
 }
 
 export function removeToken() {
   localStorage.removeItem(TOKEN_KEY)
+  window.dispatchEvent(new Event("auth-change"))
 }
 
 export function isLoggedIn(): boolean {

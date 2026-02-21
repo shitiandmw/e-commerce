@@ -270,7 +270,12 @@ export function SiteHeader({ navItems }: { navItems: MenuItem[] }) {
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const cartCount = useCart(selectTotalItems)
   const [loggedIn, setLoggedIn] = useState(false)
-  useEffect(() => { setLoggedIn(isLoggedIn()) }, [])
+  useEffect(() => {
+    const sync = () => setLoggedIn(isLoggedIn())
+    sync()
+    window.addEventListener("auth-change", sync)
+    return () => window.removeEventListener("auth-change", sync)
+  }, [])
 
   const openMenu = useCallback((id: string) => {
     if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null }
