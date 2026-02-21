@@ -60,6 +60,7 @@ export default async function SearchPage({
       const res = await fetch(url.toString(), {
         headers: {
           "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "",
+          ...(locale ? { "x-medusa-locale": locale } : {}),
         },
         next: { revalidate: 0 },
       })

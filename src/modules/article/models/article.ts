@@ -12,7 +12,6 @@ export const Article = model.define("article", {
   published_at: model.dateTime().nullable(),
   sort_order: model.number().default(0),
   is_pinned: model.boolean().default(false),
-  translations: model.json().nullable(),
   seo: model.json().nullable(),
   category: model.belongsTo(() => ArticleCategory, {
     mappedBy: "articles",

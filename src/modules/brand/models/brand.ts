@@ -5,6 +5,5 @@ export const Brand = model.define("brand", {
   name: model.text().translatable(),
   description: model.text().translatable().nullable(),
   logo_url: model.text().nullable(),
-  translations: model.json().nullable(),
   origin: model.text().nullable(),
 })

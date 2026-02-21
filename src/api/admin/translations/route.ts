@@ -2,55 +2,11 @@ import {
   MedusaRequest,
   MedusaResponse,
 } from "@medusajs/framework/http"
-
-/**
- * Maps reference names to their entity and module service info.
- * The service method names follow Medusa convention: retrieve{Entity}, update{Entity}s
- */
-const REFERENCE_MAP: Record<
-  string,
-  {
-    entity: string
-    moduleName: string
-    retrieveMethod: string
-    updateMethod: string
-  }
-> = {
-  article: {
-    entity: "article",
-    moduleName: "article",
-    retrieveMethod: "retrieveArticle",
-    updateMethod: "updateArticles",
-  },
-  page: {
-    entity: "page",
-    moduleName: "page",
-    retrieveMethod: "retrievePage",
-    updateMethod: "updatePages",
-  },
-  brand: {
-    entity: "brand",
-    moduleName: "brand",
-    retrieveMethod: "retrieveBrand",
-    updateMethod: "updateBrands",
-  },
-  menu_item: {
-    entity: "menu_item",
-    moduleName: "menu",
-    retrieveMethod: "retrieveMenuItem",
-    updateMethod: "updateMenuItems",
-  },
-  banner_item: {
-    entity: "banner_item",
-    moduleName: "banner",
-    retrieveMethod: "retrieveBannerItem",
-    updateMethod: "updateBannerItems",
-  },
-}
+import { Modules } from "@medusajs/framework/utils"
 
 /**
  * GET /admin/translations?reference=article&reference_id=xxx
- * Returns translations for a specific entity.
+ * Returns translations for a specific entity from Translation Module.
  */
 export const GET = async (
   req: MedusaRequest,
@@ -64,48 +20,21 @@ export const GET = async (
     return
   }
 
-  const refConfig = REFERENCE_MAP[reference]
-  if (!refConfig) {
-    res.status(400).json({ message: `Unknown reference: ${reference}` })
-    return
-  }
-
-  const query = req.scope.resolve("query")
-
   try {
-    const { data: [entity] } = await query.graph({
-      entity: refConfig.entity,
-      fields: ["id", "translations"],
-      filters: { id: referenceId },
+    const translationModule = req.scope.resolve(Modules.TRANSLATION) as any
+    const translations = await translationModule.listTranslations({
+      reference,
+      reference_id: referenceId,
     })
-
-    if (!entity) {
-      res.json({ translations: [] })
-      return
-    }
-
-    const storedTranslations = (entity as any).translations || {}
-    const result: Array<{
-      id: string
-      reference: string
-      reference_id: string
-      locale_code: string
-      translations: Record<string, string>
-    }> = []
-
-    for (const [locale, fields] of Object.entries(storedTranslations)) {
-      if (typeof fields === "object" && fields !== null) {
-        result.push({
-          id: `${referenceId}_${locale}`,
-          reference,
-          reference_id: referenceId,
-          locale_code: locale,
-          translations: fields as Record<string, string>,
-        })
-      }
-    }
-
-    res.json({ translations: result })
+    res.json({
+      translations: translations.map((t: any) => ({
+        id: t.id,
+        reference: t.reference,
+        reference_id: t.reference_id,
+        locale_code: t.locale_code,
+        translations: t.translations || {},
+      })),
+    })
   } catch {
     res.json({ translations: [] })
   }
@@ -114,7 +43,6 @@ export const GET = async (
 /**
  * POST /admin/translations
  * Body: { reference, reference_id, locale_code, translations: { field: value } }
- * Merges translations into the entity's translations JSON field.
  */
 export const POST = async (
   req: MedusaRequest,
@@ -134,41 +62,38 @@ export const POST = async (
     return
   }
 
-  const refConfig = REFERENCE_MAP[reference]
-  if (!refConfig) {
-    res.status(400).json({ message: `Unknown reference: ${reference}` })
-    return
-  }
-
   try {
-    const service = req.scope.resolve(refConfig.moduleName) as any
+    const translationModule = req.scope.resolve(Modules.TRANSLATION) as any
 
-    // Retrieve current entity to get existing translations
-    const entity = await service[refConfig.retrieveMethod](reference_id)
-    const existingTranslations = entity.translations || {}
-
-    // Merge new translations
-    const updatedTranslations = {
-      ...existingTranslations,
-      [locale_code]: {
-        ...(existingTranslations[locale_code] || {}),
-        ...translations,
-      },
-    }
-
-    // Update entity
-    await service[refConfig.updateMethod]({
-      id: reference_id,
-      translations: updatedTranslations,
+    // Check if translation already exists for this entity + locale
+    const existing = await translationModule.listTranslations({
+      reference,
+      reference_id,
+      locale_code,
     })
 
-    res.json({
-      translation: {
-        id: `${reference_id}_${locale_code}`,
+    let result: any
+    if (existing.length > 0) {
+      result = await translationModule.updateTranslations({
+        id: existing[0].id,
+        translations: { ...existing[0].translations, ...translations },
+      })
+    } else {
+      result = await translationModule.createTranslations({
         reference,
         reference_id,
         locale_code,
-        translations: updatedTranslations[locale_code],
+        translations,
+      })
+    }
+
+    res.json({
+      translation: {
+        id: result.id,
+        reference,
+        reference_id,
+        locale_code,
+        translations: result.translations || translations,
       },
     })
   } catch (error: any) {

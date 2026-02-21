@@ -4,10 +4,10 @@ import { sdk } from "@/lib/medusa"
 import ProductDetailClient from "./ProductDetailClient"
 
 interface Props {
-  params: Promise<{ handle: string }>
+  params: Promise<{ handle: string; locale: string }>
 }
 
-async function getProduct(handle: string) {
+async function getProduct(handle: string, locale?: string) {
   try {
     // Get default region for pricing context
     let regionId: string | undefined
@@ -21,12 +21,15 @@ async function getProduct(handle: string) {
       ? `${baseFields},+variants.calculated_price`
       : baseFields
 
+    const headers: Record<string, string> = {}
+    if (locale) headers["x-medusa-locale"] = locale
+
     const { products } = await sdk.store.product.list({
       handle,
       fields,
       limit: 1,
       ...(regionId ? { region_id: regionId } : {}),
-    })
+    }, headers)
     return products?.[0] || null
   } catch {
     return null
@@ -34,8 +37,8 @@ async function getProduct(handle: string) {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { handle } = await params
-  const product = await getProduct(handle)
+  const { handle, locale } = await params
+  const product = await getProduct(handle, locale)
   if (!product) return { title: "商品未找到" }
 
   const seo = (product.metadata as any)?.seo as
@@ -61,8 +64,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProductDetailPage({ params }: Props) {
-  const { handle } = await params
-  const product = await getProduct(handle)
+  const { handle, locale } = await params
+  const product = await getProduct(handle, locale)
   if (!product) notFound()
   return <ProductDetailClient product={product as any} />
 }

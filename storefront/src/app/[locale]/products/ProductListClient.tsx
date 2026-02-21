@@ -70,6 +70,9 @@ export default function ProductListClient() {
       if (regionId) {
         params.set("region_id", regionId)
       }
+      if (locale) {
+        params.set("locale", locale)
+      }
       const res = await fetch(`/api/products?${params}`)
       const data = await res.json()
       setProducts(data.products || [])

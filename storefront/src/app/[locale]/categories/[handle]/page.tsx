@@ -19,9 +19,10 @@ const MEDUSA_BACKEND_URL =
 const PUBLISHABLE_KEY =
   process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
 
-async function getCategory(handle: string): Promise<ProductCategory | null> {
+async function getCategory(handle: string, locale?: string): Promise<ProductCategory | null> {
   const headers: Record<string, string> = {}
   if (PUBLISHABLE_KEY) headers["x-publishable-api-key"] = PUBLISHABLE_KEY
+  if (locale) headers["x-medusa-locale"] = locale
 
   const res = await fetch(
     `${MEDUSA_BACKEND_URL}/store/product-categories?handle=${encodeURIComponent(handle)}&limit=1`,
@@ -32,11 +33,12 @@ async function getCategory(handle: string): Promise<ProductCategory | null> {
   return data.product_categories?.[0] ?? null
 }
 
-async function getProducts(categoryId: string, page: number, sort?: string) {
+async function getProducts(categoryId: string, page: number, sort?: string, locale?: string) {
   const PAGE_SIZE = 12
   const offset = (page - 1) * PAGE_SIZE
   const headers: Record<string, string> = {}
   if (PUBLISHABLE_KEY) headers["x-publishable-api-key"] = PUBLISHABLE_KEY
+  if (locale) headers["x-medusa-locale"] = locale
 
   const url = new URL(`${MEDUSA_BACKEND_URL}/store/products`)
   url.searchParams.set("category_id[]", categoryId)
@@ -55,8 +57,8 @@ async function getProducts(categoryId: string, page: number, sort?: string) {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { handle } = await params
-  const category = await getCategory(handle)
+  const { handle, locale } = await params
+  const category = await getCategory(handle, locale)
   if (!category) return { title: "分类未找到" }
   return {
     title: `${category.name} - TIMECIGAR`,
@@ -65,13 +67,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CategoryPage({ params, searchParams }: Props) {
-  const { handle } = await params
+  const { handle, locale } = await params
   const sp = await searchParams
-  const category = await getCategory(handle)
+  const category = await getCategory(handle, locale)
   if (!category) notFound()
 
   const page = Math.max(1, parseInt(sp.page || "1", 10) || 1)
-  const { products, count } = await getProducts(category.id, page, sp.sort)
+  const { products, count } = await getProducts(category.id, page, sp.sort, locale)
 
   return (
     <CategoryPageClient
