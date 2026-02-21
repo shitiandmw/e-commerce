@@ -18,7 +18,7 @@ const PopoverContext = React.createContext<PopoverContextType>({
   contentRef: { current: null },
 })
 
-function Popover({ children }: { children: React.ReactNode }) {
+function Popover({ children, className }: { children: React.ReactNode; className?: string }) {
   const [open, setOpen] = React.useState(false)
   const triggerRef = React.useRef<HTMLElement>(null)
   const contentRef = React.useRef<HTMLDivElement>(null)
@@ -40,7 +40,7 @@ function Popover({ children }: { children: React.ReactNode }) {
 
   return (
     <PopoverContext.Provider value={{ open, setOpen, triggerRef, contentRef }}>
-      <div className="relative inline-block w-full">
+      <div className={cn("relative inline-block", className)}>
         {children}
       </div>
     </PopoverContext.Provider>

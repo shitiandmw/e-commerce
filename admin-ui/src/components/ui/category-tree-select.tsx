@@ -113,7 +113,7 @@ export function CategoryTreeSelect({
 
   return (
     <div className="space-y-2">
-      <Popover>
+      <Popover className="w-full">
         <PopoverTrigger asChild>
           <button
             type="button"

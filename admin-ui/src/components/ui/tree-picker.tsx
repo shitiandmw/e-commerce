@@ -34,7 +34,7 @@ export function TreePicker({
   }, [items, value])
 
   return (
-    <Popover>
+    <Popover className="w-full">
       <PopoverTrigger asChild>
         <button
           type="button"
