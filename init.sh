@@ -138,7 +138,7 @@ fi
 
 # ---------- 2. 数据库迁移（仅同步 schema，不做种子数据） ----------
 log "同步数据库 schema..."
-npx medusa db:migrate 2>&1 | tail -3 || {
+npx medusa db:migrate --skip-links 2>&1 | tail -3 || {
   warn "数据库迁移失败，如果是全新环境请先执行: bash reset-db.sh"
 }
 
