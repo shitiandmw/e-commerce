@@ -1,0 +1,10 @@
+node_modules
+.next
+admin-ui
+storefront
+storefront-v2
+.git
+*.md
+.env*
+docker-compose*.yml
+nginx

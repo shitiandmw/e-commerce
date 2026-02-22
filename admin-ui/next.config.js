@@ -8,6 +8,7 @@ const medusaUrl = new URL(
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "standalone",
   // Allow images from Medusa backend
   images: {
     remotePatterns: [

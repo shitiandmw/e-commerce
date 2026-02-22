@@ -117,7 +117,7 @@ if command -v docker &>/dev/null; then
   POSTGRES_RUNNING=$(docker ps --filter "name=ecommerce-postgres" --filter "status=running" -q 2>/dev/null)
   if [ -z "$POSTGRES_RUNNING" ]; then
     log "启动 PostgreSQL + Redis..."
-    docker compose up -d 2>&1 | grep -v "^time=" || true
+    docker compose -f docker-compose-dev.yml up -d 2>&1 | grep -v "^time=" || true
     log "等待数据库就绪..."
     sleep 5
     for i in $(seq 1 10); do

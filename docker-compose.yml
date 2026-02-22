@@ -1,20 +1,18 @@
-version: "3.8"
-
 services:
   postgres:
     image: postgres:16-alpine
     container_name: ecommerce-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: medusa
-      POSTGRES_PASSWORD: medusa_password
-      POSTGRES_DB: medusa_ecommerce
+      POSTGRES_USER: ${POSTGRES_USER:-medusa}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-medusa_password}
+      POSTGRES_DB: ${POSTGRES_DB:-medusa_ecommerce}
     ports:
-      - "55432:5432"
+      - "${POSTGRES_PORT:-45432}:5432"
     volumes:
       - ecommerce_pg_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U medusa -d medusa_ecommerce"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-medusa} -d ${POSTGRES_DB:-medusa_ecommerce}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -24,7 +22,7 @@ services:
     container_name: ecommerce-redis
     restart: unless-stopped
     ports:
-      - "56739:6379"
+      - "${REDIS_PORT:-46379}:6379"
     volumes:
       - ecommerce_redis_data:/data
     healthcheck:
@@ -32,6 +30,84 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  medusa:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ecommerce-medusa
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgres://medusa:medusa_password@postgres:5432/medusa_ecommerce}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      JWT_SECRET: ${JWT_SECRET:-supersecret}
+      COOKIE_SECRET: ${COOKIE_SECRET:-supersecret}
+      STORE_CORS: ${STORE_CORS:-http://localhost:43000}
+      ADMIN_CORS: ${ADMIN_CORS:-http://localhost:43002}
+      AUTH_CORS: ${AUTH_CORS:-http://localhost:43002,http://localhost:43000}
+      STRIPE_API_KEY: ${STRIPE_API_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+    ports:
+      - "${MEDUSA_PORT:-49000}:9000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  admin-ui:
+    build:
+      context: ./admin-ui
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_MEDUSA_BACKEND_URL_ADMIN: ${NEXT_PUBLIC_MEDUSA_BACKEND_URL_ADMIN:-http://localhost:49000}
+    container_name: ecommerce-admin-ui
+    restart: unless-stopped
+    depends_on:
+      medusa:
+        condition: service_healthy
+    ports:
+      - "${ADMIN_PORT:-43002}:3002"
+
+  storefront:
+    build:
+      context: ./storefront-v2
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_MEDUSA_BACKEND_URL_STORE: ${NEXT_PUBLIC_MEDUSA_BACKEND_URL_STORE:-http://localhost:49000}
+        NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY:-}
+    container_name: ecommerce-storefront
+    restart: unless-stopped
+    depends_on:
+      medusa:
+        condition: service_healthy
+    ports:
+      - "${STOREFRONT_PORT:-43000}:3000"
+
+  nginx:
+    image: nginx:alpine
+    container_name: ecommerce-nginx
+    restart: unless-stopped
+    profiles:
+      - with-nginx
+    depends_on:
+      - medusa
+      - admin-ui
+      - storefront
+    ports:
+      - "${NGINX_PORT:-40080}:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/templates/default.conf.template:ro
+    environment:
+      STORE_DOMAIN: ${STORE_DOMAIN:-store.example.com}
+      ADMIN_DOMAIN: ${ADMIN_DOMAIN:-admin.example.com}
+      API_DOMAIN: ${API_DOMAIN:-api.example.com}
 
 volumes:
   ecommerce_pg_data:
