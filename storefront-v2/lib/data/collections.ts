@@ -83,9 +83,9 @@ export interface CollectionProductWithPrice {
 /**
  * Fetch a single curated collection by key.
  */
-export async function fetchCollection(key: string): Promise<CuratedCollection | null> {
+export async function fetchCollection(key: string, locale?: string): Promise<CuratedCollection | null> {
   try {
-    const data = await fetchContent<CollectionsResponse>("/store/content/collections", { key })
+    const data = await fetchContent<CollectionsResponse>("/store/content/collections", { key }, locale)
     return data?.collections?.[0] ?? null
   } catch {
     return null
@@ -98,6 +98,7 @@ export async function fetchCollection(key: string): Promise<CuratedCollection | 
  */
 export async function fetchProductPrices(
   productIds: string[],
+  locale?: string,
 ): Promise<Map<string, { price: number; currency_code: string }>> {
   const priceMap = new Map<string, { price: number; currency_code: string }>()
   if (productIds.length === 0) return priceMap
@@ -112,6 +113,9 @@ export async function fetchProductPrices(
     const headers: Record<string, string> = {}
     if (PUBLISHABLE_KEY) {
       headers["x-publishable-api-key"] = PUBLISHABLE_KEY
+    }
+    if (locale) {
+      headers["x-medusa-locale"] = locale
     }
 
     const res = await fetch(url.toString(), {
@@ -145,15 +149,16 @@ export async function fetchProductPrices(
  */
 export async function fetchCollectionWithPrices(
   key: string,
+  locale?: string,
 ): Promise<CollectionProductWithPrice[]> {
-  const collection = await fetchCollection(key)
+  const collection = await fetchCollection(key, locale)
   if (!collection) return []
 
   const productIds = collection.items
     .map((item) => item.product_id)
     .filter(Boolean)
 
-  const priceMap = await fetchProductPrices(productIds)
+  const priceMap = await fetchProductPrices(productIds, locale)
 
   return collection.items
     .filter((item) => item.product !== null)

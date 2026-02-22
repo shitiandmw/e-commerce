@@ -17,11 +17,17 @@ interface BrandResponse {
  * Fetch a single brand by ID from Medusa Store API.
  * Returns brand info + associated product IDs.
  */
-export async function fetchBrand(id: string): Promise<BrandWithProducts | null> {
+export async function fetchBrand(id: string, locale?: string): Promise<BrandWithProducts | null> {
   const url = new URL(`${MEDUSA_BACKEND_URL}/store/content/brands/${id}`)
+  if (locale) {
+    url.searchParams.set("locale", locale)
+  }
   const headers: Record<string, string> = {}
   if (PUBLISHABLE_KEY) {
     headers["x-publishable-api-key"] = PUBLISHABLE_KEY
+  }
+  if (locale) {
+    headers["x-medusa-locale"] = locale
   }
 
   try {

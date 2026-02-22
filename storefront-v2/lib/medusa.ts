@@ -16,16 +16,22 @@ export const sdk = new Medusa({
 })
 
 // Helper for fetching from custom store content API routes
-export async function fetchContent<T>(path: string, params?: Record<string, string>): Promise<T> {
+export async function fetchContent<T>(path: string, params?: Record<string, string>, locale?: string): Promise<T> {
   const url = new URL(`${MEDUSA_BACKEND_URL}${path}`)
   if (params) {
     Object.entries(params).forEach(([k, v]) => {
       if (v !== undefined && v !== "") url.searchParams.set(k, v)
     })
   }
+  if (locale) {
+    url.searchParams.set("locale", locale)
+  }
   const headers: Record<string, string> = {}
   if (PUBLISHABLE_KEY) {
     headers["x-publishable-api-key"] = PUBLISHABLE_KEY
+  }
+  if (locale) {
+    headers["x-medusa-locale"] = locale
   }
   const res = await fetch(url.toString(), {
     headers,

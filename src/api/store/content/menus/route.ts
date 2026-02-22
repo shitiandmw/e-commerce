@@ -1,6 +1,4 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
-import { MENU_MODULE } from "../../../../modules/menu"
-import MenuModuleService from "../../../../modules/menu/service"
 
 interface BrandRecord {
   id: string
@@ -81,7 +79,7 @@ function attachBrands(items: MenuItemRecord[], brands: BrandRecord[]): MenuItemR
 
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const key = req.query.key as string | undefined
-  const locale = req.query.locale as string | undefined
+  const locale = (req as any).locale as string | undefined
   const query = req.scope.resolve("query")
 
   const filters: Record<string, any> = {}
@@ -98,15 +96,18 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     { locale },
   )
 
-  // For each menu, load items and build tree
-  const menuService: MenuModuleService = req.scope.resolve(MENU_MODULE)
+  // For each menu, load items via query.graph (supports translations) and build tree
   const result = await Promise.all(
     (menus || []).map(async (menu: any) => {
-      const fullMenu = await menuService.retrieveMenu(menu.id, {
-        relations: ["items"],
-      })
-      const items = (fullMenu.items || []) as unknown as MenuItemRecord[]
-      const tree = buildTree(items)
+      const { data: items } = await query.graph(
+        {
+          entity: "menu_item",
+          fields: ["id", "label", "url", "icon_url", "sort_order", "is_enabled", "metadata", "parent_id"],
+          filters: { menu_id: menu.id },
+        },
+        { locale },
+      )
+      const tree = buildTree((items || []) as unknown as MenuItemRecord[])
 
       // If any item has item_type=brand, load brands and attach
       let finalTree = tree

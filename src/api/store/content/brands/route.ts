@@ -4,7 +4,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const query = req.scope.resolve("query")
 
   const q = req.query.q as string | undefined
-  const locale = req.query.locale as string | undefined
+  const locale = (req as any).locale as string | undefined
   const offset = parseInt((req.query.offset as string) || "0", 10)
   const limit = parseInt((req.query.limit as string) || "20", 10)
 

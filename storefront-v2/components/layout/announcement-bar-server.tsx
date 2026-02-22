@@ -10,9 +10,9 @@ interface HomeContentResponse {
   }[]
 }
 
-export async function AnnouncementBarServer() {
+export async function AnnouncementBarServer({ locale }: { locale?: string }) {
   try {
-    const data = await fetchContent<HomeContentResponse>("/store/content/home")
+    const data = await fetchContent<HomeContentResponse>("/store/content/home", undefined, locale)
     if (!data?.announcements?.length) return null
     return <AnnouncementBarClient announcements={data.announcements} />
   } catch {

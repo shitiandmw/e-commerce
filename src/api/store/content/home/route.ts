@@ -4,7 +4,7 @@ import { Modules } from "@medusajs/framework/utils"
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const query = req.scope.resolve("query")
   const now = new Date().toISOString()
-  const locale = req.query.locale as string | undefined
+  const locale = (req as any).locale as string | undefined
 
   // Fetch active banners (enabled + within time window)
   const { data: bannerSlots } = await query.graph(
