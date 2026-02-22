@@ -1,13 +1,14 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import { Link } from "@/i18n/navigation"
 import { Minus, Plus, X, ShoppingBag, ArrowRight, Truck, Shield, RotateCcw, Loader2 } from "lucide-react"
 import { useCart, selectTotalItems, selectTotalPrice, getCartProductName, getCartProductImage } from "@/lib/cart-store"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 import type { CartLineItem } from "@/lib/cart"
-import { products } from "@/lib/data/products"
+import type { MedusaProduct } from "@/lib/data/products"
+import { getMedusaPrice, getMedusaImages } from "@/lib/data/products"
 
 function formatPrice(amount: number, currencyCode?: string) {
   const prefix = currencyCode === "hkd" || !currencyCode ? "HK$" : currencyCode.toUpperCase() + " "
@@ -114,21 +115,44 @@ function EmptyCart() {
 
 function RecommendedProducts() {
   const t = useTranslations()
-  const featured = products.filter((p) => p.isFeatured).slice(0, 4)
+  const locale = useLocale()
+  const [products, setProducts] = useState<MedusaProduct[]>([])
+
+  useEffect(() => {
+    fetch(`/api/products?limit=4&order=-created_at&fields=id,title,handle,thumbnail,*variants,*variants.prices,*brand&locale=${locale}`)
+      .then((res) => res.json())
+      .then((data) => setProducts(data.products ?? []))
+      .catch(() => {})
+  }, [locale])
+
+  if (products.length === 0) return null
+
   return (
     <section className="mt-16 pt-12 border-t border-border/30">
       <h3 className="text-lg font-serif text-foreground mb-6">{t("you_may_also_like")}</h3>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {featured.map((product) => (
-          <Link key={product.id} href={`/product/${product.id}`} className="group">
-            <div className="relative aspect-square bg-secondary/30 overflow-hidden mb-3">
-              <Image src={product.image} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
-            </div>
-            <p className="text-[10px] text-gold tracking-[0.15em] uppercase">{product.brandEn}</p>
-            <p className="text-xs text-foreground mt-0.5 line-clamp-1 group-hover:text-gold transition-colors">{product.name}</p>
-            <p className="text-xs text-gold font-medium mt-1">HK${product.price.toLocaleString()}</p>
-          </Link>
-        ))}
+        {products.map((product) => {
+          const price = getMedusaPrice(product)
+          const image = getMedusaImages(product)[0] || product.thumbnail || "/images/placeholder.jpg"
+          const brand = Array.isArray(product.brand) ? product.brand[0] : product.brand
+          return (
+            <Link key={product.id} href={`/product/${product.handle}`} className="group">
+              <div className="relative aspect-square bg-secondary/30 overflow-hidden mb-3">
+                <Image src={image} alt={product.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+              </div>
+              {brand?.name && (
+                <p className="text-[10px] text-gold tracking-[0.15em] uppercase">{brand.name}</p>
+              )}
+              <p className="text-xs text-foreground mt-0.5 line-clamp-1 group-hover:text-gold transition-colors">{product.title}</p>
+              {price && (
+                <p className="text-xs text-gold font-medium mt-1">
+                  {price.currency_code === "hkd" ? "HK$" : price.currency_code.toUpperCase() + " "}
+                  {(price.amount / 100).toLocaleString()}
+                </p>
+              )}
+            </Link>
+          )
+        })}
       </div>
     </section>
   )
