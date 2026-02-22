@@ -212,11 +212,6 @@ export function ProductDetailContent({
               )}
             </div>
 
-            {/* Description */}
-            {product.description && (
-              <p className="mt-6 text-sm text-muted-foreground leading-relaxed">{product.description}</p>
-            )}
-
             {/* Variant / Option Selection */}
             {hasOptions && (
               <div className="mt-6 flex flex-col gap-5" role="group" aria-label="商品規格選擇">
@@ -340,41 +335,6 @@ export function ProductDetailContent({
               </button>
             </div>
 
-            {/* Quick Specs */}
-            {hasSpecs && (
-              <div className="mt-8 grid grid-cols-2 gap-x-8 gap-y-3 text-sm border-t border-border/30 pt-6">
-                {origin && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">產地</span>
-                    <span className="text-foreground">{origin}</span>
-                  </div>
-                )}
-                {strength && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">強度</span>
-                    <span className="text-foreground">{strength}</span>
-                  </div>
-                )}
-                {cigarLength && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">長度</span>
-                    <span className="text-foreground">{cigarLength}</span>
-                  </div>
-                )}
-                {ringGauge && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">環徑</span>
-                    <span className="text-foreground">{ringGauge}</span>
-                  </div>
-                )}
-                {customAttributes.map((attr) => (
-                  <div key={attr.key} className="flex justify-between">
-                    <span className="text-muted-foreground">{attr.key}</span>
-                    <span className="text-foreground">{attr.value}</span>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
 
         </div>
@@ -391,29 +351,29 @@ export function ProductDetailContent({
                   <p className="mt-4 text-sm text-muted-foreground leading-relaxed max-w-xl">{brandDescription}</p>
                 )}
               </div>
-              {categoryHandle && (
-                <Link
-                  href={`/category/${categoryHandle}`}
-                  className="inline-flex items-center gap-2 border border-gold/50 text-gold px-6 py-2.5 text-sm tracking-wide hover:bg-gold hover:text-primary-foreground transition-all shrink-0"
-                >
-                  探索更多 {displayBrandName} 雪茄
-                </Link>
-              )}
+              <Link
+                href={categoryHandle ? `/category/${categoryHandle}` : `/search?brand=${encodeURIComponent(displayBrandName!)}`}
+                className="inline-flex items-center gap-2 border border-gold/50 text-gold px-6 py-2.5 text-sm tracking-wide hover:bg-gold hover:text-primary-foreground transition-all shrink-0"
+              >
+                探索更多 {displayBrandName} 雪茄
+              </Link>
             </div>
           </div>
         )}
 
         {/* Product Tabs */}
-        {(hasCigarSpecs || tastingNotes || pairingNotes) && (
+        {(product.description || hasSpecs || tastingNotes || pairingNotes) && (
           <div className="mt-12">
-            <Tabs defaultValue="specs" className="w-full">
+            <Tabs defaultValue={(product.description || hasSpecs) ? "description" : "specs"} className="w-full">
               <TabsList className="w-full justify-start bg-transparent border-b border-border/30 rounded-none p-0 h-auto gap-0">
-                <TabsTrigger
-                  value="specs"
-                  className="data-[state=active]:bg-transparent data-[state=active]:text-gold data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-gold rounded-none px-6 py-3 text-sm"
-                >
-                  雪茄資料
-                </TabsTrigger>
+                {(product.description || hasSpecs) && (
+                  <TabsTrigger
+                    value="description"
+                    className="data-[state=active]:bg-transparent data-[state=active]:text-gold data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-gold rounded-none px-6 py-3 text-sm"
+                  >
+                    詳細介紹
+                  </TabsTrigger>
+                )}
                 {tastingNotes && (
                   <TabsTrigger
                     value="tasting"
@@ -432,25 +392,74 @@ export function ProductDetailContent({
                 )}
               </TabsList>
 
-              <TabsContent value="specs" className="mt-8">
-                <div className="grid md:grid-cols-2 gap-6 max-w-2xl">
-                  {[
-                    { label: "產地", value: origin },
-                    { label: "茄衣", value: wrapper },
-                    { label: "茄套", value: binder },
-                    { label: "茄芯", value: filler },
-                    { label: "長度", value: cigarLength },
-                    { label: "環徑", value: ringGauge },
-                    { label: "強度", value: strength },
-                    { label: "包裝", value: packSize ? `${packSize} 支裝` : undefined },
-                  ].filter((s) => s.value).map((spec) => (
-                    <div key={spec.label} className="flex items-center justify-between py-3 border-b border-border/20">
-                      <span className="text-sm text-muted-foreground">{spec.label}</span>
-                      <span className="text-sm font-medium text-foreground">{spec.value}</span>
+              {(product.description || hasSpecs) && (
+                <TabsContent value="description" className="mt-8">
+                  {hasSpecs && (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-3 text-sm mb-8 pb-8 border-b border-border/20">
+                      {origin && (
+                        <div className="flex flex-col gap-1">
+                          <span className="text-muted-foreground">產地</span>
+                          <span className="text-foreground font-medium">{origin}</span>
+                        </div>
+                      )}
+                      {wrapper && (
+                        <div className="flex flex-col gap-1">
+                          <span className="text-muted-foreground">茄衣</span>
+                          <span className="text-foreground font-medium">{wrapper}</span>
+                        </div>
+                      )}
+                      {binder && (
+                        <div className="flex flex-col gap-1">
+                          <span className="text-muted-foreground">茄套</span>
+                          <span className="text-foreground font-medium">{binder}</span>
+                        </div>
+                      )}
+                      {filler && (
+                        <div className="flex flex-col gap-1">
+                          <span className="text-muted-foreground">茄芯</span>
+                          <span className="text-foreground font-medium">{filler}</span>
+                        </div>
+                      )}
+                      {strength && (
+                        <div className="flex flex-col gap-1">
+                          <span className="text-muted-foreground">強度</span>
+                          <span className="text-foreground font-medium">{strength}</span>
+                        </div>
+                      )}
+                      {cigarLength && (
+                        <div className="flex flex-col gap-1">
+                          <span className="text-muted-foreground">長度</span>
+                          <span className="text-foreground font-medium">{cigarLength}</span>
+                        </div>
+                      )}
+                      {ringGauge && (
+                        <div className="flex flex-col gap-1">
+                          <span className="text-muted-foreground">環徑</span>
+                          <span className="text-foreground font-medium">{ringGauge}</span>
+                        </div>
+                      )}
+                      {packSize && (
+                        <div className="flex flex-col gap-1">
+                          <span className="text-muted-foreground">包裝</span>
+                          <span className="text-foreground font-medium">{packSize} 支裝</span>
+                        </div>
+                      )}
+                      {customAttributes.map((attr) => (
+                        <div key={attr.key} className="flex flex-col gap-1">
+                          <span className="text-muted-foreground">{attr.key}</span>
+                          <span className="text-foreground font-medium">{attr.value}</span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </TabsContent>
+                  )}
+                  {product.description && (
+                    <div
+                      className="max-w-3xl text-sm text-muted-foreground leading-relaxed [&_h2]:text-xl [&_h2]:font-serif [&_h2]:font-bold [&_h2]:text-foreground [&_h2]:mt-8 [&_h2]:mb-4 [&_h3]:text-lg [&_h3]:font-serif [&_h3]:font-semibold [&_h3]:text-foreground [&_h3]:mt-6 [&_h3]:mb-3 [&_p]:my-4 [&_ul]:my-4 [&_ul]:flex [&_ul]:flex-col [&_ul]:gap-2 [&_ol]:my-4 [&_ol]:flex [&_ol]:flex-col [&_ol]:gap-2 [&_li]:leading-relaxed [&_img]:my-6 [&_img]:max-w-full [&_a]:text-gold [&_a]:underline"
+                      dangerouslySetInnerHTML={{ __html: product.description }}
+                    />
+                  )}
+                </TabsContent>
+              )}
 
               {tastingNotes && (
                 <TabsContent value="tasting" className="mt-8">
