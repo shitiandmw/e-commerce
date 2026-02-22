@@ -2,13 +2,17 @@ import { fetchProduct, fetchRelatedProducts } from "@/lib/data/products"
 import { ProductDetailContent } from "@/components/product/product-detail-content"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; handle: string }> }): Promise<Metadata> {
   const { locale, handle } = await params
   const product = await fetchProduct(handle, locale)
-  if (!product) return { title: "找不到商品 | TimeCigar" }
+  if (!product) {
+    const t = await getTranslations({ locale })
+    return { title: t('seo_not_found_product') }
+  }
   return {
-    title: `${product.title} | TimeCigar 雪茄時間`,
+    title: product.title,
     description: product.description ?? undefined,
   }
 }

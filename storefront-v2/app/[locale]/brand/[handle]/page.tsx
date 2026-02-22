@@ -3,16 +3,18 @@ import { BrandPageContent } from "@/components/product/brand-page-content"
 import { fetchBrand } from "@/lib/data/brands"
 import { fetchProducts } from "@/lib/data/products"
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 
 const PAGE_SIZE = 20
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; handle: string }> }): Promise<Metadata> {
   const { locale, handle } = await params
+  const t = await getTranslations({ locale })
   const brand = await fetchBrand(handle, locale)
-  if (!brand) return { title: "品牌未找到 | TimeCigar 雪茄時間" }
+  if (!brand) return { title: t('seo_not_found_brand') }
   return {
-    title: `${brand.name} | TimeCigar 雪茄時間`,
-    description: brand.description || `探索 ${brand.name} 的精選雪茄系列`,
+    title: brand.name,
+    description: brand.description || t('seo_brand_description_fallback', { name: brand.name }),
   }
 }
 

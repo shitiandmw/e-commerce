@@ -1,19 +1,23 @@
 import { ArticleListContent } from "@/components/articles/article-list-content"
 import { fetchArticles } from "@/lib/data/articles"
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 
-export const metadata: Metadata = {
-  title: "茄時分享 | TimeCigar 雪茄時間",
-  description: "探索雪茄世界的最新資訊、品鑑指南、品味生活文章和 Podcast",
-}
-
-export default async function ArticlesPage({
-  params,
-  searchParams,
-}: {
+type Props = {
   params: Promise<{ locale: string }>
   searchParams: Promise<{ category?: string }>
-}) {
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale })
+  return {
+    title: t('seo_articles_title'),
+    description: t('seo_articles_description'),
+  }
+}
+
+export default async function ArticlesPage({ params, searchParams }: Props) {
   const { locale } = await params
   const { category } = await searchParams
   const { articles } = await fetchArticles({ limit: 50, locale })

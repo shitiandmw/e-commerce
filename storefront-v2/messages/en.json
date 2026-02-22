@@ -105,6 +105,18 @@
   "smoking_warning": "Smoking is harmful to your health",
   "deny": "I am under 18",
 
+  "seo_site_title": "TimeCigar | Your Premium Cigar Shopping Platform",
+  "seo_site_description": "Premium Cuban cigars, non-Cuban cigars, mini cigars, brand recommendations and pricing. Cohiba, Montecristo, Partagás and more top brands.",
+  "seo_title_template": "%s | TimeCigar",
+  "seo_articles_title": "Cigar Journal",
+  "seo_articles_description": "Explore the latest cigar news, tasting guides, lifestyle articles and Podcast",
+  "seo_not_found_product": "Product Not Found",
+  "seo_not_found_brand": "Brand Not Found",
+  "seo_not_found_article": "Article Not Found",
+  "seo_not_found_category": "Product Category",
+  "seo_brand_description_fallback": "Explore {name}'s premium cigar collection",
+  "seo_category_description_fallback": "Explore TimeCigar's premium cigar collection",
+
   "adding_to_cart": "Adding...",
   "add_to_wishlist": "Add to Wishlist",
   "price_tbd": "Price TBD",

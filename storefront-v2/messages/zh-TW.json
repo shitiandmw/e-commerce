@@ -105,6 +105,18 @@
   "smoking_warning": "吸煙有害健康",
   "deny": "我未滿 18 歲",
 
+  "seo_site_title": "TimeCigar 雪茄時間 | 您的雪茄網購平台",
+  "seo_site_description": "提供古巴雪茄、非古雪茄、迷你雪茄、雪茄品牌推薦及價格。高希霸、蒙特克里斯托、帕特加斯等頂級品牌。",
+  "seo_title_template": "%s | TimeCigar 雪茄時間",
+  "seo_articles_title": "茄時分享",
+  "seo_articles_description": "探索雪茄世界的最新資訊、品鑑指南、品味生活文章和 Podcast",
+  "seo_not_found_product": "找不到商品",
+  "seo_not_found_brand": "品牌未找到",
+  "seo_not_found_article": "文章未找到",
+  "seo_not_found_category": "商品分類",
+  "seo_brand_description_fallback": "探索 {name} 的精選雪茄系列",
+  "seo_category_description_fallback": "探索 TimeCigar 的精選雪茄系列",
+
   "adding_to_cart": "正在加入...",
   "add_to_wishlist": "加入收藏",
   "price_tbd": "價格待定",

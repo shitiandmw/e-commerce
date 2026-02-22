@@ -10,9 +10,12 @@ import type { Metadata } from "next"
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
   const { locale, slug } = await params
   const article = await fetchArticle(slug, locale)
-  if (!article) return { title: "Article Not Found | TimeCigar" }
+  if (!article) {
+    const t = await getTranslations({ locale })
+    return { title: t('seo_not_found_article') }
+  }
   return {
-    title: article.seo?.meta_title || `${article.title} | TimeCigar`,
+    title: article.seo?.meta_title || article.title,
     description: article.seo?.meta_description || article.summary || "",
     openGraph: article.seo?.og_image ? { images: [article.seo.og_image] } : undefined,
   }

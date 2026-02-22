@@ -5,19 +5,21 @@ import {
 } from "@/lib/data/categories"
 import { fetchProducts } from "@/lib/data/products"
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 
 const PAGE_SIZE = 20
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
   const { locale, slug } = await params
+  const t = await getTranslations({ locale })
   const [medusaCategory, mockCategory] = await Promise.all([
     fetchCategoryByHandle(slug, locale),
     Promise.resolve(getCategoryBySlug(slug)),
   ])
-  const name = medusaCategory?.name || mockCategory?.name || "商品分類"
-  const description = medusaCategory?.description || mockCategory?.description || "探索 TimeCigar 的精選雪茄系列"
+  const name = medusaCategory?.name || mockCategory?.name || t('seo_not_found_category')
+  const description = medusaCategory?.description || mockCategory?.description || t('seo_category_description_fallback')
   return {
-    title: `${name} | TimeCigar 雪茄時間`,
+    title: name,
     description,
   }
 }

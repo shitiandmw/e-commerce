@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
-import { getMessages, setRequestLocale } from 'next-intl/server'
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { Noto_Serif_SC, Geist } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
@@ -22,14 +22,21 @@ const geist = Geist({
   variable: "--font-geist",
 })
 
-export const metadata: Metadata = {
-  title: 'TimeCigar 雪茄時間 | 您的雪茄網購平台',
-  description: '提供古巴雪茄、非古雪茄、迷你雪茄、雪茄品牌推薦及價格。高希霸、蒙特克里斯托、帕特加斯等頂級品牌。',
-}
-
 type Props = {
   children: React.ReactNode
   params: Promise<{ locale: string }>
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale })
+  return {
+    title: {
+      default: t('seo_site_title'),
+      template: t('seo_title_template'),
+    },
+    description: t('seo_site_description'),
+  }
 }
 
 export function generateStaticParams() {
