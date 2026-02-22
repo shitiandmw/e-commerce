@@ -50,8 +50,8 @@ cat > "$ROOT_DIR/admin-ui/.env.local" <<EOF
 NEXT_PUBLIC_MEDUSA_BACKEND_URL=http://localhost:$MEDUSA_PORT
 EOF
 
-# 生成 storefront/.env.local（Publishable key 在后端就绪后自动获取）
-cat > "$ROOT_DIR/storefront/.env.local" <<EOF
+# 生成 storefront-v2/.env.local（Publishable key 在后端就绪后自动获取）
+cat > "$ROOT_DIR/storefront-v2/.env.local" <<EOF
 NEXT_PUBLIC_MEDUSA_BACKEND_URL=http://localhost:$MEDUSA_PORT
 NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=
 EOF
@@ -75,9 +75,9 @@ if [ ! -d "admin-ui/node_modules" ]; then
   cd "$ROOT_DIR/admin-ui" && npm install && cd "$ROOT_DIR"
 fi
 
-if [ ! -d "storefront/node_modules" ]; then
-  log "安装 Storefront 依赖..."
-  cd "$ROOT_DIR/storefront" && npm install && cd "$ROOT_DIR"
+if [ ! -d "storefront-v2/node_modules" ]; then
+  log "安装 Storefront V2 依赖..."
+  cd "$ROOT_DIR/storefront-v2" && npm install && cd "$ROOT_DIR"
 fi
 
 # ---------- 提高文件描述符限制 ----------
@@ -101,7 +101,7 @@ STOREFRONT_PID=""
 
 cleanup() {
   log "正在停止服务..."
-  [ -n "$STOREFRONT_PID" ] && kill $STOREFRONT_PID 2>/dev/null && log "Storefront 已停止"
+  [ -n "$STOREFRONT_PID" ] && kill $STOREFRONT_PID 2>/dev/null && log "Storefront V2 已停止"
   [ -n "$FRONTEND_PID" ] && kill $FRONTEND_PID 2>/dev/null && log "前端已停止"
   [ -n "$BACKEND_PID" ]  && kill $BACKEND_PID 2>/dev/null  && log "后端已停止"
   jobs -p | xargs -r kill 2>/dev/null
@@ -160,7 +160,7 @@ for i in $(seq 1 30); do
   sleep 1
 done
 
-# ---------- 4. 获取 Publishable API Key 写入 storefront/.env.local ----------
+# ---------- 4. 获取 Publishable API Key 写入 storefront-v2/.env.local ----------
 log "获取 Publishable API Key..."
 ADMIN_TOKEN=$(curl -s http://localhost:$MEDUSA_PORT/auth/user/emailpass \
   -X POST -H "Content-Type: application/json" \
@@ -173,11 +173,11 @@ if [ -n "$ADMIN_TOKEN" ]; then
     python3 -c "import sys,json; keys=json.load(sys.stdin).get('api_keys',[]); pk=[k for k in keys if k.get('type')=='publishable' and not k.get('revoked_at')]; print(pk[0]['token'] if pk else '')" 2>/dev/null)
 
   if [ -n "$PUB_KEY" ]; then
-    cat > "$ROOT_DIR/storefront/.env.local" <<EOF
+    cat > "$ROOT_DIR/storefront-v2/.env.local" <<EOF
 NEXT_PUBLIC_MEDUSA_BACKEND_URL=http://localhost:$MEDUSA_PORT
 NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$PUB_KEY
 EOF
-    log "✓ Publishable Key 已写入 storefront/.env.local"
+    log "✓ Publishable Key 已写入 storefront-v2/.env.local"
   else
     warn "未找到 Publishable API Key，storefront 可能无法调用 Store API"
   fi
@@ -203,21 +203,21 @@ for i in $(seq 1 30); do
   sleep 1
 done
 
-# ---------- 6. 启动 Storefront ----------
-log "启动 Storefront（端口 $STOREFRONT_PORT）..."
-cd "$ROOT_DIR/storefront"
+# ---------- 6. 启动 Storefront V2 ----------
+log "启动 Storefront V2（端口 $STOREFRONT_PORT）..."
+cd "$ROOT_DIR/storefront-v2"
 npx next dev -p $STOREFRONT_PORT &
 STOREFRONT_PID=$!
 cd "$ROOT_DIR"
 
-# 等待 Storefront 就绪
-log "等待 Storefront 就绪..."
+# 等待 Storefront V2 就绪
+log "等待 Storefront V2 就绪..."
 for i in $(seq 1 30); do
   if curl -s -o /dev/null -w "" http://localhost:$STOREFRONT_PORT 2>/dev/null; then
-    log "✓ Storefront 就绪 → http://localhost:$STOREFRONT_PORT"
+    log "✓ Storefront V2 就绪 → http://localhost:$STOREFRONT_PORT"
     break
   fi
-  [ "$i" -eq 30 ] && { warn "Storefront 启动较慢，请稍候..."; }
+  [ "$i" -eq 30 ] && { warn "Storefront V2 启动较慢，请稍候..."; }
   sleep 1
 done
 
