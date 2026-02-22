@@ -1,14 +1,17 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Minus, Plus, ShoppingBag, Heart, Share2, ChevronRight, Loader2 } from "lucide-react"
+import { Minus, Plus, ShoppingBag, Heart, ChevronRight, Loader2 } from "lucide-react"
 import { type MedusaProduct, type MedusaBrand, getMedusaImages } from "@/lib/data/products"
 import { useCart } from "@/lib/cart-store"
+import { useWishlist } from "@/lib/wishlist-store"
+import { isLoggedIn } from "@/lib/auth"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ProductCard } from "@/components/product/product-card"
+import { SharePopover } from "@/components/product/share-popover"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
@@ -34,6 +37,9 @@ export function ProductDetailContent({
   })
   const addItem = useCart((s) => s.addItem)
   const clearCart = useCart((s) => s.clear)
+  const wishlist = useWishlist()
+  const isFavorited = useWishlist((s) => s.isInWishlist(product.id))
+  const [wishlistLoading, setWishlistLoading] = useState(false)
   const [adding, setAdding] = useState(false)
   const [buyingNow, setBuyingNow] = useState(false)
   const router = useRouter()
@@ -98,6 +104,13 @@ export function ProductDetailContent({
   const displayBrandNameEn = brandNameEn
   const brandDescription = brand?.description
   const isLimited = meta.is_limited === "true"
+
+  // Fetch wishlist on mount if logged in
+  useEffect(() => {
+    if (isLoggedIn() && wishlist.items.length === 0) {
+      wishlist.fetchWishlist()
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Custom attributes from admin editor (metadata.attributes)
   const rawAttrs = (product.metadata as Record<string, unknown> | null)?.attributes
@@ -296,17 +309,44 @@ export function ProductDetailContent({
                   {isOutOfStock ? "缺貨中" : !selectedVariant && hasOptions ? "請選擇規格" : adding ? "加入中..." : "加入購物車"}
                 </button>
                 <button
-                  className="flex size-12 items-center justify-center border border-border/50 text-muted-foreground hover:text-gold hover:border-gold transition-colors"
-                  aria-label="加入收藏"
+                  className={cn(
+                    "flex size-12 items-center justify-center border transition-colors",
+                    isFavorited
+                      ? "border-gold text-gold"
+                      : "border-border/50 text-muted-foreground hover:text-gold hover:border-gold"
+                  )}
+                  aria-label={isFavorited ? "取消收藏" : "加入收藏"}
+                  aria-pressed={isFavorited}
+                  disabled={wishlistLoading}
+                  onClick={async () => {
+                    if (!isLoggedIn()) {
+                      toast.error("請先登入後再收藏商品")
+                      router.push("/login")
+                      return
+                    }
+                    setWishlistLoading(true)
+                    try {
+                      if (isFavorited) {
+                        await wishlist.removeByProductId(product.id)
+                        toast.success("已取消收藏")
+                      } else {
+                        await wishlist.addItem(product.id)
+                        toast.success("已加入收藏")
+                      }
+                    } catch {
+                      toast.error("操作失敗，請稍後再試")
+                    } finally {
+                      setWishlistLoading(false)
+                    }
+                  }}
                 >
-                  <Heart className="size-4" />
+                  {wishlistLoading ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Heart className={cn("size-4", isFavorited && "fill-current")} />
+                  )}
                 </button>
-                <button
-                  className="flex size-12 items-center justify-center border border-border/50 text-muted-foreground hover:text-gold hover:border-gold transition-colors"
-                  aria-label="分享"
-                >
-                  <Share2 className="size-4" />
-                </button>
+                <SharePopover title={product.title} />
               </div>
 
               <button

@@ -2,6 +2,7 @@ import {
   defineMiddlewares,
   validateAndTransformBody,
   validateAndTransformQuery,
+  authenticate,
 } from "@medusajs/framework/http"
 import { createFindParams } from "@medusajs/medusa/api/utils/validators"
 import { z } from "zod"
@@ -62,6 +63,9 @@ import {
 import {
   couponMiddlewares,
 } from "./store/content/coupon/validators"
+import {
+  AddWishlistItemSchema,
+} from "./store/wishlist/validators"
 
 export const GetBrandsSchema = createFindParams().merge(z.object({ q: z.string().optional() }))
 export const GetTagsSchema = createFindParams()
@@ -568,6 +572,26 @@ export default defineMiddlewares({
       method: "POST",
       middlewares: [
         validateAndTransformBody(PostAdminUpdateAttributeTemplate),
+      ],
+    },
+    // Wishlist routes (customer authentication required)
+    {
+      matcher: "/store/wishlist",
+      middlewares: [
+        authenticate("customer", ["session", "bearer"]),
+      ],
+    },
+    {
+      matcher: "/store/wishlist/:id",
+      middlewares: [
+        authenticate("customer", ["session", "bearer"]),
+      ],
+    },
+    {
+      matcher: "/store/wishlist",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(AddWishlistItemSchema),
       ],
     },
   ],

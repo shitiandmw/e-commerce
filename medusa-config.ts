@@ -35,6 +35,9 @@ module.exports = defineConfig({
       resolve: "./src/modules/attribute-template",
     },
     {
+      resolve: "./src/modules/wishlist",
+    },
+    {
       resolve: "@medusajs/medusa/payment",
     },
     {
