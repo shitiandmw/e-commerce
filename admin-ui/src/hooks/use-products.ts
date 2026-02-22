@@ -69,7 +69,10 @@ export interface Product {
   brand?: {
     id: string
     name: string
-  } | null
+  } | Array<{
+    id: string
+    name: string
+  }> | null
   custom_tags?: Array<{
     id: string
     name: string

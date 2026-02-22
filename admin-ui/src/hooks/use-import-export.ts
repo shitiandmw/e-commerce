@@ -88,7 +88,10 @@ export function useProductImportExport() {
       },
       {
         header: "brand",
-        accessor: (p) => p.brand?.name || "",
+        accessor: (p) => {
+          const b = Array.isArray(p.brand) ? p.brand[0] : p.brand
+          return b?.name || ""
+        },
       },
       { header: "weight", accessor: (p) => p.weight || "" },
       { header: "length", accessor: (p) => p.length || "" },

@@ -37,6 +37,13 @@ import {
   LOW_STOCK_THRESHOLD,
 } from "@/hooks/use-inventory"
 
+/** brand field may be a single object or an array (due to isList link) */
+function resolveBrand(brand: Product["brand"]): { id: string; name: string } | null {
+  if (!brand) return null
+  if (Array.isArray(brand)) return brand[0] ?? null
+  return brand
+}
+
 function getStatusBadge(status: Product["status"], t: (key: string) => string) {
   switch (status) {
     case "published":
@@ -505,17 +512,17 @@ export function ProductDetail({ productId }: ProductDetailProps) {
           </div>
 
           {/* Brand */}
-          {product.brand && (
+          {resolveBrand(product.brand) && (
             <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <Tag className="h-5 w-5" />
                 {t("detail.brand")}
               </h2>
               <Link
-                href={`/brands/${product.brand.id}`}
+                href={`/brands/${resolveBrand(product.brand)!.id}`}
                 className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium hover:bg-accent transition-colors"
               >
-                {product.brand.name}
+                {resolveBrand(product.brand)!.name}
               </Link>
             </div>
           )}

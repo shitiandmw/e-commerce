@@ -51,6 +51,13 @@ import {
 } from "@/components/products/product-attributes-editor"
 import { toSlug } from "@/lib/slug"
 
+/** brand field may be a single object or an array (due to isList link) */
+function resolveBrand(brand: Product["brand"]): { id: string; name: string } | null {
+  if (!brand) return null
+  if (Array.isArray(brand)) return brand[0] ?? null
+  return brand
+}
+
 const variantSchema = z.object({
   title: z.string().min(1, "Variant title is required"),
   sku: z.string().optional(),
@@ -140,7 +147,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
             manage_inventory: v.manage_inventory ?? true,
           })) || [],
         category_ids: product.categories?.map((c) => c.id) || [],
-        brand_id: product.brand?.id || "",
+        brand_id: resolveBrand(product.brand)?.id || "",
         tag_ids: product.custom_tags?.map((t) => t.id) || [],
       }
     : {
@@ -313,7 +320,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
         await updateProduct.mutateAsync(payload)
 
         // Handle brand link changes
-        const oldBrandId = product?.brand?.id
+        const oldBrandId = resolveBrand(product?.brand)?.id
         const newBrandId = data.brand_id || undefined
 
         if (oldBrandId !== newBrandId) {
@@ -758,13 +765,22 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                   </div>
                   <div className="space-y-2">
                     <Label>{t("form.variantCurrency")}</Label>
-                    <Select {...register(`variants.${index}.currency_code`)}>
-                      <option value="usd">USD</option>
-                      <option value="eur">EUR</option>
-                      <option value="gbp">GBP</option>
-                      <option value="cny">CNY</option>
-                      <option value="jpy">JPY</option>
-                    </Select>
+                    <Controller
+                      control={control}
+                      name={`variants.${index}.currency_code`}
+                      render={({ field }) => (
+                        <Select
+                          value={field.value}
+                          onChange={(e) => field.onChange(e.target.value)}
+                        >
+                          <option value="usd">USD</option>
+                          <option value="eur">EUR</option>
+                          <option value="gbp">GBP</option>
+                          <option value="cny">CNY</option>
+                          <option value="jpy">JPY</option>
+                        </Select>
+                      )}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label>{t("form.variantInventory")}</Label>
@@ -814,25 +830,43 @@ export function ProductForm({ product, mode }: ProductFormProps) {
           {/* Status */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <h2 className="text-lg font-semibold">{t("form.status")}</h2>
-            <Select {...register("status")}>
-              <option value="draft">{t("statusOptions.draft")}</option>
-              <option value="proposed">{t("statusOptions.proposed")}</option>
-              <option value="published">{t("statusOptions.published")}</option>
-              <option value="rejected">{t("statusOptions.rejected")}</option>
-            </Select>
+            <Controller
+              control={control}
+              name="status"
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onChange={(e) => field.onChange(e.target.value)}
+                >
+                  <option value="draft">{t("statusOptions.draft")}</option>
+                  <option value="proposed">{t("statusOptions.proposed")}</option>
+                  <option value="published">{t("statusOptions.published")}</option>
+                  <option value="rejected">{t("statusOptions.rejected")}</option>
+                </Select>
+              )}
+            />
           </div>
 
           {/* Brand */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <h2 className="text-lg font-semibold">{t("form.brand")}</h2>
-            <Select {...register("brand_id")}>
-              <option value="">{t("form.noBrand")}</option>
-              {brands.map((brand) => (
-                <option key={brand.id} value={brand.id}>
-                  {brand.name}
-                </option>
-              ))}
-            </Select>
+            <Controller
+              control={control}
+              name="brand_id"
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onChange={(e) => field.onChange(e.target.value)}
+                >
+                  <option value="">{t("form.noBrand")}</option>
+                  {brands.map((brand) => (
+                    <option key={brand.id} value={brand.id}>
+                      {brand.name}
+                    </option>
+                  ))}
+                </Select>
+              )}
+            />
           </div>
 
           {/* Tags */}
