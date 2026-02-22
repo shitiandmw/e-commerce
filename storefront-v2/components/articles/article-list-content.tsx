@@ -2,8 +2,9 @@
 
 import { useMemo } from "react"
 import Image from "next/image"
-import Link from "next/link"
+import { Link } from "@/i18n/navigation"
 import { useRouter, useSearchParams } from "next/navigation"
+import { useTranslations } from "next-intl"
 import type { Article } from "@/lib/data/articles"
 import { cn } from "@/lib/utils"
 
@@ -18,6 +19,7 @@ export function ArticleListContent({
   categories,
   activeCategory,
 }: ArticleListContentProps) {
+  const t = useTranslations()
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -50,9 +52,9 @@ export function ArticleListContent({
         <div className="absolute inset-0 flex items-end">
           <div className="mx-auto w-full max-w-7xl px-4 pb-8 lg:px-6">
             <p className="text-gold text-xs tracking-[0.3em] uppercase mb-2">Time for Shares</p>
-            <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground">茄時分享</h1>
+            <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground">{t("blog_section_title")}</h1>
             <p className="mt-2 text-sm text-muted-foreground max-w-lg leading-relaxed">
-              探索雪茄世界的最新資訊、品鑑指南和生活品味文章
+              {t("latest_articles_desc")}
             </p>
           </div>
         </div>
@@ -70,7 +72,7 @@ export function ArticleListContent({
                 : "text-muted-foreground hover:text-foreground border border-transparent"
             )}
           >
-            全部
+            {t("all_categories")}
           </button>
           {categories.map((cat) => (
             <button
@@ -144,7 +146,7 @@ export function ArticleListContent({
                         </p>
                       )}
                       <div className="mt-4 text-xs text-gold group-hover:text-gold-light transition-colors">
-                        閱讀全文 &rarr;
+                        {t("read_full_article")} &rarr;
                       </div>
                     </div>
                   </div>
@@ -154,12 +156,12 @@ export function ArticleListContent({
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <p className="text-muted-foreground">此分類暫無文章</p>
+            <p className="text-muted-foreground">{t("no_articles_in_category")}</p>
             <button
               onClick={() => handleCategoryChange()}
               className="mt-4 text-sm text-gold hover:text-gold-light transition-colors"
             >
-              查看全部文章
+              {t("blog_view_all_articles")}
             </button>
           </div>
         )}

@@ -41,10 +41,13 @@ const MEDUSA_BACKEND_URL =
 const PUBLISHABLE_KEY =
   process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
 
-async function medusaFetch<T>(path: string): Promise<T> {
+async function medusaFetch<T>(path: string, locale?: string): Promise<T> {
   const headers: Record<string, string> = {}
   if (PUBLISHABLE_KEY) {
     headers["x-publishable-api-key"] = PUBLISHABLE_KEY
+  }
+  if (locale) {
+    headers["x-medusa-locale"] = locale
   }
   const res = await fetch(`${MEDUSA_BACKEND_URL}${path}`, {
     headers,
@@ -57,10 +60,11 @@ async function medusaFetch<T>(path: string): Promise<T> {
 /**
  * Fetch a product category by handle from Medusa Store API.
  */
-export async function fetchCategoryByHandle(handle: string): Promise<MedusaCategory | null> {
+export async function fetchCategoryByHandle(handle: string, locale?: string): Promise<MedusaCategory | null> {
   try {
     const data = await medusaFetch<CategoryListResponse>(
-      `/store/product-categories?handle=${encodeURIComponent(handle)}&fields=id,name,handle,description,metadata`
+      `/store/product-categories?handle=${encodeURIComponent(handle)}&fields=id,name,handle,description,metadata`,
+      locale
     )
     return data?.product_categories?.[0] ?? null
   } catch {

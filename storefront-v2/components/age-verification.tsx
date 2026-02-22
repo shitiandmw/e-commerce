@@ -1,10 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslations } from "next-intl"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 
 export function AgeVerification() {
+  const t = useTranslations()
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
@@ -32,10 +34,10 @@ export function AgeVerification() {
             TIMECIGAR
           </div>
           <DialogTitle className="text-foreground text-lg font-serif">
-            年齡驗證
+            {t("age_question")}
           </DialogTitle>
           <DialogDescription className="text-muted-foreground mt-2 leading-relaxed">
-            本網站僅供年滿 18 歲人士瀏覽及購買雪茄產品。請確認您已年滿 18 歲。
+            {t("tobacco_disclaimer")}
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-3 mt-4">
@@ -43,7 +45,7 @@ export function AgeVerification() {
             onClick={handleConfirm}
             className="bg-gold text-primary-foreground hover:bg-gold-dark font-medium tracking-wide"
           >
-            我已年滿 18 歲
+            {t("confirm")}
           </Button>
           <Button
             variant="outline"
@@ -54,7 +56,7 @@ export function AgeVerification() {
           </Button>
         </div>
         <p className="text-[11px] text-muted-foreground/50 mt-2 leading-relaxed">
-          吸煙危害健康。煙草產品含有尼古丁，會導致成癮。
+          {t("smoking_warning")}
         </p>
       </DialogContent>
     </Dialog>

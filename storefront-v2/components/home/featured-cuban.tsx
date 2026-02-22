@@ -1,13 +1,15 @@
 import Image from "next/image"
-import Link from "next/link"
+import { Link } from "@/i18n/navigation"
 import { ArrowRight } from "lucide-react"
 import type { CollectionProductWithPrice } from "@/lib/data/collections"
+import { getTranslations } from "next-intl/server"
 
 interface FeaturedCubanProps {
   products: CollectionProductWithPrice[]
 }
 
-export function FeaturedCuban({ products }: FeaturedCubanProps) {
+export async function FeaturedCuban({ products }: FeaturedCubanProps) {
+  const t = await getTranslations()
   if (products.length === 0) return null
 
   return (
@@ -15,9 +17,9 @@ export function FeaturedCuban({ products }: FeaturedCubanProps) {
       <div className="mx-auto max-w-7xl">
         <div className="text-center mb-12">
           <p className="text-gold text-xs tracking-[0.3em] uppercase mb-2">Featured Selection</p>
-          <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground">古巴雪茄焦點推介</h2>
+          <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground">{t("featured_cuban_title")}</h2>
           <p className="mt-3 text-muted-foreground text-sm max-w-md mx-auto leading-relaxed">
-            精選古巴最頂級的雪茄品牌，每一支都是大師級工藝的結晶
+            {t("featured_cuban_desc")}
           </p>
         </div>
 
@@ -48,10 +50,10 @@ export function FeaturedCuban({ products }: FeaturedCubanProps) {
                     {product.price !== null ? (
                       <span className="text-gold font-bold">HK${product.price.toLocaleString()}</span>
                     ) : (
-                      <span className="text-muted-foreground text-sm">價格待定</span>
+                      <span className="text-muted-foreground text-sm">{t("price_tbd")}</span>
                     )}
                     <span className="flex items-center gap-1 text-xs text-foreground/60 group-hover:text-gold transition-colors">
-                      了解更多 <ArrowRight className="size-3" />
+                      {t("view_more")} <ArrowRight className="size-3" />
                     </span>
                   </div>
                 </div>
@@ -65,7 +67,7 @@ export function FeaturedCuban({ products }: FeaturedCubanProps) {
             href="/category/cuban-cigars"
             className="inline-flex items-center gap-2 text-sm text-gold hover:text-gold-light transition-colors tracking-wide"
           >
-            探索全部古巴雪茄 <ArrowRight className="size-4" />
+            {t("browse_all")} <ArrowRight className="size-4" />
           </Link>
         </div>
       </div>

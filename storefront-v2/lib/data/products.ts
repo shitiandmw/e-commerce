@@ -419,9 +419,10 @@ export interface FetchProductsParams {
   offset?: number
   order?: string
   q?: string
+  locale?: string
 }
 
-async function medusaFetch<T>(path: string, params?: Record<string, string | string[]>): Promise<T> {
+async function medusaFetch<T>(path: string, params?: Record<string, string | string[]>, locale?: string): Promise<T> {
   const url = new URL(`${MEDUSA_BACKEND_URL}${path}`)
   if (params) {
     Object.entries(params).forEach(([k, v]) => {
@@ -436,6 +437,9 @@ async function medusaFetch<T>(path: string, params?: Record<string, string | str
   const headers: Record<string, string> = {}
   if (PUBLISHABLE_KEY) {
     headers["x-publishable-api-key"] = PUBLISHABLE_KEY
+  }
+  if (locale) {
+    headers["x-medusa-locale"] = locale
   }
   const res = await fetch(url.toString(), {
     headers,
@@ -470,7 +474,7 @@ export async function fetchProducts(params: FetchProductsParams): Promise<Medusa
   }
 
   try {
-    return await medusaFetch<MedusaProductListResponse>("/store/products", queryParams)
+    return await medusaFetch<MedusaProductListResponse>("/store/products", queryParams, params.locale)
   } catch {
     return { products: [], count: 0, offset: 0, limit: params.limit ?? 20 }
   }
@@ -479,12 +483,12 @@ export async function fetchProducts(params: FetchProductsParams): Promise<Medusa
 /**
  * Fetch a single product by handle from Medusa Store API.
  */
-export async function fetchProduct(handle: string): Promise<MedusaProduct | null> {
+export async function fetchProduct(handle: string, locale?: string): Promise<MedusaProduct | null> {
   try {
     const data = await medusaFetch<StoreProductResponse>("/store/products", {
       handle,
       fields: "id,title,handle,subtitle,description,thumbnail,collection_id,metadata,*variants,*variants.prices,*variants.options,*options,*options.values,*images,*categories,*tags,*brand",
-    })
+    }, locale)
     return data?.products?.[0] ?? null
   } catch {
     return null
@@ -498,6 +502,7 @@ export async function fetchProduct(handle: string): Promise<MedusaProduct | null
 export async function fetchRelatedProducts(
   product: MedusaProduct,
   limit = 4,
+  locale?: string,
 ): Promise<MedusaProduct[]> {
   const fields = "id,title,handle,thumbnail,*variants,*variants.prices"
   const categoryId = product.categories?.[0]?.id
@@ -509,7 +514,7 @@ export async function fetchRelatedProducts(
         category_id: categoryId,
         limit: String(limit + 1),
         fields,
-      })
+      }, locale)
       const results = (data?.products ?? []).filter((p) => p.id !== product.id).slice(0, limit)
       if (results.length > 0) return results
     }
@@ -519,7 +524,7 @@ export async function fetchRelatedProducts(
       limit: String(limit + 1),
       order: "-created_at",
       fields,
-    })
+    }, locale)
     return (data?.products ?? []).filter((p) => p.id !== product.id).slice(0, limit)
   } catch {
     return []

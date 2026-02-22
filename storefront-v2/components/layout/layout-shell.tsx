@@ -18,7 +18,7 @@ export function LayoutShell({
   footerMenu: MenuData | null
 }) {
   const pathname = usePathname()
-  const isCheckout = pathname.startsWith("/checkout")
+  const isCheckout = pathname.includes("/checkout")
   const initCart = useCart((s) => s.initCart)
 
   useEffect(() => {

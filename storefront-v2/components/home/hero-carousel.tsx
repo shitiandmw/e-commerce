@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react"
 import Image from "next/image"
-import Link from "next/link"
+import { Link } from "@/i18n/navigation"
 import useEmblaCarousel from "embla-carousel-react"
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 
 interface BannerSlide {
@@ -21,6 +22,7 @@ interface HeroCarouselProps {
 }
 
 export function HeroCarousel({ slides = [] }: HeroCarouselProps) {
+  const t = useTranslations()
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true })
   const [selectedIndex, setSelectedIndex] = useState(0)
 
@@ -46,7 +48,7 @@ export function HeroCarousel({ slides = [] }: HeroCarouselProps) {
   if (slides.length === 0) return null
 
   return (
-    <section className="relative" aria-label="精選輪播">
+    <section className="relative" aria-label={t("hero_carousel_label")}>
       <div ref={emblaRef} className="overflow-hidden">
         <div className="flex">
           {slides.map((slide, i) => (
@@ -81,7 +83,7 @@ export function HeroCarousel({ slides = [] }: HeroCarouselProps) {
                           href={slide.link_url}
                           className="mt-8 inline-flex items-center gap-2 bg-gold text-primary-foreground px-8 py-3 text-sm font-medium tracking-wide hover:bg-gold-dark transition-colors"
                         >
-                          {slide.cta_text || "了解更多"}
+                          {slide.cta_text || t("hero_learn_more")}
                           <ArrowRight className="size-4" />
                         </Link>
                       )}
@@ -100,14 +102,14 @@ export function HeroCarousel({ slides = [] }: HeroCarouselProps) {
           <button
             onClick={scrollPrev}
             className="absolute left-4 top-1/2 -translate-y-1/2 z-10 size-10 flex items-center justify-center bg-background/30 hover:bg-background/50 text-foreground/70 hover:text-foreground backdrop-blur-sm transition-all"
-            aria-label="上一張"
+            aria-label={t("hero_prev_slide")}
           >
             <ChevronLeft className="size-5" />
           </button>
           <button
             onClick={scrollNext}
             className="absolute right-4 top-1/2 -translate-y-1/2 z-10 size-10 flex items-center justify-center bg-background/30 hover:bg-background/50 text-foreground/70 hover:text-foreground backdrop-blur-sm transition-all"
-            aria-label="下一張"
+            aria-label={t("hero_next_slide")}
           >
             <ChevronRight className="size-5" />
           </button>
@@ -122,7 +124,7 @@ export function HeroCarousel({ slides = [] }: HeroCarouselProps) {
                   "h-0.5 transition-all duration-300",
                   selectedIndex === i ? "w-8 bg-gold" : "w-4 bg-foreground/30"
                 )}
-                aria-label={`前往第 ${i + 1} 張`}
+                aria-label={t("hero_go_to_slide", { num: i + 1 })}
               />
             ))}
           </div>

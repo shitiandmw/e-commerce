@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react"
 import Image from "next/image"
-import Link from "next/link"
+import { Link } from "@/i18n/navigation"
 import { useRouter } from "next/navigation"
 import { Minus, Plus, ShoppingBag, Heart, ChevronRight, Loader2 } from "lucide-react"
 import { type MedusaProduct, type MedusaBrand, getMedusaImages } from "@/lib/data/products"
@@ -14,6 +14,7 @@ import { ProductCard } from "@/components/product/product-card"
 import { SharePopover } from "@/components/product/share-popover"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
+import { useTranslations } from "next-intl"
 
 export function ProductDetailContent({
   product,
@@ -42,6 +43,7 @@ export function ProductDetailContent({
   const [wishlistLoading, setWishlistLoading] = useState(false)
   const [adding, setAdding] = useState(false)
   const [buyingNow, setBuyingNow] = useState(false)
+  const t = useTranslations()
   const router = useRouter()
   const images = getMedusaImages(product)
   const meta = (product.metadata ?? {}) as Record<string, string | undefined>
@@ -126,7 +128,7 @@ export function ProductDetailContent({
       {/* Breadcrumb */}
       <nav className="mx-auto max-w-7xl px-4 py-4 lg:px-6" aria-label="breadcrumb">
         <ol className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <li><Link href="/" className="hover:text-gold transition-colors">首頁</Link></li>
+          <li><Link href="/" className="hover:text-gold transition-colors">{t("home")}</Link></li>
           <li><ChevronRight className="size-3" /></li>
           {categoryHandle && (
             <>
@@ -191,16 +193,16 @@ export function ProductDetailContent({
               <div className="flex items-baseline gap-3">
                 {variantPrice ? (
                   <span className="text-3xl font-bold text-gold">
-                    {!selectedVariant && hasMultipleVariants && <span className="text-lg font-normal text-muted-foreground mr-1">從</span>}
+                    {!selectedVariant && hasMultipleVariants && <span className="text-lg font-normal text-muted-foreground mr-1">{t("from")}</span>}
                     {variantPrice.currency_code === "hkd" ? "HK$" : variantPrice.currency_code.toUpperCase() + " "}
                     {variantPrice.amount.toLocaleString()}
                   </span>
                 ) : (
-                  <span className="text-3xl font-bold text-muted-foreground">價格待定</span>
+                  <span className="text-3xl font-bold text-muted-foreground">{t("price_tbd")}</span>
                 )}
               </div>
               {packSize && (
-                <p className="mt-1.5 text-xs text-muted-foreground">{packSize} 支裝 / 盒</p>
+                <p className="mt-1.5 text-xs text-muted-foreground">{t("pack_unit", { size: packSize })}</p>
               )}
               {/* Stock status */}
               {selectedVariant && (
@@ -208,17 +210,17 @@ export function ProductDetailContent({
                   {isOutOfStock ? (
                     <>
                       <span className="size-1.5 rounded-full bg-destructive" />
-                      <span className="text-xs text-destructive">缺貨</span>
+                      <span className="text-xs text-destructive">{t("out_of_stock")}</span>
                     </>
                   ) : isLowStock ? (
                     <>
                       <span className="size-1.5 rounded-full bg-amber-500" />
-                      <span className="text-xs text-amber-600">僅剩 {inventory} 件</span>
+                      <span className="text-xs text-amber-600">{t("only_x_left", { count: inventory })}</span>
                     </>
                   ) : (
                     <>
                       <span className="size-1.5 rounded-full bg-green-500" />
-                      <span className="text-xs text-muted-foreground">有貨</span>
+                      <span className="text-xs text-muted-foreground">{t("in_stock")}</span>
                     </>
                   )}
                 </div>
@@ -227,7 +229,7 @@ export function ProductDetailContent({
 
             {/* Variant / Option Selection */}
             {hasOptions && (
-              <div className="mt-6 flex flex-col gap-5" role="group" aria-label="商品規格選擇">
+              <div className="mt-6 flex flex-col gap-5" role="group" aria-label={t("option_selection_label")}>
                 {product.options!.map((option) => (
                   <div key={option.id}>
                     <p className="text-sm font-medium text-foreground mb-2.5">
@@ -263,12 +265,12 @@ export function ProductDetailContent({
             {/* Quantity & Add to Cart */}
             <div className="mt-8 flex flex-col gap-4">
               <div className="flex items-center gap-4">
-                <span className="text-sm text-foreground/70">數量</span>
+                <span className="text-sm text-foreground/70">{t("quantity")}</span>
                 <div className="flex items-center border border-border/50">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     className="flex size-10 items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-                    aria-label="減少數量"
+                    aria-label={t("decrease_quantity")}
                   >
                     <Minus className="size-4" />
                   </button>
@@ -276,7 +278,7 @@ export function ProductDetailContent({
                   <button
                     onClick={() => setQuantity(quantity + 1)}
                     className="flex size-10 items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-                    aria-label="增加數量"
+                    aria-label={t("increase_quantity")}
                   >
                     <Plus className="size-4" />
                   </button>
@@ -291,9 +293,9 @@ export function ProductDetailContent({
                     setAdding(true)
                     try {
                       await addItem(selectedVariant.id, quantity)
-                      toast.success("已加入購物車")
+                      toast.success(t("added_to_cart"))
                     } catch (err) {
-                      toast.error(err instanceof Error ? err.message : "加入購物車失敗")
+                      toast.error(err instanceof Error ? err.message : t("add_to_cart_failed"))
                     } finally {
                       setAdding(false)
                     }
@@ -306,7 +308,7 @@ export function ProductDetailContent({
                   )}
                 >
                   {adding ? <Loader2 className="size-4 animate-spin" /> : <ShoppingBag className="size-4" />}
-                  {isOutOfStock ? "缺貨中" : !selectedVariant && hasOptions ? "請選擇規格" : adding ? "加入中..." : "加入購物車"}
+                  {isOutOfStock ? t("out_of_stock_label") : !selectedVariant && hasOptions ? t("select_option") : adding ? t("adding_to_cart") : t("add_to_cart")}
                 </button>
                 <button
                   className={cn(
@@ -315,12 +317,12 @@ export function ProductDetailContent({
                       ? "border-gold text-gold"
                       : "border-border/50 text-muted-foreground hover:text-gold hover:border-gold"
                   )}
-                  aria-label={isFavorited ? "取消收藏" : "加入收藏"}
+                  aria-label={isFavorited ? t("remove_from_wishlist") : t("add_to_wishlist")}
                   aria-pressed={isFavorited}
                   disabled={wishlistLoading}
                   onClick={async () => {
                     if (!isLoggedIn()) {
-                      toast.error("請先登入後再收藏商品")
+                      toast.error(t("login_to_wishlist"))
                       router.push("/login")
                       return
                     }
@@ -328,13 +330,13 @@ export function ProductDetailContent({
                     try {
                       if (isFavorited) {
                         await wishlist.removeByProductId(product.id)
-                        toast.success("已取消收藏")
+                        toast.success(t("removed_from_wishlist"))
                       } else {
                         await wishlist.addItem(product.id)
-                        toast.success("已加入收藏")
+                        toast.success(t("added_to_wishlist"))
                       }
                     } catch {
-                      toast.error("操作失敗，請稍後再試")
+                      toast.error(t("operation_failed_retry"))
                     } finally {
                       setWishlistLoading(false)
                     }
@@ -359,7 +361,7 @@ export function ProductDetailContent({
                     await addItem(selectedVariant.id, quantity)
                     router.push("/checkout")
                   } catch (err) {
-                    toast.error(err instanceof Error ? err.message : "操作失敗")
+                    toast.error(err instanceof Error ? err.message : t("operation_failed"))
                     setBuyingNow(false)
                   }
                 }}
@@ -371,7 +373,7 @@ export function ProductDetailContent({
                 )}
               >
                 {buyingNow ? <Loader2 className="size-4 animate-spin" /> : null}
-                {buyingNow ? "處理中..." : "立即購買"}
+                {buyingNow ? t("processing") : t("buy_now")}
               </button>
             </div>
 
@@ -395,7 +397,7 @@ export function ProductDetailContent({
                 href={brand?.id ? `/brand/${brand.id}` : `/search?brand=${encodeURIComponent(displayBrandName!)}`}
                 className="inline-flex items-center gap-2 border border-gold/50 text-gold px-6 py-2.5 text-sm tracking-wide hover:bg-gold hover:text-primary-foreground transition-all shrink-0"
               >
-                探索更多 {displayBrandName} 雪茄
+                {t("explore_more_brand", { brand: displayBrandName })}
               </Link>
             </div>
           </div>
@@ -411,7 +413,7 @@ export function ProductDetailContent({
                     value="description"
                     className="data-[state=active]:bg-transparent data-[state=active]:text-gold data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-gold rounded-none px-6 py-3 text-sm"
                   >
-                    詳細介紹
+                    {t("tab_description")}
                   </TabsTrigger>
                 )}
                 {tastingNotes && (
@@ -419,7 +421,7 @@ export function ProductDetailContent({
                     value="tasting"
                     className="data-[state=active]:bg-transparent data-[state=active]:text-gold data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-gold rounded-none px-6 py-3 text-sm"
                   >
-                    品鑑筆記
+                    {t("tab_tasting")}
                   </TabsTrigger>
                 )}
                 {pairingNotes && (
@@ -427,7 +429,7 @@ export function ProductDetailContent({
                     value="pairing"
                     className="data-[state=active]:bg-transparent data-[state=active]:text-gold data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-gold rounded-none px-6 py-3 text-sm"
                   >
-                    配對建議
+                    {t("tab_pairing")}
                   </TabsTrigger>
                 )}
               </TabsList>
@@ -438,50 +440,50 @@ export function ProductDetailContent({
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-3 text-sm mb-8 pb-8 border-b border-border/20">
                       {origin && (
                         <div className="flex flex-col gap-1">
-                          <span className="text-muted-foreground">產地</span>
+                          <span className="text-muted-foreground">{t("spec_origin")}</span>
                           <span className="text-foreground font-medium">{origin}</span>
                         </div>
                       )}
                       {wrapper && (
                         <div className="flex flex-col gap-1">
-                          <span className="text-muted-foreground">茄衣</span>
+                          <span className="text-muted-foreground">{t("spec_wrapper")}</span>
                           <span className="text-foreground font-medium">{wrapper}</span>
                         </div>
                       )}
                       {binder && (
                         <div className="flex flex-col gap-1">
-                          <span className="text-muted-foreground">茄套</span>
+                          <span className="text-muted-foreground">{t("spec_binder")}</span>
                           <span className="text-foreground font-medium">{binder}</span>
                         </div>
                       )}
                       {filler && (
                         <div className="flex flex-col gap-1">
-                          <span className="text-muted-foreground">茄芯</span>
+                          <span className="text-muted-foreground">{t("spec_filler")}</span>
                           <span className="text-foreground font-medium">{filler}</span>
                         </div>
                       )}
                       {strength && (
                         <div className="flex flex-col gap-1">
-                          <span className="text-muted-foreground">強度</span>
+                          <span className="text-muted-foreground">{t("spec_strength")}</span>
                           <span className="text-foreground font-medium">{strength}</span>
                         </div>
                       )}
                       {cigarLength && (
                         <div className="flex flex-col gap-1">
-                          <span className="text-muted-foreground">長度</span>
+                          <span className="text-muted-foreground">{t("spec_length")}</span>
                           <span className="text-foreground font-medium">{cigarLength}</span>
                         </div>
                       )}
                       {ringGauge && (
                         <div className="flex flex-col gap-1">
-                          <span className="text-muted-foreground">環徑</span>
+                          <span className="text-muted-foreground">{t("spec_ring_gauge")}</span>
                           <span className="text-foreground font-medium">{ringGauge}</span>
                         </div>
                       )}
                       {packSize && (
                         <div className="flex flex-col gap-1">
-                          <span className="text-muted-foreground">包裝</span>
-                          <span className="text-foreground font-medium">{packSize} 支裝</span>
+                          <span className="text-muted-foreground">{t("spec_packaging")}</span>
+                          <span className="text-foreground font-medium">{t("pack_unit", { size: packSize })}</span>
                         </div>
                       )}
                       {customAttributes.map((attr) => (
@@ -507,9 +509,11 @@ export function ProductDetailContent({
                     <p className="text-sm text-muted-foreground leading-relaxed">{tastingNotes}</p>
                     {strength && (
                       <div className="mt-8">
-                        <p className="text-sm font-medium text-foreground mb-3">強度等級</p>
+                        <p className="text-sm font-medium text-foreground mb-3">{t("strength_level")}</p>
                         <div className="flex gap-1.5">
-                          {(["輕", "中", "中強", "強"] as const).map((level, i) => (
+                          {(["輕", "中", "中強", "強"] as const).map((level, i) => {
+                            const labelKey = { "輕": "strength_mild", "中": "strength_medium", "中強": "strength_medium_full", "強": "strength_full" }[level]
+                            return (
                             <div key={level} className="flex-1 flex flex-col items-center gap-2">
                               <div className={`h-2 w-full ${
                                 (strength === "輕" && i === 0) ||
@@ -519,9 +523,10 @@ export function ProductDetailContent({
                                   ? "bg-gold"
                                   : "bg-border/30"
                               }`} />
-                              <span className="text-[10px] text-muted-foreground">{level}</span>
+                              <span className="text-[10px] text-muted-foreground">{t(labelKey)}</span>
                             </div>
-                          ))}
+                            )
+                          })}
                         </div>
                       </div>
                     )}
@@ -543,7 +548,7 @@ export function ProductDetailContent({
         {/* Related Products */}
         {relatedProducts.length > 0 && (
           <div className="mt-16">
-            <h2 className="text-xl font-serif font-bold text-foreground mb-8">您可能也喜歡</h2>
+            <h2 className="text-xl font-serif font-bold text-foreground mb-8">{t("you_may_also_like")}</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
               {relatedProducts.map((p) => (
                 <ProductCard key={p.id} product={p} />

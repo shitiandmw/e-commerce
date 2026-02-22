@@ -27,10 +27,10 @@ export async function login(email: string, password: string): Promise<string> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   })
-  if (!res.ok) throw new Error("登录失败")
+  if (!res.ok) throw new Error("LOGIN_FAILED")
   const result = await res.json()
   const token = result.token || result
-  if (typeof token !== "string") throw new Error("登录失败")
+  if (typeof token !== "string") throw new Error("LOGIN_FAILED")
   setToken(token)
   return token
 }
@@ -50,13 +50,13 @@ export async function register(data: {
   if (!res.ok) {
     const err = await res.text()
     if (err.includes("exists") || err.includes("already")) {
-      throw new Error("该邮箱已被注册")
+      throw new Error("EMAIL_EXISTS")
     }
-    throw new Error("注册失败")
+    throw new Error("REGISTER_FAILED")
   }
   const result = await res.json()
   const token = result.token || result
-  if (typeof token !== "string") throw new Error("注册失败")
+  if (typeof token !== "string") throw new Error("REGISTER_FAILED")
   setToken(token)
 
   // Step 2: Create customer profile

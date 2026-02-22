@@ -47,27 +47,32 @@
 - [x] Header 购物车计数 + bounce 动画
 - [x] Toast 通知反馈（sonner）
 
-### 第五步：搜索功能 ⬜ 待实现
+### 第五步：搜索功能 ✅ 已完成
 
-- [ ] 搜索页面（`app/search/page.tsx`）
-- [ ] Header 搜索按钮连接
-- [ ] 搜索结果展示 + 分页
+- [x] 搜索页面（`app/[locale]/search/page.tsx`）
+- [x] Header 搜索按钮连接（`/search` 链接 + 搜索图标）
+- [x] 搜索结果展示 + 分页（ProductCard 网格 + 上一页/下一页/页码）
+- [x] 多语言支持（`useTranslations()`）
 
-### 第六步：Stripe 支付与结账 ⬜ 待实现
+### 第六步：Stripe 支付与结账 ⚠️ 部分实现
 
-- [ ] 集成 Stripe React SDK
-- [ ] 结账页面对接 Medusa 支付会话
+- [ ] 集成 Stripe React SDK（`@stripe/react-stripe-js` 和 `@stripe/stripe-js` 尚未安装）
+- [x] 结账页面 UI 框架（三步流程：联系信息 → 配送方式 → 支付方式）
+- [x] 支付会话 API 路由（`app/api/cart/[cartId]/payment-sessions/route.ts`）
+- [x] 订单完成 API 路由（`app/api/cart/[cartId]/complete/route.ts`）
+- [ ] 结账页面对接 Stripe Payment Element（当前为纯 HTML 表单，无实际支付处理）
 - [ ] Stripe webhook 路由
-- [ ] 订单确认/成功/失败页面
+- [x] 订单确认/成功页面（`app/[locale]/checkout/success/page.tsx`）
 
-### 第七步：i18n 多语言路由 ⬜ 待实现
+### 第七步：i18n 多语言路由 ✅ 已完成
 
-所有功能稳定后，最后加入多语言支持。
-
-- [ ] `[locale]` 动态路由，所有页面迁入 `app/[locale]/`
-- [ ] 移植 middleware.ts（语言检测）
-- [ ] 移植翻译文件（zh-CN、zh-TW、en）
-- [ ] 更新所有页面内链接
+- [x] `[locale]` 动态路由，所有页面已迁入 `app/[locale]/`
+- [x] 移植 middleware.ts（`next-intl/middleware`，语言检测 + 路由重写）
+- [x] i18n 配置（`i18n/routing.ts`、`i18n/request.ts`、`i18n/navigation.ts`）
+- [x] 翻译文件（`messages/zh-CN.json`、`messages/zh-TW.json`、`messages/en.json`）
+- [x] 安装 `next-intl@4.8.3`
+- [x] 支持语言：zh-TW（默认）、zh-CN、en
+- [x] 更新所有页面内链接
 
 ## 残留 mock 数据清理
 
@@ -88,10 +93,10 @@ lib/proxy.ts           → lib/proxy.ts           # 认证代理 ✅
 lib/api.ts             → lib/api.ts             # API 工具 ✅
 lib/cart.ts            → lib/cart.ts            # 购物车 API 工具库 ✅
 lib/auth.ts            → lib/auth.ts            # 认证逻辑 ✅
-lib/i18n.ts            → lib/i18n.ts            # 国际化（待实现）
-lib/useLocale.ts       → hooks/useLocale.ts     # 语言 hook（待实现）
-middleware.ts          → middleware.ts           # 语言路由中间件（待实现）
-locales/*              → locales/*              # 翻译文件（待实现）
+lib/i18n.ts            → i18n/routing.ts + i18n/request.ts + i18n/navigation.ts  # 国际化 ✅
+lib/useLocale.ts       → （由 next-intl 内置 hook 替代）                          # 语言 hook ✅
+middleware.ts          → middleware.ts           # 语言路由中间件 ✅
+locales/*              → messages/*             # 翻译文件（zh-TW, zh-CN, en）✅
 app/api/cart/*         → app/api/cart/*         # 购物车代理路由 ✅
 app/api/auth/*         → app/api/auth/*         # 认证代理路由 ✅
 app/api/account/*      → app/api/account/*      # 账户代理路由 ✅

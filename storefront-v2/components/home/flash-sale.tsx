@@ -1,15 +1,17 @@
 "use client"
 
 import Image from "next/image"
-import Link from "next/link"
+import { Link } from "@/i18n/navigation"
 import { ShoppingBag, Flame } from "lucide-react"
 import type { CollectionProductWithPrice } from "@/lib/data/collections"
+import { useTranslations } from "next-intl"
 
 interface HotPicksProps {
   products: CollectionProductWithPrice[]
 }
 
 export function HotPicks({ products }: HotPicksProps) {
+  const t = useTranslations()
   if (products.length === 0) return null
 
   return (
@@ -19,13 +21,13 @@ export function HotPicks({ products }: HotPicksProps) {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
           <div>
             <p className="text-gold text-xs tracking-[0.3em] uppercase mb-2">Hot Picks</p>
-            <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground text-balance">炙热单品</h2>
+            <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground text-balance">{t("flash_sale")}</h2>
           </div>
           <Link
             href="/category/cuban-cigars"
             className="text-xs text-muted-foreground hover:text-gold transition-colors tracking-wide"
           >
-            查看更多 &rarr;
+            {t("view_more")} &rarr;
           </Link>
         </div>
 
@@ -60,7 +62,7 @@ export function HotPicks({ products }: HotPicksProps) {
                     className="w-full flex items-center justify-center gap-2 bg-gold/90 text-primary-foreground py-3 text-xs font-medium tracking-wide hover:bg-gold transition-colors"
                   >
                     <ShoppingBag className="size-3.5" />
-                    查看詳情
+                    {t("product_details")}
                   </span>
                 </div>
               </div>
@@ -70,7 +72,7 @@ export function HotPicks({ products }: HotPicksProps) {
                   {product.price !== null ? (
                     <span className="text-gold font-bold text-base">HK${product.price.toLocaleString()}</span>
                   ) : (
-                    <span className="text-muted-foreground text-sm">價格待定</span>
+                    <span className="text-muted-foreground text-sm">{t("price_tbd")}</span>
                   )}
                 </div>
               </div>

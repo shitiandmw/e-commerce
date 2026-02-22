@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useRef, useCallback, useEffect } from "react"
-import Link from "next/link"
+import { Link, useRouter, usePathname } from "@/i18n/navigation"
+import { useLocale } from "next-intl"
 import Image from "next/image"
 import { Search, User, ShoppingBag, Menu, ChevronDown, ChevronRight, Globe, Check, LogIn } from "lucide-react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
@@ -31,8 +32,8 @@ function BrandLogo({ brand, size = "sm" }: { brand: MenuBrand; size?: "sm" | "md
 
 /* ─── language options ─── */
 const languages = [
-  { code: "zh-Hant", label: "繁體中文", short: "繁中" },
-  { code: "zh-Hans", label: "简体中文", short: "简中" },
+  { code: "zh-TW", label: "繁體中文", short: "繁中" },
+  { code: "zh-CN", label: "简体中文", short: "简中" },
   { code: "en", label: "English", short: "EN" },
 ]
 
@@ -220,9 +221,16 @@ function MobileNavSection({ item, onNavigate }: { item: MenuItem; onNavigate: ()
 /* ─── language switcher dropdown ─── */
 function LanguageSwitcher() {
   const [open, setOpen] = useState(false)
-  const [lang, setLang] = useState("zh-Hant")
+  const locale = useLocale()
+  const router = useRouter()
+  const pathname = usePathname()
   const closeRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const current = languages.find((l) => l.code === lang)!
+  const current = languages.find((l) => l.code === locale) || languages[0]
+
+  const switchLocale = (code: string) => {
+    router.replace(pathname, { locale: code })
+    setOpen(false)
+  }
 
   return (
     <div
@@ -248,17 +256,45 @@ function LanguageSwitcher() {
         {languages.map((l) => (
           <button
             key={l.code}
-            onClick={() => { setLang(l.code); setOpen(false) }}
+            onClick={() => switchLocale(l.code)}
             className={cn(
               "w-full flex items-center justify-between px-3 py-2 text-xs transition-colors",
-              l.code === lang ? "text-gold" : "text-foreground/60 hover:text-gold hover:bg-secondary/40"
+              l.code === locale ? "text-gold" : "text-foreground/60 hover:text-gold hover:bg-secondary/40"
             )}
           >
             <span>{l.label}</span>
-            {l.code === lang && <Check className="size-3 text-gold" />}
+            {l.code === locale && <Check className="size-3 text-gold" />}
           </button>
         ))}
       </div>
+    </div>
+  )
+}
+
+/* ─── mobile language switcher ─── */
+function MobileLanguageSwitcher({ onNavigate }: { onNavigate: () => void }) {
+  const locale = useLocale()
+  const router = useRouter()
+  const pathname = usePathname()
+
+  const switchLocale = (code: string) => {
+    router.replace(pathname, { locale: code })
+    onNavigate()
+  }
+
+  return (
+    <div className="mt-4 pt-4 border-t border-border/30">
+      <p className="px-3 pb-2 text-[10px] text-gold/50 uppercase tracking-widest">語言</p>
+      {languages.map((l) => (
+        <button
+          key={l.code}
+          onClick={() => switchLocale(l.code)}
+          className="flex w-full items-center justify-between px-3 py-2 text-sm text-foreground/70 hover:text-gold transition-colors"
+        >
+          <span>{l.label}</span>
+          {l.code === locale && <Check className="size-3.5 text-gold" />}
+        </button>
+      ))}
     </div>
   )
 }
@@ -325,15 +361,7 @@ export function SiteHeader({ navItems }: { navItems: MenuItem[] }) {
                     <MobileNavSection key={item.id} item={item} onNavigate={() => setMobileOpen(false)} />
                   ))}
                   {/* mobile language */}
-                  <div className="mt-4 pt-4 border-t border-border/30">
-                    <p className="px-3 pb-2 text-[10px] text-gold/50 uppercase tracking-widest">語言</p>
-                    {languages.map((l) => (
-                      <button key={l.code} className="flex w-full items-center justify-between px-3 py-2 text-sm text-foreground/70 hover:text-gold transition-colors">
-                        <span>{l.label}</span>
-                        {l.code === "zh-Hant" && <Check className="size-3.5 text-gold" />}
-                      </button>
-                    ))}
-                  </div>
+                  <MobileLanguageSwitcher onNavigate={() => setMobileOpen(false)} />
                 </nav>
               </SheetContent>
             </Sheet>

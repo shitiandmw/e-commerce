@@ -1,13 +1,15 @@
 import Image from "next/image"
-import Link from "next/link"
+import { Link } from "@/i18n/navigation"
 import { ArrowRight } from "lucide-react"
 import type { CollectionProductWithPrice } from "@/lib/data/collections"
+import { getTranslations } from "next-intl/server"
 
 interface LimitedEditionsProps {
   products: CollectionProductWithPrice[]
 }
 
-export function LimitedEditions({ products }: LimitedEditionsProps) {
+export async function LimitedEditions({ products }: LimitedEditionsProps) {
+  const t = await getTranslations()
   if (products.length === 0) return null
 
   return (
@@ -18,16 +20,16 @@ export function LimitedEditions({ products }: LimitedEditionsProps) {
           <div>
             <p className="text-gold text-xs tracking-[0.3em] uppercase mb-2">Limited Edition</p>
             <h2 className="text-2xl md:text-4xl font-serif font-bold text-foreground leading-tight text-balance">
-              限量珍藏版
+              {t("limited_editions")}
             </h2>
             <p className="mt-4 text-muted-foreground leading-relaxed max-w-md">
-              每年僅生產極少數量的珍藏版雪茄，融合了品牌最頂尖的製茄工藝與最珍貴的陳年菸葉。一經售罄，便不再重現。
+              {t("limited_editions_desc")}
             </p>
             <Link
               href="/category/cuban-cigars"
               className="mt-8 inline-flex items-center gap-2 border border-gold text-gold px-8 py-3 text-sm font-medium tracking-wide hover:bg-gold hover:text-primary-foreground transition-all"
             >
-              探索限量版 <ArrowRight className="size-4" />
+              {t("view_more")} <ArrowRight className="size-4" />
             </Link>
           </div>
 
@@ -61,7 +63,7 @@ export function LimitedEditions({ products }: LimitedEditionsProps) {
                     {product.price !== null ? (
                       <p className="mt-2 text-gold font-bold text-sm">HK${product.price.toLocaleString()}</p>
                     ) : (
-                      <p className="mt-2 text-muted-foreground text-xs">價格待定</p>
+                      <p className="mt-2 text-muted-foreground text-xs">{t("price_tbd")}</p>
                     )}
                   </div>
                 </div>

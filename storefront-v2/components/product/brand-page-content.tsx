@@ -2,19 +2,13 @@
 
 import { useState, useMemo } from "react"
 import Image from "next/image"
-import Link from "next/link"
+import { Link } from "@/i18n/navigation"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Grid3X3, LayoutList, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react"
 import { type MedusaProduct, type MedusaBrand, getMedusaPrice } from "@/lib/data/products"
 import { ProductCard } from "@/components/product/product-card"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-
-const sortOptions = [
-  { value: "recommended", label: "推薦排序" },
-  { value: "price-asc", label: "價格：低至高" },
-  { value: "price-desc", label: "價格：高至低" },
-  { value: "name", label: "名稱 A-Z" },
-]
 
 interface BrandPageContentProps {
   brand: MedusaBrand
@@ -35,7 +29,15 @@ export function BrandPageContent({
 }: BrandPageContentProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations()
   const [gridCols, setGridCols] = useState<3 | 2>(3)
+
+  const sortOptions = [
+    { value: "recommended", label: t("sort_recommended") },
+    { value: "price-asc", label: t("sort_price_asc") },
+    { value: "price-desc", label: t("sort_price_desc") },
+    { value: "name", label: t("sort_name") },
+  ]
 
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
 
@@ -97,7 +99,7 @@ export function BrandPageContent({
         <div className="flex-1 min-w-0">
           {/* Toolbar */}
           <div className="flex items-center justify-between mb-6 pb-4 border-b border-border/30">
-            <span className="text-xs text-muted-foreground">共 {totalCount} 款產品</span>
+            <span className="text-xs text-muted-foreground">{t("total_products", { count: totalCount })}</span>
             <div className="flex items-center gap-3">
               <div className="relative">
                 <select
@@ -115,14 +117,14 @@ export function BrandPageContent({
                 <button
                   onClick={() => setGridCols(3)}
                   className={cn("p-1 transition-colors", gridCols === 3 ? "text-gold" : "text-muted-foreground")}
-                  aria-label="三列佈局"
+                  aria-label={t("grid_3_col")}
                 >
                   <Grid3X3 className="size-4" />
                 </button>
                 <button
                   onClick={() => setGridCols(2)}
                   className={cn("p-1 transition-colors", gridCols === 2 ? "text-gold" : "text-muted-foreground")}
-                  aria-label="兩列佈局"
+                  aria-label={t("grid_2_col")}
                 >
                   <LayoutList className="size-4" />
                 </button>
@@ -141,7 +143,7 @@ export function BrandPageContent({
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <p className="text-muted-foreground">暫無產品</p>
+              <p className="text-muted-foreground">{t("no_products")}</p>
             </div>
           )}
 

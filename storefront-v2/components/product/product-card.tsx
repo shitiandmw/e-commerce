@@ -2,10 +2,11 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import Link from "next/link"
+import { Link } from "@/i18n/navigation"
 import { ShoppingBag, Heart, Loader2 } from "lucide-react"
 import { type Product, type MedusaProduct, getMedusaPrice } from "@/lib/data/products"
 import { useCart } from "@/lib/cart-store"
+import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 
 function isMedusaProduct(p: Product | MedusaProduct): p is MedusaProduct {
@@ -29,6 +30,7 @@ function MedusaProductCard({
   product: MedusaProduct
   addItem: (variantId: string, qty?: number) => Promise<void>
 }) {
+  const t = useTranslations()
   const [adding, setAdding] = useState(false)
   const priceInfo = getMedusaPrice(product)
   const meta = (product.metadata ?? {}) as Record<string, string | undefined>
@@ -44,9 +46,9 @@ function MedusaProductCard({
     setAdding(true)
     try {
       await addItem(firstVariantId)
-      toast.success("已加入購物車")
+      toast.success(t("added_to_cart"))
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "加入購物車失敗")
+      toast.error(err instanceof Error ? err.message : t("add_to_cart_failed"))
     } finally {
       setAdding(false)
     }
@@ -73,7 +75,7 @@ function MedusaProductCard({
         )}
         <button
           className="absolute top-3 right-3 size-8 flex items-center justify-center bg-background/50 backdrop-blur-sm text-foreground/50 hover:text-gold opacity-0 group-hover:opacity-100 transition-all"
-          aria-label="加入收藏"
+          aria-label={t("add_to_wishlist")}
           onClick={(e) => e.preventDefault()}
         >
           <Heart className="size-4" />
@@ -86,7 +88,7 @@ function MedusaProductCard({
               disabled={adding}
             >
               {adding ? <Loader2 className="size-3.5 animate-spin" /> : <ShoppingBag className="size-3.5" />}
-              {adding ? "加入中..." : "加入購物車"}
+              {adding ? t("adding_to_cart") : t("add_to_cart")}
             </button>
           </div>
         )}
@@ -108,7 +110,7 @@ function MedusaProductCard({
               {priceInfo.amount.toLocaleString()}
             </span>
           ) : (
-            <span className="text-muted-foreground font-bold">價格待定</span>
+            <span className="text-muted-foreground font-bold">{t("price_tbd")}</span>
           )}
         </div>
       </div>
@@ -147,7 +149,7 @@ function MockProductCard({
         </div>
         <button
           className="absolute top-3 right-3 size-8 flex items-center justify-center bg-background/50 backdrop-blur-sm text-foreground/50 hover:text-gold opacity-0 group-hover:opacity-100 transition-all"
-          aria-label="加入收藏"
+          aria-label="Wishlist"
           onClick={(e) => e.preventDefault()}
         >
           <Heart className="size-4" />
@@ -161,11 +163,11 @@ function MockProductCard({
         <p className="mt-0.5 text-xs text-muted-foreground">{product.nameEn}</p>
         <div className="mt-3 flex items-center justify-between">
           <span className="text-gold font-bold">HK${product.price.toLocaleString()}</span>
-          <span className="text-[10px] text-muted-foreground/60">{product.packSize} 支裝</span>
+          <span className="text-[10px] text-muted-foreground/60">{product.packSize}</span>
         </div>
         <div className="mt-2 flex items-center gap-2">
           <span className={`size-1.5 rounded-full ${product.inStock ? "bg-green-500" : "bg-destructive"}`} />
-          <span className="text-[10px] text-muted-foreground">{product.inStock ? "有貨" : "缺貨"}</span>
+          <span className="text-[10px] text-muted-foreground">{product.inStock ? "✓" : "✗"}</span>
         </div>
       </div>
     </Link>

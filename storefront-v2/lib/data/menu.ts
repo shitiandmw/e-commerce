@@ -36,22 +36,22 @@ interface MenuApiResponse {
 
 /* ─── fetch ─── */
 
-export async function getMenuByKey(key: string): Promise<MenuData | null> {
+export async function getMenuByKey(key: string, locale?: string): Promise<MenuData | null> {
   try {
     const data = await fetchContent<MenuApiResponse>("/store/content/menus", {
       key,
-    })
+    }, locale)
     return data?.menus?.[0] ?? null
   } catch {
     return null
   }
 }
 
-export async function getMainNav(): Promise<MenuItem[]> {
-  const menu = await getMenuByKey("main-nav")
+export async function getMainNav(locale?: string): Promise<MenuItem[]> {
+  const menu = await getMenuByKey("main-nav", locale)
   return menu?.items ?? []
 }
 
-export async function getFooterMenu(): Promise<MenuData | null> {
-  return getMenuByKey("footer")
+export async function getFooterMenu(locale?: string): Promise<MenuData | null> {
+  return getMenuByKey("footer", locale)
 }

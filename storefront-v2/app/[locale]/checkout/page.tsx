@@ -1,0 +1,502 @@
+"use client"
+
+import { useState } from "react"
+import Image from "next/image"
+import { Link, useRouter } from "@/i18n/navigation"
+import {
+  ChevronLeft,
+  ChevronDown,
+  Lock,
+  CreditCard,
+  Truck,
+  Shield,
+  CheckCircle2,
+} from "lucide-react"
+import { useCart, selectTotalItems, selectTotalPrice, getCartProductName, getCartProductImage } from "@/lib/cart-store"
+import { cn } from "@/lib/utils"
+import { useTranslations } from "next-intl"
+
+/* ─── step definitions ─── */
+type Step = "info" | "shipping" | "payment"
+const steps: { key: Step; labelKey: string; num: number }[] = [
+  { key: "info", labelKey: "checkout_contact_title", num: 1 },
+  { key: "shipping", labelKey: "checkout_shipping_method", num: 2 },
+  { key: "payment", labelKey: "checkout_payment_method", num: 3 },
+]
+
+/* ─── shared input ─── */
+function FormInput({
+  label,
+  id,
+  type = "text",
+  placeholder,
+  required = false,
+  half = false,
+}: {
+  label: string
+  id: string
+  type?: string
+  placeholder?: string
+  required?: boolean
+  half?: boolean
+}) {
+  return (
+    <div className={half ? "flex-1 min-w-0" : ""}>
+      <label htmlFor={id} className="block text-xs text-foreground/70 mb-1.5">
+        {label}
+        {required && <span className="text-gold ml-0.5">*</span>}
+      </label>
+      <input
+        id={id}
+        type={type}
+        placeholder={placeholder}
+        required={required}
+        className="w-full h-10 bg-background border border-border/50 rounded-sm px-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-gold/50 transition-colors"
+      />
+    </div>
+  )
+}
+
+/* ─── step indicator ─── */
+function StepIndicator({ current, t }: { current: Step; t: (key: string) => string }) {
+  return (
+    <div className="flex items-center gap-2 mb-8">
+      {steps.map((s, i) => {
+        const isActive = s.key === current
+        const isDone = steps.findIndex((x) => x.key === current) > i
+        return (
+          <div key={s.key} className="flex items-center gap-2">
+            {i > 0 && (
+              <div className={cn("w-8 h-px", isDone ? "bg-gold" : "bg-border/50")} />
+            )}
+            <div className="flex items-center gap-2">
+              <span
+                className={cn(
+                  "size-6 flex items-center justify-center rounded-full text-[10px] font-bold transition-colors",
+                  isActive
+                    ? "bg-gold text-primary-foreground"
+                    : isDone
+                      ? "bg-gold/20 text-gold"
+                      : "bg-secondary text-muted-foreground"
+                )}
+              >
+                {isDone ? <CheckCircle2 className="size-3.5" /> : s.num}
+              </span>
+              <span
+                className={cn(
+                  "text-xs hidden sm:block transition-colors",
+                  isActive ? "text-gold" : isDone ? "text-foreground/50" : "text-muted-foreground/50"
+                )}
+              >
+                {t(s.labelKey)}
+              </span>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+/* ═══════════════ CHECKOUT PAGE ═══════════════ */
+export default function CheckoutPage() {
+  const router = useRouter()
+  const { cart, clear } = useCart()
+  const items = cart?.items ?? []
+  const [step, setStep] = useState<Step>("info")
+  const [shippingMethod, setShippingMethod] = useState("standard")
+  const [paymentMethod, setPaymentMethod] = useState("card")
+  const [showOrderSummary, setShowOrderSummary] = useState(false)
+
+  const t = useTranslations()
+
+  const shippingMethods = [
+    { id: "standard", label: t("checkout_standard_shipping"), desc: t("checkout_standard_desc"), price: 120, priceLabel: "HK$120" },
+    { id: "express", label: t("checkout_express_shipping"), desc: t("checkout_express_desc"), price: 280, priceLabel: "HK$280" },
+    { id: "free", label: t("checkout_free_shipping"), desc: t("checkout_free_desc"), price: 0, priceLabel: t("checkout_free_label"), condition: 2000 },
+  ]
+  const paymentMethods = [
+    { id: "card", label: t("checkout_credit_card"), icon: CreditCard },
+    { id: "paypal", label: "PayPal", icon: Shield },
+    { id: "bank", label: t("checkout_bank_transfer"), icon: Lock },
+  ]
+
+  const subtotal = cart?.item_total ?? 0
+  const selectedShipping = shippingMethods.find((m) => m.id === shippingMethod)
+  const shippingCost =
+    shippingMethod === "free" && subtotal >= 200000
+      ? 0
+      : selectedShipping?.price ?? 120
+  const total = subtotal + shippingCost
+  const itemCount = items.reduce((s, i) => s + i.quantity, 0)
+
+  if (items.length === 0) {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-24 text-center">
+        <h1 className="text-xl font-serif text-foreground mb-4">{t("checkout_empty_cart")}</h1>
+        <p className="text-sm text-muted-foreground mb-6">
+          {t("checkout_empty_cart_desc")}
+        </p>
+        <Link
+          href="/category/cuban-cigars"
+          className="inline-flex items-center gap-2 bg-gold text-primary-foreground px-6 py-3 text-sm font-medium hover:bg-gold-light transition-colors"
+        >
+          {t("explore_cigars")}
+        </Link>
+      </div>
+    )
+  }
+
+  const handleSubmit = () => {
+    if (step === "info") {
+      setStep("shipping")
+    } else if (step === "shipping") {
+      setStep("payment")
+    } else {
+      clear()
+      router.push("/checkout/success")
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* checkout header */}
+      <div className="border-b border-border/30 bg-card">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 lg:px-6">
+          <Link
+            href="/cart"
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-gold transition-colors"
+          >
+            <ChevronLeft className="size-4" />
+            {t("checkout_back_to_cart")}
+          </Link>
+          <Link href="/" className="text-lg font-serif font-bold tracking-[0.15em] text-gold">
+            TIMECIGAR
+          </Link>
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Lock className="size-3.5 text-gold/60" />
+            <span className="hidden sm:inline">{t("checkout_secure")}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-6xl px-4 py-8 lg:py-12 lg:px-6">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+          {/* left: form area */}
+          <div className="flex-1 min-w-0">
+            <StepIndicator current={step} t={t} />
+
+            {/* ── step 1: info ── */}
+            {step === "info" && (
+              <div>
+                <h2 className="text-lg font-serif text-foreground mb-6">{t("checkout_contact_title")}</h2>
+
+                {/* contact */}
+                <div className="mb-8">
+                  <h3 className="text-xs text-gold uppercase tracking-widest mb-4">{t("checkout_contact_method")}</h3>
+                  <div className="flex flex-col gap-4">
+                    <FormInput label={t("checkout_email_label")} id="email" type="email" placeholder="your@email.com" required />
+                    <FormInput label={t("checkout_phone_label")} id="phone" type="tel" placeholder="+852 xxxx xxxx" required />
+                  </div>
+                </div>
+
+                {/* shipping address */}
+                <div>
+                  <h3 className="text-xs text-gold uppercase tracking-widest mb-4">{t("checkout_shipping_address")}</h3>
+                  <div className="flex flex-col gap-4">
+                    <div className="flex gap-4">
+                      <FormInput label={t("checkout_first_name")} id="first-name" placeholder={t("checkout_first_name")} required half />
+                      <FormInput label={t("checkout_last_name")} id="last-name" placeholder={t("checkout_last_name")} required half />
+                    </div>
+                    <FormInput label={t("checkout_address_line1")} id="address1" placeholder={t("street_address")} required />
+                    <FormInput label={t("checkout_address_line2")} id="address2" placeholder={t("checkout_address_line2_placeholder")} />
+                    <div className="flex gap-4">
+                      <FormInput label={t("checkout_city")} id="city" placeholder={t("checkout_city")} required half />
+                      <FormInput label={t("checkout_postal_code")} id="zip" placeholder="000000" half />
+                    </div>
+                    <div>
+                      <label htmlFor="country" className="block text-xs text-foreground/70 mb-1.5">
+                        {t("checkout_country")}<span className="text-gold ml-0.5">*</span>
+                      </label>
+                      <select
+                        id="country"
+                        className="w-full h-10 bg-background border border-border/50 rounded-sm px-3 text-sm text-foreground focus:outline-none focus:border-gold/50 transition-colors appearance-none"
+                        defaultValue="HK"
+                      >
+                        <option value="HK">{t("checkout_country_hk")}</option>
+                        <option value="MO">{t("checkout_country_mo")}</option>
+                        <option value="TW">{t("checkout_country_tw")}</option>
+                        <option value="SG">{t("checkout_country_sg")}</option>
+                        <option value="MY">{t("checkout_country_my")}</option>
+                        <option value="CN">{t("checkout_country_cn")}</option>
+                        <option value="JP">{t("checkout_country_jp")}</option>
+                        <option value="US">{t("checkout_country_us")}</option>
+                        <option value="UK">{t("checkout_country_uk")}</option>
+                        <option value="OTHER">{t("checkout_country_other")}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── step 2: shipping ── */}
+            {step === "shipping" && (
+              <div>
+                <h2 className="text-lg font-serif text-foreground mb-6">{t("checkout_shipping_method")}</h2>
+                <div className="flex flex-col gap-3">
+                  {shippingMethods.map((m) => {
+                    const isDisabled = m.condition !== undefined && subtotal < m.condition
+                    return (
+                      <button
+                        key={m.id}
+                        onClick={() => !isDisabled && setShippingMethod(m.id)}
+                        disabled={isDisabled}
+                        className={cn(
+                          "flex items-center justify-between p-4 border transition-colors text-left",
+                          shippingMethod === m.id
+                            ? "border-gold/50 bg-gold/5"
+                            : isDisabled
+                              ? "border-border/20 opacity-40 cursor-not-allowed"
+                              : "border-border/30 hover:border-gold/30"
+                        )}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={cn(
+                              "size-4 rounded-full border-2 flex items-center justify-center",
+                              shippingMethod === m.id ? "border-gold" : "border-border/50"
+                            )}
+                          >
+                            {shippingMethod === m.id && <div className="size-2 rounded-full bg-gold" />}
+                          </div>
+                          <div>
+                            <p className="text-sm text-foreground">{m.label}</p>
+                            <p className="text-[11px] text-muted-foreground mt-0.5">{m.desc}</p>
+                          </div>
+                        </div>
+                        <span className={cn("text-sm font-medium", m.price === 0 ? "text-gold" : "text-foreground")}>
+                          {m.priceLabel}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+
+                <div className="mt-8 p-4 bg-secondary/30 border border-border/20 flex items-start gap-3">
+                  <Truck className="size-4 text-gold/60 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-xs text-foreground/70">{t("checkout_shipping_note_title")}</p>
+                    <p className="text-[11px] text-muted-foreground mt-1">
+                      {t("checkout_shipping_note_desc")}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── step 3: payment ── */}
+            {step === "payment" && (
+              <div>
+                <h2 className="text-lg font-serif text-foreground mb-6">{t("checkout_payment_method")}</h2>
+
+                {/* method selector */}
+                <div className="flex flex-col gap-3 mb-8">
+                  {paymentMethods.map((m) => {
+                    const Icon = m.icon
+                    return (
+                      <button
+                        key={m.id}
+                        onClick={() => setPaymentMethod(m.id)}
+                        className={cn(
+                          "flex items-center gap-3 p-4 border transition-colors text-left",
+                          paymentMethod === m.id
+                            ? "border-gold/50 bg-gold/5"
+                            : "border-border/30 hover:border-gold/30"
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            "size-4 rounded-full border-2 flex items-center justify-center",
+                            paymentMethod === m.id ? "border-gold" : "border-border/50"
+                          )}
+                        >
+                          {paymentMethod === m.id && <div className="size-2 rounded-full bg-gold" />}
+                        </div>
+                        <Icon className="size-4 text-muted-foreground" />
+                        <span className="text-sm text-foreground">{m.label}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+
+                {/* card form */}
+                {paymentMethod === "card" && (
+                  <div className="border border-border/30 p-5">
+                    <div className="flex items-center gap-2 mb-5">
+                      <CreditCard className="size-4 text-gold/60" />
+                      <span className="text-xs text-foreground/70">{t("checkout_card_details")}</span>
+                    </div>
+                    <div className="flex flex-col gap-4">
+                      <FormInput label={t("checkout_cardholder")} id="card-name" placeholder={t("checkout_cardholder")} required />
+                      <FormInput label={t("checkout_card_number")} id="card-number" placeholder="xxxx xxxx xxxx xxxx" required />
+                      <div className="flex gap-4">
+                        <FormInput label={t("checkout_expiry")} id="card-expiry" placeholder="MM / YY" required half />
+                        <FormInput label={t("checkout_cvc")} id="card-cvc" placeholder="CVC" required half />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {paymentMethod === "paypal" && (
+                  <div className="border border-border/30 p-8 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      {t("checkout_paypal_redirect")}
+                    </p>
+                  </div>
+                )}
+
+                {paymentMethod === "bank" && (
+                  <div className="border border-border/30 p-5">
+                    <p className="text-xs text-muted-foreground mb-3">{t("checkout_bank_info")}</p>
+                    <div className="flex flex-col gap-2 text-xs">
+                      <div className="flex justify-between py-1.5 border-b border-border/20">
+                        <span className="text-muted-foreground">{t("checkout_bank_name")}</span>
+                        <span className="text-foreground">HSBC</span>
+                      </div>
+                      <div className="flex justify-between py-1.5 border-b border-border/20">
+                        <span className="text-muted-foreground">{t("checkout_account_name")}</span>
+                        <span className="text-foreground">TimeCigar Limited</span>
+                      </div>
+                      <div className="flex justify-between py-1.5">
+                        <span className="text-muted-foreground">{t("checkout_account_number")}</span>
+                        <span className="text-foreground font-mono">xxx-xxxxxx-xxx</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* terms */}
+                <label className="flex items-start gap-3 mt-6 cursor-pointer">
+                  <input type="checkbox" className="mt-0.5 accent-[#c8a96e]" />
+                  <span className="text-xs text-muted-foreground leading-relaxed">
+                    {t("checkout_terms_agree")}
+                    <Link href="/terms" className="text-gold hover:underline mx-0.5">{t("checkout_terms")}</Link>
+                    {t("checkout_and")}
+                    <Link href="/privacy" className="text-gold hover:underline mx-0.5">{t("checkout_privacy")}</Link>
+                    。
+                  </span>
+                </label>
+              </div>
+            )}
+
+            {/* navigation buttons */}
+            <div className="flex items-center justify-between mt-8 pt-6 border-t border-border/20">
+              {step !== "info" ? (
+                <button
+                  onClick={() => setStep(step === "payment" ? "shipping" : "info")}
+                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-gold transition-colors"
+                >
+                  <ChevronLeft className="size-4" />
+                  {t("checkout_prev_step")}
+                </button>
+              ) : (
+                <Link
+                  href="/cart"
+                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-gold transition-colors"
+                >
+                  <ChevronLeft className="size-4" />
+                  {t("checkout_back_to_cart")}
+                </Link>
+              )}
+
+              <button
+                onClick={handleSubmit}
+                className="flex items-center gap-2 bg-gold text-primary-foreground px-8 py-3 text-sm font-medium tracking-wide hover:bg-gold-light transition-colors"
+              >
+                {step === "payment" ? (
+                  <>
+                    <Lock className="size-3.5" />
+                    {t("checkout_confirm_payment", { total: total.toLocaleString() })}
+                  </>
+                ) : (
+                  t("checkout_continue")
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* right: order summary sidebar */}
+          <div className="lg:w-[360px] shrink-0">
+            {/* mobile toggle */}
+            <button
+              onClick={() => setShowOrderSummary(!showOrderSummary)}
+              className="lg:hidden flex items-center justify-between w-full p-4 bg-card border border-border/30 mb-4"
+            >
+              <span className="text-sm text-foreground">{t("checkout_order_summary", { count: itemCount })}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-gold">HK${total.toLocaleString()}</span>
+                <ChevronDown className={cn("size-4 text-muted-foreground transition-transform", showOrderSummary && "rotate-180")} />
+              </div>
+            </button>
+
+            <div className={cn("lg:block", showOrderSummary ? "block" : "hidden")}>
+              <div className="sticky top-20 bg-card border border-border/30 p-5">
+                <h3 className="text-sm font-medium text-foreground mb-4 tracking-wide">{t("checkout_order_content")}</h3>
+
+                {/* items */}
+                <div className="flex flex-col gap-4 max-h-[320px] overflow-y-auto pr-1">
+                  {items.map((item) => (
+                    <div key={item.id} className="flex gap-3">
+                      <div className="relative size-14 bg-secondary/30 shrink-0">
+                        <Image
+                          src={getCartProductImage(item)}
+                          alt={getCartProductName(item)}
+                          fill
+                          className="object-cover"
+                        />
+                        <span className="absolute -top-1.5 -right-1.5 size-5 flex items-center justify-center bg-gold text-[9px] font-bold text-primary-foreground rounded-full">
+                          {item.quantity}
+                        </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-foreground line-clamp-1">{getCartProductName(item)}</p>
+                        {item.variant_title && (
+                          <p className="text-[10px] text-muted-foreground mt-0.5">{item.variant_title}</p>
+                        )}
+                        <p className="text-xs text-gold mt-1">
+                          HK${(item.total / 100).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* totals */}
+                <div className="border-t border-border/30 mt-4 pt-4 flex flex-col gap-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t("subtotal")}</span>
+                    <span className="text-foreground">HK${(subtotal / 100).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t("shipping")}</span>
+                    <span className={shippingCost === 0 ? "text-gold" : "text-foreground"}>
+                      {shippingCost === 0 ? t("checkout_free_label") : `HK$${shippingCost.toLocaleString()}`}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="border-t border-border/30 mt-3 pt-3">
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-sm text-foreground">{t("total")}</span>
+                    <span className="text-lg font-bold text-gold">HK${(total / 100).toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

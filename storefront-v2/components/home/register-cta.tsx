@@ -1,11 +1,13 @@
 "use client"
 
-import Link from "next/link"
+import { Link } from "@/i18n/navigation"
 import { ArrowRight } from "lucide-react"
 import { isLoggedIn } from "@/lib/auth"
 import { useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
 
 export function RegisterCTA() {
+  const t = useTranslations()
   const [loggedIn, setLoggedIn] = useState(false)
   useEffect(() => { setLoggedIn(isLoggedIn()) }, [])
 
@@ -23,23 +25,23 @@ export function RegisterCTA() {
 
           <p className="text-gold text-xs tracking-[0.3em] uppercase mb-3">Join Us</p>
           <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground text-balance">
-            立即加入 TIMECIGAR
+            {t("join_timecigar")}
           </h2>
           <p className="mt-4 text-muted-foreground max-w-md mx-auto leading-relaxed">
-            註冊成為會員，即可享受多重專屬禮遇，開啟您的雪茄品鑑之旅。
+            {t("member_benefits")}
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link
               href="/register"
               className="inline-flex items-center gap-2 bg-gold text-primary-foreground px-8 py-3 text-sm font-medium tracking-wide hover:bg-gold-dark transition-colors"
             >
-              免費註冊 <ArrowRight className="size-4" />
+              {t("free_register")} <ArrowRight className="size-4" />
             </Link>
             <Link
               href="/login"
               className="inline-flex items-center gap-2 border border-border text-foreground/70 px-8 py-3 text-sm tracking-wide hover:border-gold hover:text-gold transition-colors"
             >
-              已有帳戶？登入
+              {t("has_account")} {t("login")}
             </Link>
           </div>
         </div>

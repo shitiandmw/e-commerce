@@ -46,6 +46,7 @@ export async function fetchArticles(params?: {
   q?: string
   offset?: number
   limit?: number
+  locale?: string
 }): Promise<ArticlesResponse> {
   const queryParams: Record<string, string> = {}
   if (params?.category) queryParams.category = params.category
@@ -55,14 +56,17 @@ export async function fetchArticles(params?: {
 
   const result = await fetchContent<ArticlesResponse>(
     "/store/content/articles",
-    queryParams
+    queryParams,
+    params?.locale
   )
   return result ?? { articles: [], count: 0, offset: 0, limit: 20 }
 }
 
-export async function fetchArticle(slug: string): Promise<Article | null> {
+export async function fetchArticle(slug: string, locale?: string): Promise<Article | null> {
   const result = await fetchContent<ArticleResponse>(
-    `/store/content/articles/${slug}`
+    `/store/content/articles/${slug}`,
+    undefined,
+    locale
   )
   return result?.article ?? null
 }

@@ -1,4 +1,7 @@
-import Link from "next/link"
+"use client"
+
+import { Link } from "@/i18n/navigation"
+import { useTranslations } from "next-intl"
 import type { MenuData, MenuItem } from "@/lib/data/menu"
 
 /* ─── helpers ─── */
@@ -16,6 +19,7 @@ function menuToSections(items: MenuItem[]) {
 /* ─── component ─── */
 
 export function SiteFooter({ menu }: { menu: MenuData | null }) {
+  const t = useTranslations()
   const sections = menu?.items?.length ? menuToSections(menu.items) : []
 
   return (
@@ -29,10 +33,10 @@ export function SiteFooter({ menu }: { menu: MenuData | null }) {
               <span className="text-xl font-serif font-bold tracking-wider text-gold">
                 TIMECIGAR
               </span>
-              <p className="text-xs text-muted-foreground mt-1 tracking-widest">雪茄時間</p>
+              <p className="text-xs text-muted-foreground mt-1 tracking-widest">{t("site_name")}</p>
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              您的雪茄網購平台，提供古巴雪茄、非古雪茄、迷你雪茄等頂級品牌的正貨保證。
+              {t("footer_brand_desc")}
             </p>
             <div className="mt-6 flex items-center gap-4">
               <SocialIcon label="Instagram" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
@@ -71,10 +75,10 @@ export function SiteFooter({ menu }: { menu: MenuData | null }) {
         <div className="mx-auto max-w-7xl px-4 py-6 lg:px-6">
           <div className="flex flex-col items-center gap-4 text-center lg:flex-row lg:justify-between lg:text-left">
             <p className="text-xs text-muted-foreground/70">
-              &copy; {new Date().getFullYear()} TimeCigar. All rights reserved.
+              &copy; {new Date().getFullYear()} TimeCigar. {t("all_rights_reserved")}
             </p>
             <p className="text-xs text-muted-foreground/50 max-w-lg leading-relaxed">
-              吸煙危害健康。本網站僅供年滿18歲人士瀏覽及購買。雪茄產品圖片僅供參考，實際產品可能略有差異。
+              {t("footer_disclaimer")}
             </p>
           </div>
         </div>

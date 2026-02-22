@@ -1,6 +1,7 @@
 import Image from "next/image"
-import Link from "next/link"
+import { Link } from "@/i18n/navigation"
 import { ArrowRight } from "lucide-react"
+import { getTranslations } from "next-intl/server"
 
 export interface ArticleItem {
   id: string
@@ -16,7 +17,8 @@ interface BlogPreviewProps {
   articles?: ArticleItem[]
 }
 
-export function BlogPreview({ articles = [] }: BlogPreviewProps) {
+export async function BlogPreview({ articles = [] }: BlogPreviewProps) {
+  const t = await getTranslations()
   if (articles.length === 0) return null
 
   return (
@@ -25,13 +27,13 @@ export function BlogPreview({ articles = [] }: BlogPreviewProps) {
         <div className="flex items-end justify-between mb-10">
           <div>
             <p className="text-gold text-xs tracking-[0.3em] uppercase mb-2">Time for Shares</p>
-            <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground">茄時分享</h2>
+            <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground">{t("blog_section_title")}</h2>
           </div>
           <Link
             href="/articles"
             className="hidden sm:inline-flex items-center gap-2 text-sm text-gold hover:text-gold-light transition-colors"
           >
-            查看全部 <ArrowRight className="size-4" />
+            {t("view_all")} <ArrowRight className="size-4" />
           </Link>
         </div>
 
@@ -86,7 +88,7 @@ export function BlogPreview({ articles = [] }: BlogPreviewProps) {
             href="/articles"
             className="inline-flex items-center gap-2 text-sm text-gold hover:text-gold-light transition-colors"
           >
-            查看全部文章 <ArrowRight className="size-4" />
+            {t("blog_view_all_articles")} <ArrowRight className="size-4" />
           </Link>
         </div>
       </div>
