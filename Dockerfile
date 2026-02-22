@@ -1,30 +1,27 @@
-# ---- Stage 1: Install dependencies ----
-FROM node:20-alpine AS deps
+# ---- Stage 1: Build ----
+FROM node:20-slim AS builder
 WORKDIR /app
-COPY package.json package-lock.json* ./
-RUN npm ci --omit=dev
 
-# ---- Stage 2: Build ----
-FROM node:20-alpine AS builder
-WORKDIR /app
+# Install dependencies (cached if package.json unchanged)
 COPY package.json package-lock.json* ./
-RUN npm ci
+COPY scripts/patch-watcher.js ./scripts/
+RUN --mount=type=cache,target=/root/.npm npm ci
+
+# Build Medusa
 COPY tsconfig.json medusa-config.ts ./
 COPY src/ ./src/
-RUN npx medusa build
+RUN npx medusa build && ls -la .medusa/server/
 
-# ---- Stage 3: Production runner ----
-FROM node:20-alpine AS runner
+# ---- Stage 2: Production runner ----
+FROM node:20-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=builder /app/.medusa ./.medusa
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/medusa-config.ts ./
-COPY --from=builder /app/src ./src
+# Copy built server and install only production deps
+COPY --from=builder /app/.medusa/server ./
+RUN mkdir -p scripts && echo "" > scripts/patch-watcher.js
+RUN npm ci --omit=dev
 
 EXPOSE 9000
 
-# Run migrations then start
 CMD ["sh", "-c", "npx medusa db:migrate && npx medusa start"]

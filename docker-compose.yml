@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: ecommerce-postgres
+    container_name: ecommerce-prod-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-medusa}
@@ -10,7 +10,7 @@ services:
     ports:
       - "${POSTGRES_PORT:-45432}:5432"
     volumes:
-      - ecommerce_pg_data:/var/lib/postgresql/data
+      - ecommerce_prod_pg_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-medusa} -d ${POSTGRES_DB:-medusa_ecommerce}"]
       interval: 5s
@@ -19,12 +19,12 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: ecommerce-redis
+    container_name: ecommerce-prod-redis
     restart: unless-stopped
     ports:
       - "${REDIS_PORT:-46379}:6379"
     volumes:
-      - ecommerce_redis_data:/data
+      - ecommerce_prod_redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -35,7 +35,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ecommerce-medusa
+    container_name: ecommerce-prod-medusa
     restart: unless-stopped
     depends_on:
       postgres:
@@ -67,7 +67,7 @@ services:
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_MEDUSA_BACKEND_URL_ADMIN: ${NEXT_PUBLIC_MEDUSA_BACKEND_URL_ADMIN:-http://localhost:49000}
-    container_name: ecommerce-admin-ui
+    container_name: ecommerce-prod-admin-ui
     restart: unless-stopped
     depends_on:
       medusa:
@@ -82,7 +82,7 @@ services:
       args:
         NEXT_PUBLIC_MEDUSA_BACKEND_URL_STORE: ${NEXT_PUBLIC_MEDUSA_BACKEND_URL_STORE:-http://localhost:49000}
         NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY:-}
-    container_name: ecommerce-storefront
+    container_name: ecommerce-prod-storefront
     restart: unless-stopped
     depends_on:
       medusa:
@@ -92,7 +92,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: ecommerce-nginx
+    container_name: ecommerce-prod-nginx
     restart: unless-stopped
     profiles:
       - with-nginx
@@ -110,5 +110,5 @@ services:
       API_DOMAIN: ${API_DOMAIN:-api.example.com}
 
 volumes:
-  ecommerce_pg_data:
-  ecommerce_redis_data:
+  ecommerce_prod_pg_data:
+  ecommerce_prod_redis_data:
