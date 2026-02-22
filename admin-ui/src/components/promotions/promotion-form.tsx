@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import {
@@ -86,6 +86,7 @@ export function PromotionForm({ promotion, mode }: PromotionFormProps) {
     register,
     handleSubmit,
     watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<PromotionFormData>({
     resolver: zodResolver(promotionSchema),
@@ -203,23 +204,38 @@ export function PromotionForm({ promotion, mode }: PromotionFormProps) {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="type">{t("form.promotionType")}</Label>
-                <Select id="type" {...register("type")}>
-                  <option value="standard">{t("type.standard")}</option>
-                  <option value="buyget">{t("type.buyget")}</option>
-                </Select>
+                <Controller
+                  name="type"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      id="type"
+                      value={field.value}
+                      onChange={(e) => field.onChange(e.target.value)}
+                    >
+                      <option value="standard">{t("type.standard")}</option>
+                      <option value="buyget">{t("type.buyget")}</option>
+                    </Select>
+                  )}
+                />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="is_automatic">{t("form.applicationMode")}</Label>
-                <Select
-                  id="is_automatic"
-                  {...register("is_automatic", {
-                    setValueAs: (v) => v === "true",
-                  })}
-                >
-                  <option value="false">{t("application.manual")}</option>
-                  <option value="true">{t("application.automatic")}</option>
-                </Select>
+                <Controller
+                  name="is_automatic"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      id="is_automatic"
+                      value={String(field.value)}
+                      onChange={(e) => field.onChange(e.target.value === "true")}
+                    >
+                      <option value="false">{t("application.manual")}</option>
+                      <option value="true">{t("application.automatic")}</option>
+                    </Select>
+                  )}
+                />
               </div>
             </div>
           </div>
@@ -231,10 +247,20 @@ export function PromotionForm({ promotion, mode }: PromotionFormProps) {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="discount_type">{t("form.discountType")}</Label>
-                <Select id="discount_type" {...register("discount_type")}>
-                  <option value="percentage">{t("form.percentage")}</option>
-                  <option value="fixed">{t("form.fixedAmount")}</option>
-                </Select>
+                <Controller
+                  name="discount_type"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      id="discount_type"
+                      value={field.value}
+                      onChange={(e) => field.onChange(e.target.value)}
+                    >
+                      <option value="percentage">{t("form.percentage")}</option>
+                      <option value="fixed">{t("form.fixedAmount")}</option>
+                    </Select>
+                  )}
+                />
               </div>
 
               <div className="space-y-2">
@@ -260,33 +286,63 @@ export function PromotionForm({ promotion, mode }: PromotionFormProps) {
             {discountType === "fixed" && (
               <div className="space-y-2">
                 <Label htmlFor="currency_code">{t("form.currency")}</Label>
-                <Select id="currency_code" {...register("currency_code")}>
-                  <option value="usd">USD</option>
-                  <option value="eur">EUR</option>
-                  <option value="gbp">GBP</option>
-                  <option value="cny">CNY</option>
-                  <option value="jpy">JPY</option>
-                </Select>
+                <Controller
+                  name="currency_code"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      id="currency_code"
+                      value={field.value}
+                      onChange={(e) => field.onChange(e.target.value)}
+                    >
+                      <option value="usd">USD</option>
+                      <option value="eur">EUR</option>
+                      <option value="gbp">GBP</option>
+                      <option value="cny">CNY</option>
+                      <option value="jpy">JPY</option>
+                    </Select>
+                  )}
+                />
               </div>
             )}
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="target_type">{t("form.appliesTo")}</Label>
-                <Select id="target_type" {...register("target_type")}>
-                  <option value="order">{t("form.entireOrder")}</option>
-                  <option value="items">{t("form.specificItems")}</option>
-                  <option value="shipping_methods">{t("form.shippingMethods")}</option>
-                </Select>
+                <Controller
+                  name="target_type"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      id="target_type"
+                      value={field.value}
+                      onChange={(e) => field.onChange(e.target.value)}
+                    >
+                      <option value="order">{t("form.entireOrder")}</option>
+                      <option value="items">{t("form.specificItems")}</option>
+                      <option value="shipping_methods">{t("form.shippingMethods")}</option>
+                    </Select>
+                  )}
+                />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="allocation">{t("form.allocation")}</Label>
-                <Select id="allocation" {...register("allocation")}>
-                  <option value="">{t("form.none")}</option>
-                  <option value="each">{t("form.eachItem")}</option>
-                  <option value="across">{t("form.acrossItems")}</option>
-                </Select>
+                <Controller
+                  name="allocation"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      id="allocation"
+                      value={field.value}
+                      onChange={(e) => field.onChange(e.target.value)}
+                    >
+                      <option value="">{t("form.none")}</option>
+                      <option value="each">{t("form.eachItem")}</option>
+                      <option value="across">{t("form.acrossItems")}</option>
+                    </Select>
+                  )}
+                />
               </div>
             </div>
           </div>

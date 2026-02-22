@@ -239,10 +239,19 @@ export function ArticleForm({ article, mode }: ArticleFormProps) {
             <h2 className="text-lg font-semibold">{t("form.publishing")}</h2>
             <div className="space-y-2">
               <Label>{t("form.statusLabel")}</Label>
-              <Select {...register("status")}>
-                <option value="draft">{t("status.draft")}</option>
-                <option value="published">{t("status.published")}</option>
-              </Select>
+              <Controller
+                name="status"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onChange={(e) => field.onChange(e.target.value)}
+                  >
+                    <option value="draft">{t("status.draft")}</option>
+                    <option value="published">{t("status.published")}</option>
+                  </Select>
+                )}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="published_at">{t("form.publishedAtLabel")}</Label>

@@ -253,19 +253,39 @@ export function PopupForm({ popup, mode }: PopupFormProps) {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="trigger_type">{t("form.triggerTypeLabel")}</Label>
-                <Select id="trigger_type" {...register("trigger_type")}>
-                  <option value="first_visit">{t("triggerType.first_visit")}</option>
-                  <option value="every_visit">{t("triggerType.every_visit")}</option>
-                  <option value="specific_page">{t("triggerType.specific_page")}</option>
-                </Select>
+                <Controller
+                  name="trigger_type"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      id="trigger_type"
+                      value={field.value}
+                      onChange={(e) => field.onChange(e.target.value)}
+                    >
+                      <option value="first_visit">{t("triggerType.first_visit")}</option>
+                      <option value="every_visit">{t("triggerType.every_visit")}</option>
+                      <option value="specific_page">{t("triggerType.specific_page")}</option>
+                    </Select>
+                  )}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="display_frequency">{t("form.displayFrequencyLabel")}</Label>
-                <Select id="display_frequency" {...register("display_frequency")}>
-                  <option value="once">{t("displayFrequency.once")}</option>
-                  <option value="once_per_session">{t("displayFrequency.once_per_session")}</option>
-                  <option value="once_per_day">{t("displayFrequency.once_per_day")}</option>
-                </Select>
+                <Controller
+                  name="display_frequency"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      id="display_frequency"
+                      value={field.value}
+                      onChange={(e) => field.onChange(e.target.value)}
+                    >
+                      <option value="once">{t("displayFrequency.once")}</option>
+                      <option value="once_per_session">{t("displayFrequency.once_per_session")}</option>
+                      <option value="once_per_day">{t("displayFrequency.once_per_day")}</option>
+                    </Select>
+                  )}
+                />
               </div>
             </div>
 

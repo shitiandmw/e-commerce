@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import {
@@ -53,6 +53,7 @@ export function TagForm({ tag, mode }: TagFormProps) {
     register,
     handleSubmit,
     watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<TagFormData>({
     resolver: zodResolver(tagSchema),
@@ -152,10 +153,19 @@ export function TagForm({ tag, mode }: TagFormProps) {
 
             <div className="space-y-2">
               <Label htmlFor="type">{t("form.typeLabel")}</Label>
-              <Select {...register("type")}>
-                <option value="badge">{t("typeOptions.badge")}</option>
-                <option value="attribute">{t("typeOptions.attribute")}</option>
-              </Select>
+              <Controller
+                name="type"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onChange={(e) => field.onChange(e.target.value)}
+                  >
+                    <option value="badge">{t("typeOptions.badge")}</option>
+                    <option value="attribute">{t("typeOptions.attribute")}</option>
+                  </Select>
+                )}
+              />
               <p className="text-xs text-muted-foreground">
                 {t("form.typeHint")}
               </p>

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { MenuItem } from "@/hooks/use-menus"
@@ -100,6 +100,7 @@ export function MenuItemForm({
     reset,
     setValue,
     watch,
+    control,
     formState: { errors },
   } = useForm<MenuItemFormData>({
     resolver: zodResolver(menuItemSchema),
@@ -247,14 +248,24 @@ export function MenuItemForm({
           {/* Parent */}
           <div className="space-y-2">
             <Label htmlFor="item-parent">{t("itemForm.parentField")}</Label>
-            <Select id="item-parent" {...register("parent_id")}>
-              <option value="">{t("itemForm.parentNone")}</option>
-              {parentOptions.map((opt) => (
-                <option key={opt.id} value={opt.id}>
-                  {"─".repeat(opt.depth)} {opt.label}
-                </option>
-              ))}
-            </Select>
+            <Controller
+              name="parent_id"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  id="item-parent"
+                  value={field.value}
+                  onChange={(e) => field.onChange(e.target.value)}
+                >
+                  <option value="">{t("itemForm.parentNone")}</option>
+                  {parentOptions.map((opt) => (
+                    <option key={opt.id} value={opt.id}>
+                      {"─".repeat(opt.depth)} {opt.label}
+                    </option>
+                  ))}
+                </Select>
+              )}
+            />
           </div>
 
           {/* Enabled */}
