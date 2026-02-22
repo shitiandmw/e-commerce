@@ -36,14 +36,22 @@ interface MenuApiResponse {
 
 /* ─── fetch ─── */
 
-export async function getMainNav(): Promise<MenuItem[]> {
+export async function getMenuByKey(key: string): Promise<MenuData | null> {
   try {
     const data = await fetchContent<MenuApiResponse>("/store/content/menus", {
-      key: "main-nav",
+      key,
     })
-    const menu = data?.menus?.[0]
-    return menu?.items ?? []
+    return data?.menus?.[0] ?? null
   } catch {
-    return []
+    return null
   }
+}
+
+export async function getMainNav(): Promise<MenuItem[]> {
+  const menu = await getMenuByKey("main-nav")
+  return menu?.items ?? []
+}
+
+export async function getFooterMenu(): Promise<MenuData | null> {
+  return getMenuByKey("footer")
 }

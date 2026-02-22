@@ -5,7 +5,7 @@ import { Toaster } from 'sonner'
 import { LayoutShell } from '@/components/layout/layout-shell'
 import { AnnouncementBarServer } from '@/components/layout/announcement-bar-server'
 import { AgeVerification } from '@/components/age-verification'
-import { getMainNav } from '@/lib/data/menu'
+import { getMainNav, getFooterMenu } from '@/lib/data/menu'
 import './globals.css'
 
 const notoSerifSC = Noto_Serif_SC({
@@ -35,14 +35,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const navItems = await getMainNav()
+  const [navItems, footerMenu] = await Promise.all([getMainNav(), getFooterMenu()])
 
   return (
     <html lang="zh-Hant" className={`${notoSerifSC.variable} ${geist.variable}`}>
       <body className="font-sans antialiased bg-background text-foreground">
         <AgeVerification />
         <AnnouncementBarServer />
-        <LayoutShell navItems={navItems}>{children}</LayoutShell>
+        <LayoutShell navItems={navItems} footerMenu={footerMenu}>{children}</LayoutShell>
         <Toaster position="top-center" richColors />
         <Analytics />
       </body>
