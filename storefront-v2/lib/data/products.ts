@@ -417,6 +417,7 @@ export interface FetchProductsParams {
   limit?: number
   offset?: number
   order?: string
+  q?: string
 }
 
 async function medusaFetch<T>(path: string, params?: Record<string, string>): Promise<T> {
@@ -454,6 +455,9 @@ export async function fetchProducts(params: FetchProductsParams): Promise<Medusa
   }
   if (params.order) {
     queryParams.order = params.order
+  }
+  if (params.q) {
+    queryParams.q = params.q
   }
 
   try {

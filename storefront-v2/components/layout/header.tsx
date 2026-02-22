@@ -374,9 +374,9 @@ export function SiteHeader({ navItems }: { navItems: MenuItem[] }) {
             {/* right icons */}
             <div className="flex items-center gap-0.5 shrink-0 ml-auto">
               <LanguageSwitcher />
-              <button className="p-2 text-foreground/60 hover:text-gold transition-colors" aria-label="搜尋">
+              <Link href="/search" className="p-2 text-foreground/60 hover:text-gold transition-colors" aria-label="搜尋">
                 <Search className="size-[18px]" />
-              </button>
+              </Link>
               <Link href={loggedIn ? "/account" : "/login"} className="p-2 text-foreground/60 hover:text-gold transition-colors" aria-label={loggedIn ? "帳戶" : "登入"}>
                 {loggedIn ? <User className="size-[18px]" /> : <LogIn className="size-[18px]" />}
               </Link>
