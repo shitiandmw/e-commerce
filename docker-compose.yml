@@ -92,6 +92,64 @@ services:
     ports:
       - "${STOREFRONT_PORT:-43000}:3000"
 
+  init:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ecommerce-prod-init
+    profiles:
+      - init
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-medusa}:${POSTGRES_PASSWORD:-medusa_password}@postgres:5432/${POSTGRES_DB:-medusa_ecommerce}?sslmode=disable
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-supersecret}
+      COOKIE_SECRET: ${COOKIE_SECRET:-supersecret}
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        echo '[init] 创建管理员账号...' &&
+        npx medusa user -e $${ADMIN_EMAIL:-admin@test.com} -p $${ADMIN_PASSWORD:-admin123456} 2>&1 | tail -2 &&
+        echo '[init] 管理员账号创建完成!'
+
+  seed:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ecommerce-prod-seed
+    profiles:
+      - seed
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-medusa}:${POSTGRES_PASSWORD:-medusa_password}@postgres:5432/${POSTGRES_DB:-medusa_ecommerce}?sslmode=disable
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-supersecret}
+      COOKIE_SECRET: ${COOKIE_SECRET:-supersecret}
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        echo '[seed] 导入基础种子数据...' &&
+        npx medusa exec ./src/scripts/seed.js &&
+        echo '[seed] 导入分类数据...' &&
+        npx medusa exec ./src/scripts/seed-categories.js &&
+        echo '[seed] 导入品牌数据...' &&
+        npx medusa exec ./src/scripts/seed-brands.js &&
+        echo '[seed] 导入菜单数据...' &&
+        npx medusa exec ./src/scripts/seed-menu.js &&
+        echo '[seed] 导入 Banner 数据...' &&
+        npx medusa exec ./src/scripts/seed-banners.js &&
+        echo '[seed] 导入精选集数据...' &&
+        npx medusa exec ./src/scripts/seed-collections.js &&
+        echo '[seed] 种子数据导入完成!'
+
   nginx:
     image: nginx:alpine
     container_name: ecommerce-prod-nginx

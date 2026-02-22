@@ -1,76 +1,75 @@
-<p align="center">
-  <a href="https://www.medusajs.com">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/59018053/229103275-b5e482bb-4601-46e6-8142-244f531cebdb.svg">
-    <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
-    <img alt="Medusa logo" src="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
-    </picture>
-  </a>
-</p>
-<h1 align="center">
-  Medusa
-</h1>
+# TIMECIGAR 电商平台
 
-<h4 align="center">
-  <a href="https://docs.medusajs.com">Documentation</a> |
-  <a href="https://www.medusajs.com">Website</a>
-</h4>
+基于 Medusa v2 的雪茄电商平台。
 
-<p align="center">
-  Building blocks for digital commerce
-</p>
-<p align="center">
-  <a href="https://github.com/medusajs/medusa/blob/master/CONTRIBUTING.md">
-    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat" alt="PRs welcome!" />
-  </a>
-    <a href="https://www.producthunt.com/posts/medusa"><img src="https://img.shields.io/badge/Product%20Hunt-%231%20Product%20of%20the%20Day-%23DA552E" alt="Product Hunt"></a>
-  <a href="https://discord.gg/xpCwq3Kfn8">
-    <img src="https://img.shields.io/badge/chat-on%20discord-7289DA.svg" alt="Discord Chat" />
-  </a>
-  <a href="https://twitter.com/intent/follow?screen_name=medusajs">
-    <img src="https://img.shields.io/twitter/follow/medusajs.svg?label=Follow%20@medusajs" alt="Follow @medusajs" />
-  </a>
-</p>
+## 项目结构
 
-## Compatibility
+- **根目录** — Medusa 后端（PostgreSQL + Redis）
+- **admin-ui/** — 独立 Next.js 管理后台
+- **storefront-v2/** — 店铺前端（Next.js + Radix UI）
 
-This starter is compatible with versions >= 2 of `@medusajs/medusa`. 
+## 本地开发
 
-## Getting Started
+```bash
+bash init.sh          # 启动全部服务（Docker + 后端 + 前端）
+npm run db:reset      # 重置数据库并导入种子数据
+```
 
-Visit the [Quickstart Guide](https://docs.medusajs.com/learn/installation) to set up a server.
+## 生产环境部署
 
-Visit the [Docs](https://docs.medusajs.com/learn/installation#get-started) to learn more about our system requirements.
+### 1. 配置环境变量
 
-## What is Medusa
+复制 `.env.example`（如有）或手动创建 `.env`：
 
-Medusa is a set of commerce modules and tools that allow you to build rich, reliable, and performant commerce applications without reinventing core commerce logic. The modules can be customized and used to build advanced ecommerce stores, marketplaces, or any product that needs foundational commerce primitives. All modules are open-source and freely available on npm.
+```env
+POSTGRES_USER=medusa
+POSTGRES_PASSWORD=<强密码>
+POSTGRES_DB=medusa_ecommerce
+JWT_SECRET=<随机字符串>
+COOKIE_SECRET=<随机字符串>
+PROD_STORE_CORS=https://your-store-domain.com
+PROD_ADMIN_CORS=https://your-admin-domain.com
+AUTH_CORS=https://your-admin-domain.com,https://your-store-domain.com
+STRIPE_API_KEY=<Stripe 密钥>
+STRIPE_WEBHOOK_SECRET=<Stripe Webhook 密钥>
+NEXT_PUBLIC_MEDUSA_BACKEND_URL_ADMIN=https://your-api-domain.com
+NEXT_PUBLIC_MEDUSA_BACKEND_URL_STORE=https://your-api-domain.com
+NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=<Publishable API Key>
+```
 
-Learn more about [Medusa’s architecture](https://docs.medusajs.com/learn/introduction/architecture) and [commerce modules](https://docs.medusajs.com/learn/fundamentals/modules/commerce-modules) in the Docs.
+### 2. 构建并启动服务
 
-## Build with AI Agents
+```bash
+docker compose up -d --build
+```
 
-### Claude Code Plugin
+首次启动时 Medusa 容器会自动执行 `db:migrate` 创建数据库表。
 
-If you use AI agents like Claude Code, check out the [medusa-dev Claude Code plugin](https://github.com/medusajs/medusa-claude-plugins).
+### 3. 创建管理员账号（仅首次部署）
 
-### Other Agents
+```bash
+docker compose --profile init run --rm init
+```
 
-If you use AI agents other than Claude Code, copy the [skills directory](https://github.com/medusajs/medusa-claude-plugins/tree/main/plugins/medusa-dev/skills) into your agent's relevant `skills` directory.
+默认账号 `admin@test.com` / `admin123456`，可通过环境变量自定义：
 
-### MCP Server
+```bash
+ADMIN_EMAIL=your@email.com ADMIN_PASSWORD=yourpassword \
+  docker compose --profile init run --rm init
+```
 
-You can also add the MCP server `https://docs.medusajs.com/mcp` to your AI agents to answer questions related to Medusa. The `medusa-dev` Claude Code plugin includes this MCP server by default.
+### 4. 导入种子数据（可选，用于开发/演示环境）
 
-## Community & Contributions
+```bash
+docker compose --profile seed run --rm seed
+```
 
-The community and core team are available in [GitHub Discussions](https://github.com/medusajs/medusa/discussions), where you can ask for support, discuss roadmap, and share ideas.
+导入分类、品牌、菜单、Banner、精选集等演示数据。
 
-Join our [Discord server](https://discord.com/invite/medusajs) to meet other community members.
+### 5. 启用 Nginx 反向代理（可选）
 
-## Other channels
+```bash
+docker compose --profile with-nginx up -d
+```
 
-- [GitHub Issues](https://github.com/medusajs/medusa/issues)
-- [Twitter](https://twitter.com/medusajs)
-- [LinkedIn](https://www.linkedin.com/company/medusajs)
-- [Medusa Blog](https://medusajs.com/blog/)
+需配置 `STORE_DOMAIN`、`ADMIN_DOMAIN`、`API_DOMAIN` 环境变量。
