@@ -414,17 +414,23 @@ export interface MedusaProductListResponse {
 
 export interface FetchProductsParams {
   category_id?: string
+  ids?: string[]
   limit?: number
   offset?: number
   order?: string
   q?: string
 }
 
-async function medusaFetch<T>(path: string, params?: Record<string, string>): Promise<T> {
+async function medusaFetch<T>(path: string, params?: Record<string, string | string[]>): Promise<T> {
   const url = new URL(`${MEDUSA_BACKEND_URL}${path}`)
   if (params) {
     Object.entries(params).forEach(([k, v]) => {
-      if (v !== undefined && v !== "") url.searchParams.set(k, v)
+      if (v === undefined || v === "") return
+      if (Array.isArray(v)) {
+        v.forEach((item) => url.searchParams.append(k, item))
+      } else {
+        url.searchParams.set(k, v)
+      }
     })
   }
   const headers: Record<string, string> = {}
@@ -445,13 +451,16 @@ async function medusaFetch<T>(path: string, params?: Record<string, string>): Pr
  * Fetch products from Medusa Store API with optional category filter, pagination, and sorting.
  */
 export async function fetchProducts(params: FetchProductsParams): Promise<MedusaProductListResponse> {
-  const queryParams: Record<string, string> = {
+  const queryParams: Record<string, string | string[]> = {
     limit: String(params.limit ?? 20),
     offset: String(params.offset ?? 0),
     fields: "id,title,handle,subtitle,description,thumbnail,*variants,*variants.prices,*images,*categories,*brand",
   }
   if (params.category_id) {
     queryParams["category_id[]"] = params.category_id
+  }
+  if (params.ids?.length) {
+    queryParams["id[]"] = params.ids
   }
   if (params.order) {
     queryParams.order = params.order

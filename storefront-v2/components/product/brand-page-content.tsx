@@ -1,0 +1,191 @@
+"use client"
+
+import { useState, useMemo } from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
+import { Grid3X3, LayoutList, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react"
+import { type MedusaProduct, type MedusaBrand, getMedusaPrice } from "@/lib/data/products"
+import { ProductCard } from "@/components/product/product-card"
+import { cn } from "@/lib/utils"
+
+const sortOptions = [
+  { value: "recommended", label: "推薦排序" },
+  { value: "price-asc", label: "價格：低至高" },
+  { value: "price-desc", label: "價格：高至低" },
+  { value: "name", label: "名稱 A-Z" },
+]
+
+interface BrandPageContentProps {
+  brand: MedusaBrand
+  medusaProducts: MedusaProduct[]
+  totalCount: number
+  currentPage: number
+  pageSize: number
+  currentSort: string
+}
+
+export function BrandPageContent({
+  brand,
+  medusaProducts,
+  totalCount,
+  currentPage,
+  pageSize,
+  currentSort,
+}: BrandPageContentProps) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const [gridCols, setGridCols] = useState<3 | 2>(3)
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
+
+  const sortedProducts = useMemo(() => {
+    if (currentSort === "price-asc" || currentSort === "price-desc") {
+      return [...medusaProducts].sort((a, b) => {
+        const pa = getMedusaPrice(a)?.amount ?? 0
+        const pb = getMedusaPrice(b)?.amount ?? 0
+        return currentSort === "price-asc" ? pa - pb : pb - pa
+      })
+    }
+    return medusaProducts
+  }, [medusaProducts, currentSort])
+
+  function buildUrl(updates: Record<string, string | null>) {
+    const params = new URLSearchParams(searchParams.toString())
+    for (const [key, value] of Object.entries(updates)) {
+      if (value === null || value === "") {
+        params.delete(key)
+      } else {
+        params.set(key, value)
+      }
+    }
+    if ("sort" in updates) params.delete("page")
+    const qs = params.toString()
+    return `/brand/${brand.id}${qs ? `?${qs}` : ""}`
+  }
+
+  return (
+    <div>
+      {/* Hero Banner */}
+      <div className="relative h-48 md:h-64 overflow-hidden bg-gradient-to-br from-card via-background to-card">
+        <div className="absolute inset-0 flex items-end">
+          <div className="mx-auto w-full max-w-7xl px-4 pb-8 lg:px-6">
+            <div className="flex items-end gap-6">
+              {brand.logo_url ? (
+                <div className="relative size-16 md:size-20 shrink-0 bg-gold/10 border border-gold/20 overflow-hidden">
+                  <Image src={brand.logo_url} alt={brand.name} fill className="object-contain p-2" />
+                </div>
+              ) : (
+                <span className="size-16 md:size-20 shrink-0 inline-flex items-center justify-center bg-gold/10 border border-gold/20 text-gold font-bold uppercase text-2xl md:text-3xl">
+                  {brand.name.charAt(0)}
+                </span>
+              )}
+              <div>
+                {brand.origin && (
+                  <p className="text-gold text-xs tracking-[0.3em] uppercase mb-2">{brand.origin}</p>
+                )}
+                <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground">{brand.name}</h1>
+                {brand.description && (
+                  <p className="mt-2 text-sm text-muted-foreground max-w-xl leading-relaxed">{brand.description}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="mx-auto max-w-7xl px-4 py-8 lg:px-6">
+        <div className="flex-1 min-w-0">
+          {/* Toolbar */}
+          <div className="flex items-center justify-between mb-6 pb-4 border-b border-border/30">
+            <span className="text-xs text-muted-foreground">共 {totalCount} 款產品</span>
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <select
+                  value={currentSort}
+                  onChange={(e) => router.push(buildUrl({ sort: e.target.value }))}
+                  className="appearance-none bg-transparent text-sm text-muted-foreground pr-6 cursor-pointer focus:outline-none hover:text-foreground transition-colors"
+                >
+                  {sortOptions.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
+              </div>
+              <div className="hidden md:flex items-center gap-1 border-l border-border/30 pl-3">
+                <button
+                  onClick={() => setGridCols(3)}
+                  className={cn("p-1 transition-colors", gridCols === 3 ? "text-gold" : "text-muted-foreground")}
+                  aria-label="三列佈局"
+                >
+                  <Grid3X3 className="size-4" />
+                </button>
+                <button
+                  onClick={() => setGridCols(2)}
+                  className={cn("p-1 transition-colors", gridCols === 2 ? "text-gold" : "text-muted-foreground")}
+                  aria-label="兩列佈局"
+                >
+                  <LayoutList className="size-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+          {/* Product Grid */}
+          {sortedProducts.length > 0 ? (
+            <div className={cn(
+              "grid gap-4 lg:gap-6",
+              gridCols === 3 ? "grid-cols-2 md:grid-cols-3" : "grid-cols-1 md:grid-cols-2"
+            )}>
+              {sortedProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <p className="text-muted-foreground">暫無產品</p>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-10">
+              <Link
+                href={buildUrl({ page: String(currentPage - 1) })}
+                className={cn(
+                  "size-9 flex items-center justify-center border border-border/30 text-sm transition-colors",
+                  currentPage <= 1 ? "pointer-events-none opacity-30" : "hover:border-gold/50 hover:text-gold"
+                )}
+                aria-disabled={currentPage <= 1}
+              >
+                <ChevronLeft className="size-4" />
+              </Link>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <Link
+                  key={p}
+                  href={buildUrl({ page: String(p) })}
+                  className={cn(
+                    "size-9 flex items-center justify-center border text-sm transition-colors",
+                    p === currentPage
+                      ? "border-gold text-gold bg-gold/5"
+                      : "border-border/30 text-muted-foreground hover:border-gold/50 hover:text-gold"
+                  )}
+                >
+                  {p}
+                </Link>
+              ))}
+              <Link
+                href={buildUrl({ page: String(currentPage + 1) })}
+                className={cn(
+                  "size-9 flex items-center justify-center border border-border/30 text-sm transition-colors",
+                  currentPage >= totalPages ? "pointer-events-none opacity-30" : "hover:border-gold/50 hover:text-gold"
+                )}
+                aria-disabled={currentPage >= totalPages}
+              >
+                <ChevronRight className="size-4" />
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

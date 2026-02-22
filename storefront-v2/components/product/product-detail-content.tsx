@@ -392,7 +392,7 @@ export function ProductDetailContent({
                 )}
               </div>
               <Link
-                href={categoryHandle ? `/category/${categoryHandle}` : `/search?brand=${encodeURIComponent(displayBrandName!)}`}
+                href={brand?.id ? `/brand/${brand.id}` : `/search?brand=${encodeURIComponent(displayBrandName!)}`}
                 className="inline-flex items-center gap-2 border border-gold/50 text-gold px-6 py-2.5 text-sm tracking-wide hover:bg-gold hover:text-primary-foreground transition-all shrink-0"
               >
                 探索更多 {displayBrandName} 雪茄
