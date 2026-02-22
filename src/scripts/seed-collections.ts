@@ -65,7 +65,7 @@ export default async function seedCollections({ container }: ExecArgs) {
 
   // Check if collections already exist
   const existing = await collectionService.listCuratedCollections(
-    { key: "featured" },
+    { key: "hot-picks" },
     { take: 1 }
   )
   if (existing.length > 0) {
@@ -176,8 +176,8 @@ export default async function seedCollections({ container }: ExecArgs) {
 
   // 1. Featured / 热门推荐
   const featured = await collectionService.createCuratedCollections({
-    name: "热门推荐",
-    key: "featured",
+    name: "热门精选",
+    key: "hot-picks",
     description: "精选热门雪茄推荐",
     sort_order: 0,
   })
@@ -192,8 +192,8 @@ export default async function seedCollections({ container }: ExecArgs) {
 
   // 2. Deals / 限时特惠
   const deals = await collectionService.createCuratedCollections({
-    name: "限时特惠",
-    key: "deals",
+    name: "古巴精选",
+    key: "featured-cuban",
     description: "限时优惠雪茄精选",
     sort_order: 1,
   })
@@ -208,8 +208,8 @@ export default async function seedCollections({ container }: ExecArgs) {
 
   // 3. New Arrivals / 新品上市
   const newArrivals = await collectionService.createCuratedCollections({
-    name: "新品上市",
-    key: "new-arrivals",
+    name: "限量版",
+    key: "limited-editions",
     description: "最新到货雪茄",
     sort_order: 2,
   })

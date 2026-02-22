@@ -10,7 +10,7 @@ export default async function seedBanners({ container }: ExecArgs) {
   const bannerService: BannerModuleService = container.resolve(BANNER_MODULE)
 
   // Check if banners already exist
-  const existing = await bannerService.listBannerSlots({}, { take: 1 })
+  const existing = await bannerService.listBannerSlots({ key: "homepage-hero" }, { take: 1 })
   if (existing.length > 0) {
     console.log("Banners already exist, skipping seed.")
     return
@@ -21,7 +21,7 @@ export default async function seedBanners({ container }: ExecArgs) {
   // 1. Hero Banner (homepage main carousel)
   const hero = await bannerService.createBannerSlots({
     name: "首页轮播",
-    key: "hero",
+    key: "homepage-hero",
     description: "首页顶部大图轮播",
   })
 
