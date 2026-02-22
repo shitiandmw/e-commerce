@@ -24,8 +24,8 @@
 - [x] 商品详情页：对接产品 API，支持变体选择、规格展示
 - [x] 分类页：对接分类 API，支持筛选、排序、分页
 - [x] 文章页：对接文章列表 + 详情 API
-- [ ] 购物车页推荐商品区块仍用 mock 数据（`app/cart/page.tsx`）
-- [ ] 分类页侧边栏分类列表仍用 mock（`category-page-content.tsx`）
+- [x] 购物车页推荐商品区块（已改为调用 `/api/products` 获取最新商品）
+- [x] 分类页侧边栏分类列表（已改为 API + 层级树展示）
 
 ### 第三步：用户认证 ✅ 已完成
 
@@ -78,8 +78,8 @@
 
 | 文件 | 内容 | 状态 |
 |------|------|------|
-| `app/cart/page.tsx` | 推荐商品区块 | 待替换为 API |
-| `components/product/category-page-content.tsx` | 侧边栏分类列表 | 待替换为 API |
+| `app/[locale]/cart/page.tsx` | 推荐商品区块 | ✅ 已改为 API |
+| `components/product/category-page-content.tsx` | 侧边栏分类列表 | ✅ 已改为 API |
 | `components/home/flash-sale.tsx` | 快速加购已移除，改为"查看详情"链接 | ✅ 已处理 |
 
 ## 从 v1 移植的关键文件

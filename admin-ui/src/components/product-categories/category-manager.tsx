@@ -31,7 +31,10 @@ import {
   Loader2,
   FolderTree,
   ChevronRight,
+  ImageIcon,
+  X,
 } from "lucide-react"
+import { MediaPicker } from "@/components/media/media-picker"
 import { toSlug } from "@/lib/slug"
 
 export function ProductCategoryManager() {
@@ -167,6 +170,10 @@ function CategoryFormDialog({
   const [parentId, setParentId] = React.useState<string>(category?.parent_category_id || "")
   const [isActive, setIsActive] = React.useState(category?.is_active !== false)
   const [autoHandle, setAutoHandle] = React.useState(!isEdit)
+  const [imageUrl, setImageUrl] = React.useState<string>(
+    (category?.metadata?.image_url as string) || ""
+  )
+  const [mediaPickerOpen, setMediaPickerOpen] = React.useState(false)
 
   const parentOptions = React.useMemo(() => {
     if (!isEdit) return buildProductCategoryTree(allCategories)
@@ -204,6 +211,7 @@ function CategoryFormDialog({
         rank: rank ? Number(rank) : undefined,
         parent_category_id: parentId || null,
         is_active: isActive,
+        metadata: { ...(category?.metadata || {}), image_url: imageUrl || null },
       }
 
       if (isEdit) {
@@ -243,6 +251,47 @@ function CategoryFormDialog({
           <div className="space-y-2">
             <Label>{t("descriptionLabel")}</Label>
             <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t("descriptionPlaceholder")} rows={3} />
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t("imageLabel")}</Label>
+            {imageUrl ? (
+              <div className="relative rounded-lg border overflow-hidden bg-muted aspect-[16/9] max-h-40 flex items-center justify-center group">
+                <img
+                  src={imageUrl}
+                  alt="Preview"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    ;(e.target as HTMLImageElement).style.display = "none"
+                  }}
+                />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                  <Button type="button" size="sm" variant="secondary" onClick={() => setMediaPickerOpen(true)}>
+                    {t("changeImage")}
+                  </Button>
+                  <Button type="button" size="sm" variant="destructive" onClick={() => setImageUrl("")}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setMediaPickerOpen(true)}
+                className="w-full rounded-lg border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors aspect-[16/9] max-h-40 flex flex-col items-center justify-center gap-2 text-muted-foreground"
+              >
+                <ImageIcon className="h-8 w-8" />
+                <span className="text-sm">{t("selectImage")}</span>
+              </button>
+            )}
+            <MediaPicker
+              open={mediaPickerOpen}
+              onOpenChange={setMediaPickerOpen}
+              onSelect={(urls) => {
+                if (urls.length > 0) setImageUrl(urls[0])
+              }}
+              selectedUrls={imageUrl ? [imageUrl] : []}
+            />
           </div>
 
           <div className="space-y-2">

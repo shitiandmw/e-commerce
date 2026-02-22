@@ -23,6 +23,7 @@ export interface MedusaCategory {
   handle: string
   description: string | null
   parent_category: MedusaCategory | null
+  parent_category_id: string | null
   category_children: MedusaCategory[]
   metadata: Record<string, unknown> | null
 }
@@ -63,13 +64,55 @@ async function medusaFetch<T>(path: string, locale?: string): Promise<T> {
 export async function fetchCategoryByHandle(handle: string, locale?: string): Promise<MedusaCategory | null> {
   try {
     const data = await medusaFetch<CategoryListResponse>(
-      `/store/product-categories?handle=${encodeURIComponent(handle)}&fields=id,name,handle,description,metadata`,
+      `/store/product-categories?handle=${encodeURIComponent(handle)}&fields=id,name,handle,description,parent_category_id,metadata`,
       locale
     )
     return data?.product_categories?.[0] ?? null
   } catch {
     return null
   }
+}
+
+/**
+ * Fetch all product categories from Medusa Store API.
+ */
+export async function fetchAllCategories(locale?: string): Promise<MedusaCategory[]> {
+  try {
+    const data = await medusaFetch<CategoryListResponse>(
+      `/store/product-categories?limit=100&fields=id,name,handle,description,parent_category_id,metadata`,
+      locale
+    )
+    return data?.product_categories ?? []
+  } catch {
+    return []
+  }
+}
+
+/**
+ * Build a flat list sorted by tree hierarchy with depth info.
+ */
+export function buildCategoryTree(
+  categories: MedusaCategory[]
+): { category: MedusaCategory; depth: number }[] {
+  const result: { category: MedusaCategory; depth: number }[] = []
+  const childrenMap = new Map<string | null, MedusaCategory[]>()
+
+  for (const cat of categories) {
+    const pid = cat.parent_category_id ?? null
+    if (!childrenMap.has(pid)) childrenMap.set(pid, [])
+    childrenMap.get(pid)!.push(cat)
+  }
+
+  function walk(parentId: string | null, depth: number) {
+    const children = childrenMap.get(parentId) ?? []
+    for (const child of children.sort((a, b) => a.name.localeCompare(b.name))) {
+      result.push({ category: child, depth })
+      walk(child.id, depth + 1)
+    }
+  }
+
+  walk(null, 0)
+  return result
 }
 
 export const categories: Category[] = [

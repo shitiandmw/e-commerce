@@ -38,11 +38,6 @@ npm run lint
 - 搜索：`/search` 页面，支持关键词搜索 + 分页
 - 多语言：`[locale]` 动态路由，支持 zh-TW（默认）、zh-CN、en
 
-### 仍使用 mock 数据
-
-- `app/[locale]/cart/page.tsx` — 推荐商品区块仍用 `lib/data/products.ts` 的 mock 数据
-- `components/product/category-page-content.tsx` — 侧边栏分类列表仍用 `lib/data/categories.ts` 的 mock 数据
-
 ### 待实现
 
 - Stripe 支付集成（`@stripe/react-stripe-js` + `@stripe/stripe-js` 尚未安装，结账页面为纯 HTML 表单）

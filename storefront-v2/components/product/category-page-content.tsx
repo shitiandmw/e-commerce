@@ -6,7 +6,7 @@ import { Link } from "@/i18n/navigation"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Grid3X3, LayoutList, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react"
 import { type MedusaProduct, getMedusaPrice } from "@/lib/data/products"
-import { categories } from "@/lib/data/categories"
+import { type MedusaCategory, buildCategoryTree } from "@/lib/data/categories"
 import { ProductCard } from "@/components/product/product-card"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
@@ -22,6 +22,7 @@ interface CategoryPageContentProps {
   currentPage: number
   pageSize: number
   currentSort: string
+  allCategories: MedusaCategory[]
 }
 
 export function CategoryPageContent({
@@ -35,6 +36,7 @@ export function CategoryPageContent({
   currentPage,
   pageSize,
   currentSort,
+  allCategories,
 }: CategoryPageContentProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -104,11 +106,14 @@ export function CategoryPageContent({
             <div>
               <h3 className="text-sm font-medium text-foreground mb-4 tracking-wide">{t("other_categories")}</h3>
               <div className="flex flex-col gap-1">
-                {categories.filter(c => c.slug !== slug).map((cat) => (
+                {buildCategoryTree(allCategories)
+                  .filter(({ category: cat }) => cat.handle !== slug)
+                  .map(({ category: cat, depth }) => (
                   <Link
-                    key={cat.slug}
-                    href={`/category/${cat.slug}`}
-                    className="text-sm text-muted-foreground hover:text-gold transition-colors px-3 py-2"
+                    key={cat.id}
+                    href={`/category/${cat.handle}`}
+                    className="text-sm text-muted-foreground hover:text-gold transition-colors py-2"
+                    style={{ paddingLeft: 12 + depth * 16 }}
                   >
                     {cat.name}
                   </Link>

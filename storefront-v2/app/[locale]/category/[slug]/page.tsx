@@ -1,6 +1,7 @@
 import { CategoryPageContent } from "@/components/product/category-page-content"
 import {
   fetchCategoryByHandle,
+  fetchAllCategories,
   getCategoryBySlug,
 } from "@/lib/data/categories"
 import { fetchProducts } from "@/lib/data/products"
@@ -44,10 +45,11 @@ export default async function CategoryPage({
     default: order = undefined
   }
 
-  // Fetch category in parallel with mock fallback
-  const [medusaCategory, mockCategory] = await Promise.all([
+  // Fetch category and all categories in parallel with mock fallback
+  const [medusaCategory, mockCategory, allCategories] = await Promise.all([
     fetchCategoryByHandle(slug, locale),
     Promise.resolve(getCategoryBySlug(slug)),
+    fetchAllCategories(locale),
   ])
 
   // Fetch products using the Medusa category ID
@@ -67,12 +69,13 @@ export default async function CategoryPage({
       categoryName={medusaCategory?.name || mockCategory?.name || ""}
       categoryNameEn={mockCategory?.nameEn || slug}
       categoryDescription={medusaCategory?.description || mockCategory?.description || ""}
-      categoryImage={mockCategory?.image || "/images/hero-1.jpg"}
+      categoryImage={(medusaCategory?.metadata?.image_url as string) || mockCategory?.image || "/images/article-2.jpg"}
       medusaProducts={productsData.products}
       totalCount={productsData.count}
       currentPage={page}
       pageSize={PAGE_SIZE}
       currentSort={sort}
+      allCategories={allCategories}
     />
   )
 }

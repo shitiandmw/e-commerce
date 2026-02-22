@@ -48,7 +48,7 @@ export function useProductCategories() {
         params: {
           limit: "100",
           offset: "0",
-          fields: "id,name,handle,description,is_active,is_internal,rank,parent_category_id,parent_category.*,category_children.*,created_at,updated_at",
+          fields: "id,name,handle,description,is_active,is_internal,rank,parent_category_id,parent_category.*,category_children.*,created_at,updated_at,metadata",
         },
       }),
   })
@@ -59,7 +59,7 @@ export function useProductCategory(id: string) {
     queryKey: ["product-category", id],
     queryFn: () =>
       adminFetch<{ product_category: ProductCategory }>(
-        `/admin/product-categories/${id}?fields=id,name,handle,description,is_active,is_internal,rank,parent_category_id,parent_category.*,category_children.*,created_at,updated_at`
+        `/admin/product-categories/${id}?fields=id,name,handle,description,is_active,is_internal,rank,parent_category_id,parent_category.*,category_children.*,created_at,updated_at,metadata`
       ),
     enabled: !!id,
   })
@@ -77,6 +77,7 @@ export function useCreateProductCategory() {
       is_active?: boolean
       is_internal?: boolean
       rank?: number
+      metadata?: Record<string, unknown>
     }) =>
       adminFetch<{ product_category: ProductCategory }>(
         "/admin/product-categories",
@@ -100,6 +101,7 @@ export function useUpdateProductCategory(id: string) {
       is_active?: boolean
       is_internal?: boolean
       rank?: number
+      metadata?: Record<string, unknown>
     }) =>
       adminFetch<{ product_category: ProductCategory }>(
         `/admin/product-categories/${id}`,

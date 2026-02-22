@@ -24,6 +24,9 @@
     "delete": "删除",
     "deleting": "删除中...",
     "active": "已启用",
-    "inactive": "已停用"
+    "inactive": "已停用",
+    "imageLabel": "分类头图",
+    "selectImage": "选择图片",
+    "changeImage": "更换图片"
   }
 }

@@ -24,6 +24,9 @@
     "delete": "Delete",
     "deleting": "Deleting...",
     "active": "Active",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "imageLabel": "Category Image",
+    "selectImage": "Select Image",
+    "changeImage": "Change Image"
   }
 }

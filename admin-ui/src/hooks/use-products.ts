@@ -50,6 +50,7 @@ export interface ProductCategory {
   is_active?: boolean
   is_internal?: boolean
   rank?: number
+  metadata?: Record<string, unknown> | null
   created_at?: string
   updated_at?: string
 }
