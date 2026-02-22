@@ -376,6 +376,14 @@ interface MedusaCategory {
   handle: string
 }
 
+export interface MedusaBrand {
+  id: string
+  name: string
+  description: string | null
+  logo_url: string | null
+  origin: string | null
+}
+
 export interface MedusaProduct {
   id: string
   title: string
@@ -387,6 +395,7 @@ export interface MedusaProduct {
   options: MedusaProductOption[]
   variants: MedusaVariant[]
   categories?: MedusaCategory[]
+  brand?: MedusaBrand | MedusaBrand[]
   collection_id: string | null
   metadata: Record<string, unknown> | null
   tags?: { id: string; value: string }[]
@@ -438,7 +447,7 @@ export async function fetchProducts(params: FetchProductsParams): Promise<Medusa
   const queryParams: Record<string, string> = {
     limit: String(params.limit ?? 20),
     offset: String(params.offset ?? 0),
-    fields: "id,title,handle,subtitle,description,thumbnail,*variants,*variants.prices,*images,*categories",
+    fields: "id,title,handle,subtitle,description,thumbnail,*variants,*variants.prices,*images,*categories,*brand",
   }
   if (params.category_id) {
     queryParams["category_id[]"] = params.category_id
@@ -461,7 +470,7 @@ export async function fetchProduct(handle: string): Promise<MedusaProduct | null
   try {
     const data = await medusaFetch<StoreProductResponse>("/store/products", {
       handle,
-      fields: "id,title,handle,subtitle,description,thumbnail,collection_id,metadata,*variants,*variants.prices,*variants.options,*options,*options.values,*images,*categories,*tags",
+      fields: "id,title,handle,subtitle,description,thumbnail,collection_id,metadata,*variants,*variants.prices,*variants.options,*options,*options.values,*images,*categories,*tags,*brand",
     })
     return data?.products?.[0] ?? null
   } catch {

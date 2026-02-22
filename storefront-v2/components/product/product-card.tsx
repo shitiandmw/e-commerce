@@ -33,7 +33,8 @@ function MedusaProductCard({
   const priceInfo = getMedusaPrice(product)
   const meta = (product.metadata ?? {}) as Record<string, string | undefined>
   const isLimited = meta.is_limited === "true"
-  const brandNameEn = meta.brand_name_en
+  const brandObj = Array.isArray(product.brand) ? product.brand[0] : product.brand
+  const brandNameEn = brandObj?.name ?? meta.brand_name_en
   const hasSingleVariant = (product.variants?.length ?? 0) === 1
   const firstVariantId = product.variants?.[0]?.id
 

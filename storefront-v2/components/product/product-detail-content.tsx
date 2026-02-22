@@ -5,7 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Minus, Plus, ShoppingBag, Heart, Share2, ChevronRight, Loader2 } from "lucide-react"
-import { type MedusaProduct, getMedusaImages } from "@/lib/data/products"
+import { type MedusaProduct, type MedusaBrand, getMedusaImages } from "@/lib/data/products"
 import { useCart } from "@/lib/cart-store"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ProductCard } from "@/components/product/product-card"
@@ -93,6 +93,10 @@ export function ProductDetailContent({
   const pairingNotes = meta.pairing_notes
   const brandName = meta.brand_name
   const brandNameEn = meta.brand_name_en
+  const brand: MedusaBrand | undefined = Array.isArray(product.brand) ? product.brand[0] : product.brand
+  const displayBrandName = brand?.name ?? brandName
+  const displayBrandNameEn = brandNameEn
+  const brandDescription = brand?.description
   const isLimited = meta.is_limited === "true"
 
   // Custom attributes from admin editor (metadata.attributes)
@@ -161,8 +165,8 @@ export function ProductDetailContent({
 
           {/* Product Info */}
           <div className="flex flex-col">
-            {brandNameEn && (
-              <p className="text-gold text-xs tracking-[0.3em] uppercase">{brandNameEn}</p>
+            {(displayBrandNameEn || displayBrandName) && (
+              <p className="text-gold text-xs tracking-[0.3em] uppercase">{displayBrandNameEn || displayBrandName}</p>
             )}
             <h1 className="mt-2 text-2xl md:text-3xl font-serif font-bold text-foreground leading-tight">{product.title}</h1>
             {product.subtitle && (
@@ -376,20 +380,23 @@ export function ProductDetailContent({
         </div>
 
         {/* Brand Story Banner */}
-        {brandName && (
+        {displayBrandName && (
           <div className="mt-16 border border-border/30 bg-card p-8 lg:p-12">
             <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8">
               <div className="flex-1">
                 <p className="text-gold text-xs tracking-[0.3em] uppercase mb-2">Brand Heritage</p>
-                <h2 className="text-xl font-serif font-bold text-foreground">{brandName}</h2>
-                {brandNameEn && <p className="mt-1 text-sm text-muted-foreground">{brandNameEn}</p>}
+                <h2 className="text-xl font-serif font-bold text-foreground">{displayBrandName}</h2>
+                {displayBrandNameEn && <p className="mt-1 text-sm text-muted-foreground">{displayBrandNameEn}</p>}
+                {brandDescription && (
+                  <p className="mt-4 text-sm text-muted-foreground leading-relaxed max-w-xl">{brandDescription}</p>
+                )}
               </div>
               {categoryHandle && (
                 <Link
                   href={`/category/${categoryHandle}`}
                   className="inline-flex items-center gap-2 border border-gold/50 text-gold px-6 py-2.5 text-sm tracking-wide hover:bg-gold hover:text-primary-foreground transition-all shrink-0"
                 >
-                  探索更多 {brandName} 雪茄
+                  探索更多 {displayBrandName} 雪茄
                 </Link>
               )}
             </div>
