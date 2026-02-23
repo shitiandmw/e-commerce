@@ -81,6 +81,35 @@
       "page": "第 {current} 页，共 {total} 页"
     },
 
+    "zones": {
+      "title": "配送区域",
+      "description": "管理仓库的配送服务区域和覆盖国家/地区",
+      "addZone": "添加服务区域",
+      "editZone": "编辑服务区域",
+      "createZone": "创建服务区域",
+      "noZones": "暂无配送区域配置。",
+      "noFulfillmentSets": "暂无物流集合，请先创建仓库和物流集合。",
+      "deleteConfirm": "确定要删除此服务区域吗？",
+      "countries": "覆盖国家/地区",
+      "fulfillmentSet": "物流集合",
+      "selectFulfillmentSet": "选择物流集合",
+      "form": {
+        "name": "区域名称 *",
+        "namePlaceholder": "例如：亚太地区",
+        "countries": "覆盖国家/地区",
+        "countriesHint": "选择此区域覆盖的国家/地区",
+        "searchPlaceholder": "搜索国家/地区...",
+        "selectAll": "全选",
+        "selected": "{count}/{total}",
+        "noResults": "无匹配结果",
+        "cancel": "取消",
+        "create": "创建",
+        "creating": "创建中...",
+        "update": "更新",
+        "updating": "更新中..."
+      }
+    },
+
     "actions": {
       "edit": "编辑",
       "delete": "删除"

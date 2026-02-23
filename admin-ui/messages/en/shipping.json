@@ -81,6 +81,35 @@
       "page": "Page {current} of {total}"
     },
 
+    "zones": {
+      "title": "Service Zones",
+      "description": "Manage fulfillment service zones and their country/region coverage",
+      "addZone": "Add Service Zone",
+      "editZone": "Edit Service Zone",
+      "createZone": "Create Service Zone",
+      "noZones": "No service zones configured.",
+      "noFulfillmentSets": "No fulfillment sets found. Please create a stock location and fulfillment set first.",
+      "deleteConfirm": "Are you sure you want to delete this service zone?",
+      "countries": "Countries/Regions",
+      "fulfillmentSet": "Fulfillment Set",
+      "selectFulfillmentSet": "Select Fulfillment Set",
+      "form": {
+        "name": "Zone Name *",
+        "namePlaceholder": "e.g. Asia Pacific",
+        "countries": "Countries/Regions",
+        "countriesHint": "Select countries/regions covered by this zone",
+        "searchPlaceholder": "Search countries/regions...",
+        "selectAll": "Select all",
+        "selected": "{count}/{total}",
+        "noResults": "No matching results",
+        "cancel": "Cancel",
+        "create": "Create",
+        "creating": "Creating...",
+        "update": "Update",
+        "updating": "Updating..."
+      }
+    },
+
     "actions": {
       "edit": "Edit",
       "delete": "Delete"
