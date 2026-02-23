@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl"
 import { ShippingOptionsTable } from "@/components/shipping/shipping-options-table"
 import { ShippingProfiles } from "@/components/shipping/shipping-profiles"
 import { FulfillmentProviders } from "@/components/shipping/fulfillment-providers"
+import { ServiceZones } from "@/components/shipping/service-zones"
 
 export default function ShippingPage() {
   const t = useTranslations("shipping")
@@ -16,6 +17,7 @@ export default function ShippingPage() {
         </p>
       </div>
 
+      <ServiceZones />
       <ShippingOptionsTable />
       <ShippingProfiles />
       <FulfillmentProviders />

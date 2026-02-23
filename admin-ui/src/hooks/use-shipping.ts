@@ -245,3 +245,98 @@ export function useStockLocations() {
       }),
   })
 }
+
+// ---- Service Zones (via Stock Locations) ----
+
+export interface GeoZone {
+  id: string
+  country_code: string
+  type: string
+}
+
+export interface ServiceZone {
+  id: string
+  name: string
+  geo_zones: GeoZone[]
+}
+
+export interface FulfillmentSet {
+  id: string
+  name: string
+  type: string
+  service_zones: ServiceZone[]
+}
+
+export interface StockLocationWithZones extends StockLocation {
+  fulfillment_sets: FulfillmentSet[]
+}
+
+interface StockLocationsWithZonesResponse {
+  stock_locations: StockLocationWithZones[]
+  count: number
+}
+
+export function useStockLocationsWithZones() {
+  return useQuery<StockLocationsWithZonesResponse>({
+    queryKey: ["stock-locations-zones"],
+    queryFn: () =>
+      adminFetch<StockLocationsWithZonesResponse>("/admin/stock-locations", {
+        params: {
+          limit: "50",
+          fields:
+            "*fulfillment_sets,*fulfillment_sets.service_zones,*fulfillment_sets.service_zones.geo_zones",
+        },
+      }),
+  })
+}
+
+export function useCreateServiceZone(fulfillmentSetId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: {
+      name: string
+      geo_zones: { country_code: string; type: string }[]
+    }) =>
+      adminFetch(
+        `/admin/fulfillment-sets/${fulfillmentSetId}/service-zones`,
+        { method: "POST", body: data }
+      ),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["stock-locations-zones"] })
+    },
+  })
+}
+
+export function useUpdateServiceZone(
+  fulfillmentSetId: string,
+  zoneId: string
+) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: {
+      name?: string
+      geo_zones?: { country_code: string; type: string }[]
+    }) =>
+      adminFetch(
+        `/admin/fulfillment-sets/${fulfillmentSetId}/service-zones/${zoneId}`,
+        { method: "POST", body: data }
+      ),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["stock-locations-zones"] })
+    },
+  })
+}
+
+export function useDeleteServiceZone(fulfillmentSetId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (zoneId: string) =>
+      adminFetch(
+        `/admin/fulfillment-sets/${fulfillmentSetId}/service-zones/${zoneId}`,
+        { method: "DELETE" }
+      ),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["stock-locations-zones"] })
+    },
+  })
+}
