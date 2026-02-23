@@ -10,7 +10,7 @@ export function BeginnerSection() {
           {/* Image */}
           <div className="relative h-64 lg:h-auto min-h-[400px]">
             <Image
-              src="/images/hero-3.jpg"
+              src="/images/beginner-guide.jpg"
               alt="新手入門"
               fill
               className="object-cover"
@@ -52,7 +52,7 @@ export function BeginnerSection() {
                 href="/category/mini-cigars"
                 className="inline-flex items-center gap-2 border border-border text-foreground/70 px-6 py-3 text-sm tracking-wide hover:border-gold hover:text-gold transition-colors"
               >
-                入門推薦
+                小雪茄入門系列 <ArrowRight className="size-4" />
               </Link>
             </div>
           </div>
