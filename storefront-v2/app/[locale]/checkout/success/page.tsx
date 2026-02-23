@@ -1,9 +1,45 @@
-import { Link } from "@/i18n/navigation"
-import { CheckCircle2, ArrowRight, Package } from "lucide-react"
-import { getTranslations } from "next-intl/server"
+"use client"
 
-export default async function CheckoutSuccessPage() {
-  const t = await getTranslations()
+import { useEffect, useState } from "react"
+import { Link } from "@/i18n/navigation"
+import { useSearchParams } from "next/navigation"
+import { CheckCircle2, ArrowRight, Package, Loader2 } from "lucide-react"
+import { useTranslations } from "next-intl"
+import { getToken } from "@/lib/auth"
+
+interface Order {
+  id: string
+  display_id?: number
+  status?: string
+  total?: number
+  currency_code?: string
+}
+
+export default function CheckoutSuccessPage() {
+  const t = useTranslations()
+  const searchParams = useSearchParams()
+  const orderId = searchParams.get("order_id")
+  const [order, setOrder] = useState<Order | null>(null)
+  const [loading, setLoading] = useState(!!orderId)
+
+  useEffect(() => {
+    if (!orderId) return
+    const token = getToken()
+    fetch(`/api/account/orders/${orderId}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+      .then((r) => r.json())
+      .then((data) => setOrder(data.order || null))
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [orderId])
+
+  const orderNumber = order?.display_id
+    ? `TC-${order.display_id}`
+    : orderId
+      ? `TC-${orderId.slice(-8).toUpperCase()}`
+      : `TC-${Date.now().toString(36).toUpperCase()}`
+
   return (
     <div className="mx-auto max-w-lg px-4 py-24 text-center">
       <div className="size-20 flex items-center justify-center rounded-full bg-gold/10 mx-auto mb-8">
@@ -23,20 +59,26 @@ export default async function CheckoutSuccessPage() {
           <Package className="size-4 text-gold/60" />
           <span className="text-sm text-foreground">{t("order_details")}</span>
         </div>
-        <div className="flex flex-col gap-2 text-xs">
-          <div className="flex justify-between py-1.5 border-b border-border/20">
-            <span className="text-muted-foreground">{t("order_number")}</span>
-            <span className="text-foreground font-mono">TC-{Date.now().toString(36).toUpperCase()}</span>
+        {loading ? (
+          <div className="flex items-center justify-center py-4">
+            <Loader2 className="size-4 animate-spin text-muted-foreground" />
           </div>
-          <div className="flex justify-between py-1.5 border-b border-border/20">
-            <span className="text-muted-foreground">{t("order_status")}</span>
-            <span className="text-gold">{t("order_status_processing")}</span>
+        ) : (
+          <div className="flex flex-col gap-2 text-xs">
+            <div className="flex justify-between py-1.5 border-b border-border/20">
+              <span className="text-muted-foreground">{t("order_number")}</span>
+              <span className="text-foreground font-mono">{orderNumber}</span>
+            </div>
+            <div className="flex justify-between py-1.5 border-b border-border/20">
+              <span className="text-muted-foreground">{t("order_status")}</span>
+              <span className="text-gold">{t("order_status_processing")}</span>
+            </div>
+            <div className="flex justify-between py-1.5">
+              <span className="text-muted-foreground">{t("estimated_delivery")}</span>
+              <span className="text-foreground">{t("delivery_days")}</span>
+            </div>
           </div>
-          <div className="flex justify-between py-1.5">
-            <span className="text-muted-foreground">{t("estimated_delivery")}</span>
-            <span className="text-foreground">{t("delivery_days")}</span>
-          </div>
-        </div>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -48,10 +90,10 @@ export default async function CheckoutSuccessPage() {
           <ArrowRight className="size-4" />
         </Link>
         <Link
-          href="/"
+          href="/account/orders"
           className="text-sm text-muted-foreground hover:text-gold transition-colors"
         >
-          {t("back_to_home")}
+          {t("view_orders")}
         </Link>
       </div>
     </div>
