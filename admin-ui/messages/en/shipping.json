@@ -113,6 +113,33 @@
     "actions": {
       "edit": "Edit",
       "delete": "Delete"
+    },
+
+    "locations": {
+      "title": "Stock Locations",
+      "description": "Manage warehouses and stock locations for inventory and fulfillment.",
+      "addLocation": "Add Location",
+      "editLocation": "Edit Location",
+      "noLocations": "No stock locations yet.",
+      "deleteConfirm": "Are you sure you want to delete this stock location?",
+      "fulfillmentSets": "{count} fulfillment sets",
+      "form": {
+        "name": "Name *",
+        "namePlaceholder": "e.g. European Warehouse",
+        "address": "Address *",
+        "addressPlaceholder": "Street address",
+        "city": "City",
+        "province": "Province",
+        "postalCode": "Postal Code",
+        "country": "Country",
+        "selectCountry": "Select country",
+        "cancel": "Cancel",
+        "create": "Create",
+        "creating": "Creating...",
+        "update": "Update",
+        "updating": "Updating...",
+        "saveFailed": "Save failed. Please check your input and try again."
+      }
     }
   }
 }

@@ -113,6 +113,33 @@
     "actions": {
       "edit": "编辑",
       "delete": "删除"
+    },
+
+    "locations": {
+      "title": "仓库管理",
+      "description": "管理仓库和库存地点，用于库存管理和物流配送。",
+      "addLocation": "添加仓库",
+      "editLocation": "编辑仓库",
+      "noLocations": "暂无仓库。",
+      "deleteConfirm": "确定要删除此仓库吗？",
+      "fulfillmentSets": "{count} 个物流集合",
+      "form": {
+        "name": "名称 *",
+        "namePlaceholder": "例如：欧洲仓库",
+        "address": "地址 *",
+        "addressPlaceholder": "街道地址",
+        "city": "城市",
+        "province": "省份",
+        "postalCode": "邮编",
+        "country": "国家",
+        "selectCountry": "选择国家",
+        "cancel": "取消",
+        "create": "创建",
+        "creating": "创建中...",
+        "update": "更新",
+        "updating": "更新中...",
+        "saveFailed": "保存失败，请检查输入后重试。"
+      }
     }
   }
 }

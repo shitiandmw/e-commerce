@@ -141,6 +141,23 @@
       "cancel": "Cancel",
       "updateStock": "Update Stock",
       "updating": "Updating..."
+    },
+
+    "addLocation": {
+      "addButton": "Add Location",
+      "title": "Add Stock Location",
+      "location": "Stock Location",
+      "selectLocation": "Select a location...",
+      "noAvailableLocations": "All locations already have inventory for this item.",
+      "stockedQuantity": "Initial Stocked Quantity",
+      "incomingQuantity": "Incoming Quantity",
+      "add": "Add",
+      "adding": "Adding...",
+      "errors": {
+        "selectLocation": "Please select a location.",
+        "invalidQuantity": "Please enter a valid quantity.",
+        "createFailed": "Failed to add location inventory."
+      }
     }
   }
 }

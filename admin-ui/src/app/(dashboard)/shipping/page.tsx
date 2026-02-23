@@ -1,6 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
+import { StockLocations } from "@/components/shipping/stock-locations"
 import { ShippingOptionsTable } from "@/components/shipping/shipping-options-table"
 import { ShippingProfiles } from "@/components/shipping/shipping-profiles"
 import { FulfillmentProviders } from "@/components/shipping/fulfillment-providers"
@@ -17,6 +18,7 @@ export default function ShippingPage() {
         </p>
       </div>
 
+      <StockLocations />
       <ServiceZones />
       <ShippingOptionsTable />
       <ShippingProfiles />

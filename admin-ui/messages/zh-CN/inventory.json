@@ -141,6 +141,23 @@
       "cancel": "取消",
       "updateStock": "更新库存",
       "updating": "更新中..."
+    },
+
+    "addLocation": {
+      "addButton": "添加仓库库存",
+      "title": "添加仓库库存",
+      "location": "仓库",
+      "selectLocation": "请选择仓库...",
+      "noAvailableLocations": "所有仓库已有此库存项的库存记录。",
+      "stockedQuantity": "初始库存量",
+      "incomingQuantity": "待入库数量",
+      "add": "添加",
+      "adding": "添加中...",
+      "errors": {
+        "selectLocation": "请选择仓库。",
+        "invalidQuantity": "请输入有效的数量。",
+        "createFailed": "添加仓库库存失败。"
+      }
     }
   }
 }

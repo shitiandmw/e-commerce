@@ -1,13 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 import {
   useShippingOptions,
   useDeleteShippingOption,
   type ShippingOption,
 } from "@/hooks/use-shipping"
 import { ShippingOptionForm } from "./shipping-option-form"
+import { getProviderLabel } from "./fulfillment-providers"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -31,6 +32,8 @@ const PAGE_SIZE = 20
 
 export function ShippingOptionsTable() {
   const t = useTranslations("shipping")
+  const locale = useLocale()
+  const isZh = locale.startsWith("zh")
   const [page, setPage] = useState(0)
   const [formOpen, setFormOpen] = useState(false)
   const [editOption, setEditOption] = useState<ShippingOption | null>(null)
@@ -132,7 +135,7 @@ export function ShippingOptionsTable() {
                     <TableCell>{formatPrice(option)}</TableCell>
                     <TableCell>
                       {option.provider_id ? (
-                        <Badge variant="secondary">{option.provider_id}</Badge>
+                        <Badge variant="secondary">{getProviderLabel(option.provider_id, isZh)}</Badge>
                       ) : (
                         <span className="text-muted-foreground">—</span>
                       )}

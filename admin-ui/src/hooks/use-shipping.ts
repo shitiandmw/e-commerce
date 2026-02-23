@@ -340,3 +340,78 @@ export function useDeleteServiceZone(fulfillmentSetId: string) {
     },
   })
 }
+
+// ---- Stock Location CRUD ----
+
+export function useCreateStockLocation() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (data: {
+      name: string
+      address?: {
+        address_1?: string
+        city?: string
+        province?: string
+        postal_code?: string
+        country_code?: string
+      }
+    }) => {
+      const res = await adminFetch<{ stock_location: StockLocation }>(
+        "/admin/stock-locations",
+        { method: "POST", body: data }
+      )
+      // Auto-create a fulfillment set so the location can have service zones
+      await adminFetch(
+        `/admin/stock-locations/${res.stock_location.id}/fulfillment-sets`,
+        {
+          method: "POST",
+          body: {
+            name: `${data.name} delivery`,
+            type: "shipping",
+          },
+        }
+      )
+      return res
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["stock-locations"] })
+      qc.invalidateQueries({ queryKey: ["stock-locations-zones"] })
+    },
+  })
+}
+
+export function useUpdateStockLocation(id: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: {
+      name?: string
+      address?: {
+        address_1?: string
+        city?: string
+        province?: string
+        postal_code?: string
+        country_code?: string
+      }
+    }) =>
+      adminFetch<{ stock_location: StockLocation }>(
+        `/admin/stock-locations/${id}`,
+        { method: "POST", body: data }
+      ),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["stock-locations"] })
+      qc.invalidateQueries({ queryKey: ["stock-locations-zones"] })
+    },
+  })
+}
+
+export function useDeleteStockLocation() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) =>
+      adminFetch(`/admin/stock-locations/${id}`, { method: "DELETE" }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["stock-locations"] })
+      qc.invalidateQueries({ queryKey: ["stock-locations-zones"] })
+    },
+  })
+}

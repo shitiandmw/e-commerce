@@ -16,6 +16,7 @@ import {
   LOW_STOCK_THRESHOLD,
 } from "@/hooks/use-inventory"
 import { InventoryAdjustDialog } from "./inventory-adjust-dialog"
+import { InventoryAddLocationDialog } from "./inventory-add-location-dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -30,6 +31,7 @@ import {
   Lock,
   Boxes,
   TrendingUp,
+  Plus,
 } from "lucide-react"
 
 interface InventoryDetailProps {
@@ -42,6 +44,7 @@ export function InventoryDetail({ inventoryItemId }: InventoryDetailProps) {
   const { data: locationsData } = useStockLocations()
   const [adjustOpen, setAdjustOpen] = React.useState(false)
   const [adjustLocationId, setAdjustLocationId] = React.useState<string | undefined>()
+  const [addLocationOpen, setAddLocationOpen] = React.useState(false)
 
   const item = data?.inventory_item
   const locations = locationsData?.stock_locations ?? []
@@ -208,9 +211,15 @@ export function InventoryDetail({ inventoryItemId }: InventoryDetailProps) {
                 <MapPin className="h-5 w-5" />
                 {t("detail.stockByLocation")}
               </h2>
-              <Badge variant="secondary">
-                {t("table.locationsCount", { count: item.location_levels?.length || 0 })}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => setAddLocationOpen(true)}>
+                  <Plus className="mr-1.5 h-3.5 w-3.5" />
+                  {t("addLocation.addButton")}
+                </Button>
+                <Badge variant="secondary">
+                  {t("table.locationsCount", { count: item.location_levels?.length || 0 })}
+                </Badge>
+              </div>
             </div>
 
             {!item.location_levels || item.location_levels.length === 0 ? (
@@ -466,6 +475,13 @@ export function InventoryDetail({ inventoryItemId }: InventoryDetailProps) {
         open={adjustOpen}
         onOpenChange={setAdjustOpen}
         preselectedLocationId={adjustLocationId}
+      />
+
+      {/* Add Location Dialog */}
+      <InventoryAddLocationDialog
+        item={item}
+        open={addLocationOpen}
+        onOpenChange={setAddLocationOpen}
       />
     </div>
   )

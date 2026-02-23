@@ -156,6 +156,26 @@ export function useUpdateInventoryLevel(inventoryItemId: string) {
   })
 }
 
+export function useCreateInventoryLevel(inventoryItemId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: {
+      location_id: string
+      stocked_quantity: number
+      incoming_quantity?: number
+    }) =>
+      adminFetch(
+        `/admin/inventory-items/${inventoryItemId}/location-levels`,
+        { method: "POST", body: data }
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inventory-items"] })
+      queryClient.invalidateQueries({ queryKey: ["inventory-item", inventoryItemId] })
+    },
+  })
+}
+
 export function useUpdateInventoryItem(id: string) {
   const queryClient = useQueryClient()
 

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 import {
   useCreateShippingOption,
   useUpdateShippingOption,
@@ -21,6 +21,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Select } from "@/components/ui/select"
+import { getProviderLabel } from "@/components/shipping/fulfillment-providers"
 
 interface ShippingOptionFormProps {
   open: boolean
@@ -34,6 +35,8 @@ export function ShippingOptionForm({
   editOption,
 }: ShippingOptionFormProps) {
   const t = useTranslations("shipping")
+  const locale = useLocale()
+  const isZh = locale.startsWith("zh")
   const createOption = useCreateShippingOption()
   const updateOption = useUpdateShippingOption(editOption?.id || "")
   const { data: profilesData } = useShippingProfiles()
@@ -205,7 +208,7 @@ export function ShippingOptionForm({
                 <option value="">{t("options.form.selectProvider")}</option>
                 {providers.map((p) => (
                   <option key={p.id} value={p.id}>
-                    {p.id}
+                    {getProviderLabel(p.id, isZh)}
                   </option>
                 ))}
               </Select>

@@ -1,13 +1,29 @@
 "use client"
 
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 import { useFulfillmentProviders } from "@/hooks/use-shipping"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Truck } from "lucide-react"
 
+const PROVIDER_LABELS: Record<string, { zh: string; en: string }> = {
+  "manual_manual": { zh: "手动发货", en: "Manual Fulfillment" },
+  "pp_manual_manual": { zh: "手动发货", en: "Manual Fulfillment" },
+  "pp_system_default": { zh: "系统默认", en: "System Default" },
+}
+
+export function getProviderLabel(id: string, isZh: boolean): string {
+  const label = PROVIDER_LABELS[id]
+  if (label) return isZh ? label.zh : label.en
+  // 把 pp_xxx_yyy 格式化为可读名称
+  const name = id.replace(/^pp_/, "").replace(/_/g, " ")
+  return name.charAt(0).toUpperCase() + name.slice(1)
+}
+
 export function FulfillmentProviders() {
   const t = useTranslations("shipping")
+  const locale = useLocale()
+  const isZh = locale.startsWith("zh")
   const { data, isLoading } = useFulfillmentProviders()
 
   if (isLoading) {
@@ -45,7 +61,10 @@ export function FulfillmentProviders() {
             >
               <div className="flex items-center gap-3">
                 <Truck className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium text-sm">{provider.id}</span>
+                <div>
+                  <span className="font-medium text-sm">{getProviderLabel(provider.id, isZh)}</span>
+                  <p className="text-xs text-muted-foreground font-mono">{provider.id}</p>
+                </div>
               </div>
               <Badge variant={provider.is_enabled !== false ? "default" : "secondary"}>
                 {provider.is_enabled !== false ? t("providers.enabled") : t("providers.disabled")}
