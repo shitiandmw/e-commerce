@@ -70,7 +70,7 @@ export function useRegions() {
     queryKey: ["admin-regions"],
     queryFn: () =>
       adminFetch<RegionsResponse>("/admin/regions", {
-        params: { limit: "50", fields: "+countries,+payment_providers" },
+        params: { limit: "50", fields: "+countries,*payment_providers" },
       }),
   })
 }
@@ -80,7 +80,7 @@ export function useRegion(id: string) {
     queryKey: ["admin-region", id],
     queryFn: () =>
       adminFetch<{ region: AdminRegion }>(`/admin/regions/${id}`, {
-        params: { fields: "+countries,+payment_providers" },
+        params: { fields: "+countries,*payment_providers" },
       }),
     enabled: !!id,
   })
@@ -94,6 +94,7 @@ export function useCreateRegion() {
       currency_code: string
       countries?: string[]
       automatic_taxes?: boolean
+      payment_providers?: string[]
     }) =>
       adminFetch<{ region: AdminRegion }>("/admin/regions", {
         method: "POST",
@@ -113,6 +114,7 @@ export function useUpdateRegion(id: string) {
       currency_code?: string
       countries?: string[]
       automatic_taxes?: boolean
+      payment_providers?: string[]
     }) =>
       adminFetch<{ region: AdminRegion }>(`/admin/regions/${id}`, {
         method: "POST",
@@ -158,7 +160,7 @@ export function useCurrencies() {
     queryKey: ["admin-currencies"],
     queryFn: () =>
       adminFetch<CurrenciesResponse>("/admin/currencies", {
-        params: { limit: "100" },
+        params: { limit: "200" },
       }),
   })
 }
@@ -300,6 +302,25 @@ export function usePaymentProviders() {
         params: { limit: "50" },
       }),
   })
+}
+
+/**
+ * 将 payment provider ID 转为可读名称
+ * pp_stripe_stripe → Stripe
+ * pp_stripe-ideal_stripe → Stripe Ideal
+ * pp_system_default → System Default
+ */
+export function formatProviderName(id: string): string {
+  // 去掉 pp_ 前缀
+  const withoutPrefix = id.replace(/^pp_/, "")
+  // 按 _ 分割，取第一段作为名称（第二段是 type，可忽略）
+  const parts = withoutPrefix.split("_")
+  const name = parts[0] || withoutPrefix
+  // 把 stripe-ideal 这种转成 Stripe Ideal
+  return name
+    .split("-")
+    .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+    .join(" ")
 }
 
 // ---- Tax Regions ----

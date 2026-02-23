@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { usePaymentProviders } from "@/hooks/use-settings"
+import { usePaymentProviders, formatProviderName } from "@/hooks/use-settings"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { CreditCard } from "lucide-react"
@@ -46,9 +46,9 @@ export function PaymentSettings() {
                 <div className="flex items-center gap-3">
                   <CreditCard className="h-8 w-8 text-muted-foreground" />
                   <div>
-                    <span className="font-medium">{provider.id}</span>
+                    <span className="font-medium">{formatProviderName(provider.id)}</span>
                     <p className="text-xs text-muted-foreground">
-                      {t("payment.paymentProvider")}
+                      {provider.id}
                     </p>
                   </div>
                 </div>

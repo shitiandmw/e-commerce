@@ -8,6 +8,8 @@ import {
   useUpdateRegion,
   useDeleteRegion,
   useCurrencies,
+  usePaymentProviders,
+  formatProviderName,
   type AdminRegion,
 } from "@/hooks/use-settings"
 import { Button } from "@/components/ui/button"
@@ -117,7 +119,7 @@ export function RegionSettings() {
                   )}
                   <p className="text-xs text-muted-foreground">
                     {region.payment_providers && region.payment_providers.length > 0
-                      ? t("regionSettings.paymentProviders", { count: region.payment_providers.length })
+                      ? region.payment_providers.map((p) => formatProviderName(p.id)).join(", ")
                       : t("regionSettings.noPaymentProviders")}
                   </p>
                 </div>
@@ -219,6 +221,7 @@ function RegionFormDialog({
   const t = useTranslations("settings")
   const createRegion = useCreateRegion()
   const updateRegion = useUpdateRegion(region?.id || "")
+  const { data: providersData } = usePaymentProviders()
 
   const [name, setName] = React.useState(region?.name || "")
   const [currencyCode, setCurrencyCode] = React.useState(
@@ -227,18 +230,31 @@ function RegionFormDialog({
   const [countriesInput, setCountriesInput] = React.useState(
     region?.countries?.map((c) => c.iso_2).join(", ") || ""
   )
+  const [selectedProviders, setSelectedProviders] = React.useState<string[]>(
+    region?.payment_providers?.map((p) => p.id) || []
+  )
+
+  const allProviders = providersData?.payment_providers || []
 
   React.useEffect(() => {
     if (region) {
       setName(region.name)
       setCurrencyCode(region.currency_code)
       setCountriesInput(region.countries?.map((c) => c.iso_2).join(", ") || "")
+      setSelectedProviders(region.payment_providers?.map((p) => p.id) || [])
     } else {
       setName("")
       setCurrencyCode("usd")
       setCountriesInput("")
+      setSelectedProviders([])
     }
   }, [region, open])
+
+  const toggleProvider = (id: string) => {
+    setSelectedProviders((prev) =>
+      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
+    )
+  }
 
   const handleSubmit = async () => {
     const countries = countriesInput
@@ -252,12 +268,14 @@ function RegionFormDialog({
           name,
           currency_code: currencyCode,
           countries,
+          payment_providers: selectedProviders,
         })
       } else {
         await updateRegion.mutateAsync({
           name,
           currency_code: currencyCode,
           countries,
+          payment_providers: selectedProviders,
         })
       }
       onOpenChange(false)
@@ -325,6 +343,34 @@ function RegionFormDialog({
               onChange={(e) => setCountriesInput(e.target.value)}
               placeholder={t("regionSettings.countriesPlaceholder")}
             />
+          </div>
+          <div className="space-y-2">
+            <Label>{t("regionSettings.paymentProvidersLabel")}</Label>
+            {allProviders.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                {t("regionSettings.noAvailableProviders")}
+              </p>
+            ) : (
+              <div className="space-y-2 max-h-48 overflow-y-auto rounded-md border p-3">
+                {allProviders.map((p) => (
+                  <label
+                    key={p.id}
+                    className="flex items-center gap-3 cursor-pointer py-1"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedProviders.includes(p.id)}
+                      onChange={() => toggleProvider(p.id)}
+                      className="rounded border-gray-300"
+                    />
+                    <div>
+                      <span className="text-sm">{formatProviderName(p.id)}</span>
+                      <span className="text-xs text-muted-foreground ml-2">{p.id}</span>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
           {error && (
             <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">

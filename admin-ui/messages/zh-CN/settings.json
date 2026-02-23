@@ -117,6 +117,8 @@
       "countries": "国家",
       "countriesHint": "（逗号分隔的 ISO 代码）",
       "countriesPlaceholder": "例如：us, ca, mx",
+      "paymentProvidersLabel": "支付服务商",
+      "noAvailableProviders": "暂无可用的支付服务商，请先在 Medusa 配置中添加。",
       "errorOccurred": "发生错误",
       "cancel": "取消",
       "create": "创建",

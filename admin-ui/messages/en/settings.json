@@ -117,6 +117,8 @@
       "countries": "Countries",
       "countriesHint": "(comma-separated ISO codes)",
       "countriesPlaceholder": "e.g. us, ca, mx",
+      "paymentProvidersLabel": "Payment Providers",
+      "noAvailableProviders": "No payment providers available. Please add a payment provider module in Medusa config.",
       "errorOccurred": "An error occurred",
       "cancel": "Cancel",
       "create": "Create",
