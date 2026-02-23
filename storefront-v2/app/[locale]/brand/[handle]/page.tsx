@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import { BrandPageContent } from "@/components/product/brand-page-content"
 import { fetchBrand } from "@/lib/data/brands"
 import { fetchProducts } from "@/lib/data/products"
+import { getRegion } from "@/lib/region"
 import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
 
@@ -42,13 +43,14 @@ export default async function BrandPage({
 
   // Get product IDs from brand, then fetch full product data
   const productIds = brand.products?.map((p) => p.id) ?? []
+  const region = await getRegion()
 
   let productsData = { products: [] as Awaited<ReturnType<typeof fetchProducts>>["products"], count: 0, offset: 0, limit: PAGE_SIZE }
   if (productIds.length > 0) {
     // Slice IDs for current page, then fetch those products
     const pageIds = productIds.slice(offset, offset + PAGE_SIZE)
     if (pageIds.length > 0) {
-      const data = await fetchProducts({ ids: pageIds, limit: PAGE_SIZE, order, locale })
+      const data = await fetchProducts({ ids: pageIds, limit: PAGE_SIZE, order, locale, region_id: region.id })
       productsData = { ...data, count: productIds.length }
     } else {
       productsData = { products: [], count: productIds.length, offset, limit: PAGE_SIZE }

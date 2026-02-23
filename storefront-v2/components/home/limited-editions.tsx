@@ -2,6 +2,7 @@ import Image from "next/image"
 import { Link } from "@/i18n/navigation"
 import { ArrowRight } from "lucide-react"
 import type { CollectionProductWithPrice } from "@/lib/data/collections"
+import { formatPrice } from "@/lib/format"
 import { getTranslations } from "next-intl/server"
 
 interface LimitedEditionsProps {
@@ -61,7 +62,7 @@ export async function LimitedEditions({ products }: LimitedEditionsProps) {
                   <div className="absolute bottom-0 left-0 right-0 p-4">
                     <h3 className="mt-1 text-sm font-serif font-medium text-foreground">{product.title}</h3>
                     {product.price !== null ? (
-                      <p className="mt-2 text-gold font-bold text-sm">HK${product.price.toLocaleString()}</p>
+                      <p className="mt-2 text-gold font-bold text-sm">{formatPrice(product.price, product.currency_code)}</p>
                     ) : (
                       <p className="mt-2 text-muted-foreground text-xs">{t("price_tbd")}</p>
                     )}

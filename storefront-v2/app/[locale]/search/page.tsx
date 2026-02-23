@@ -1,6 +1,7 @@
 import { Link } from "@/i18n/navigation"
 import { Search } from "lucide-react"
 import { fetchProducts, type MedusaProductListResponse } from "@/lib/data/products"
+import { getRegion } from "@/lib/region"
 import { ProductCard } from "@/components/product/product-card"
 import { getTranslations } from "next-intl/server"
 
@@ -23,7 +24,8 @@ export default async function SearchPage({
   let data: MedusaProductListResponse = { products: [], count: 0, offset: 0, limit: PAGE_SIZE }
 
   if (query) {
-    data = await fetchProducts({ q: query, limit: PAGE_SIZE, offset, locale })
+    const region = await getRegion()
+    data = await fetchProducts({ q: query, limit: PAGE_SIZE, offset, locale, region_id: region.id })
   }
 
   const totalPages = Math.ceil(data.count / PAGE_SIZE)

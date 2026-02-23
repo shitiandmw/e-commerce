@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { getToken } from "@/lib/auth"
+import { formatPrice } from "@/lib/format"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -90,8 +91,6 @@ export default function OrdersPage() {
   useEffect(() => { loadOrders() }, [loadOrders])
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit" })
-  const formatPrice = (amount: number, currency: string) =>
-    new Intl.NumberFormat("zh-CN", { style: "currency", currency: currency || "USD" }).format(amount)
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
   if (detail) {

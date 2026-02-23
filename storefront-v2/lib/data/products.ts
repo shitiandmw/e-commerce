@@ -354,11 +354,18 @@ interface MedusaPrice {
   currency_code: string
 }
 
+interface MedusaCalculatedPrice {
+  calculated_amount: number
+  currency_code: string
+  original_amount: number
+}
+
 interface MedusaVariant {
   id: string
   title: string
   sku: string | null
   prices: MedusaPrice[]
+  calculated_price?: MedusaCalculatedPrice
   options?: MedusaOptionValue[]
   inventory_quantity?: number
   manage_inventory?: boolean
@@ -420,6 +427,7 @@ export interface FetchProductsParams {
   order?: string
   q?: string
   locale?: string
+  region_id?: string
 }
 
 async function medusaFetch<T>(path: string, params?: Record<string, string | string[]>, locale?: string): Promise<T> {
@@ -458,7 +466,10 @@ export async function fetchProducts(params: FetchProductsParams): Promise<Medusa
   const queryParams: Record<string, string | string[]> = {
     limit: String(params.limit ?? 20),
     offset: String(params.offset ?? 0),
-    fields: "id,title,handle,subtitle,description,thumbnail,*variants,*variants.prices,*images,*categories,*brand",
+    fields: "id,title,handle,subtitle,description,thumbnail,*variants,*variants.prices,*variants.calculated_price,*images,*categories,*brand",
+  }
+  if (params.region_id) {
+    queryParams.region_id = params.region_id
   }
   if (params.category_id) {
     queryParams["category_id[]"] = params.category_id
@@ -483,12 +494,16 @@ export async function fetchProducts(params: FetchProductsParams): Promise<Medusa
 /**
  * Fetch a single product by handle from Medusa Store API.
  */
-export async function fetchProduct(handle: string, locale?: string): Promise<MedusaProduct | null> {
+export async function fetchProduct(handle: string, locale?: string, regionId?: string): Promise<MedusaProduct | null> {
   try {
-    const data = await medusaFetch<StoreProductResponse>("/store/products", {
+    const params: Record<string, string> = {
       handle,
-      fields: "id,title,handle,subtitle,description,thumbnail,collection_id,metadata,*variants,*variants.prices,*variants.options,*options,*options.values,*images,*categories,*tags,*brand",
-    }, locale)
+      fields: "id,title,handle,subtitle,description,thumbnail,collection_id,metadata,*variants,*variants.prices,*variants.calculated_price,*variants.options,*options,*options.values,*images,*categories,*tags,*brand",
+    }
+    if (regionId) {
+      params.region_id = regionId
+    }
+    const data = await medusaFetch<StoreProductResponse>("/store/products", params, locale)
     return data?.products?.[0] ?? null
   } catch {
     return null
@@ -503,28 +518,33 @@ export async function fetchRelatedProducts(
   product: MedusaProduct,
   limit = 4,
   locale?: string,
+  regionId?: string,
 ): Promise<MedusaProduct[]> {
-  const fields = "id,title,handle,thumbnail,*variants,*variants.prices"
+  const fields = "id,title,handle,thumbnail,*variants,*variants.prices,*variants.calculated_price"
   const categoryId = product.categories?.[0]?.id
 
   try {
     // 优先查同分类商品
     if (categoryId) {
-      const data = await medusaFetch<StoreProductResponse>("/store/products", {
+      const params: Record<string, string> = {
         category_id: categoryId,
         limit: String(limit + 1),
         fields,
-      }, locale)
+      }
+      if (regionId) params.region_id = regionId
+      const data = await medusaFetch<StoreProductResponse>("/store/products", params, locale)
       const results = (data?.products ?? []).filter((p) => p.id !== product.id).slice(0, limit)
       if (results.length > 0) return results
     }
 
     // Fallback: 最新商品
-    const data = await medusaFetch<StoreProductResponse>("/store/products", {
+    const fallbackParams: Record<string, string> = {
       limit: String(limit + 1),
       order: "-created_at",
       fields,
-    }, locale)
+    }
+    if (regionId) fallbackParams.region_id = regionId
+    const data = await medusaFetch<StoreProductResponse>("/store/products", fallbackParams, locale)
     return (data?.products ?? []).filter((p) => p.id !== product.id).slice(0, limit)
   } catch {
     return []
@@ -533,11 +553,27 @@ export async function fetchRelatedProducts(
 
 /* ---- Helpers for extracting display data from MedusaProduct ---- */
 
-export function getMedusaPrice(product: MedusaProduct): { amount: number; currency_code: string } | null {
-  const price = product.variants
-    ?.flatMap((v) => v.prices ?? [])
+/**
+ * Get price from calculated_price (region-aware, preferred) or fallback to raw prices.
+ * When region_id is passed to the API, Medusa populates calculated_price on each variant.
+ */
+export function getMedusaPrice(product: MedusaProduct, preferredCurrency = "usd"): { amount: number; currency_code: string } | null {
+  // 1. Prefer calculated_price (set when region_id is passed to API)
+  const calcPrices = product.variants
+    ?.map((v) => v.calculated_price)
+    .filter((cp): cp is MedusaCalculatedPrice => !!cp && cp.calculated_amount != null)
+  if (calcPrices?.length) {
+    const cheapest = calcPrices.sort((a, b) => a.calculated_amount - b.calculated_amount)[0]
+    return { amount: cheapest.calculated_amount, currency_code: cheapest.currency_code }
+  }
+  // 2. Fallback: raw prices filtered by preferred currency
+  const allPrices = product.variants?.flatMap((v) => v.prices ?? []) ?? []
+  const preferred = allPrices
+    .filter((p) => p.currency_code === preferredCurrency)
     .sort((a, b) => a.amount - b.amount)[0]
-  return price ? { amount: price.amount, currency_code: price.currency_code } : null
+  if (preferred) return { amount: preferred.amount, currency_code: preferred.currency_code }
+  const fallback = allPrices.sort((a, b) => a.amount - b.amount)[0]
+  return fallback ? { amount: fallback.amount, currency_code: fallback.currency_code } : null
 }
 
 export function getMedusaImages(product: MedusaProduct): string[] {

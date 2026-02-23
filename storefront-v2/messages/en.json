@@ -414,6 +414,15 @@
   "checkout_country_uk": "United Kingdom",
   "checkout_country_other": "Other",
 
+  "checkout_saved_addresses": "Saved Addresses",
+  "checkout_new_address": "Use New Address",
+  "checkout_payment_failed": "Payment failed, please try again",
+  "checkout_processing": "Processing...",
+  "checkout_to_be_calculated": "To be calculated",
+  "checkout_loading": "Loading...",
+  "checkout_no_shipping_options": "No shipping options available for your address. Please try a different address or contact support.",
+  "view_orders": "View Orders",
+
   "search_alt_hint": "Try other keywords, or browse our product catalog",
   "search_lang_support": "Supports Chinese and English search",
 

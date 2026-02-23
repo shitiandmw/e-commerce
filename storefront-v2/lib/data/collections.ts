@@ -128,7 +128,11 @@ export async function fetchProductPrices(
     for (const product of data?.products ?? []) {
       const cheapest = product.variants
         ?.flatMap((v) => v.prices ?? [])
+        .filter((p) => p.currency_code === "usd")
         .sort((a, b) => a.amount - b.amount)[0]
+        || product.variants
+          ?.flatMap((v) => v.prices ?? [])
+          .sort((a, b) => a.amount - b.amount)[0]
       if (cheapest) {
         priceMap.set(product.id, {
           price: cheapest.amount,
@@ -170,7 +174,7 @@ export async function fetchCollectionWithPrices(
         handle: item.product!.handle,
         thumbnail: item.product!.thumbnail,
         price: priceInfo?.price ?? null,
-        currency_code: priceInfo?.currency_code ?? "hkd",
+        currency_code: priceInfo?.currency_code ?? "usd",
       }
     })
 }

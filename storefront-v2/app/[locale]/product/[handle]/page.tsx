@@ -1,4 +1,5 @@
 import { fetchProduct, fetchRelatedProducts } from "@/lib/data/products"
+import { getRegion } from "@/lib/region"
 import { ProductDetailContent } from "@/components/product/product-detail-content"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
@@ -19,10 +20,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
 export default async function ProductPage({ params }: { params: Promise<{ locale: string; handle: string }> }) {
   const { locale, handle } = await params
-  const product = await fetchProduct(handle, locale)
+  const region = await getRegion()
+  const product = await fetchProduct(handle, locale, region.id)
   if (!product) notFound()
 
-  const relatedProducts = await fetchRelatedProducts(product, 4, locale)
+  const relatedProducts = await fetchRelatedProducts(product, 4, locale, region.id)
 
   return <ProductDetailContent product={product} relatedProducts={relatedProducts} />
 }

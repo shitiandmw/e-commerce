@@ -9,11 +9,7 @@ import { useTranslations, useLocale } from "next-intl"
 import type { CartLineItem } from "@/lib/cart"
 import type { MedusaProduct } from "@/lib/data/products"
 import { getMedusaPrice, getMedusaImages } from "@/lib/data/products"
-
-function formatPrice(amount: number, currencyCode?: string) {
-  const prefix = currencyCode === "hkd" || !currencyCode ? "HK$" : currencyCode.toUpperCase() + " "
-  return `${prefix}${(amount / 100).toLocaleString()}`
-}
+import { formatPrice } from "@/lib/format"
 
 function CartItemRow({ item, currencyCode }: { item: CartLineItem; currencyCode?: string }) {
   const { updateItem, removeItem, loading } = useCart()
@@ -146,8 +142,7 @@ function RecommendedProducts() {
               <p className="text-xs text-foreground mt-0.5 line-clamp-1 group-hover:text-gold transition-colors">{product.title}</p>
               {price && (
                 <p className="text-xs text-gold font-medium mt-1">
-                  {price.currency_code === "hkd" ? "HK$" : price.currency_code.toUpperCase() + " "}
-                  {(price.amount / 100).toLocaleString()}
+                  {formatPrice(price.amount, price.currency_code)}
                 </p>
               )}
             </Link>
@@ -164,7 +159,7 @@ export default function CartPage() {
   const subtotal = useCart(selectTotalPrice)
   const currencyCode = cart?.currency_code
   const items = cart?.items ?? []
-  const freeShippingThreshold = 200000 // in cents (HK$2000)
+  const freeShippingThreshold = 200000 // in cents ($2000)
   const shippingProgress = Math.min((subtotal / freeShippingThreshold) * 100, 100)
   const shippingRemaining = Math.max(freeShippingThreshold - subtotal, 0)
 

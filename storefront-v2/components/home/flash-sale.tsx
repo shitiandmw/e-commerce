@@ -4,6 +4,7 @@ import Image from "next/image"
 import { Link } from "@/i18n/navigation"
 import { ShoppingBag, Flame } from "lucide-react"
 import type { CollectionProductWithPrice } from "@/lib/data/collections"
+import { formatPrice } from "@/lib/format"
 import { useTranslations } from "next-intl"
 
 interface HotPicksProps {
@@ -70,7 +71,7 @@ export function HotPicks({ products }: HotPicksProps) {
                 <h3 className="mt-1 text-sm font-medium text-foreground leading-snug line-clamp-2">{product.title}</h3>
                 <div className="mt-3">
                   {product.price !== null ? (
-                    <span className="text-gold font-bold text-base">HK${product.price.toLocaleString()}</span>
+                    <span className="text-gold font-bold text-base">{formatPrice(product.price, product.currency_code)}</span>
                   ) : (
                     <span className="text-muted-foreground text-sm">{t("price_tbd")}</span>
                   )}

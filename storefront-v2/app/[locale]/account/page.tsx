@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react"
 import { Link } from "@/i18n/navigation"
 import { getCustomer, getToken } from "@/lib/auth"
+import { formatPrice } from "@/lib/format"
 import { useTranslations } from "next-intl"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -54,8 +55,6 @@ export default function AccountPage() {
   useEffect(() => { loadData() }, [loadData])
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString("zh-CN")
-  const formatPrice = (amount: number, currency: string) =>
-    new Intl.NumberFormat("zh-CN", { style: "currency", currency: currency || "USD" }).format(amount)
 
   if (loading) {
     return (

@@ -102,12 +102,6 @@ app/api/auth/*         → app/api/auth/*         # 认证代理路由 ✅
 app/api/account/*      → app/api/account/*      # 账户代理路由 ✅
 ```
 
-## 可选功能（按需添加）
-
-- 产品对比（v1 的 CompareProvider）
-- 欢迎弹窗 + 语言选择器（v1 的 WelcomeGate）
-- 优惠券弹窗（v1 的 CouponPopup）
-
 ## 原则
 
 - 每一步完成后前端都应可独立运行

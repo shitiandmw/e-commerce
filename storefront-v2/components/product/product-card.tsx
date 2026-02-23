@@ -5,6 +5,7 @@ import Image from "next/image"
 import { Link } from "@/i18n/navigation"
 import { ShoppingBag, Heart, Loader2 } from "lucide-react"
 import { type Product, type MedusaProduct, getMedusaPrice } from "@/lib/data/products"
+import { formatPrice } from "@/lib/format"
 import { useCart } from "@/lib/cart-store"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
@@ -106,8 +107,7 @@ function MedusaProductCard({
         <div className="mt-3">
           {priceInfo ? (
             <span className="text-gold font-bold">
-              {priceInfo.currency_code === "hkd" ? "HK$" : priceInfo.currency_code.toUpperCase() + " "}
-              {priceInfo.amount.toLocaleString()}
+              {formatPrice(priceInfo.amount, priceInfo.currency_code)}
             </span>
           ) : (
             <span className="text-muted-foreground font-bold">{t("price_tbd")}</span>
@@ -162,7 +162,7 @@ function MockProductCard({
         </h3>
         <p className="mt-0.5 text-xs text-muted-foreground">{product.nameEn}</p>
         <div className="mt-3 flex items-center justify-between">
-          <span className="text-gold font-bold">HK${product.price.toLocaleString()}</span>
+          <span className="text-gold font-bold">${product.price.toLocaleString()}</span>
           <span className="text-[10px] text-muted-foreground/60">{product.packSize}</span>
         </div>
         <div className="mt-2 flex items-center gap-2">

@@ -5,6 +5,7 @@ import {
   getCategoryBySlug,
 } from "@/lib/data/categories"
 import { fetchProducts } from "@/lib/data/products"
+import { getRegion } from "@/lib/region"
 import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
 
@@ -46,10 +47,11 @@ export default async function CategoryPage({
   }
 
   // Fetch category and all categories in parallel with mock fallback
-  const [medusaCategory, mockCategory, allCategories] = await Promise.all([
+  const [medusaCategory, mockCategory, allCategories, region] = await Promise.all([
     fetchCategoryByHandle(slug, locale),
     Promise.resolve(getCategoryBySlug(slug)),
     fetchAllCategories(locale),
+    getRegion(),
   ])
 
   // Fetch products using the Medusa category ID
@@ -60,6 +62,7 @@ export default async function CategoryPage({
         offset,
         order,
         locale,
+        region_id: region.id,
       })
     : { products: [], count: 0, offset: 0, limit: PAGE_SIZE }
 

@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation"
 import { useRouter } from "next/navigation"
 import { Minus, Plus, ShoppingBag, Heart, ChevronRight, Loader2 } from "lucide-react"
 import { type MedusaProduct, type MedusaBrand, getMedusaImages } from "@/lib/data/products"
+import { formatPrice } from "@/lib/format"
 import { useCart } from "@/lib/cart-store"
 import { useWishlist } from "@/lib/wishlist-store"
 import { isLoggedIn } from "@/lib/auth"
@@ -67,17 +68,33 @@ export function ProductDetailContent({
     )
   }, [selectedOptions, product])
 
-  // Price from selected variant, or cheapest variant as fallback
+  // Price from selected variant (prefer calculated_price), or cheapest variant as fallback
   const variantPrice = useMemo(() => {
     const v = selectedVariant
-    if (v?.prices?.length) {
-      const p = v.prices[0]
-      return { amount: p.amount, currency_code: p.currency_code }
+    if (v) {
+      // Prefer calculated_price (populated when region_id was passed)
+      if (v.calculated_price?.calculated_amount != null) {
+        return { amount: v.calculated_price.calculated_amount, currency_code: v.calculated_price.currency_code }
+      }
+      if (v.prices?.length) {
+        const usd = v.prices.find((p) => p.currency_code === "usd")
+        const p = usd || v.prices[0]
+        return { amount: p.amount, currency_code: p.currency_code }
+      }
     }
-    // Fallback: cheapest across all variants
-    const cheapest = product.variants
-      ?.flatMap((vr) => vr.prices ?? [])
-      .sort((a, b) => a.amount - b.amount)[0]
+    // Fallback: cheapest calculated_price across all variants
+    const calcPrices = product.variants
+      ?.map((vr) => vr.calculated_price)
+      .filter((cp): cp is NonNullable<typeof cp> => !!cp && cp.calculated_amount != null)
+    if (calcPrices?.length) {
+      const cheapest = calcPrices.sort((a, b) => a.calculated_amount - b.calculated_amount)[0]
+      return { amount: cheapest.calculated_amount, currency_code: cheapest.currency_code }
+    }
+    // Fallback: cheapest raw price in USD
+    const allPrices = product.variants?.flatMap((vr) => vr.prices ?? []) ?? []
+    const usd = allPrices.filter((p) => p.currency_code === "usd").sort((a, b) => a.amount - b.amount)[0]
+    if (usd) return { amount: usd.amount, currency_code: usd.currency_code }
+    const cheapest = allPrices.sort((a, b) => a.amount - b.amount)[0]
     return cheapest ? { amount: cheapest.amount, currency_code: cheapest.currency_code } : null
   }, [selectedVariant, product])
 
@@ -194,8 +211,7 @@ export function ProductDetailContent({
                 {variantPrice ? (
                   <span className="text-3xl font-bold text-gold">
                     {!selectedVariant && hasMultipleVariants && <span className="text-lg font-normal text-muted-foreground mr-1">{t("from")}</span>}
-                    {variantPrice.currency_code === "hkd" ? "HK$" : variantPrice.currency_code.toUpperCase() + " "}
-                    {variantPrice.amount.toLocaleString()}
+                    {formatPrice(variantPrice.amount, variantPrice.currency_code)}
                   </span>
                 ) : (
                   <span className="text-3xl font-bold text-muted-foreground">{t("price_tbd")}</span>

@@ -80,7 +80,7 @@ export interface PaymentSession {
   id: string
   provider_id: string
   status: string
-  data?: Record<string, unknown>
+  data?: Record<string, unknown> & { client_secret?: string }
 }
 
 const FIELDS = "fields=*items,*items.variant,*items.variant.product"
@@ -211,12 +211,12 @@ export async function clearCart(): Promise<Cart> {
   return cart
 }
 
-export async function initPaymentSessions(): Promise<Cart & { payment_collection?: { payment_sessions?: PaymentSession[] } }> {
+export async function initPaymentSessions(providerId = "pp_stripe_stripe"): Promise<Cart & { payment_collection?: { payment_sessions?: PaymentSession[] } }> {
   const cartId = getCartId()
   if (!cartId) throw new Error("No cart found")
   const data = await apiFetch<{ cart: Cart & { payment_collection?: { payment_sessions?: PaymentSession[] } } }>(
     `/api/cart/${cartId}/payment-sessions`,
-    { method: "POST", body: JSON.stringify({ provider_id: "pp_system_default" }) }
+    { method: "POST", body: JSON.stringify({ provider_id: providerId }) }
   )
   return data.cart
 }

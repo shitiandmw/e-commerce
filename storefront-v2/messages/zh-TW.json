@@ -414,6 +414,15 @@
   "checkout_country_uk": "英國",
   "checkout_country_other": "其他",
 
+  "checkout_saved_addresses": "已保存地址",
+  "checkout_new_address": "使用新地址",
+  "checkout_payment_failed": "付款失敗，請重試",
+  "checkout_processing": "處理中...",
+  "checkout_to_be_calculated": "待計算",
+  "checkout_loading": "載入中...",
+  "checkout_no_shipping_options": "當前地址暫無可用配送方式，請更換收貨地址或聯繫客服。",
+  "view_orders": "查看訂單",
+
   "search_alt_hint": "試試其他關鍵詞，或瀏覽我們的商品目錄",
   "search_lang_support": "支持中文和英文搜尋",
 
