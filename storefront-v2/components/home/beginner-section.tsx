@@ -18,7 +18,7 @@ export async function BeginnerSection() {
           {/* Image */}
           <div className="relative h-64 lg:h-auto min-h-[400px]">
             <Image
-              src="/images/hero-3.jpg"
+              src="/images/beginner-guide.jpg"
               alt={t("beginner_title")}
               fill
               className="object-cover"
