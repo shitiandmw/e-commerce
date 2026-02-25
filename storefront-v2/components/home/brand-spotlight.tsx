@@ -37,7 +37,7 @@ export async function BrandSpotlight() {
                   </div>
                 </div>
                 <Link
-                  href="/articles/guide-to-cuban-cigars"
+                  href="/brand-story"
                   className="mt-8 inline-flex items-center gap-2 text-sm text-gold hover:text-gold-light transition-colors tracking-wide"
                 >
                   {t("brand_story_link")} <ArrowRight className="size-4" />
