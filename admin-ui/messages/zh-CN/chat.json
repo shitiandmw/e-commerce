@@ -1,0 +1,26 @@
+{
+  "chat": {
+    "title": "客服",
+    "conversations": "会话列表",
+    "noConversation": "选择一个会话开始聊天",
+    "noConversations": "暂无会话",
+    "typeMessage": "输入消息...",
+    "send": "发送",
+    "close": "关闭会话",
+    "reopen": "重新打开",
+    "statusOpen": "进行中",
+    "statusClosed": "已关闭",
+    "allStatus": "全部",
+    "visitor": "访客",
+    "customer": "客户",
+    "agent": "客服",
+    "system": "系统",
+    "settings": "聊天设置",
+    "welcomeMessage": "欢迎语",
+    "offlineMessage": "离线消息",
+    "save": "保存",
+    "connected": "已连接",
+    "disconnected": "未连接",
+    "search": "搜索会话..."
+  }
+}

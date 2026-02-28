@@ -30,6 +30,10 @@
     "node_modules",
     ".medusa/server",
     ".medusa/admin",
-    ".cache"
+    ".cache",
+    "admin-ui",
+    "storefront",
+    "storefront-v2",
+    "src/chat-widget"
   ]
 }

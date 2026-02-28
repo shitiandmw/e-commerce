@@ -29,8 +29,10 @@ import {
   List,
   ChevronDown,
   FolderTree,
+  MessageCircle,
 } from "lucide-react"
 import { LanguageSwitcher } from "@/components/language-switcher"
+import { useChatSocketContext } from "@/providers/chat-socket-provider"
 
 type NavItem = {
   key: string
@@ -92,6 +94,7 @@ const navigation: NavEntry[] = [
       { key: "popups", href: "/popups", icon: Maximize2 },
     ],
   },
+  { key: "chat", href: "/chat", icon: MessageCircle },
   { key: "analytics", href: "/analytics", icon: BarChart3 },
   { key: "settings", href: "/settings", icon: Settings },
 ]
@@ -100,6 +103,7 @@ export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const t = useTranslations("sidebar")
+  const { totalUnread } = useChatSocketContext()
 
   // Auto-expand groups that contain the active route
   const [openGroups, setOpenGroups] = useState<Set<string>>(() => {
@@ -164,7 +168,12 @@ export function Sidebar() {
                   )}
                 >
                   <entry.icon className="h-4 w-4" />
-                  {t(entry.key)}
+                  <span className="flex-1">{t(entry.key)}</span>
+                  {entry.key === "chat" && totalUnread > 0 && (
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-xs font-medium text-destructive-foreground">
+                      {totalUnread > 99 ? "99+" : totalUnread}
+                    </span>
+                  )}
                 </Link>
               )
             }

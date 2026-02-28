@@ -38,6 +38,9 @@ module.exports = defineConfig({
       resolve: "./src/modules/wishlist",
     },
     {
+      resolve: "./src/modules/chat",
+    },
+    ...(process.env.STRIPE_API_KEY ? [{
       resolve: "@medusajs/medusa/payment",
       options: {
         providers: [
@@ -50,7 +53,7 @@ module.exports = defineConfig({
           },
         ],
       },
-    },
+    }] : []),
     {
       resolve: "@medusajs/medusa/translation",
     },

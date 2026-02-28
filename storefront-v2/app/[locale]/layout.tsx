@@ -4,6 +4,7 @@ import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server
 import { notFound } from 'next/navigation'
 import { Noto_Serif_SC, Geist } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import Script from 'next/script'
 import { Toaster } from 'sonner'
 import { LayoutShell } from '@/components/layout/layout-shell'
 import { AnnouncementBarServer } from '@/components/layout/announcement-bar-server'
@@ -70,6 +71,11 @@ export default async function LocaleLayout({ children, params }: Props) {
           <Toaster position="top-center" richColors />
         </NextIntlClientProvider>
         <Analytics />
+        <Script
+          src={`${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || 'http://localhost:9000'}/chat/widget`}
+          strategy="lazyOnload"
+          data-publishable-key={process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ''}
+        />
       </body>
     </html>
   )

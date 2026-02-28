@@ -1,0 +1,26 @@
+{
+  "chat": {
+    "title": "Chat",
+    "conversations": "Conversations",
+    "noConversation": "Select a conversation to start chatting",
+    "noConversations": "No conversations yet",
+    "typeMessage": "Type a message...",
+    "send": "Send",
+    "close": "Close conversation",
+    "reopen": "Reopen",
+    "statusOpen": "Open",
+    "statusClosed": "Closed",
+    "allStatus": "All",
+    "visitor": "Visitor",
+    "customer": "Customer",
+    "agent": "Agent",
+    "system": "System",
+    "settings": "Chat Settings",
+    "welcomeMessage": "Welcome message",
+    "offlineMessage": "Offline message",
+    "save": "Save",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "search": "Search conversations..."
+  }
+}

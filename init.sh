@@ -31,11 +31,12 @@ fi
 MEDUSA_PORT=$((9000 + OFFSET))
 ADMIN_PORT=$((3002 + OFFSET))
 STOREFRONT_PORT=$((3000 + OFFSET))
+SOCKET_PORT=$((9001 + OFFSET))
 
-export MEDUSA_PORT ADMIN_PORT STOREFRONT_PORT
+export MEDUSA_PORT ADMIN_PORT STOREFRONT_PORT SOCKET_PORT
 
 log "端口偏移量: $OFFSET（基于目录路径）"
-log "Medusa=$MEDUSA_PORT  Admin=$ADMIN_PORT  Storefront=$STOREFRONT_PORT"
+log "Medusa=$MEDUSA_PORT  Admin=$ADMIN_PORT  Storefront=$STOREFRONT_PORT  Socket.io=$SOCKET_PORT"
 
 # 写入 .ports.env 供其他工具读取
 cat > "$ROOT_DIR/.ports.env" <<EOF
@@ -43,11 +44,13 @@ PORT_OFFSET=$OFFSET
 MEDUSA_PORT=$MEDUSA_PORT
 ADMIN_PORT=$ADMIN_PORT
 STOREFRONT_PORT=$STOREFRONT_PORT
+SOCKET_PORT=$SOCKET_PORT
 EOF
 
 # 生成 admin-ui/.env.local
 cat > "$ROOT_DIR/admin-ui/.env.local" <<EOF
 NEXT_PUBLIC_MEDUSA_BACKEND_URL=http://localhost:$MEDUSA_PORT
+NEXT_PUBLIC_SOCKET_URL=http://localhost:$SOCKET_PORT
 EOF
 
 # 生成 storefront-v2/.env.local（Publishable key 在后端就绪后自动获取）
@@ -78,6 +81,12 @@ fi
 if [ ! -d "storefront-v2/node_modules" ]; then
   log "安装 Storefront V2 依赖..."
   cd "$ROOT_DIR/storefront-v2" && npm install && cd "$ROOT_DIR"
+fi
+
+# ---------- 构建聊天 Widget ----------
+if [ ! -f "src/chat-widget/dist/widget.js" ]; then
+  log "构建聊天 Widget..."
+  npx tsx src/chat-widget/build.ts
 fi
 
 # ---------- 提高文件描述符限制 ----------
@@ -229,6 +238,7 @@ echo -e "${BLUE}============================================${NC}"
 echo -e "  后端:       ${GREEN}http://localhost:$MEDUSA_PORT${NC}"
 echo -e "  管理后台:   ${GREEN}http://localhost:$ADMIN_PORT${NC}"
 echo -e "  前台商城:   ${GREEN}http://localhost:$STOREFRONT_PORT${NC}"
+echo -e "  Socket.io:  ${GREEN}ws://localhost:$SOCKET_PORT${NC}"
 echo -e "  数据库: PostgreSQL :55432"
 echo -e "  缓存: Redis :56739"
 echo -e "${BLUE}--------------------------------------------${NC}"

@@ -66,6 +66,14 @@ import {
 import {
   AddWishlistItemSchema,
 } from "./store/wishlist/validators"
+import {
+  PostStoreCreateConversation,
+} from "./store/chat/validators"
+import {
+  PostAdminUpdateConversation,
+  PostAdminUpdateChatSettings,
+} from "./admin/chat/validators"
+import { initSocketIO, setContainer } from "../lib/socket-io"
 
 export const GetBrandsSchema = createFindParams().merge(z.object({ q: z.string().optional() }))
 export const GetTagsSchema = createFindParams()
@@ -82,6 +90,11 @@ export const GetArticleCategoriesSchema = createFindParams()
 export const GetCuratedCollectionsSchema = createFindParams()
 export const GetMenusSchema = createFindParams()
 export const GetAttributeTemplatesSchema = createFindParams()
+
+export const GetConversationsSchema = createFindParams().merge(z.object({
+  q: z.string().optional(),
+  status: z.string().optional(),
+}))
 
 export const GetStoreContentSchema = createFindParams().merge(z.object({
   locale: z.string().optional(),
@@ -592,6 +605,77 @@ export default defineMiddlewares({
       method: "POST",
       middlewares: [
         validateAndTransformBody(AddWishlistItemSchema),
+      ],
+    },
+    // Socket.io lazy initialization — triggers on first chat-related request
+    {
+      matcher: "/admin/chat/**",
+      middlewares: [
+        (req, _res, next) => {
+          initSocketIO()
+          setContainer(req.scope)
+          next()
+        },
+      ],
+    },
+    {
+      matcher: "/store/chat/**",
+      middlewares: [
+        (req, _res, next) => {
+          initSocketIO()
+          setContainer(req.scope)
+          next()
+        },
+      ],
+    },
+    {
+      matcher: "/chat/**",
+      middlewares: [
+        (req, _res, next) => {
+          initSocketIO()
+          setContainer(req.scope)
+          next()
+        },
+      ],
+    },
+    // Chat store routes (no auth required - visitors can chat)
+    {
+      matcher: "/store/chat/conversations",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostStoreCreateConversation),
+      ],
+    },
+    // Chat admin routes
+    {
+      matcher: "/admin/chat/conversations",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(
+          GetConversationsSchema,
+          {
+            defaults: [
+              "id", "visitor_id", "customer_id", "assigned_agent_id",
+              "status", "last_message_preview", "last_message_at",
+              "unread_count", "created_at", "updated_at",
+            ],
+            isList: true,
+          }
+        ),
+      ],
+    },
+    {
+      matcher: "/admin/chat/conversations/:id",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminUpdateConversation),
+      ],
+    },
+    {
+      matcher: "/admin/chat/settings",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminUpdateChatSettings),
       ],
     },
   ],

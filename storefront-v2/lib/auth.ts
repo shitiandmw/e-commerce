@@ -10,6 +10,8 @@ export function getToken(): string | null {
 export function setToken(token: string) {
   localStorage.setItem(TOKEN_KEY, token)
   window.dispatchEvent(new Event("auth-change"))
+  // Sync with chat widget
+  ;(window as any).TimeCigarChat?.setCustomerToken(token)
 }
 
 export function removeToken() {

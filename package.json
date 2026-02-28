@@ -22,14 +22,17 @@
     "db:reset": "bash scripts/reset-db.sh",
     "test:integration:http": "TEST_TYPE=integration:http NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
     "test:integration:modules": "TEST_TYPE=integration:modules NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
-    "test:unit": "TEST_TYPE=unit NODE_OPTIONS=--experimental-vm-modules jest --silent --runInBand --forceExit"
+    "test:unit": "TEST_TYPE=unit NODE_OPTIONS=--experimental-vm-modules jest --silent --runInBand --forceExit",
+    "build:widget": "npx tsx src/chat-widget/build.ts"
   },
   "dependencies": {
     "@medusajs/admin-sdk": "2.13.1",
     "@medusajs/cli": "2.13.1",
     "@medusajs/framework": "2.13.1",
     "@medusajs/medusa": "2.13.1",
-    "@medusajs/payment-stripe": "^2.13.1"
+    "@medusajs/payment-stripe": "^2.13.1",
+    "@socket.io/redis-adapter": "^8.3.0",
+    "socket.io": "^4.8.3"
   },
   "devDependencies": {
     "@medusajs/test-utils": "2.13.1",
@@ -39,11 +42,13 @@
     "@types/node": "^20.12.11",
     "@types/react": "^18.3.2",
     "@types/react-dom": "^18.2.25",
+    "esbuild": "^0.24.0",
     "jest": "^29.7.0",
     "patch-package": "^8.0.1",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "socket.io-client": "^4.8.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.2",
     "vite": "^5.4.14",
