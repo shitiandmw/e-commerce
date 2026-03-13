@@ -2,25 +2,25 @@ import { z } from "zod"
 
 const TranslationsSchema = z.record(z.string(), z.object({
   text: z.string().optional(),
-})).nullable().optional()
+})).optional()
 
 export const PostAdminCreateAnnouncement = z.object({
   text: z.string().min(1),
-  link_url: z.string().url().nullable().optional(),
+  link_url: z.string().url().optional(),
   sort_order: z.number().int().optional(),
   is_enabled: z.boolean().optional(),
-  starts_at: z.string().nullable().optional(),
-  ends_at: z.string().nullable().optional(),
+  starts_at: z.string().optional(),
+  ends_at: z.string().optional(),
   translations: TranslationsSchema,
 })
 
 export const PostAdminUpdateAnnouncement = z.object({
   text: z.string().min(1).optional(),
-  link_url: z.string().url().nullable().optional(),
+  link_url: z.string().url().optional(),
   sort_order: z.number().int().optional(),
   is_enabled: z.boolean().optional(),
-  starts_at: z.string().nullable().optional(),
-  ends_at: z.string().nullable().optional(),
+  starts_at: z.string().optional(),
+  ends_at: z.string().optional(),
   translations: TranslationsSchema,
 })
 

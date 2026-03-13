@@ -10,9 +10,9 @@ import BrandModuleService from "../../modules/brand/service"
 type UpdateBrandInput = {
   id: string
   name?: string
-  description?: string | null
-  logo_url?: string | null
-  translations?: Record<string, any> | null
+  description?: string
+  logo_url?: string
+  translations?: Record<string, any>
 }
 
 const updateBrandStep = createStep(

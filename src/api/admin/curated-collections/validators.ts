@@ -3,7 +3,7 @@ import { z } from "zod"
 const TranslationsSchema = z.record(z.string(), z.object({
   name: z.string().optional(),
   description: z.string().optional(),
-})).nullable().optional()
+})).optional()
 
 // Collection validators
 export const PostAdminCreateCuratedCollection = z.object({
@@ -17,7 +17,7 @@ export const PostAdminCreateCuratedCollection = z.object({
 export const PostAdminUpdateCuratedCollection = z.object({
   name: z.string().min(1).optional(),
   key: z.string().min(1).optional(),
-  description: z.string().nullable().optional(),
+  description: z.string().optional(),
   sort_order: z.number().int().optional(),
   translations: TranslationsSchema,
 })
@@ -38,12 +38,12 @@ export const PostAdminUpdateCollectionTab = z.object({
 // Item validators
 export const PostAdminAddCollectionItem = z.object({
   product_id: z.string().min(1),
-  tab_id: z.string().nullable().optional(),
+  tab_id: z.string().optional(),
   sort_order: z.number().int().optional(),
 })
 
 export const PostAdminUpdateCollectionItem = z.object({
-  tab_id: z.string().nullable().optional(),
+  tab_id: z.string().optional(),
   sort_order: z.number().int().optional(),
 })
 

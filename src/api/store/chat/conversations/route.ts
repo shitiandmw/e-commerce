@@ -14,7 +14,7 @@ export const POST = async (
   const { result } = await createConversationWorkflow(req.scope).run({
     input: {
       customer_id: customerId,
-      visitor_id: customerId ? null : (req.validatedBody.visitor_id || null),
+      visitor_id: customerId ? undefined : (req.validatedBody.visitor_id || undefined),
     },
   })
 

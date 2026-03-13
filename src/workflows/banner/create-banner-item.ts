@@ -15,9 +15,9 @@ type CreateBannerItemInput = {
   link_url?: string
   sort_order?: number
   is_enabled?: boolean
-  starts_at?: string | Date | null
-  ends_at?: string | Date | null
-  translations?: Record<string, any> | null
+  starts_at?: string
+  ends_at?: string
+  translations?: Record<string, any>
 }
 
 const createBannerItemStep = createStep(
@@ -26,8 +26,8 @@ const createBannerItemStep = createStep(
     const bannerService: BannerModuleService = container.resolve(BANNER_MODULE)
     const data = {
       ...input,
-      starts_at: input.starts_at ? new Date(input.starts_at) : null,
-      ends_at: input.ends_at ? new Date(input.ends_at) : null,
+      starts_at: input.starts_at ? new Date(input.starts_at) : undefined,
+      ends_at: input.ends_at ? new Date(input.ends_at) : undefined,
     }
     const item = await bannerService.createBannerItems(data)
     return new StepResponse(item, item.id)

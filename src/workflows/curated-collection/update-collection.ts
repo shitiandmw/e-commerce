@@ -11,9 +11,9 @@ type UpdateCollectionInput = {
   id: string
   name?: string
   key?: string
-  description?: string | null
+  description?: string
   sort_order?: number
-  translations?: Record<string, any> | null
+  translations?: Record<string, any>
 }
 
 const updateCollectionStep = createStep(

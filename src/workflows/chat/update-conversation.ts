@@ -10,7 +10,7 @@ import ChatModuleService from "../../modules/chat/service"
 type UpdateConversationInput = {
   id: string
   status?: "open" | "closed"
-  assigned_agent_id?: string | null
+  assigned_agent_id?: string
   unread_count?: number
 }
 

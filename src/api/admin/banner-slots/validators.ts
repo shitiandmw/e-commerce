@@ -9,7 +9,7 @@ export const PostAdminCreateBannerSlot = z.object({
 export const PostAdminUpdateBannerSlot = z.object({
   name: z.string().min(1).optional(),
   key: z.string().min(1).optional(),
-  description: z.string().nullable().optional(),
+  description: z.string().optional(),
 })
 
 export type PostAdminCreateBannerSlotType = z.infer<typeof PostAdminCreateBannerSlot>

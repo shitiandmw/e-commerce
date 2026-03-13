@@ -36,7 +36,7 @@ export default async function seedCategories({ container }: ExecArgs) {
     const cats = await productCategoryService.listProductCategories({ name })
     for (const cat of cats) {
       try {
-        await productCategoryService.deleteProductCategories(cat.id)
+        await productCategoryService.deleteProductCategories([cat.id])
         console.log(`Deleted default category: ${name}`)
       } catch (e: any) {
         console.warn(`Could not delete category ${name}: ${e.message}`)

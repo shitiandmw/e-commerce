@@ -10,7 +10,7 @@ import TagModuleService from "../../modules/tag/service"
 type UpdateTagInput = {
   id: string
   name?: string
-  color?: string | null
+  color?: string
   type?: "badge" | "attribute"
 }
 

@@ -34,6 +34,7 @@
     "admin-ui",
     "storefront",
     "storefront-v2",
-    "src/chat-widget"
+    "src/chat-widget",
+    "template"
   ]
 }

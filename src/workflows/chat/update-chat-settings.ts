@@ -8,9 +8,9 @@ import { CHAT_MODULE } from "../../modules/chat"
 import ChatModuleService from "../../modules/chat/service"
 
 type UpdateChatSettingsInput = {
-  welcome_message?: string | null
-  offline_message?: string | null
-  business_hours?: Record<string, any> | null
+  welcome_message?: string
+  offline_message?: string
+  business_hours?: Record<string, any>
 }
 
 const updateChatSettingsStep = createStep(

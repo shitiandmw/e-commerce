@@ -8,8 +8,8 @@ import { CHAT_MODULE } from "../../modules/chat"
 import ChatModuleService from "../../modules/chat/service"
 
 type CreateConversationInput = {
-  visitor_id?: string | null
-  customer_id?: string | null
+  visitor_id?: string
+  customer_id?: string
 }
 
 const createConversationStep = createStep(

@@ -41,14 +41,14 @@ export const POST = async (
   const { id } = req.params
   const { content, sender_type, sender_id } = req.body as {
     content: string
-    sender_type: string
+    sender_type?: "customer" | "visitor" | "agent" | "system"
     sender_id: string
   }
 
   const { result } = await sendMessageWorkflow(req.scope).run({
     input: {
       conversation_id: id,
-      sender_type: sender_type || "visitor",
+      sender_type: (sender_type || "visitor") as "customer" | "visitor" | "agent" | "system",
       sender_id: sender_id || "anonymous",
       content,
       message_type: "text",

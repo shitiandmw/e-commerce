@@ -5,7 +5,7 @@ const SeoSchema = z.object({
   meta_description: z.string().optional(),
   og_image: z.string().optional(),
   keywords: z.string().optional(),
-}).nullable().optional()
+}).optional()
 
 export const PostAdminCreateArticle = z.object({
   title: z.string().min(1),
@@ -14,7 +14,7 @@ export const PostAdminCreateArticle = z.object({
   summary: z.string().optional(),
   content: z.string().optional(),
   status: z.enum(["draft", "published"]).optional(),
-  published_at: z.string().datetime().nullable().optional(),
+  published_at: z.string().datetime().optional(),
   sort_order: z.number().optional(),
   is_pinned: z.boolean().optional(),
   category_id: z.string().optional(),
@@ -24,14 +24,14 @@ export const PostAdminCreateArticle = z.object({
 export const PostAdminUpdateArticle = z.object({
   title: z.string().min(1).optional(),
   slug: z.string().min(1).optional(),
-  cover_image: z.string().nullable().optional(),
-  summary: z.string().nullable().optional(),
-  content: z.string().nullable().optional(),
+  cover_image: z.string().optional(),
+  summary: z.string().optional(),
+  content: z.string().optional(),
   status: z.enum(["draft", "published"]).optional(),
-  published_at: z.string().datetime().nullable().optional(),
+  published_at: z.string().datetime().optional(),
   sort_order: z.number().optional(),
   is_pinned: z.boolean().optional(),
-  category_id: z.string().nullable().optional(),
+  category_id: z.string().optional(),
   seo: SeoSchema,
 })
 

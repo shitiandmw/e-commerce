@@ -21,7 +21,7 @@ export default async function syncTranslationSettings(
   if (!settingsService) return
 
   const currentSettings = await settingsService.list()
-  const settingsMap = new Map(
+  const settingsMap = new Map<string, any>(
     currentSettings.map((s: any) => [s.entity_type, s])
   )
 
@@ -29,7 +29,7 @@ export default async function syncTranslationSettings(
 
   for (const entity of translatableEntities) {
     const entityType = toSnakeCase(entity.entity)
-    const existing = settingsMap.get(entityType)
+    const existing: any = settingsMap.get(entityType)
     if (!existing) continue
 
     const currentFields: string[] = existing.fields || []

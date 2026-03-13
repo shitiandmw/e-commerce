@@ -8,19 +8,19 @@ import { POPUP_MODULE } from "../../modules/popup"
 import PopupModuleService from "../../modules/popup/service"
 
 type CreatePopupInput = {
-  title?: string | null
-  description?: string | null
-  image_url?: string | null
-  button_text?: string | null
-  button_link?: string | null
+  title?: string
+  description?: string
+  image_url?: string
+  button_text?: string
+  button_link?: string
   is_enabled?: boolean
   trigger_type?: "first_visit" | "every_visit" | "specific_page"
   display_frequency?: "once" | "once_per_session" | "once_per_day"
-  target_page?: string | null
+  target_page?: string
   sort_order?: number
   popup_type?: "general" | "coupon"
-  coupon_code?: string | null
-  translations?: Record<string, any> | null
+  coupon_code?: string
+  translations?: Record<string, any>
 }
 
 const createPopupStep = createStep(

@@ -10,13 +10,13 @@ import MenuModuleService from "../../modules/menu/service"
 type UpdateMenuItemInput = {
   id: string
   label?: string
-  url?: string | null
-  icon_url?: string | null
+  url?: string
+  icon_url?: string
   sort_order?: number
   is_enabled?: boolean
-  metadata?: Record<string, unknown> | null
-  parent_id?: string | null
-  translations?: Record<string, any> | null
+  metadata?: Record<string, unknown>
+  parent_id?: string
+  translations?: Record<string, any>
 }
 
 const updateMenuItemStep = createStep(

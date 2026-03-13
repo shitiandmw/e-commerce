@@ -11,16 +11,16 @@ type UpdateArticleInput = {
   id: string
   title?: string
   slug?: string
-  cover_image?: string | null
-  summary?: string | null
-  content?: string | null
+  cover_image?: string
+  summary?: string
+  content?: string
   status?: string
-  published_at?: string | null
+  published_at?: string
   sort_order?: number
   is_pinned?: boolean
-  category_id?: string | null
-  translations?: Record<string, any> | null
-  seo?: Record<string, any> | null
+  category_id?: string
+  translations?: Record<string, any>
+  seo?: Record<string, any>
 }
 
 const updateArticleStep = createStep(

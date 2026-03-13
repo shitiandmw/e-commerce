@@ -2,13 +2,13 @@ import { z } from "zod"
 
 export const PostAdminCreateTag = z.object({
   name: z.string().min(1),
-  color: z.string().nullable().optional(),
+  color: z.string().optional(),
   type: z.enum(["badge", "attribute"]).default("badge"),
 })
 
 export const PostAdminUpdateTag = z.object({
   name: z.string().min(1).optional(),
-  color: z.string().nullable().optional(),
+  color: z.string().optional(),
   type: z.enum(["badge", "attribute"]).optional(),
 })
 

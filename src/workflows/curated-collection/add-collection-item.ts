@@ -10,7 +10,7 @@ import CuratedCollectionModuleService from "../../modules/curated-collection/ser
 type AddCollectionItemInput = {
   collection_id: string
   product_id: string
-  tab_id?: string | null
+  tab_id?: string
   sort_order?: number
 }
 

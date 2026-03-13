@@ -11,14 +11,14 @@ type UpdateBannerItemInput = {
   id: string
   slot_id?: string
   image_url?: string
-  title?: string | null
-  subtitle?: string | null
-  link_url?: string | null
+  title?: string
+  subtitle?: string
+  link_url?: string
   sort_order?: number
   is_enabled?: boolean
-  starts_at?: string | Date | null
-  ends_at?: string | Date | null
-  translations?: Record<string, any> | null
+  starts_at?: string
+  ends_at?: string
+  translations?: Record<string, any>
 }
 
 const updateBannerItemStep = createStep(
@@ -28,10 +28,10 @@ const updateBannerItemStep = createStep(
     const existing = await bannerService.retrieveBannerItem(input.id)
     const data: Record<string, unknown> = { ...input }
     if (input.starts_at !== undefined) {
-      data.starts_at = input.starts_at ? new Date(input.starts_at) : null
+      data.starts_at = input.starts_at ? new Date(input.starts_at) : undefined
     }
     if (input.ends_at !== undefined) {
-      data.ends_at = input.ends_at ? new Date(input.ends_at) : null
+      data.ends_at = input.ends_at ? new Date(input.ends_at) : undefined
     }
     const item = await bannerService.updateBannerItems(data as any)
     return new StepResponse(item, existing)

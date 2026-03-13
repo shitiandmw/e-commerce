@@ -11,7 +11,7 @@ type UpdateBannerSlotInput = {
   id: string
   name?: string
   key?: string
-  description?: string | null
+  description?: string
 }
 
 const updateBannerSlotStep = createStep(

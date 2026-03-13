@@ -9,19 +9,24 @@ import AnnouncementModuleService from "../../modules/announcement/service"
 
 type CreateAnnouncementInput = {
   text: string
-  link_url?: string | null
+  link_url?: string
   sort_order?: number
   is_enabled?: boolean
-  starts_at?: string | null
-  ends_at?: string | null
-  translations?: Record<string, any> | null
+  starts_at?: string
+  ends_at?: string
+  translations?: Record<string, any>
 }
 
 const createAnnouncementStep = createStep(
   "create-announcement-step",
   async (input: CreateAnnouncementInput, { container }) => {
     const announcementService: AnnouncementModuleService = container.resolve(ANNOUNCEMENT_MODULE)
-    const announcement = await announcementService.createAnnouncements(input)
+    const data = {
+      ...input,
+      starts_at: input.starts_at ? new Date(input.starts_at) : undefined,
+      ends_at: input.ends_at ? new Date(input.ends_at) : undefined,
+    }
+    const announcement = await announcementService.createAnnouncements(data)
     return new StepResponse(announcement, announcement.id)
   },
   async (announcementId: string, { container }) => {

@@ -11,7 +11,7 @@ type CreateBrandInput = {
   name: string
   description?: string
   logo_url?: string
-  translations?: Record<string, any> | null
+  translations?: Record<string, any>
 }
 
 const createBrandStep = createStep(

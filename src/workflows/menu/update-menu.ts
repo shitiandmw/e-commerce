@@ -11,7 +11,7 @@ type UpdateMenuInput = {
   id: string
   name?: string
   key?: string
-  description?: string | null
+  description?: string
 }
 
 const updateMenuStep = createStep(

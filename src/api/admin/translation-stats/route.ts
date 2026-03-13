@@ -79,6 +79,22 @@ const TRANSLATABLE_RESOURCES = [
   },
 ] as const
 
+type TranslationStat = {
+  reference: string
+  label: string
+  labelEn: string
+  fields: string[]
+  displayField: string
+  totalItems: number
+  translatedCount: number
+  items: Array<{
+    id: string
+    displayValue: string
+    originalValues: Record<string, string>
+    translations: Record<string, Record<string, string>>
+  }>
+}
+
 export const GET = async (
   req: MedusaRequest,
   res: MedusaResponse
@@ -87,7 +103,7 @@ export const GET = async (
   const translationModule = req.scope.resolve(Modules.TRANSLATION) as any
   const locale = req.query.locale as string | undefined
 
-  const stats = []
+  const stats: TranslationStat[] = []
 
   for (const resource of TRANSLATABLE_RESOURCES) {
     try {

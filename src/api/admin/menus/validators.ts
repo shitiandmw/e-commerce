@@ -9,7 +9,7 @@ export const PostAdminCreateMenu = z.object({
 export const PostAdminUpdateMenu = z.object({
   name: z.string().min(1).optional(),
   key: z.string().min(1).optional(),
-  description: z.string().nullable().optional(),
+  description: z.string().optional(),
 })
 
 export type PostAdminCreateMenuType = z.infer<typeof PostAdminCreateMenu>

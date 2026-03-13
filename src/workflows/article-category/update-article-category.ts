@@ -11,7 +11,7 @@ type UpdateArticleCategoryInput = {
   id: string
   name?: string
   handle?: string
-  description?: string | null
+  description?: string
   sort_order?: number
 }
 

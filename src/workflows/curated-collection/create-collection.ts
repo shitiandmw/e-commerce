@@ -12,7 +12,7 @@ type CreateCollectionInput = {
   key: string
   description?: string
   sort_order?: number
-  translations?: Record<string, any> | null
+  translations?: Record<string, any>
 }
 
 const createCollectionStep = createStep(

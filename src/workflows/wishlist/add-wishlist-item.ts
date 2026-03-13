@@ -19,7 +19,8 @@ export const addWishlistItemStep = createStep(
     })
 
     if (existing.length > 0) {
-      return new StepResponse(existing[0])
+      // Return existing item without compensation data (don't delete on rollback)
+      return new StepResponse(existing[0], null)
     }
 
     const item = await wishlistService.createWishlistItems({

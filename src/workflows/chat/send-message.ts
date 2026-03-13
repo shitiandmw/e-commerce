@@ -13,7 +13,7 @@ type SendMessageInput = {
   sender_id: string
   content: string
   message_type?: "text" | "image" | "system"
-  metadata?: Record<string, any> | null
+  metadata?: Record<string, any>
 }
 
 const sendMessageStep = createStep(
