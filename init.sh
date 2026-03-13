@@ -83,12 +83,6 @@ if [ ! -d "storefront-v2/node_modules" ]; then
   cd "$ROOT_DIR/storefront-v2" && npm install && cd "$ROOT_DIR"
 fi
 
-# ---------- 构建聊天 Widget ----------
-if [ ! -f "src/chat-widget/dist/widget.js" ]; then
-  log "构建聊天 Widget..."
-  npx tsx src/chat-widget/build.ts
-fi
-
 # ---------- 提高文件描述符限制 ----------
 CURRENT_LIMIT=$(ulimit -n)
 TARGET_LIMIT=65536
@@ -169,7 +163,17 @@ for i in $(seq 1 30); do
   sleep 1
 done
 
-# ---------- 4. 获取 Publishable API Key 写入 storefront-v2/.env.local ----------
+# ---------- 4. 构建聊天 Widget（后端就绪后） ----------
+if [ ! -f "src/chat-widget/dist/widget.js" ]; then
+  log "构建聊天 Widget..."
+  if npx tsx src/chat-widget/build.ts 2>&1; then
+    log "✓ 聊天 Widget 构建成功"
+  else
+    warn "聊天 Widget 构建失败（不影响主流程）"
+  fi
+fi
+
+# ---------- 5. 启动 Admin UI 前端 ----------
 log "获取 Publishable API Key..."
 ADMIN_TOKEN=$(curl -s http://localhost:$MEDUSA_PORT/auth/user/emailpass \
   -X POST -H "Content-Type: application/json" \
@@ -194,7 +198,7 @@ else
   warn "无法获取管理员 Token，跳过 Publishable Key 配置"
 fi
 
-# ---------- 5. 启动 Admin UI 前端 ----------
+# ---------- 6. 启动 Admin UI 前端 ----------
 log "启动 Admin UI 前端（端口 $ADMIN_PORT）..."
 cd "$ROOT_DIR/admin-ui"
 npx next dev -p $ADMIN_PORT &
@@ -212,7 +216,7 @@ for i in $(seq 1 30); do
   sleep 1
 done
 
-# ---------- 6. 启动 Storefront V2 ----------
+# ---------- 7. 启动 Storefront V2 ----------
 log "启动 Storefront V2（端口 $STOREFRONT_PORT）..."
 cd "$ROOT_DIR/storefront-v2"
 npx next dev -p $STOREFRONT_PORT &
