@@ -68,9 +68,10 @@ export ADMIN_CORS="http://localhost:$ADMIN_PORT,http://localhost:$MEDUSA_PORT,ht
 export AUTH_CORS="http://localhost:$ADMIN_PORT,http://localhost:$MEDUSA_PORT,http://localhost:$STOREFRONT_PORT,http://localhost:5173,http://localhost:9000,http://localhost:8000,http://localhost:3001,http://localhost:3002"
 
 # ---------- 安装依赖 ----------
-if [ ! -d "node_modules" ]; then
-  log "安装项目依赖..."
-  npm install
+# 强制使用 development 模式安装，确保 devDependencies（包括 ts-node）被安装
+if [ ! -d "node_modules" ] || [ ! -d "node_modules/ts-node" ]; then
+  log "安装项目依赖（development 模式）..."
+  NODE_ENV=development npm install
 fi
 
 if [ ! -d "admin-ui/node_modules" ]; then
@@ -81,6 +82,14 @@ fi
 if [ ! -d "storefront-v2/node_modules" ]; then
   log "安装 Storefront V2 依赖..."
   cd "$ROOT_DIR/storefront-v2" && npm install && cd "$ROOT_DIR"
+fi
+
+# ---------- 编译后端代码 ----------
+# 首次启动或 .medusa 目录不存在时，先编译生成必要的文件
+if [ ! -d ".medusa/server" ]; then
+  log "首次启动，正在编译后端代码..."
+  NODE_ENV=development npm run build
+  log "✓ 后端代码编译完成"
 fi
 
 # ---------- 提高文件描述符限制 ----------

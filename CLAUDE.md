@@ -76,6 +76,29 @@ npm run test:integration:modules
 
 ## 已知问题
 
+### NODE_ENV=production 导致依赖缺失
+
+**问题**：如果 shell 环境中设置了 `NODE_ENV=production`，运行 `npm install` 会跳过所有 `devDependencies`，包括 `ts-node`。这会导致：
+- Medusa 无法加载 TypeScript 配置文件（`medusa-config.ts`）
+- Build 失败，报错：`TypeError: Cannot read properties of null (reading 'admin')`
+- 配置加载器返回 `null`
+
+**根本原因**：
+1. Medusa 启动时尝试注册 `ts-node` 来支持 TypeScript 文件
+2. 如果 `ts-node` 未安装，Node.js 无法加载 `.ts` 文件
+3. `medusa-config.ts` 中的 `defineConfig()` 会验证自定义模块路径
+4. 模块验证失败导致配置加载返回 `null`
+
+**解决方案**：
+- **项目级**：`package.json` 中的关键脚本（`build`, `dev`, `seed`）已强制设置 `NODE_ENV=development`
+- **环境级**：如果全局设置了 `NODE_ENV=production`，运行 `unset NODE_ENV` 或 `export NODE_ENV=development`
+- **新 worktree**：使用 `bash init.sh` 一键启动，脚本会自动使用 development 模式安装依赖并编译
+
+**预防措施**：
+- `package.json` 的 `preinstall` 钩子会在 `NODE_ENV=production` 时显示警告
+- `init.sh` 脚本强制使用 `NODE_ENV=development npm install`
+- 首次启动时会先编译生成 `.medusa/server/` 目录
+
 ### Chokidar 文件监视补丁
 
 Medusa 的 `develop` 命令用 chokidar 监视项目根目录，但只忽略根级 `node_modules`。子项目（admin-ui、storefront、storefront-v2）各自的 `node_modules` 包含数万文件，会导致 ENFILE（文件描述符耗尽）和误触发后端重启。
