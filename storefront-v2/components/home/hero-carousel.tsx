@@ -61,7 +61,7 @@ export function HeroCarousel({ slides = [] }: HeroCarouselProps) {
                   className="object-cover"
                   priority={i === 0}
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent dark:from-background/90 dark:via-background/50 dark:to-transparent" />
                 <div className="absolute inset-0 flex items-center">
                   <div className="mx-auto w-full max-w-7xl px-4 lg:px-6">
                     <div className="max-w-lg">
@@ -101,14 +101,14 @@ export function HeroCarousel({ slides = [] }: HeroCarouselProps) {
           {/* Navigation arrows */}
           <button
             onClick={scrollPrev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 size-10 flex items-center justify-center bg-background/30 hover:bg-background/50 text-foreground/70 hover:text-foreground backdrop-blur-sm transition-all"
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 size-10 flex items-center justify-center bg-black/20 hover:bg-black/30 dark:bg-background/30 dark:hover:bg-background/50 text-foreground/70 hover:text-foreground backdrop-blur-sm transition-all"
             aria-label={t("hero_prev_slide")}
           >
             <ChevronLeft className="size-5" />
           </button>
           <button
             onClick={scrollNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 size-10 flex items-center justify-center bg-background/30 hover:bg-background/50 text-foreground/70 hover:text-foreground backdrop-blur-sm transition-all"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 size-10 flex items-center justify-center bg-black/20 hover:bg-black/30 dark:bg-background/30 dark:hover:bg-background/50 text-foreground/70 hover:text-foreground backdrop-blur-sm transition-all"
             aria-label={t("hero_next_slide")}
           >
             <ChevronRight className="size-5" />

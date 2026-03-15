@@ -6,6 +6,7 @@ import { Noto_Serif_SC, Geist } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import Script from 'next/script'
 import { Toaster } from 'sonner'
+import { ThemeProvider } from '@/components/theme-provider'
 import { LayoutShell } from '@/components/layout/layout-shell'
 import { AnnouncementBarServer } from '@/components/layout/announcement-bar-server'
 import { AgeVerification } from '@/components/age-verification'
@@ -60,16 +61,23 @@ export default async function LocaleLayout({ children, params }: Props) {
   ])
 
   return (
-    <html lang={locale} className={`${notoSerifSC.variable} ${geist.variable}`}>
+    <html lang={locale} className={`${notoSerifSC.variable} ${geist.variable}`} suppressHydrationWarning>
       <body className="font-sans antialiased bg-background text-foreground">
-        <NextIntlClientProvider messages={messages}>
-          <AgeVerification />
-          <AnnouncementBarServer locale={locale} />
-          <LayoutShell navItems={navItems} footerMenu={footerMenu}>
-            {children}
-          </LayoutShell>
-          <Toaster position="top-center" richColors />
-        </NextIntlClientProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          <NextIntlClientProvider messages={messages}>
+            <AgeVerification />
+            <AnnouncementBarServer locale={locale} />
+            <LayoutShell navItems={navItems} footerMenu={footerMenu}>
+              {children}
+            </LayoutShell>
+            <Toaster position="top-center" richColors />
+          </NextIntlClientProvider>
+        </ThemeProvider>
         <Analytics />
         <Script
           src={`${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || 'http://localhost:9000'}/chat/widget`}

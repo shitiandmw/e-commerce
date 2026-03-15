@@ -2,10 +2,12 @@
 
 import { useState, useRef, useCallback, useEffect } from "react"
 import { Link, useRouter, usePathname } from "@/i18n/navigation"
-import { useLocale } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import Image from "next/image"
-import { Search, User, ShoppingBag, Menu, ChevronDown, ChevronRight, Globe, Check, LogIn } from "lucide-react"
+import { Search, User, ShoppingBag, Menu, ChevronDown, ChevronRight, Globe, Check, LogIn, Sun, Moon } from "lucide-react"
+import { useTheme } from "next-themes"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { useCart, selectTotalItems } from "@/lib/cart-store"
 import { isLoggedIn } from "@/lib/auth"
 import { cn } from "@/lib/utils"
@@ -299,6 +301,36 @@ function MobileLanguageSwitcher({ onNavigate }: { onNavigate: () => void }) {
   )
 }
 
+/* ─── mobile theme switcher ─── */
+function MobileThemeSwitcher() {
+  const { theme, setTheme } = useTheme()
+  const t = useTranslations('Common')
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return null
+
+  return (
+    <div className="mt-4 pt-4 border-t border-border/30">
+      <p className="px-3 pb-2 text-[10px] text-gold/50 uppercase tracking-widest">{t('theme')}</p>
+      <button
+        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        className="flex w-full items-center gap-3 px-3 py-2 text-sm text-foreground/70 hover:text-gold transition-colors"
+      >
+        {theme === 'dark' ? (
+          <Sun className="size-4 text-gold" />
+        ) : (
+          <Moon className="size-4 text-gold" />
+        )}
+        <span>{theme === 'dark' ? t('light_mode') : t('dark_mode')}</span>
+      </button>
+    </div>
+  )
+}
+
 /* ═══════════════════════════ HEADER ═══════════════════════════ */
 export function SiteHeader({ navItems }: { navItems: MenuItem[] }) {
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
@@ -362,6 +394,8 @@ export function SiteHeader({ navItems }: { navItems: MenuItem[] }) {
                   ))}
                   {/* mobile language */}
                   <MobileLanguageSwitcher onNavigate={() => setMobileOpen(false)} />
+                  {/* mobile theme */}
+                  <MobileThemeSwitcher />
                 </nav>
               </SheetContent>
             </Sheet>
@@ -401,6 +435,7 @@ export function SiteHeader({ navItems }: { navItems: MenuItem[] }) {
 
             {/* right icons */}
             <div className="flex items-center gap-0.5 shrink-0 ml-auto">
+              <ThemeToggle />
               <LanguageSwitcher />
               <Link href="/search" className="p-2 text-foreground/60 hover:text-gold transition-colors" aria-label="搜尋">
                 <Search className="size-[18px]" />

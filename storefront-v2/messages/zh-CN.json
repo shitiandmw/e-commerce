@@ -575,5 +575,12 @@
   "bs_cta_title": "品鉴古巴的灵魂",
   "bs_cta_desc": "了解了古巴制茄的百年传承，是时候亲身品鉴这份来自加勒比海的礼物。从经典的蒙特克里斯托二号到珍稀的高希霸 Behike，在 TimeCigar 找到属于您的那一支。",
   "bs_cta_explore": "探索古巴雪茄",
-  "bs_cta_guide": "入门选购指南"
+  "bs_cta_guide": "入门选购指南",
+
+  "Common": {
+    "toggle_theme": "切换主题",
+    "theme": "主题",
+    "light_mode": "亮色模式",
+    "dark_mode": "暗色模式"
+  }
 }

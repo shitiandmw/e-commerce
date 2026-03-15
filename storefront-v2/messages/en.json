@@ -575,5 +575,12 @@
   "bs_cta_title": "Taste the Soul of Cuba",
   "bs_cta_desc": "Now that you've discovered the century-old heritage of Cuban cigar making, it's time to experience this gift from the Caribbean firsthand. From the classic Montecristo No.2 to the rare Cohiba Behike, find your perfect cigar at TimeCigar.",
   "bs_cta_explore": "Explore Cuban Cigars",
-  "bs_cta_guide": "Beginner's Buying Guide"
+  "bs_cta_guide": "Beginner's Buying Guide",
+
+  "Common": {
+    "toggle_theme": "Toggle theme",
+    "theme": "Theme",
+    "light_mode": "Light mode",
+    "dark_mode": "Dark mode"
+  }
 }
