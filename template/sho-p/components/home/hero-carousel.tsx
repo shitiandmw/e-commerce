@@ -68,17 +68,17 @@ export function HeroCarousel() {
                   className="object-cover"
                   priority={i === 0}
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
                 <div className="absolute inset-0 flex items-center">
                   <div className="mx-auto w-full max-w-7xl px-4 lg:px-6">
                     <div className="max-w-lg">
                       <p className="text-gold text-sm tracking-[0.3em] uppercase mb-3 font-medium">
                         TimeCigar
                       </p>
-                      <h1 className="text-3xl md:text-5xl lg:text-6xl font-serif font-bold text-foreground leading-tight text-balance">
+                      <h1 className="text-3xl md:text-5xl lg:text-6xl font-serif font-bold text-white leading-tight text-balance">
                         {slide.title}
                       </h1>
-                      <p className="mt-4 text-base md:text-lg text-foreground/70 leading-relaxed">
+                      <p className="mt-4 text-base md:text-lg text-white/70 leading-relaxed">
                         {slide.subtitle}
                       </p>
                       <Link
@@ -100,14 +100,14 @@ export function HeroCarousel() {
       {/* Navigation arrows */}
       <button
         onClick={scrollPrev}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-10 size-10 flex items-center justify-center bg-background/30 hover:bg-background/50 text-foreground/70 hover:text-foreground backdrop-blur-sm transition-all"
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-10 size-10 flex items-center justify-center bg-black/30 hover:bg-black/50 text-white/70 hover:text-white backdrop-blur-sm transition-all"
         aria-label="上一張"
       >
         <ChevronLeft className="size-5" />
       </button>
       <button
         onClick={scrollNext}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-10 size-10 flex items-center justify-center bg-background/30 hover:bg-background/50 text-foreground/70 hover:text-foreground backdrop-blur-sm transition-all"
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-10 size-10 flex items-center justify-center bg-black/30 hover:bg-black/50 text-white/70 hover:text-white backdrop-blur-sm transition-all"
         aria-label="下一張"
       >
         <ChevronRight className="size-5" />
@@ -121,7 +121,7 @@ export function HeroCarousel() {
             onClick={() => emblaApi?.scrollTo(i)}
             className={cn(
               "h-0.5 transition-all duration-300",
-              selectedIndex === i ? "w-8 bg-gold" : "w-4 bg-foreground/30"
+              selectedIndex === i ? "w-8 bg-gold" : "w-4 bg-white/30"
             )}
             aria-label={`前往第 ${i + 1} 張`}
           />

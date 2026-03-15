@@ -42,14 +42,14 @@ export function LimitedEditions() {
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                   <div className="absolute top-3 left-3 bg-gold/90 text-primary-foreground text-[10px] font-bold px-2 py-1 tracking-wider">
                     LIMITED
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <p className="text-gold/80 text-[10px] tracking-wider uppercase">{product.brandEn}</p>
-                    <h3 className="mt-1 text-sm font-serif font-medium text-foreground">{product.name}</h3>
-                    <p className="mt-2 text-gold font-bold text-sm">HK${product.price.toLocaleString()}</p>
+                    <p className="text-gold-light text-[10px] tracking-wider uppercase">{product.brandEn}</p>
+                    <h3 className="mt-1 text-sm font-serif font-medium text-white">{product.name}</h3>
+                    <p className="mt-2 text-gold-light font-bold text-sm">HK${product.price.toLocaleString()}</p>
                   </div>
                 </div>
               </Link>

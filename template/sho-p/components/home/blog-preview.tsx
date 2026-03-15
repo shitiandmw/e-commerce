@@ -36,7 +36,7 @@ export function BlogPreview() {
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
+                {/* Light overlay for tag visibility */}
                 <div className="absolute top-3 left-3">
                   <span className="bg-gold/90 text-primary-foreground text-[10px] font-medium px-2 py-1 tracking-wider">
                     {article.category}

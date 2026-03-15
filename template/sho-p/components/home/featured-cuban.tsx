@@ -31,14 +31,14 @@ export function FeaturedCuban() {
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <p className="text-gold text-xs tracking-[0.2em] uppercase">{product.brandEn}</p>
-                  <h3 className="mt-2 text-lg font-serif font-bold text-foreground">{product.name}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{product.nameEn}</p>
+                  <p className="text-gold-light text-xs tracking-[0.2em] uppercase">{product.brandEn}</p>
+                  <h3 className="mt-2 text-lg font-serif font-bold text-white">{product.name}</h3>
+                  <p className="mt-1 text-sm text-white/70">{product.nameEn}</p>
                   <div className="mt-3 flex items-center justify-between">
-                    <span className="text-gold font-bold">HK${product.price.toLocaleString()}</span>
-                    <span className="flex items-center gap-1 text-xs text-foreground/60 group-hover:text-gold transition-colors">
+                    <span className="text-gold-light font-bold">HK${product.price.toLocaleString()}</span>
+                    <span className="flex items-center gap-1 text-xs text-white/60 group-hover:text-gold-light transition-colors">
                       了解更多 <ArrowRight className="size-3" />
                     </span>
                   </div>

@@ -16,6 +16,7 @@ import {
 } from "@/lib/data/categories"
 import { useCart, selectTotalItems } from "@/lib/cart-store"
 import { cn } from "@/lib/utils"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 /* ─── brand logo placeholder ─── */
 function BrandLogo({ letter, size = "sm" }: { letter?: string; size?: "sm" | "md" }) {
@@ -371,7 +372,7 @@ export function SiteHeader() {
           <button
             onClick={() => setShowBanner(false)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-primary-foreground/70 hover:text-primary-foreground transition-colors"
-            aria-label="關閉橫幅"
+            aria-label="關閉橫���"
           >
             <X className="size-3.5" />
           </button>
@@ -431,7 +432,7 @@ export function SiteHeader() {
                         onClick={() => setActiveMenu(null)}
                         className={cn(
                           "flex items-center gap-0.5 whitespace-nowrap px-2.5 py-2 text-[13px] tracking-wide transition-colors xl:px-3",
-                          isActive ? "text-gold" : "text-foreground/65 hover:text-gold"
+                          isActive ? "text-gold" : "text-foreground/85 hover:text-gold"
                         )}
                       >
                         {item.label}
@@ -446,13 +447,14 @@ export function SiteHeader() {
             {/* right icons */}
             <div className="flex items-center gap-0.5 shrink-0 ml-auto">
               <LanguageSwitcher />
-              <button className="p-2 text-foreground/60 hover:text-gold transition-colors" aria-label="搜尋">
+              <ThemeToggle />
+              <button className="p-2 text-foreground/70 hover:text-gold transition-colors" aria-label="搜尋">
                 <Search className="size-[18px]" />
               </button>
-              <Link href="/cart" className="p-2 text-foreground/60 hover:text-gold transition-colors" aria-label="帳戶">
+              <Link href="/cart" className="p-2 text-foreground/70 hover:text-gold transition-colors" aria-label="帳戶">
                 <User className="size-[18px]" />
               </Link>
-              <Link href="/cart" className="relative p-2 text-foreground/60 hover:text-gold transition-colors" aria-label="購物車">
+              <Link href="/cart" className="relative p-2 text-foreground/70 hover:text-gold transition-colors" aria-label="購物車">
                 <ShoppingBag className="size-[18px]" />
                 {cartCount > 0 && (
                   <span className="absolute top-0 right-0 flex size-3.5 items-center justify-center rounded-full bg-gold text-[9px] font-bold text-primary-foreground">

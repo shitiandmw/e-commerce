@@ -34,7 +34,7 @@ export function ProductCard({ product }: { product: Product }) {
           )}
         </div>
         <button
-          className="absolute top-3 right-3 size-8 flex items-center justify-center bg-background/50 backdrop-blur-sm text-foreground/50 hover:text-gold opacity-0 group-hover:opacity-100 transition-all"
+          className="absolute top-3 right-3 size-8 flex items-center justify-center bg-black/40 backdrop-blur-sm text-white/70 hover:text-gold opacity-0 group-hover:opacity-100 transition-all"
           aria-label="加入收藏"
           onClick={(e) => e.preventDefault()}
         >

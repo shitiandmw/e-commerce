@@ -4,6 +4,39 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  --background: #faf8f5;
+  --foreground: #1a1714;
+  --card: #ffffff;
+  --card-foreground: #1a1714;
+  --popover: #ffffff;
+  --popover-foreground: #1a1714;
+  --primary: #8b6914;
+  --primary-foreground: #ffffff;
+  --secondary: #f0ebe3;
+  --secondary-foreground: #1a1714;
+  --muted: #f0ebe3;
+  --muted-foreground: #5c5247;
+  --accent: #8b6914;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --destructive-foreground: #fef2f2;
+  --border: #d9d0c3;
+  --input: #d9d0c3;
+  --ring: #8b6914;
+  --chart-1: #8b6914;
+  --chart-2: #a68020;
+  --chart-3: #c4a050;
+  --chart-4: #dfc888;
+  --chart-5: #f0ebe3;
+  --radius: 0.375rem;
+  --gold: #8b6914;
+  --gold-light: #a68020;
+  --gold-dark: #6b5010;
+  --surface: #ffffff;
+  --surface-elevated: #faf8f5;
+}
+
+.dark {
   --background: #0a0a0a;
   --foreground: #e8e0d4;
   --card: #141414;
@@ -28,7 +61,6 @@
   --chart-3: #5c4d3c;
   --chart-4: #3d3228;
   --chart-5: #2a2118;
-  --radius: 0.375rem;
   --gold: #c8a96e;
   --gold-light: #d4bc8a;
   --gold-dark: #a68b50;
@@ -83,8 +115,8 @@
     @apply bg-background text-foreground;
   }
   ::selection {
-    background-color: #c8a96e;
-    color: #0a0a0a;
+    background-color: var(--gold);
+    color: var(--background);
   }
 }
 

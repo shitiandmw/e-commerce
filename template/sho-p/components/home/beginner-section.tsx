@@ -15,7 +15,7 @@ export function BeginnerSection() {
               fill
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-background/20 lg:bg-none" />
+            {/* No overlay needed - image is decorative */}
           </div>
 
           {/* Content */}

@@ -69,9 +69,9 @@ export function CraftProcess() {
                   fill
                   className="object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <p className="text-xs text-foreground/70 italic">
+                  <p className="text-xs text-white/70 italic">
                     Torcedor -- 古巴製茄的守護者
                   </p>
                 </div>

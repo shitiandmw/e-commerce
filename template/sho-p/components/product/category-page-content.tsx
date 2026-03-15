@@ -54,12 +54,12 @@ export function CategoryPageContent({ slug }: { slug: string }) {
           fill
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
         <div className="absolute inset-0 flex items-end">
           <div className="mx-auto w-full max-w-7xl px-4 pb-8 lg:px-6">
-            <p className="text-gold text-xs tracking-[0.3em] uppercase mb-2">{category?.nameEn}</p>
-            <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground">{categoryName}</h1>
-            <p className="mt-2 text-sm text-muted-foreground max-w-xl leading-relaxed">{categoryDescription}</p>
+            <p className="text-gold-light text-xs tracking-[0.3em] uppercase mb-2">{category?.nameEn}</p>
+            <h1 className="text-3xl md:text-4xl font-serif font-bold text-white">{categoryName}</h1>
+            <p className="mt-2 text-sm text-white/70 max-w-xl leading-relaxed">{categoryDescription}</p>
           </div>
         </div>
       </div>

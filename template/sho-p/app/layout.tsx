@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Noto_Serif_SC, Geist } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { ThemeProvider } from '@/components/theme-provider'
 import { LayoutShell } from '@/components/layout/layout-shell'
 import { AgeVerification } from '@/components/age-verification'
 import './globals.css'
@@ -33,10 +34,17 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="zh-Hant" className={`${notoSerifSC.variable} ${geist.variable}`}>
+    <html lang="zh-Hant" className={`${notoSerifSC.variable} ${geist.variable}`} suppressHydrationWarning>
       <body className="font-sans antialiased bg-background text-foreground">
-        <AgeVerification />
-        <LayoutShell>{children}</LayoutShell>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AgeVerification />
+          <LayoutShell>{children}</LayoutShell>
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>

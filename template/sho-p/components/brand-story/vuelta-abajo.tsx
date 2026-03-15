@@ -46,12 +46,12 @@ export function VueltaAbajo() {
               fill
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-card/80 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-6">
-              <p className="text-gold text-xs tracking-[0.2em] uppercase">
+              <p className="text-gold-light text-xs tracking-[0.2em] uppercase">
                 Pinar del Rio, Cuba
               </p>
-              <p className="mt-1 text-sm text-foreground/80">
+              <p className="mt-1 text-sm text-white/80">
                 Vuelta Abajo -- 世界菸草的聖地
               </p>
             </div>
