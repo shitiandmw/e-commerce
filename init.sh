@@ -210,7 +210,7 @@ fi
 # ---------- 6. 启动 Admin UI 前端 ----------
 log "启动 Admin UI 前端（端口 $ADMIN_PORT）..."
 cd "$ROOT_DIR/admin-ui"
-npx next dev -p $ADMIN_PORT &
+NODE_ENV=development npx next dev -p $ADMIN_PORT &
 FRONTEND_PID=$!
 cd "$ROOT_DIR"
 
@@ -228,7 +228,7 @@ done
 # ---------- 7. 启动 Storefront V2 ----------
 log "启动 Storefront V2（端口 $STOREFRONT_PORT）..."
 cd "$ROOT_DIR/storefront-v2"
-npx next dev -p $STOREFRONT_PORT &
+NODE_ENV=development npx next dev -p $STOREFRONT_PORT &
 STOREFRONT_PID=$!
 cd "$ROOT_DIR"
 
