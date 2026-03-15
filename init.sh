@@ -76,12 +76,12 @@ fi
 
 if [ ! -d "admin-ui/node_modules" ]; then
   log "安装 Admin UI 依赖..."
-  cd "$ROOT_DIR/admin-ui" && npm install && cd "$ROOT_DIR"
+  cd "$ROOT_DIR/admin-ui" && NODE_ENV=development npm install && cd "$ROOT_DIR"
 fi
 
 if [ ! -d "storefront-v2/node_modules" ]; then
   log "安装 Storefront V2 依赖..."
-  cd "$ROOT_DIR/storefront-v2" && npm install && cd "$ROOT_DIR"
+  cd "$ROOT_DIR/storefront-v2" && NODE_ENV=development npm install && cd "$ROOT_DIR"
 fi
 
 # ---------- 编译后端代码 ----------
