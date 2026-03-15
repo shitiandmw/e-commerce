@@ -99,7 +99,21 @@ export function useUpdateConversation(id: string) {
 }
 
 export function useChatSettings() {
-  return useQuery<{ chat_settings: Array<{ id: string; welcome_message?: string | null; offline_message?: string | null; business_hours?: Record<string, unknown> | null }> }>({
+  return useQuery<{
+    chat_settings: Array<{
+      id: string
+      welcome_message?: string | null
+      offline_message?: string | null
+      business_hours?: Record<string, unknown> | null
+      ai_enabled?: boolean
+      ai_provider?: "openai" | "anthropic" | null
+      ai_api_url?: string | null
+      ai_api_key?: string | null
+      ai_model?: string | null
+      ai_system_prompt?: string | null
+      ai_debounce_seconds?: number
+    }>
+  }>({
     queryKey: ["chat-settings"],
     queryFn: () => adminFetch("/admin/chat/settings"),
   })
@@ -108,7 +122,18 @@ export function useChatSettings() {
 export function useUpdateChatSettings() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: { welcome_message?: string | null; offline_message?: string | null; business_hours?: Record<string, unknown> | null }) =>
+    mutationFn: (data: {
+      welcome_message?: string | null
+      offline_message?: string | null
+      business_hours?: Record<string, unknown> | null
+      ai_enabled?: boolean
+      ai_provider?: "openai" | "anthropic"
+      ai_api_url?: string
+      ai_api_key?: string
+      ai_model?: string
+      ai_system_prompt?: string
+      ai_debounce_seconds?: number
+    }) =>
       adminFetch("/admin/chat/settings", { method: "POST", body: data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["chat-settings"] })

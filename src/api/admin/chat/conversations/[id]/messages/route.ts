@@ -3,6 +3,7 @@ import {
   MedusaResponse,
 } from "@medusajs/framework/http"
 import { sendMessageWorkflow } from "../../../../../../workflows/chat/send-message"
+import { triggerAIResponse } from "../../../../../../lib/socket-io"
 
 export const GET = async (
   req: MedusaRequest,
@@ -39,18 +40,24 @@ export const POST = async (
   res: MedusaResponse
 ) => {
   const { id } = req.params
-  const { content } = req.body as { content: string }
+  const { content, sender_type } = req.body as { content: string; sender_type?: string }
   const agentId = (req as any).auth_context?.actor_id || "admin"
 
   const { result } = await sendMessageWorkflow(req.scope).run({
     input: {
       conversation_id: id,
-      sender_type: "agent",
-      sender_id: agentId,
+      sender_type: (sender_type || "agent") as any,
+      sender_id: sender_type === "customer" ? "test_customer" : agentId,
       content,
       message_type: "text",
     },
   })
+
+  // 触发AI自动回复(如果是客户消息)
+  if (sender_type === "customer") {
+    console.log('[API] Triggering AI response for conversation:', id)
+    triggerAIResponse(id, req.scope)
+  }
 
   res.json({ message: result })
 }

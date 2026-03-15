@@ -5,9 +5,13 @@ import jwt from "jsonwebtoken"
 import http from "http"
 import { MedusaContainer } from "@medusajs/framework/types"
 import { sendMessageWorkflow } from "../workflows/chat/send-message"
+import { generateAIResponse } from "./ai-service"
+import { CHAT_MODULE } from "../modules/chat"
+import ChatModuleService from "../modules/chat/service"
 
 let io: SocketIOServer | null = null
 let containerRef: MedusaContainer | null = null
+const aiDebounceTimers = new Map<string, NodeJS.Timeout>()
 
 export function getSocketIO(): SocketIOServer | null {
   return io
@@ -145,6 +149,9 @@ export function initSocketIO(): SocketIOServer {
             last_message_preview: content.substring(0, 100),
             sender_type: senderType,
           })
+
+          // AI自动回复
+          handleAIResponse(conversation_id, containerRef)
         }
       } catch (err) {
         console.error("[socket.io] Error sending message:", err)
@@ -170,4 +177,63 @@ export function initSocketIO(): SocketIOServer {
   })
 
   return io
+}
+
+async function handleAIResponse(conversationId: string, container: MedusaContainer) {
+  const existingTimer = aiDebounceTimers.get(conversationId)
+  if (existingTimer) clearTimeout(existingTimer)
+
+  try {
+    const chatService: ChatModuleService = container.resolve(CHAT_MODULE)
+    const settings = await chatService.listChatSettings({}, { take: 1 })
+    const config = settings[0]
+
+    if (!config?.ai_enabled || !config.ai_api_key) return
+
+    const timer = setTimeout(async () => {
+      try {
+        const messages = await chatService.listChatMessages(
+          { conversation_id: conversationId },
+          { select: ["sender_type", "content", "created_at"], order: { created_at: "ASC" } }
+        )
+
+        const aiResponse = await generateAIResponse(config as any, messages)
+
+        const { result: aiMessage } = await sendMessageWorkflow(container).run({
+          input: {
+            conversation_id: conversationId,
+            sender_type: "agent",
+            sender_id: "ai-assistant",
+            content: aiResponse,
+            message_type: "text",
+            metadata: { ai_generated: true },
+          },
+        })
+
+        io!.to(`conversation:${conversationId}`).emit("chat:message", {
+          id: aiMessage.id,
+          conversation_id: conversationId,
+          sender_type: "agent",
+          sender_id: "ai-assistant",
+          content: aiResponse,
+          message_type: "text",
+          metadata: { ai_generated: true },
+          created_at: aiMessage.created_at,
+        })
+
+        aiDebounceTimers.delete(conversationId)
+      } catch (err) {
+        console.error("[AI] Error generating response:", err)
+        aiDebounceTimers.delete(conversationId)
+      }
+    }, (config.ai_debounce_seconds || 3) * 1000)
+
+    aiDebounceTimers.set(conversationId, timer)
+  } catch (err) {
+    console.error("[AI] Error setting up AI response:", err)
+  }
+}
+
+export function triggerAIResponse(conversationId: string, container: MedusaContainer) {
+  handleAIResponse(conversationId, container)
 }

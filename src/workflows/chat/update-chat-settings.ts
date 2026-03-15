@@ -11,6 +11,13 @@ type UpdateChatSettingsInput = {
   welcome_message?: string
   offline_message?: string
   business_hours?: Record<string, any>
+  ai_enabled?: boolean
+  ai_provider?: "openai" | "anthropic"
+  ai_api_url?: string
+  ai_api_key?: string
+  ai_model?: string
+  ai_system_prompt?: string
+  ai_debounce_seconds?: number
 }
 
 const updateChatSettingsStep = createStep(

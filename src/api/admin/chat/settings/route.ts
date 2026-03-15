@@ -14,7 +14,7 @@ export const GET = async (
   const chatService: ChatModuleService = req.scope.resolve(CHAT_MODULE)
   const settings = await chatService.listChatSettings({}, { take: 1 })
 
-  res.json({ settings: settings[0] || null })
+  res.json({ chat_settings: settings })
 }
 
 export const POST = async (
@@ -25,5 +25,5 @@ export const POST = async (
     input: req.validatedBody,
   })
 
-  res.json({ settings: result })
+  res.json({ chat_settings: [result] })
 }

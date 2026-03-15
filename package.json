@@ -27,12 +27,16 @@
     "build:widget": "npx tsx src/chat-widget/build.ts"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.58",
+    "@ai-sdk/openai": "^3.0.41",
+    "@ai-sdk/openai-compatible": "^2.0.35",
     "@medusajs/admin-sdk": "2.13.1",
     "@medusajs/cli": "2.13.1",
     "@medusajs/framework": "2.13.1",
     "@medusajs/medusa": "2.13.1",
     "@medusajs/payment-stripe": "^2.13.1",
     "@socket.io/redis-adapter": "^8.3.0",
+    "ai": "^6.0.116",
     "socket.io": "^4.8.3"
   },
   "devDependencies": {
