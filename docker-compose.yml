@@ -147,17 +147,17 @@ services:
     command:
       - |
         echo '[seed] 导入基础种子数据...' &&
-        npx medusa exec ./.medusa/server/src/scripts/seed.js &&
+        npx medusa exec ./src/scripts/seed.js &&
         echo '[seed] 导入分类数据...' &&
-        npx medusa exec ./.medusa/server/src/scripts/seed-categories.js &&
+        npx medusa exec ./src/scripts/seed-categories.js &&
         echo '[seed] 导入品牌数据...' &&
-        npx medusa exec ./.medusa/server/src/scripts/seed-brands.js &&
+        npx medusa exec ./src/scripts/seed-brands.js &&
         echo '[seed] 导入菜单数据...' &&
-        npx medusa exec ./.medusa/server/src/scripts/seed-menu.js &&
+        npx medusa exec ./src/scripts/seed-menu.js &&
         echo '[seed] 导入 Banner 数据...' &&
-        npx medusa exec ./.medusa/server/src/scripts/seed-banners.js &&
+        npx medusa exec ./src/scripts/seed-banners.js &&
         echo '[seed] 导入精选集数据...' &&
-        npx medusa exec ./.medusa/server/src/scripts/seed-collections.js &&
+        npx medusa exec ./src/scripts/seed-collections.js &&
         echo '[seed] 种子数据导入完成!'
 
   nginx:
