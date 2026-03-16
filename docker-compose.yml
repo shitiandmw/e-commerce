@@ -54,8 +54,14 @@ services:
       AUTH_CORS: ${PROD_AUTH_CORS:-http://localhost:43002,http://localhost:43000}
       STRIPE_API_KEY: ${STRIPE_API_KEY:-}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      SOCKET_PORT: ${SOCKET_PORT:-9001}
+      AI_PROVIDER: ${AI_PROVIDER:-openai}
+      AI_API_KEY: ${AI_API_KEY:-}
+      AI_API_URL: ${AI_API_URL:-}
+      AI_MODEL: ${AI_MODEL:-gpt-4o-mini}
     ports:
       - "${MEDUSA_PORT:-49000}:9000"
+      - "${SOCKET_PORT:-49001}:9001"
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://localhost:9000/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
       interval: 10s
@@ -74,6 +80,8 @@ services:
     depends_on:
       medusa:
         condition: service_healthy
+    environment:
+      NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL:-http://localhost:49001}
     ports:
       - "${ADMIN_PORT:-43002}:3002"
 
@@ -89,6 +97,8 @@ services:
     depends_on:
       medusa:
         condition: service_healthy
+    environment:
+      NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL:-http://localhost:49001}
     ports:
       - "${STOREFRONT_PORT:-43000}:3000"
 
@@ -137,17 +147,17 @@ services:
     command:
       - |
         echo '[seed] 导入基础种子数据...' &&
-        npx medusa exec ./src/scripts/seed.js &&
+        npx medusa exec ./.medusa/server/src/scripts/seed.js &&
         echo '[seed] 导入分类数据...' &&
-        npx medusa exec ./src/scripts/seed-categories.js &&
+        npx medusa exec ./.medusa/server/src/scripts/seed-categories.js &&
         echo '[seed] 导入品牌数据...' &&
-        npx medusa exec ./src/scripts/seed-brands.js &&
+        npx medusa exec ./.medusa/server/src/scripts/seed-brands.js &&
         echo '[seed] 导入菜单数据...' &&
-        npx medusa exec ./src/scripts/seed-menu.js &&
+        npx medusa exec ./.medusa/server/src/scripts/seed-menu.js &&
         echo '[seed] 导入 Banner 数据...' &&
-        npx medusa exec ./src/scripts/seed-banners.js &&
+        npx medusa exec ./.medusa/server/src/scripts/seed-banners.js &&
         echo '[seed] 导入精选集数据...' &&
-        npx medusa exec ./src/scripts/seed-collections.js &&
+        npx medusa exec ./.medusa/server/src/scripts/seed-collections.js &&
         echo '[seed] 种子数据导入完成!'
 
   nginx:
