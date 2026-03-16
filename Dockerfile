@@ -1,6 +1,12 @@
 # ---- Stage 1: Build ----
 FROM node:20-slim AS builder
 WORKDIR /app
+ENV NODE_ENV=development
+
+# Install build tools for native modules
+RUN apt-get update && \
+    apt-get install -y python3 make g++ && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install dependencies (cached if package.json unchanged)
 COPY package.json package-lock.json* ./
