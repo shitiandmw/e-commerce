@@ -49,9 +49,9 @@ services:
       REDIS_URL: redis://redis:6379
       JWT_SECRET: ${JWT_SECRET:-supersecret}
       COOKIE_SECRET: ${COOKIE_SECRET:-supersecret}
-      STORE_CORS: ${PROD_STORE_CORS:-http://localhost:43000}
-      ADMIN_CORS: ${PROD_ADMIN_CORS:-http://localhost:43002}
-      AUTH_CORS: ${PROD_AUTH_CORS:-http://localhost:43002,http://localhost:43000}
+      STORE_CORS: ${STORE_CORS:-http://localhost:43000}
+      ADMIN_CORS: ${ADMIN_CORS:-http://localhost:43002}
+      AUTH_CORS: ${AUTH_CORS:-http://localhost:43002,http://localhost:43000}
       STRIPE_API_KEY: ${STRIPE_API_KEY:-}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
       SOCKET_PORT: ${SOCKET_PORT:-9001}
