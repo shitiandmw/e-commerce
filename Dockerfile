@@ -5,9 +5,7 @@ WORKDIR /app
 # Install dependencies (cached if package.json unchanged)
 COPY package.json package-lock.json* ./
 COPY scripts/patch-watcher.js ./scripts/
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci && \
-    npm install --no-save @swc/core-linux-arm64-gnu
+RUN --mount=type=cache,target=/root/.npm npm ci
 
 # Build Medusa
 COPY tsconfig.json medusa-config.ts ./
