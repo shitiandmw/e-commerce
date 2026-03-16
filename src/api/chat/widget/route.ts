@@ -35,7 +35,8 @@ export const GET = async (
 
     const rawJs = readFileSync(widgetPath, "utf-8")
     const socketPort = process.env.SOCKET_PORT || "9001"
-    cachedWidget = `window.__TIMECIGAR_CHAT_CONFIG__=${JSON.stringify({ publishableKey, socketPort })};\n${rawJs}`
+    const socketUrl = process.env.WIDGET_SOCKET_URL || ""
+    cachedWidget = `window.__TIMECIGAR_CHAT_CONFIG__=${JSON.stringify({ publishableKey, socketPort, socketUrl })};\n${rawJs}`
   }
 
   res.setHeader("Content-Type", "application/javascript")

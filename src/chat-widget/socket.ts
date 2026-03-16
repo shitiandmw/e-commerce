@@ -5,6 +5,7 @@ let socket: Socket | null = null
 
 function getSocketUrl(): string {
   const config = (window as any).__TIMECIGAR_CHAT_CONFIG__
+  if (config?.socketUrl) return config.socketUrl
   const script = document.querySelector('script[src*="chat/widget"]') as HTMLScriptElement
   const host = script ? new URL(script.src).hostname : "localhost"
   const port = config?.socketPort || "9001"

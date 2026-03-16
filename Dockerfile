@@ -19,6 +19,9 @@ RUN npx medusa build; \
       echo "ERROR: .medusa/server not generated" && exit 1; \
     fi
 
+# Build chat widget
+RUN npx tsx src/chat-widget/build.ts
+
 # ---- Stage 2: Production runner ----
 FROM node:20-slim AS runner
 WORKDIR /app
@@ -26,6 +29,7 @@ ENV NODE_ENV=production
 
 # Copy built server and install only production deps
 COPY --from=builder /app/.medusa/server ./
+COPY --from=builder /app/src/chat-widget/dist ./src/chat-widget/dist
 RUN mkdir -p scripts && echo "" > scripts/patch-watcher.js
 RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev
 
