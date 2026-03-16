@@ -3,15 +3,10 @@ FROM node:20-slim AS builder
 WORKDIR /app
 ENV NODE_ENV=development
 
-# Install build tools for native modules
-RUN apt-get update && \
-    apt-get install -y python3 make g++ && \
-    rm -rf /var/lib/apt/lists/*
-
 # Install dependencies (cached if package.json unchanged)
 COPY package.json package-lock.json* ./
 COPY scripts/patch-watcher.js ./scripts/
-RUN --mount=type=cache,target=/root/.npm npm ci
+RUN --mount=type=cache,target=/root/.npm npm install
 
 # Build Medusa
 COPY tsconfig.json medusa-config.ts ./
