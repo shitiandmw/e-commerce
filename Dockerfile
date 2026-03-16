@@ -6,7 +6,8 @@ ENV NODE_ENV=development
 # Install dependencies (cached if package.json unchanged)
 COPY package.json package-lock.json* ./
 COPY scripts/patch-watcher.js ./scripts/
-RUN --mount=type=cache,target=/root/.npm npm install
+RUN --mount=type=cache,target=/root/.npm npm install && \
+    node -e "require('@swc/core')" 2>/dev/null || npm install @swc/core --force --no-save
 
 # Build Medusa
 COPY tsconfig.json medusa-config.ts ./
