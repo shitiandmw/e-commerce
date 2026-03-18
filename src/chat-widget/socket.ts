@@ -32,7 +32,7 @@ export function connectSocket(conversationId: string) {
 
   socket = io(getSocketUrl(), {
     auth,
-    transports: ["websocket", "polling"],
+    transports: ["polling", "websocket"],
   })
 
   socket.on("connect", () => {
