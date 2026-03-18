@@ -76,6 +76,7 @@ services:
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_MEDUSA_BACKEND_URL_ADMIN: ${NEXT_PUBLIC_MEDUSA_BACKEND_URL_ADMIN:-http://localhost:49000}
+        NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL:-http://localhost:9001}
     container_name: ecommerce-prod-admin-ui
     restart: unless-stopped
     depends_on:
@@ -93,6 +94,7 @@ services:
       args:
         NEXT_PUBLIC_MEDUSA_BACKEND_URL_STORE: ${NEXT_PUBLIC_MEDUSA_BACKEND_URL_STORE:-http://localhost:49000}
         NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY:-}
+        NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL:-http://localhost:9001}
     container_name: ecommerce-prod-storefront
     restart: unless-stopped
     depends_on:
