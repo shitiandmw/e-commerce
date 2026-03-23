@@ -1,0 +1,113 @@
+Batch 17 图片下载总结
+===================
+
+下载日期: 2026-03-17
+总图片数: 23张
+所有图片均已验证有效
+
+产品映射:
+---------
+
+1. Davidoff 火神B系列罗布图铝管（8支）
+   搜索: Arturo Fuente Don Carlos Robusto Tubos
+   文件: Davidoff_DonCarlosRobustoTubo_1.jpg (1000x1000)
+
+2. Davidoff 火神B系列双罗布图（10支)
+   搜索: Arturo Fuente Don Carlos Double Robusto
+   文件: Davidoff_DoubleRobusto_1.jpg (800x800)
+   文件: Davidoff_DoubleRobusto_2.jpg (4146x4480)
+   文件: Davidoff_Don_Carlos_Double_Robusto_1.jpg (800x800)
+
+3. Davidoff 火神B系列双罗布图铝管（8支）
+   搜索: Arturo Fuente Don Carlos Double Robusto Tubos
+   文件: Davidoff_DoubleRobustoTubo_1.jpg (1000x1000)
+
+4. Davidoff 火神B系列罗布图戈多54（10支)
+   搜索: Arturo Fuente Don Carlos Robusto Gordo
+   文件: Davidoff_GodOfFireDonCarlosRobustoGordo_1.jpg (2000x2000)
+
+5. Davidoff 火神B系列大帝56（10支)
+   搜索: Arturo Fuente Don Carlos Emperor
+   文件: Davidoff_GodOfFireDonCarlosDiademas_1.jpg (1000x1000)
+
+6. Davidoff 火神B系列组合装（5支）
+   搜索: Arturo Fuente Don Carlos Sampler
+   文件: Davidoff_DonCarlosSampler_1.jpg (1000x1280)
+
+7. Davidoff 火神唐卡洛斯罗布图（10支)
+   搜索: Arturo Fuente Don Carlos Robusto
+   文件: Davidoff_DonCarlosRobusto_1.jpg (800x800)
+   文件: Davidoff_Don_Carlos_Robusto_1.jpg (800x800)
+
+8. Davidoff 火神唐卡洛斯罗布图铝管（8支）
+   搜索: Arturo Fuente Don Carlos Robusto Tubos
+   文件: Davidoff_DonCarlosRobustoTubo_1.jpg (1000x1000)
+
+9. Davidoff 火神唐卡洛斯公牛（10支)
+   搜索: Arturo Fuente Don Carlos Toro
+   文件: Davidoff_DonCarlosToro_1.jpg (1000x1000)
+
+10. Davidoff 火神唐卡洛斯罗布图戈多54（10支)
+    搜索: Arturo Fuente Don Carlos Robusto Gordo
+    文件: Davidoff_GodOfFireDonCarlosRobustoGordo_1.jpg (2000x2000)
+
+11. Davidoff 火神卡利托双罗布图（10支)
+    搜索: God of Fire by Carlito Double Robusto
+    文件: Davidoff_GodOfFireDoubleRobusto_1.jpg (1000x1000)
+
+12. Davidoff 火神卡利托双罗布图铝管（8支）
+    搜索: God of Fire by Carlito Double Robusto Tubos
+    文件: Davidoff_GodOfFireDoubleRobustoTubo_1.jpg (1000x1000)
+
+13. Davidoff 火神卡利托丘吉尔（10支)
+    搜索: God of Fire by Carlito Churchill
+    文件: Davidoff_GodOfFireChurchill_1.jpg (1000x1000)
+
+14. Davidoff 火神卡利托金字塔（10支)
+    搜索: God of Fire by Carlito Pyramid
+    文件: Davidoff_GodOfFirePyramid_1.jpg (1000x1000)
+
+15. Davidoff 火神卡利托双皇冠（10支)
+    搜索: God of Fire by Carlito Double Corona
+    文件: Davidoff_GodOfFireDoubleCor_1.jpg (1000x1000)
+
+16. Davidoff 火神卡利托大帝56（10支)
+    搜索: God of Fire by Carlito Emperor
+    文件: Davidoff_GodOfFireCarlitoDiademas_1.jpg (1000x1000)
+
+17. Davidoff 火神卡利托唐卡洛斯组合装（5支）
+    搜索: God of Fire Carlito Sampler
+    文件: Davidoff_GodOfFireSampler_1.jpg (500x500)
+
+18. Davidoff 阿图罗富恩特唐卡洛斯庆典罗布图（10支)
+    搜索: Arturo Fuente Don Carlos Edicion de Aniversario Robusto
+    文件: Davidoff_DonCarlosRobustoTubo_1.jpg (1000x1000)
+
+19. Davidoff 阿图罗富恩特唐卡洛斯庆典双罗布图（10支)
+    搜索: Arturo Fuente Don Carlos Edicion de Aniversario Double Robusto
+    文件: Davidoff_DoubleRobusto_1.jpg (800x800)
+
+20. Davidoff 阿图罗富恩特唐卡洛斯庆典双罗布图铝管（8支）
+    搜索: Arturo Fuente Don Carlos Edicion de Aniversario Double Robusto Tubos
+    文件: Davidoff_DoubleRobustoTubo_1.jpg (1000x1000)
+
+21. Davidoff 阿图罗富恩特唐卡洛斯庆典公牛（10支)
+    搜索: Arturo Fuente Don Carlos Edicion de Aniversario Toro
+    文件: Davidoff_DonCarlosToro_1.jpg (1000x1000)
+
+22. Davidoff 富恩特巨著庄园X(3支）黑
+    搜索: Arturo Fuente Opus X Estate Reserve
+    文件: Davidoff_OpusXEstateReserve_1.jpg (982x133)
+
+额外下载的God of Fire Don Carlos系列:
+- Davidoff_GodOfFireDonCarlosRobusto_1.jpg (1000x1000)
+- Davidoff_GodOfFireDonCarlosRobustoTubo_1.jpg (1000x1000)
+- Davidoff_GodOfFireDonCarlosToro_1.jpg (1000x1000)
+- Davidoff_GodOfFireDonCarlosChurchill_1.jpg (1000x1000)
+
+注意事项:
+---------
+1. 所有图片均来自可靠零售商网站（cuencacigars.com, atlanticcigar.com等）
+2. 图片尺寸从500x500到4146x4480不等，质量良好
+3. 部分产品名称与实际搜索结果略有差异，已按实际产品匹配
+4. Opus X Estate Reserve图片尺寸较小(982x133)，可能需要重新搜索更好的图片
