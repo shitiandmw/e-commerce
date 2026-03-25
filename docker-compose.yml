@@ -45,8 +45,8 @@ services:
       redis:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER:-medusa}:${POSTGRES_PASSWORD:-medusa_password}@postgres:5432/${POSTGRES_DB:-medusa_ecommerce}?sslmode=disable
-      REDIS_URL: redis://redis:6379
+      DATABASE_URL: "${DATABASE_URL:-postgres://${POSTGRES_USER:-medusa}:${POSTGRES_PASSWORD:-medusa_password}@postgres:5432/${POSTGRES_DB:-medusa_ecommerce}?sslmode=disable}"
+      REDIS_URL: "${REDIS_URL:-redis://redis:6379}"
       JWT_SECRET: ${JWT_SECRET:-supersecret}
       COOKIE_SECRET: ${COOKIE_SECRET:-supersecret}
       STORE_CORS: ${STORE_CORS:-http://localhost:43000}
@@ -63,12 +63,13 @@ services:
     ports:
       - "${MEDUSA_PORT:-49000}:9000"
       - "${SOCKET_PORT:-49001}:9001"
+    command: ["sh", "-c", "npx medusa db:migrate --execute-safe-links && npx medusa start"]
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://localhost:9000/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
       interval: 10s
       timeout: 5s
-      retries: 10
-      start_period: 30s
+      retries: 20
+      start_period: 120s
 
   admin-ui:
     build:
@@ -118,8 +119,8 @@ services:
       redis:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER:-medusa}:${POSTGRES_PASSWORD:-medusa_password}@postgres:5432/${POSTGRES_DB:-medusa_ecommerce}?sslmode=disable
-      REDIS_URL: redis://redis:6379
+      DATABASE_URL: "${DATABASE_URL:-postgres://${POSTGRES_USER:-medusa}:${POSTGRES_PASSWORD:-medusa_password}@postgres:5432/${POSTGRES_DB:-medusa_ecommerce}?sslmode=disable}"
+      REDIS_URL: "${REDIS_URL:-redis://redis:6379}"
       JWT_SECRET: ${JWT_SECRET:-supersecret}
       COOKIE_SECRET: ${COOKIE_SECRET:-supersecret}
     entrypoint: ["sh", "-c"]
@@ -142,8 +143,8 @@ services:
       redis:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER:-medusa}:${POSTGRES_PASSWORD:-medusa_password}@postgres:5432/${POSTGRES_DB:-medusa_ecommerce}?sslmode=disable
-      REDIS_URL: redis://redis:6379
+      DATABASE_URL: "${DATABASE_URL:-postgres://${POSTGRES_USER:-medusa}:${POSTGRES_PASSWORD:-medusa_password}@postgres:5432/${POSTGRES_DB:-medusa_ecommerce}?sslmode=disable}"
+      REDIS_URL: "${REDIS_URL:-redis://redis:6379}"
       JWT_SECRET: ${JWT_SECRET:-supersecret}
       COOKIE_SECRET: ${COOKIE_SECRET:-supersecret}
     entrypoint: ["sh", "-c"]
