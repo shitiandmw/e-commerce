@@ -65,7 +65,7 @@
 | `brand_cn` / `brand_en` | 品牌 |
 | `brand_slug` | 品牌 slug |
 | `title` | 商品标题（中文+英文型号） |
-| `price_hkd` | 港币价格 |
+| `price_usd` | 美元价格（已确认使用 USD） |
 | `length_mm` / `ring_gauge` | 尺寸（部分商品缺失） |
 | `handle` | 商品 URL handle |
 | `category_slug` | 归属品牌分类 slug |
@@ -88,7 +88,7 @@
 2. **删除所有品牌**：`GET /admin/brands` 获取列表，逐条 `DELETE /admin/brands/:id`
 3. **删除所有商品分类**：`GET /admin/product-categories` 获取列表，逐条 `DELETE /admin/product-categories/:id`
 
-> ⚠️ 删除前无需备份，原始数据在 CSV 文件中。
+> ⚠️ 删除前无需备份，线上均为测试数据，原始数据在 CSV 文件中。
 
 ---
 
@@ -211,17 +211,29 @@ Body: { add: [productId1, productId2, ...] }
 **Base URL**: `https://api.shangjiacigar.com`
 **Auth Header**: `Authorization: Bearer <token>`
 
+### 认证方式
+
+通过 agent-browser 登录管理后台获取 JWT token，然后使用 curl 调用 API：
+
+- **登录地址**：`https://admin.shangjiacigar.com/login`
+- **账号**：`admin@test.com`
+- **密码**：`admin123456`
+- **数据文件**：使用 `products.csv`（USD 价格），不使用 `products_with_urls.csv`（HKD）
+- **备份**：不需要，线上均为测试数据
+
 ---
 
 ## 待确认事项
 
 - [x] 图片上传（已完成）
 - [x] `products.csv` 含生产 URL（已完成）
+- [x] 币种确认：使用 USD（`products.csv` 的 `price_usd` 字段）
+- [x] 执行方式：agent-browser 登录获取 token + curl 调用 API
+- [x] 备份确认：不需要，线上为测试数据
 - [ ] Step 1：清空现有数据（待执行）
 - [ ] Step 2：导入品牌（待执行）
 - [ ] Step 3：创建分类（待执行）
 - [ ] Step 4：更新菜单（待执行）
-- [ ] Step 6.1：单商品测试（待执行）
 - [ ] Step 6.2：批量导入（待执行）
 - [ ] Step 7：关联品牌（待执行）
 
