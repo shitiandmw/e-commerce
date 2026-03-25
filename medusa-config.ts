@@ -64,6 +64,11 @@ module.exports = defineConfig({
   projectConfig: {
     redisUrl: process.env.REDIS_URL,
     databaseUrl: process.env.DATABASE_URL,
+    // Our compose PostgreSQL container doesn't expose TLS, so force plain TCP.
+    databaseDriverOptions: {
+      ssl: false,
+      sslmode: "disable",
+    },
     http: {
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
