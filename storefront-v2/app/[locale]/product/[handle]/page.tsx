@@ -7,7 +7,8 @@ import { getTranslations } from "next-intl/server"
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; handle: string }> }): Promise<Metadata> {
   const { locale, handle } = await params
-  const product = await fetchProduct(handle, locale)
+  const region = await getRegion()
+  const product = await fetchProduct(handle, locale, region.id)
   if (!product) {
     const t = await getTranslations({ locale })
     return { title: t('seo_not_found_product') }
