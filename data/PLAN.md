@@ -9,9 +9,8 @@
 | `brands.csv` | 品牌定义 | 36 个 |
 | `categories.csv` | 商品分类（两层树） | 38 个 |
 | `menu_items.csv` | 菜单项（含嵌套关系） | 45 项 |
-| `products.csv` | 待导入商品 | 429 条 |
-| `products_with_urls.csv` | 商品含生产环境图片URL | 429 条 |
-| `image_url_map.json` | 图片本地路径→远程URL映射 | 713 条 |
+| `products.csv` | 当前线上商品数据源 | 429 条 |
+| `image_url_map_reuploaded.json` | 当前正确的图片本地路径→远程URL映射 | 712 条 |
 
 ---
 
@@ -70,11 +69,12 @@
 | `handle` | 商品 URL handle |
 | `category_slug` | 归属品牌分类 slug |
 | `cuban_parent_slug` | 固定 `cigar-cuban`（用于同时挂两个分类） |
-| `image1~5` | 已替换为生产环境远程 URL |
+| `image1~5` | 当前 CSV 中为线上远程 URL；如媒体丢失，可通过 remap 文件重传恢复 |
 
-**图片状态**（已上传完成）：
-- 713 张真实图片：`https://api.shangjiacigar.com/static/...`
-- 占位图：`https://api.shangjiacigar.com/static/1774260606710-placeholder.png`
+**图片状态**（已恢复并验证）:
+- 本轮有效远程图片 URL：712 张（`https://api.shangjiacigar.com/static/...`）
+- 占位图已重新上传并纳入商品更新
+- 前端已通过浏览器验证图片恢复正常显示
 
 ---
 
@@ -119,21 +119,21 @@ Body: { name, handle, is_active, parent_category_id? }
 
 ---
 
-### Step 4：更新菜单
+### Step 4：更新菜单（已完成 ✅）
 
-1. 主导航菜单 ID：`01KKVE2WZ92RP6CY56HRRMYVB8`（已知）
-2. 删除现有菜单项
-3. 按 `data/menu_items.csv` 顺序创建新菜单项
-   - 一级项：先创建，记录返回的 `id`
-   - 二级项：传入 `parent_id` 关联
+1. 主导航菜单 ID：`01KMJ1RHFBZWZ40P72520DHX97`
+2. 按 `data/menu_items.csv` 顺序创建新菜单项
+   - 一级项先创建，二级项通过 `parent_id` 关联
 
 ---
 
 ### Step 5：上传图片（已完成 ✅）
 
-- 713 张真实图片 → 已上传至 `https://api.shangjiacigar.com/static/`
-- 1 张占位图 → 已上传至 `https://api.shangjiacigar.com/static/1774260606710-placeholder.png`
-- 映射文件：`data/image_url_map.json`
+- 首轮上传后的媒体文件因 `docker compose down -v` 被删除
+- 已使用 `/product_images` 原始目录重新上传 712 个实际远程 URL
+- 商品图片已批量重写为新 URL，结果：`429/429` 成功
+- 当前映射文件：`data/image_url_map_reuploaded.json`
+- 验证页面：`/zh-CN/product/davidoff-cuban-10-nicaragua-10th-anniversary` 图片已正常显示
 
 ---
 
@@ -145,13 +145,14 @@ Body: { name, handle, is_active, parent_category_id? }
 - 标题：尼加拉瓜系列10週年限量版 Nicaragua 10th Anniversary (12枝)
 - 已验证：后台显示长度152、环径56
 
-#### 6.2 批量商品导入
+#### 6.2 批量商品导入（已完成 ✅）
 
-循环调用 `POST /admin/products`，记录失败的 Handle 供补录。
+已成功创建 `429/429` 个商品，并已加入默认 Sales Channel。
 
 ```
 Body: {
   title, handle, status: "published",
+  categories: [{ id: "品牌分类ID" }, { id: "父分类ID" }],
   images: [{ url: "..." }],
   thumbnail: "...",
   options: [{ title: "Size", values: ["Default"] }],
@@ -165,28 +166,28 @@ Body: {
       { key: "长度", value: "<length_mm>" },
       { key: "环径", value: "<ring_gauge>" }
     ]
-  },
-  category_ids: [品牌分类ID, 古巴雪茄顶层ID]
+  }
 }
 ```
 
 关键点：
-- **价格**：CSV 的 `price_usd` 是美元数值，需 × 100 转为分
-- **商品属性**：长度和环径存入 `metadata.attributes` 数组，不使用 API 的 `length` 字段
-- **选项**：Medusa 要求至少有一个 option 才能创建变体，使用默认的 "Size" 选项
-- **分类**：每个商品关联品牌分类 + 父分类（如古巴雪茄）
-- **库存**：创建后通过 Inventory API 批量设置，暂设 999
+- 商品分类字段实际使用 `categories: [{ id }]`，不是 `category_ids`
+- 当前图片规则：`thumbnail = 第一张图`，`images = 剩余图片`
+- 价格使用 USD，Store API 需配合 region 才能返回计算价格
 
 ---
 
-### Step 7：关联品牌与商品
+### Step 7：关联品牌与商品（已完成 ✅）
 
 ```
 POST /admin/brands/{brandId}/products
-Body: { add: [productId1, productId2, ...] }
+Body: { product_id: "prod_xxx" }
 ```
 
-按品牌批量处理，同一品牌的商品一起关联。
+- 品牌与商品关系为多对一
+- 接口一次只接收一个 `product_id`
+- 已完成补录，结果：`429/429` 成功
+- 结果文件：`data/brand_link_report.json`
 
 ---
 
@@ -204,9 +205,9 @@ Body: { add: [productId1, productId2, ...] }
 | 创建分类 | `/admin/product-categories` | POST |
 | 删除分类 | `/admin/product-categories/:id` | DELETE |
 | 菜单列表 | `/admin/menus` | GET |
-| 菜单项操作 | `/admin/menus/:id/items` | POST/DELETE |
+| 菜单项操作 | `/admin/menu-items` | POST/DELETE |
 | 图片上传 | `/admin/uploads` | POST |
-| 主导航菜单ID | `01KKVE2WZ92RP6CY56HRRMYVB8` | — |
+| 主导航菜单ID | `01KMJ1RHFBZWZ40P72520DHX97` | — |
 
 **Base URL**: `https://api.shangjiacigar.com`
 **Auth Header**: `Authorization: Bearer <token>`
@@ -218,24 +219,23 @@ Body: { add: [productId1, productId2, ...] }
 - **登录地址**：`https://admin.shangjiacigar.com/login`
 - **账号**：`admin@test.com`
 - **密码**：`admin123456`
-- **数据文件**：使用 `products.csv`（USD 价格），不使用 `products_with_urls.csv`（HKD）
+- **数据文件**：使用 `products.csv`（USD 价格，且已回写为最新线上图片 URL）
 - **备份**：不需要，线上均为测试数据
 
 ---
 
 ## 待确认事项
 
-- [x] 图片上传（已完成）
-- [x] `products.csv` 含生产 URL（已完成）
-- [x] 币种确认：使用 USD（`products.csv` 的 `price_usd` 字段）
-- [x] 执行方式：agent-browser 登录获取 token + curl 调用 API
-- [x] 备份确认：不需要，线上为测试数据
-- [ ] Step 1：清空现有数据（待执行）
-- [ ] Step 2：导入品牌（待执行）
-- [ ] Step 3：创建分类（待执行）
-- [ ] Step 4：更新菜单（待执行）
-- [ ] Step 6.2：批量导入（待执行）
-- [ ] Step 7：关联品牌（待执行）
+- [x] Step 1：清空现有数据（已完成）
+- [x] Step 2：导入品牌（已完成）
+- [x] Step 3：创建分类（已完成）
+- [x] Step 4：更新菜单（已完成）
+- [x] Step 5：上传图片（已完成，且已二次重传恢复）
+- [x] Step 6.2：批量导入（已完成）
+- [x] Step 7：关联品牌（已完成）
+- [x] 创建 Region：`Default` / USD / CN+HK+US+Europe（已完成）
+- [x] 商品加入默认 Sales Channel（已完成）
+- [x] storefront-v2 已验证可加载商品与图片（已完成）
 
 ---
 
@@ -243,10 +243,10 @@ Body: { add: [productId1, productId2, ...] }
 
 | 文件 | 说明 |
 |------|------|
-| `data/products.csv` | 含生产 URL 的商品数据 |
+| `data/products.csv` | 当前线上商品数据源（已回写为最新远程图片 URL） |
 | `data/brands.csv` | 36 个品牌定义 |
 | `data/categories.csv` | 分类结构 |
 | `data/menu_items.csv` | 菜单结构 |
-| `data/image_url_map.json` | 图片映射 |
-| `scripts/batch-upload-images.py` | 图片上传脚本 |
+| `data/image_url_map_reuploaded.json` | 当前正确的图片映射 |
+| `scripts/batch-upload-images.py` | 首轮图片上传脚本 |
 | `src/scripts/seed-brands.ts` | 品牌描述参考 |
