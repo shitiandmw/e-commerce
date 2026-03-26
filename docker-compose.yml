@@ -63,6 +63,8 @@ services:
     ports:
       - "${MEDUSA_PORT:-49000}:9000"
       - "${SOCKET_PORT:-49001}:9001"
+    volumes:
+      - ecommerce_prod_static:/app/static
     command: ["sh", "-c", "npx medusa db:migrate --execute-safe-links && npx medusa start"]
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://localhost:9000/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
@@ -186,3 +188,4 @@ services:
 volumes:
   ecommerce_prod_pg_data:
   ecommerce_prod_redis_data:
+  ecommerce_prod_static:
