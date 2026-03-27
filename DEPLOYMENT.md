@@ -155,12 +155,69 @@ docker compose down -v
 docker compose --env-file .env.production up -d postgres redis
 docker compose --env-file .env.production --profile init up init
 
-# 备份数据库
-docker exec ecommerce-prod-postgres pg_dump -U medusa medusa_ecommerce > backup.sql
+# 手动备份数据库
+docker exec ecommerce-prod-postgres sh -lc 'export PGPASSWORD="$POSTGRES_PASSWORD"; pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc' > backup.dump
 
-# 恢复数据库
-docker exec -i ecommerce-prod-postgres psql -U medusa medusa_ecommerce < backup.sql
+# 手动恢复数据库（建议先停止依赖数据库的应用服务）
+docker exec -i ecommerce-prod-postgres sh -lc 'export PGPASSWORD="$POSTGRES_PASSWORD"; pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --clean --if-exists --no-owner --no-privileges' < backup.dump
 ```
+
+### 定时备份数据库（cron）
+
+推荐在宿主机上使用 `cron + pg_dump -Fc`，不要在 cron 里依赖当前工作目录去执行 `docker compose`。
+
+1. 给脚本执行权限：
+
+```bash
+chmod +x scripts/backup-db.sh
+```
+
+2. 手动试跑一次：
+
+```bash
+BACKUP_DIR=/var/backups/ecommerce-postgres \
+RETENTION_DAYS=14 \
+bash scripts/backup-db.sh
+```
+
+3. 配置 crontab（示例：每天凌晨 3:00 执行一次）：
+
+```bash
+0 3 * * * BACKUP_DIR=/var/backups/ecommerce-postgres RETENTION_DAYS=14 /path/to/repo/scripts/backup-db.sh
+```
+
+脚本支持这些环境变量：
+
+- `CONTAINER_NAME`：默认 `ecommerce-prod-postgres`
+- `BACKUP_DIR`：默认 `/var/backups/ecommerce-postgres`
+- `RETENTION_DAYS`：默认 `14`
+- `FILE_PREFIX`：默认 `medusa`
+- `LOCK_FILE`：默认 `/tmp/medusa-pg-backup.lock`
+- `LOG_FILE`：默认 `$BACKUP_DIR/backup.log`
+
+脚本行为：
+
+- 使用 `flock` 防止并发执行
+- 通过 `docker exec` 读取容器内的 `POSTGRES_USER`、`POSTGRES_PASSWORD`、`POSTGRES_DB`
+- 输出 PostgreSQL custom format 备份文件（`.dump`）
+- 先写入 `.dump.tmp`，成功后再原子重命名
+- 自动删除超过保留天数的旧备份
+
+### 数据库恢复建议
+
+恢复生产库前，建议先停止依赖数据库的应用服务：
+
+```bash
+docker compose --env-file .env.production stop medusa admin-ui storefront
+docker exec -i ecommerce-prod-postgres sh -lc 'export PGPASSWORD="$POSTGRES_PASSWORD"; pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --clean --if-exists --no-owner --no-privileges' < /var/backups/ecommerce-postgres/medusa-your-host-20260327-030000.dump
+docker compose --env-file .env.production start medusa admin-ui storefront
+```
+
+注意：
+
+- `pg_dump -Fc` 不需要停机，适合日常定时备份
+- 恢复前最好先在测试环境验证备份文件可用
+- 该方案只覆盖 PostgreSQL；如果线上有上传图片或文件，还需要单独备份 `ecommerce_prod_static` 卷
 
 ### 更新部署
 
