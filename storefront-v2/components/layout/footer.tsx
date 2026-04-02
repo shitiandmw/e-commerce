@@ -31,7 +31,7 @@ export function SiteFooter({ menu }: { menu: MenuData | null }) {
           <div className="shrink-0 md:w-[360px]">
             <Link href="/" className="inline-block">
               <span className="text-xl font-serif font-bold tracking-wider text-gold">
-                TIMECIGAR
+                SHANGJIA
               </span>
               <p className="text-xs text-muted-foreground mt-1 tracking-widest">{t("site_name")}</p>
             </Link>
@@ -75,7 +75,7 @@ export function SiteFooter({ menu }: { menu: MenuData | null }) {
         <div className="mx-auto max-w-7xl px-4 py-6 lg:px-6">
           <div className="flex flex-col items-center gap-4 text-center lg:flex-row lg:justify-between lg:text-left">
             <p className="text-xs text-muted-foreground/70">
-              &copy; {new Date().getFullYear()} TimeCigar. {t("all_rights_reserved")}
+              &copy; {new Date().getFullYear()} ShangJia. {t("all_rights_reserved")}
             </p>
             <p className="text-xs text-muted-foreground/50 max-w-lg leading-relaxed">
               {t("footer_disclaimer")}

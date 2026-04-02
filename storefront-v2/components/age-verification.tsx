@@ -47,7 +47,7 @@ export function AgeVerification() {
       >
         <DialogHeader className="items-center">
           <div className="text-gold font-serif text-2xl font-bold tracking-wider mb-2">
-            TIMECIGAR
+            SHANGJIA
           </div>
           <DialogTitle className="text-foreground text-lg font-serif">
             {t("age_question")}

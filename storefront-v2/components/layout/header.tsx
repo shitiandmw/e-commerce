@@ -386,7 +386,7 @@ export function SiteHeader({ navItems }: { navItems: MenuItem[] }) {
               </SheetTrigger>
               <SheetContent side="left" className="w-[320px] bg-background border-border overflow-y-auto">
                 <SheetHeader>
-                  <SheetTitle className="text-gold font-serif text-lg tracking-wider">TIMECIGAR</SheetTitle>
+                  <SheetTitle className="text-gold font-serif text-lg tracking-wider">SHANGJIA</SheetTitle>
                 </SheetHeader>
                 <nav className="flex flex-col gap-0.5 mt-4">
                   {navItems.map((item) => (
@@ -402,9 +402,9 @@ export function SiteHeader({ navItems }: { navItems: MenuItem[] }) {
 
             {/* logo */}
             <Link href="/" className="flex items-center gap-2.5 shrink-0 mr-4 lg:mr-6">
-              <span className="text-xl font-serif font-bold tracking-[0.2em] text-gold">TIMECIGAR</span>
+              <span className="text-xl font-serif font-bold tracking-[0.2em] text-gold">SHANGJIA</span>
               <span className="hidden sm:block text-[10px] text-muted-foreground tracking-widest leading-none">
-                雪茄時間
+                上茄
               </span>
             </Link>
 

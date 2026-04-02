@@ -1,10 +1,10 @@
-# TIMECIGAR 电商平台
+# SHANGJIA 电商平台
 
 基于 Medusa v2.13.1 的雪茄电商平台，包含三个子项目：
 - **后端**（根目录）— Medusa 服务端，PostgreSQL + Redis
 - **admin-ui/** — 独立 Next.js 14 管理后台（非 Medusa 内置 admin）
 - **storefront-v2/** — 主力店铺前端（Next.js 16 + Radix UI），开发中
-- **storefront/** — 旧版店铺前端，逐步废弃，新功能请在 storefront-v2 中实现
+- **storefront/** — 旧版店铺前端，已废弃，不再维护
 
 ## 开发命令
 

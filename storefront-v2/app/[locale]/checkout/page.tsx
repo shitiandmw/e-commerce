@@ -144,7 +144,7 @@ export default function CheckoutPage() {
             {t("checkout_back_to_cart")}
           </Link>
           <Link href="/" className="text-lg font-serif font-bold tracking-[0.15em] text-gold">
-            TIMECIGAR
+            SHANGJIA
           </Link>
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Lock className="size-3.5 text-gold/60" />

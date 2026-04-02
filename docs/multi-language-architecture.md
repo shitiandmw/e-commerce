@@ -1,8 +1,8 @@
-# TIMECIGAR 多语言与多市场架构方案
+# SHANGJIA 多语言与多市场架构方案
 
 ## 概述
 
-本文档梳理 Medusa v2 中与国际化相关的三个核心概念，以及 TIMECIGAR 项目的选型决策和未来扩展路径。
+本文档梳理 Medusa v2 中与国际化相关的三个核心概念，以及 SHANGJIA 项目的选型决策和未来扩展路径。
 
 ## 三个正交维度
 
@@ -184,7 +184,7 @@ Davidoff Winston Churchill
 
 ---
 
-## TIMECIGAR 选型建议
+## SHANGJIA 选型建议
 
 ### 当前阶段
 

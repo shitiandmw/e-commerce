@@ -1,7 +1,7 @@
 {
-  "site_name": "TIMECIGAR",
-  "site_description": "Premium cigars, refined living. TIMECIGAR offers the finest cigars from around the world.",
-  "home_hero_title": "TIMECIGAR",
+  "site_name": "SHANGJIA",
+  "site_description": "Premium cigars, refined living. SHANGJIA offers the finest cigars from around the world.",
+  "home_hero_title": "SHANGJIA",
   "home_hero_subtitle": "Premium cigars, refined living. Explore the finest cigars from around the world.",
   "browse_products": "Browse Products",
   "search": "Search",
@@ -105,9 +105,9 @@
   "smoking_warning": "Smoking is harmful to your health",
   "deny": "I am under 18",
 
-  "seo_site_title": "TimeCigar | Your Premium Cigar Shopping Platform",
+  "seo_site_title": "ShangJia | Your Premium Cigar Shopping Platform",
   "seo_site_description": "Premium Cuban cigars, non-Cuban cigars, mini cigars, brand recommendations and pricing. Cohiba, Montecristo, Partagás and more top brands.",
-  "seo_title_template": "%s | TimeCigar",
+  "seo_title_template": "%s | ShangJia",
   "seo_articles_title": "Cigar Journal",
   "seo_articles_description": "Explore the latest cigar news, tasting guides, lifestyle articles and Podcast",
   "seo_not_found_product": "Product Not Found",
@@ -115,7 +115,7 @@
   "seo_not_found_article": "Article Not Found",
   "seo_not_found_category": "Product Category",
   "seo_brand_description_fallback": "Explore {name}'s premium cigar collection",
-  "seo_category_description_fallback": "Explore TimeCigar's premium cigar collection",
+  "seo_category_description_fallback": "Explore ShangJia's premium cigar collection",
 
   "adding_to_cart": "Adding...",
   "add_to_wishlist": "Add to Wishlist",
@@ -132,7 +132,7 @@
   "contact_info": "Contact Information",
   "shipping_method": "Shipping Method",
   "payment": "Payment",
-  "join_timecigar": "Join TIMECIGAR",
+  "join_timecigar": "Join SHANGJIA",
   "member_benefits": "Become a member for exclusive offers and latest updates",
   "free_register": "Register Free",
   "quantity": "Quantity",
@@ -390,7 +390,7 @@
   "checkout_bank_name": "Bank",
   "checkout_account_name": "Account Name",
   "checkout_account_number": "Account Number",
-  "checkout_terms_agree": "I have read and agree to TimeCigar's",
+  "checkout_terms_agree": "I have read and agree to ShangJia's",
   "checkout_terms": "Terms of Service",
   "checkout_and": "and",
   "checkout_privacy": "Privacy Policy",
@@ -445,10 +445,10 @@
 
   "share_article": "Share this article",
   "related_articles": "Related Articles",
-  "article_not_found_meta": "Article not found | TimeCigar",
+  "article_not_found_meta": "Article not found | ShangJia",
   "breadcrumb_articles": "Articles",
 
-  "bs_page_title": "A Century of Cuban Cigar Heritage | TimeCigar",
+  "bs_page_title": "A Century of Cuban Cigar Heritage | ShangJia",
   "bs_page_description": "From the fertile soils of Vuelta Abajo to the cigar workshops of Havana, explore 500 years of Cuban cigar history, traditional craftsmanship and 27 legendary brands.",
   "bs_breadcrumb_home": "Home",
   "bs_breadcrumb_brand_story": "Brand Story",
@@ -573,7 +573,7 @@
 
   "bs_cta_tag": "Explore Collection",
   "bs_cta_title": "Taste the Soul of Cuba",
-  "bs_cta_desc": "Now that you've discovered the century-old heritage of Cuban cigar making, it's time to experience this gift from the Caribbean firsthand. From the classic Montecristo No.2 to the rare Cohiba Behike, find your perfect cigar at TimeCigar.",
+  "bs_cta_desc": "Now that you've discovered the century-old heritage of Cuban cigar making, it's time to experience this gift from the Caribbean firsthand. From the classic Montecristo No.2 to the rare Cohiba Behike, find your perfect cigar at ShangJia.",
   "bs_cta_explore": "Explore Cuban Cigars",
   "bs_cta_guide": "Beginner's Buying Guide",
 

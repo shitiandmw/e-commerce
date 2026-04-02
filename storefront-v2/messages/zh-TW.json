@@ -1,7 +1,7 @@
 {
-  "site_name": "TIMECIGAR",
-  "site_description": "精選雪茄，品味生活。TIMECIGAR 為您提供全球優質雪茄。",
-  "home_hero_title": "TIMECIGAR",
+  "site_name": "SHANGJIA",
+  "site_description": "精選雪茄，品味生活。SHANGJIA 為您提供全球優質雪茄。",
+  "home_hero_title": "SHANGJIA",
   "home_hero_subtitle": "精選雪茄，品味生活。探索來自全球的優質雪茄。",
   "browse_products": "瀏覽商品",
   "search": "搜尋",
@@ -105,9 +105,9 @@
   "smoking_warning": "吸煙有害健康",
   "deny": "我未滿 18 歲",
 
-  "seo_site_title": "TimeCigar 雪茄時間 | 您的雪茄網購平台",
+  "seo_site_title": "ShangJia 上茄 | 您的雪茄網購平台",
   "seo_site_description": "提供古巴雪茄、非古雪茄、迷你雪茄、雪茄品牌推薦及價格。高希霸、蒙特克里斯托、帕特加斯等頂級品牌。",
-  "seo_title_template": "%s | TimeCigar 雪茄時間",
+  "seo_title_template": "%s | ShangJia 上茄",
   "seo_articles_title": "茄時分享",
   "seo_articles_description": "探索雪茄世界的最新資訊、品鑑指南、品味生活文章和 Podcast",
   "seo_not_found_product": "找不到商品",
@@ -115,7 +115,7 @@
   "seo_not_found_article": "文章未找到",
   "seo_not_found_category": "商品分類",
   "seo_brand_description_fallback": "探索 {name} 的精選雪茄系列",
-  "seo_category_description_fallback": "探索 TimeCigar 的精選雪茄系列",
+  "seo_category_description_fallback": "探索 ShangJia 的精選雪茄系列",
 
   "adding_to_cart": "正在加入...",
   "add_to_wishlist": "加入收藏",
@@ -132,7 +132,7 @@
   "contact_info": "聯絡資訊",
   "shipping_method": "配送方式",
   "payment": "付款方式",
-  "join_timecigar": "加入 TIMECIGAR",
+  "join_timecigar": "加入 SHANGJIA",
   "member_benefits": "成為會員，享受專屬優惠與最新資訊",
   "free_register": "免費註冊",
   "quantity": "數量",
@@ -390,7 +390,7 @@
   "checkout_bank_name": "銀行",
   "checkout_account_name": "帳戶名稱",
   "checkout_account_number": "帳戶號碼",
-  "checkout_terms_agree": "我已閱讀並同意 TimeCigar 的",
+  "checkout_terms_agree": "我已閱讀並同意 ShangJia 的",
   "checkout_terms": "服務條款",
   "checkout_and": "和",
   "checkout_privacy": "私隱政策",
@@ -445,10 +445,10 @@
 
   "share_article": "分享此文章",
   "related_articles": "相關文章",
-  "article_not_found_meta": "找不到文章 | TimeCigar",
+  "article_not_found_meta": "找不到文章 | ShangJia",
   "breadcrumb_articles": "茄時分享",
 
-  "bs_page_title": "古巴製茄的百年傳承 | TimeCigar 雪茄時間",
+  "bs_page_title": "古巴製茄的百年傳承 | ShangJia 上茄",
   "bs_page_description": "從Vuelta Abajo的肥沃土壤到哈瓦那的製茄工坊，探索古巴雪茄500年的傳奇歷史、傳統製茄工藝和27個經典品牌。",
   "bs_breadcrumb_home": "首頁",
   "bs_breadcrumb_brand_story": "品牌故事",
@@ -573,7 +573,7 @@
 
   "bs_cta_tag": "Explore Collection",
   "bs_cta_title": "品鑑古巴的靈魂",
-  "bs_cta_desc": "了解了古巴製茄的百年傳承，是時候親身品鑑這份來自加勒比海的禮物。從經典的蒙特克里斯托二號到珍稀的高希霸 Behike，在 TimeCigar 找到屬於您的那一支。",
+  "bs_cta_desc": "了解了古巴製茄的百年傳承，是時候親身品鑑這份來自加勒比海的禮物。從經典的蒙特克里斯托二號到珍稀的高希霸 Behike，在上茄找到屬於您的那一支。",
   "bs_cta_explore": "探索古巴雪茄",
   "bs_cta_guide": "入門選購指南",
 

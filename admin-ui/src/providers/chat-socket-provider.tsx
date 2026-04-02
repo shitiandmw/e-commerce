@@ -68,7 +68,7 @@ export function ChatSocketProvider({ children }: { children: ReactNode }) {
 
       // Browser notification
       if (Notification.permission === "granted") {
-        new Notification("TIMECIGAR 客服", {
+        new Notification("SHANGJIA 客服", {
           body: data.last_message_preview || "新消息",
           icon: "/favicon.ico",
         })

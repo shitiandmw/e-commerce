@@ -1,4 +1,4 @@
-# TIMECIGAR 电商平台
+# SHANGJIA 电商平台
 
 基于 Medusa v2 的雪茄电商平台。
 

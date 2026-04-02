@@ -66,7 +66,7 @@ export function HeroCarousel({ slides = [] }: HeroCarouselProps) {
                   <div className="mx-auto w-full max-w-7xl px-4 lg:px-6">
                     <div className="max-w-lg">
                       <p className="text-gold text-sm tracking-[0.3em] uppercase mb-3 font-medium">
-                        TimeCigar
+                        ShangJia
                       </p>
                       {slide.title && (
                         <h1 className="text-3xl md:text-5xl lg:text-6xl font-serif font-bold text-foreground leading-tight text-balance">

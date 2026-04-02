@@ -22,7 +22,7 @@ export function createUI(shadowRoot: ShadowRoot) {
   windowEl.innerHTML = `
     <div class="tc-chat-header">
       <div>
-        <div class="tc-chat-header-title">TIMECIGAR</div>
+        <div class="tc-chat-header-title">SHANGJIA</div>
         <div class="tc-chat-header-status">在线客服</div>
       </div>
       <button class="tc-chat-close">${CLOSE_ICON}</button>
