@@ -104,7 +104,6 @@
   "tobacco_disclaimer": "本网站包含烟草相关内容，仅面向法定吸烟年龄以上的成年人。进入本网站即表示您确认已达到所在地区的法定吸烟年龄。",
   "smoking_warning": "吸烟有害健康",
   "deny": "我未满 18 岁",
-
   "seo_site_title": "ShangJia 上茄 | 您的雪茄网购平台",
   "seo_site_description": "提供古巴雪茄、非古雪茄、迷你雪茄、雪茄品牌推荐及价格。高希霸、蒙特克里斯托、帕特加斯等顶级品牌。",
   "seo_title_template": "%s | ShangJia 上茄",
@@ -116,7 +115,6 @@
   "seo_not_found_category": "商品分类",
   "seo_brand_description_fallback": "探索 {name} 的精选雪茄系列",
   "seo_category_description_fallback": "探索 ShangJia 的精选雪茄系列",
-
   "adding_to_cart": "正在加入...",
   "add_to_wishlist": "加入收藏",
   "price_tbd": "价格待定",
@@ -187,7 +185,6 @@
   "global_shipping": "全球配送，专业包装保护",
   "return_policy": "7 天无理由退换",
   "free_shipping_remaining": "再消费 HK${amount} 即享免运费",
-
   "service_authentic_title": "100% 正品保证",
   "service_authentic_desc": "所有产品均由原厂授权渠道直接供货",
   "service_shipping_title": "全球免费配送",
@@ -196,14 +193,12 @@
   "service_member_desc": "注册会员享首单 9 折及积分回馈",
   "service_tracking_title": "全程邮包追踪",
   "service_tracking_desc": "实时追踪您的包裹配送状态",
-
   "brand_story_subtitle": "Brand Story",
   "brand_story_title": "古巴制茄的百年传承",
   "brand_story_desc": "从Vuelta Abajo的肥沃土壤到哈瓦那的制茄工坊，每一支古巴雪茄都承载着几代人的智慧与热情。了解这些传奇品牌背后的故事，感受真正的古巴灵魂。",
   "brand_story_stat1_label": "个活跃古巴雪茄品牌",
   "brand_story_stat2_label": "年的烟草种植历史",
   "brand_story_link": "探索品牌故事",
-
   "beginner_guide_title": "新手入门指南",
   "beginner_guide_desc": "不知道如何选择第一支雪茄？让我们为您推荐最适合入门的雪茄系列。从轻度到中度，从迷你到标准尺寸，找到属于您的第一支好茄。",
   "beginner_tip_1": "专业选茄指南，根据口味偏好推荐",
@@ -211,23 +206,18 @@
   "beginner_tip_3": "完整的雪茄品鉴教学与搭配建议",
   "beginner_read_guide": "阅读指南",
   "beginner_recommendations": "入门推荐",
-
   "blog_section_title": "茄时分享",
   "blog_view_all_articles": "查看全部文章",
   "read_full_article": "阅读全文",
   "no_articles_in_category": "此分类暂无文章",
-
   "featured_cuban_title": "古巴雪茄焦点推介",
   "featured_cuban_desc": "精选古巴最顶级的雪茄品牌，每一支都是大师级工艺的结晶",
-
   "limited_editions_desc": "每年仅生产极少数量的珍藏版雪茄，融合了品牌最顶尖的制茄工艺与最珍贵的陈年烟叶。一经售罄，便不再重现。",
-
   "hero_carousel_label": "精选轮播",
   "hero_prev_slide": "上一张",
   "hero_next_slide": "下一张",
   "hero_go_to_slide": "前往第 {num} 张",
   "hero_learn_more": "了解更多",
-
   "sort_recommended": "推荐排序",
   "sort_price_asc": "价格：低至高",
   "sort_price_desc": "价格：高至低",
@@ -236,7 +226,6 @@
   "grid_3_col": "三列布局",
   "grid_2_col": "两列布局",
   "other_categories": "其他分类",
-
   "added_to_cart": "已加入购物车",
   "add_to_cart_failed": "加入购物车失败",
   "pack_unit": "{size} 支装 / 盒",
@@ -267,13 +256,10 @@
   "added_to_wishlist": "已加入收藏",
   "operation_failed_retry": "操作失败，请稍后再试",
   "remove_from_wishlist": "取消收藏",
-
   "copy_link": "复制链接",
   "link_copied": "已复制",
-
   "footer_brand_desc": "您的雪茄网购平台，提供古巴雪茄、非古雪茄、迷你雪茄等顶级品牌的正品保证。",
   "footer_disclaimer": "吸烟危害健康。本网站仅供年满18岁人士浏览及购买。雪茄产品图片仅供参考，实际产品可能略有差异。",
-
   "order_confirmed": "订单已确认",
   "order_confirmed_thanks": "感谢您的购买！我们已收到您的订单。",
   "order_email_sent": "订单确认邮件已发送到您的电邮地址。",
@@ -281,7 +267,6 @@
   "order_status_processing": "处理中",
   "estimated_delivery": "预计送达",
   "delivery_days": "7-14 个工作天",
-
   "account_overview_title": "账户概览",
   "personal_info": "个人信息",
   "name_label": "姓名",
@@ -294,7 +279,6 @@
   "status_canceled": "已取消",
   "status_requires_action": "待操作",
   "status_archived": "已归档",
-
   "profile_title": "个人资料",
   "edit_profile": "编辑资料",
   "name_required": "姓名不能为空",
@@ -305,7 +289,6 @@
   "enter_phone": "请输入电话号码",
   "saving": "保存中...",
   "save_changes": "保存修改",
-
   "order_history_title": "订单历史",
   "no_orders_desc": "您还没有任何订单记录",
   "back_to_orders": "← 返回订单列表",
@@ -336,7 +319,6 @@
   "fulfillment_delivered": "已送达",
   "fulfillment_returned": "已退货",
   "fulfillment_canceled": "已取消",
-
   "addresses_title": "收货地址",
   "add_new_address": "新增地址",
   "no_addresses": "暂无收货地址",
@@ -353,7 +335,6 @@
   "country_code_label": "国家代码",
   "confirm_delete": "确认删除",
   "confirm_delete_address": "确定要删除此收货地址吗？此操作无法撤销。",
-
   "checkout_contact_title": "联络资讯",
   "checkout_contact_method": "联系方式",
   "checkout_email_label": "电邮地址",
@@ -413,7 +394,6 @@
   "checkout_country_us": "美国",
   "checkout_country_uk": "英国",
   "checkout_country_other": "其他",
-
   "checkout_saved_addresses": "已保存地址",
   "checkout_new_address": "使用新地址",
   "checkout_payment_failed": "付款失败，请重试",
@@ -422,10 +402,8 @@
   "checkout_loading": "加载中...",
   "checkout_no_shipping_options": "当前地址暂无可用配送方式，请更换收货地址或联系客服。",
   "view_orders": "查看订单",
-
   "search_alt_hint": "试试其他关键词，或浏览我们的商品目录",
   "search_lang_support": "支持中文和英文搜索",
-
   "validation_email_required": "请输入邮箱",
   "validation_email_invalid": "邮箱格式不正确",
   "validation_password_required": "请输入密码",
@@ -442,12 +420,10 @@
   "placeholder_password_min": "至少8位",
   "placeholder_confirm_password": "再次输入密码",
   "placeholder_enter_password": "输入密码",
-
   "share_article": "分享此文章",
   "related_articles": "相关文章",
   "article_not_found_meta": "找不到文章 | ShangJia",
   "breadcrumb_articles": "茄时分享",
-
   "bs_page_title": "古巴制茄的百年传承 | ShangJia 上茄",
   "bs_page_description": "从Vuelta Abajo的肥沃土壤到哈瓦那的制茄工坊，探索古巴雪茄500年的传奇历史、传统制茄工艺和27个经典品牌。",
   "bs_breadcrumb_home": "首页",
@@ -464,7 +440,6 @@
   "bs_hero_stat3_value": "5",
   "bs_hero_stat3_line1": "大经典",
   "bs_hero_stat3_line2": "产区",
-
   "bs_history_tag": "History",
   "bs_history_title": "五百年的传奇历程",
   "bs_history_desc": "从一片烟叶到一个传奇，古巴雪茄的故事跨越了五个世纪",
@@ -489,7 +464,6 @@
   "bs_history_7_year": "至今",
   "bs_history_7_title": "传承与创新",
   "bs_history_7_desc": "古巴雪茄继续坚持全手工制作的传统，同时不断推出限量版和特别版，将百年工艺与现代品味完美融合。每年的 Habanos Festival 更成为全球雪茄爱好者的朝圣之旅。",
-
   "bs_terroir_tag": "Terroir",
   "bs_terroir_title": "风土的馈赠",
   "bs_terroir_desc": "古巴的烟草产区如同勃艮第的葡萄园，每一寸土地都有其独特的性格。正是这些不可复制的风土条件，赋予了古巴雪茄无法模仿的灵魂。",
@@ -509,7 +483,6 @@
   "bs_terroir_r5_name": "Oriente",
   "bs_terroir_r5_name_zh": "东方区",
   "bs_terroir_r5_desc": "古巴最东端的产区，虽然产量较小，但其烟叶带有独特的风土特征，常用于特别版雪茄的配方。",
-
   "bs_craft_tag": "Craftsmanship",
   "bs_craft_title": "匠心独运的制茄工艺",
   "bs_craft_desc": "一支古巴雪茄从种植到成品，需要经历超过 200 道工序，历时 2-5 年。每一步都是对耐心与技艺的极致考验。",
@@ -532,7 +505,6 @@
   "bs_craft_s6_title": "陈放与装箱",
   "bs_craft_s6_title_en": "Aging & Packaging",
   "bs_craft_s6_desc": "成品雪茄会在 Escaparate（陈放室）中静置数周至数月，让茄芯、茄套和茄衣的风味充分融合。最后由 Escogedora（选色师）按照茄衣颜色的深浅排列装箱。",
-
   "bs_brands_tag": "Brands",
   "bs_brands_title": "经典品牌巡礼",
   "bs_brands_desc": "27 个古巴雪茄品牌，每一个都有其独特的风格与灵魂",
@@ -570,17 +542,18 @@
   "bs_brand_punch": "潘趣",
   "bs_brand_punch_desc": "品牌名源于英国幽默杂志《Punch》，是古巴最古老的品牌之一。Punch Punch 是其标志性型号。",
   "bs_brand_punch_strength": "中至中强",
-
   "bs_cta_tag": "Explore Collection",
   "bs_cta_title": "品鉴古巴的灵魂",
   "bs_cta_desc": "了解了古巴制茄的百年传承，是时候亲身品鉴这份来自加勒比海的礼物。从经典的蒙特克里斯托二号到珍稀的高希霸 Behike，在上茄找到属于您的那一支。",
   "bs_cta_explore": "探索古巴雪茄",
   "bs_cta_guide": "入门选购指南",
-
   "Common": {
     "toggle_theme": "切换主题",
     "theme": "主题",
     "light_mode": "亮色模式",
     "dark_mode": "暗色模式"
-  }
+  },
+  "collection_label": "精选集合",
+  "collection_not_found": "集合未找到",
+  "no_image": "暂无图片"
 }

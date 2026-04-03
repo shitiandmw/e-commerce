@@ -95,9 +95,12 @@ export async function generateAIResponse(
     ? createOpenAICompatible({
         name: "custom-openai",
         apiKey: config.ai_api_key,
-        baseURL: config.ai_api_url
+        ...(config.ai_api_url && { baseURL: config.ai_api_url }),
       })(config.ai_model)
-    : createAnthropic({ apiKey: config.ai_api_key, baseURL: config.ai_api_url })(config.ai_model)
+    : createAnthropic({
+        apiKey: config.ai_api_key,
+        ...(config.ai_api_url && { baseURL: config.ai_api_url }),
+      })(config.ai_model)
 
   const { text } = await generateText({
     model,

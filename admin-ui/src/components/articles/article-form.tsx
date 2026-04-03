@@ -117,7 +117,7 @@ export function ArticleForm({ article, mode }: ArticleFormProps) {
         sort_order: data.sort_order,
         is_pinned: data.is_pinned,
         category_id: data.category_id || undefined,
-        seo: Object.values(seo).some(Boolean) ? seo : null,
+        seo: Object.values(seo).some(Boolean) ? seo : {},
       }
 
       if (mode === "create") {

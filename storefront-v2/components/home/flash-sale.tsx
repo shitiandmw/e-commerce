@@ -25,7 +25,7 @@ export function HotPicks({ products }: HotPicksProps) {
             <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground text-balance">{t("flash_sale")}</h2>
           </div>
           <Link
-            href="/category/cuban-cigars"
+            href="/collection/hot-picks"
             className="text-xs text-muted-foreground hover:text-gold transition-colors tracking-wide"
           >
             {t("view_more")} &rarr;

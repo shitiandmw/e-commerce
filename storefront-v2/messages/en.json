@@ -104,7 +104,6 @@
   "tobacco_disclaimer": "This website contains tobacco-related content and is intended for adults of legal smoking age only. By entering this site, you confirm that you have reached the legal smoking age in your region.",
   "smoking_warning": "Smoking is harmful to your health",
   "deny": "I am under 18",
-
   "seo_site_title": "ShangJia | Your Premium Cigar Shopping Platform",
   "seo_site_description": "Premium Cuban cigars, non-Cuban cigars, mini cigars, brand recommendations and pricing. Cohiba, Montecristo, Partagás and more top brands.",
   "seo_title_template": "%s | ShangJia",
@@ -116,7 +115,6 @@
   "seo_not_found_category": "Product Category",
   "seo_brand_description_fallback": "Explore {name}'s premium cigar collection",
   "seo_category_description_fallback": "Explore ShangJia's premium cigar collection",
-
   "adding_to_cart": "Adding...",
   "add_to_wishlist": "Add to Wishlist",
   "price_tbd": "Price TBD",
@@ -187,7 +185,6 @@
   "global_shipping": "Worldwide shipping with professional packaging",
   "return_policy": "7-day hassle-free returns",
   "free_shipping_remaining": "Spend HK${amount} more for free shipping",
-
   "service_authentic_title": "100% Authentic Guarantee",
   "service_authentic_desc": "All products sourced directly from authorized channels",
   "service_shipping_title": "Free Global Shipping",
@@ -196,14 +193,12 @@
   "service_member_desc": "Register for 10% off first order and reward points",
   "service_tracking_title": "Full Parcel Tracking",
   "service_tracking_desc": "Track your parcel delivery status in real time",
-
   "brand_story_subtitle": "Brand Story",
   "brand_story_title": "A Century of Cuban Cigar Heritage",
   "brand_story_desc": "From the fertile soils of Vuelta Abajo to the cigar workshops of Havana, every Cuban cigar carries the wisdom and passion of generations. Discover the stories behind these legendary brands and feel the true Cuban soul.",
   "brand_story_stat1_label": "active Cuban cigar brands",
   "brand_story_stat2_label": "years of tobacco cultivation history",
   "brand_story_link": "Explore Brand Stories",
-
   "beginner_guide_title": "Beginner's Guide",
   "beginner_guide_desc": "Not sure how to choose your first cigar? Let us recommend the best beginner-friendly cigar series. From mild to medium, from mini to standard size, find your perfect first cigar.",
   "beginner_tip_1": "Expert cigar selection guide based on taste preferences",
@@ -211,23 +206,18 @@
   "beginner_tip_3": "Complete cigar tasting tutorials and pairing suggestions",
   "beginner_read_guide": "Read Guide",
   "beginner_recommendations": "Beginner Picks",
-
   "blog_section_title": "Cigar Time Shares",
   "blog_view_all_articles": "View All Articles",
   "read_full_article": "Read Full Article",
   "no_articles_in_category": "No articles in this category",
-
   "featured_cuban_title": "Cuban Cigar Featured Selection",
   "featured_cuban_desc": "Handpicked top Cuban cigar brands, each a masterpiece of craftsmanship",
-
   "limited_editions_desc": "Each year, only a very limited number of collector's edition cigars are produced, combining the brand's finest craftsmanship with the most precious aged tobacco leaves. Once sold out, they are gone forever.",
-
   "hero_carousel_label": "Featured Carousel",
   "hero_prev_slide": "Previous slide",
   "hero_next_slide": "Next slide",
   "hero_go_to_slide": "Go to slide {num}",
   "hero_learn_more": "Learn More",
-
   "sort_recommended": "Recommended",
   "sort_price_asc": "Price: Low to High",
   "sort_price_desc": "Price: High to Low",
@@ -236,7 +226,6 @@
   "grid_3_col": "3-column layout",
   "grid_2_col": "2-column layout",
   "other_categories": "Other Categories",
-
   "added_to_cart": "Added to cart",
   "add_to_cart_failed": "Failed to add to cart",
   "pack_unit": "{size} per box",
@@ -267,13 +256,10 @@
   "added_to_wishlist": "Added to wishlist",
   "operation_failed_retry": "Operation failed, please try again",
   "remove_from_wishlist": "Remove from wishlist",
-
   "copy_link": "Copy Link",
   "link_copied": "Copied",
-
   "footer_brand_desc": "Your online cigar platform, offering authentic guaranteed premium brands including Cuban cigars, non-Cuban cigars, and mini cigars.",
   "footer_disclaimer": "Smoking is harmful to health. This website is for persons aged 18 and above only. Cigar product images are for reference only, actual products may vary slightly.",
-
   "order_confirmed": "Order Confirmed",
   "order_confirmed_thanks": "Thank you for your purchase! We have received your order.",
   "order_email_sent": "An order confirmation email has been sent to your email address.",
@@ -281,7 +267,6 @@
   "order_status_processing": "Processing",
   "estimated_delivery": "Estimated Delivery",
   "delivery_days": "7-14 business days",
-
   "account_overview_title": "Account Overview",
   "personal_info": "Personal Information",
   "name_label": "Name",
@@ -294,7 +279,6 @@
   "status_canceled": "Canceled",
   "status_requires_action": "Action Required",
   "status_archived": "Archived",
-
   "profile_title": "Profile",
   "edit_profile": "Edit Profile",
   "name_required": "Name is required",
@@ -305,7 +289,6 @@
   "enter_phone": "Enter phone number",
   "saving": "Saving...",
   "save_changes": "Save Changes",
-
   "order_history_title": "Order History",
   "no_orders_desc": "You don't have any orders yet",
   "back_to_orders": "← Back to Orders",
@@ -336,7 +319,6 @@
   "fulfillment_delivered": "Delivered",
   "fulfillment_returned": "Returned",
   "fulfillment_canceled": "Canceled",
-
   "addresses_title": "Shipping Addresses",
   "add_new_address": "Add Address",
   "no_addresses": "No shipping addresses",
@@ -353,7 +335,6 @@
   "country_code_label": "Country Code",
   "confirm_delete": "Confirm Delete",
   "confirm_delete_address": "Are you sure you want to delete this address? This action cannot be undone.",
-
   "checkout_contact_title": "Contact Information",
   "checkout_contact_method": "Contact Method",
   "checkout_email_label": "Email Address",
@@ -413,7 +394,6 @@
   "checkout_country_us": "United States",
   "checkout_country_uk": "United Kingdom",
   "checkout_country_other": "Other",
-
   "checkout_saved_addresses": "Saved Addresses",
   "checkout_new_address": "Use New Address",
   "checkout_payment_failed": "Payment failed, please try again",
@@ -422,10 +402,8 @@
   "checkout_loading": "Loading...",
   "checkout_no_shipping_options": "No shipping options available for your address. Please try a different address or contact support.",
   "view_orders": "View Orders",
-
   "search_alt_hint": "Try other keywords, or browse our product catalog",
   "search_lang_support": "Supports Chinese and English search",
-
   "validation_email_required": "Please enter email",
   "validation_email_invalid": "Invalid email format",
   "validation_password_required": "Please enter password",
@@ -442,12 +420,10 @@
   "placeholder_password_min": "At least 8 characters",
   "placeholder_confirm_password": "Enter password again",
   "placeholder_enter_password": "Enter password",
-
   "share_article": "Share this article",
   "related_articles": "Related Articles",
   "article_not_found_meta": "Article not found | ShangJia",
   "breadcrumb_articles": "Articles",
-
   "bs_page_title": "A Century of Cuban Cigar Heritage | ShangJia",
   "bs_page_description": "From the fertile soils of Vuelta Abajo to the cigar workshops of Havana, explore 500 years of Cuban cigar history, traditional craftsmanship and 27 legendary brands.",
   "bs_breadcrumb_home": "Home",
@@ -464,7 +440,6 @@
   "bs_hero_stat3_value": "5",
   "bs_hero_stat3_line1": "Classic",
   "bs_hero_stat3_line2": "Regions",
-
   "bs_history_tag": "History",
   "bs_history_title": "Five Centuries of Legend",
   "bs_history_desc": "From a single tobacco leaf to a legend, the story of Cuban cigars spans five centuries",
@@ -489,7 +464,6 @@
   "bs_history_7_year": "Today",
   "bs_history_7_title": "Heritage & Innovation",
   "bs_history_7_desc": "Cuban cigars continue the tradition of entirely handmade production while constantly introducing limited and special editions, perfectly blending centuries of craftsmanship with modern taste. The annual Habanos Festival has become a pilgrimage for cigar enthusiasts worldwide.",
-
   "bs_terroir_tag": "Terroir",
   "bs_terroir_title": "The Gift of Terroir",
   "bs_terroir_desc": "Cuba's tobacco regions are like the vineyards of Burgundy — every inch of land has its own unique character. It is these irreplicable terroir conditions that give Cuban cigars their inimitable soul.",
@@ -509,7 +483,6 @@
   "bs_terroir_r5_name": "Oriente",
   "bs_terroir_r5_name_zh": "Eastern Region",
   "bs_terroir_r5_desc": "Cuba's easternmost region. Though smaller in output, its tobacco carries unique terroir characteristics, often used in special edition cigar blends.",
-
   "bs_craft_tag": "Craftsmanship",
   "bs_craft_title": "The Art of Cigar Making",
   "bs_craft_desc": "A Cuban cigar undergoes over 200 processes from planting to finished product, taking 2-5 years. Every step is the ultimate test of patience and skill.",
@@ -532,7 +505,6 @@
   "bs_craft_s6_title": "Aging & Packaging",
   "bs_craft_s6_title_en": "Aging & Packaging",
   "bs_craft_s6_desc": "Finished cigars rest in the Escaparate (aging room) for weeks to months, allowing the flavors of filler, binder and wrapper to fully marry. Finally, the Escogedora (color sorter) arranges them by wrapper shade for boxing.",
-
   "bs_brands_tag": "Brands",
   "bs_brands_title": "Classic Brand Gallery",
   "bs_brands_desc": "27 Cuban cigar brands, each with its own unique style and soul",
@@ -570,17 +542,18 @@
   "bs_brand_punch": "Punch",
   "bs_brand_punch_desc": "Named after the British humor magazine, one of Cuba's oldest brands. The Punch Punch is its signature format.",
   "bs_brand_punch_strength": "Medium to Med-Full",
-
   "bs_cta_tag": "Explore Collection",
   "bs_cta_title": "Taste the Soul of Cuba",
   "bs_cta_desc": "Now that you've discovered the century-old heritage of Cuban cigar making, it's time to experience this gift from the Caribbean firsthand. From the classic Montecristo No.2 to the rare Cohiba Behike, find your perfect cigar at ShangJia.",
   "bs_cta_explore": "Explore Cuban Cigars",
   "bs_cta_guide": "Beginner's Buying Guide",
-
   "Common": {
     "toggle_theme": "Toggle theme",
     "theme": "Theme",
     "light_mode": "Light mode",
     "dark_mode": "Dark mode"
-  }
+  },
+  "collection_label": "Collection",
+  "collection_not_found": "Collection Not Found",
+  "no_image": "No Image"
 }

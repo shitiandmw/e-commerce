@@ -14,6 +14,8 @@ export async function BrandSpotlight() {
               src="/images/brand-story.jpg"
               alt={t("brand_story_title")}
               fill
+              sizes="100vw"
+              priority
               className="object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-transparent" />

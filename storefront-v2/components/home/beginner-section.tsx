@@ -21,6 +21,8 @@ export async function BeginnerSection() {
               src="/images/beginner-guide.jpg"
               alt={t("beginner_title")}
               fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              priority
               className="object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-transparent to-background/20 lg:bg-none" />

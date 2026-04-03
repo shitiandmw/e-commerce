@@ -27,7 +27,7 @@ export async function LimitedEditions({ products }: LimitedEditionsProps) {
               {t("limited_editions_desc")}
             </p>
             <Link
-              href="/category/cuban-cigars"
+              href="/collection/limited-editions"
               className="mt-8 inline-flex items-center gap-2 border border-gold text-gold px-8 py-3 text-sm font-medium tracking-wide hover:bg-gold hover:text-primary-foreground transition-all"
             >
               {t("view_more")} <ArrowRight className="size-4" />

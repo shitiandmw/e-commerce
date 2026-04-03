@@ -65,7 +65,7 @@ export async function FeaturedCuban({ products }: FeaturedCubanProps) {
 
         <div className="text-center mt-10">
           <Link
-            href="/category/cuban-cigars"
+            href="/collection/featured-cuban"
             className="inline-flex items-center gap-2 text-sm text-gold hover:text-gold-light transition-colors tracking-wide"
           >
             {t("browse_all")} <ArrowRight className="size-4" />
