@@ -1,0 +1,283 @@
+{
+  "start_time": "2026-04-07T16:04:38+08:00",
+  "products": [
+    {
+      "handle": "cohiba-1-siglo-i-25-18-19",
+      "status": "success",
+      "product_id": "prod_01KMJ3DE5T200P8JVWND6XHXZ6",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549079138-cohiba_22_no40.jpg",
+        "https://api.shangjiacigar.com/static/1775549079309-cohiba_25_no42.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-1-siglo-i-5",
+      "status": "success",
+      "product_id": "prod_01KMJ3DDQPX17DD1S2WQM3WVEJ",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549080919-cohiba_22_no40.jpg",
+        "https://api.shangjiacigar.com/static/1775549081047-cohiba_23_no43.jpg",
+        "https://api.shangjiacigar.com/static/1775549081289-cohiba_24_no41.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-2-siglo-ii-25",
+      "status": "success",
+      "product_id": "prod_01KMJ3DF7D1W05NWF04KXBGXPS",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549082886-cohiba_6_no58.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-2-siglo-ii-25-2",
+      "status": "success",
+      "product_id": "prod_01KMJ3DFQ0FH6Z0BB5P0VHFKHC",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549084331-cohiba_6_no58.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-2-siglo-ii-a-t-15",
+      "status": "success",
+      "product_id": "prod_01KMJ3DERRWNTVY7Y3NKMRXF9H",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549085791-cohiba_6_no58.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-3-siglo-iii-15",
+      "status": "success",
+      "product_id": "prod_01KMJ3DG5AWBFNBZN9C31ASB2K",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549087249-cohiba_28_no62.jpg",
+        "https://api.shangjiacigar.com/static/1775549087363-cohiba_29_no64.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-3-siglo-iii-25",
+      "status": "success",
+      "product_id": "prod_01KMJ3DGMFPPTS8ZB3J8J9A1QD",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549088877-cohiba_28_no62.jpg",
+        "https://api.shangjiacigar.com/static/1775549089099-cohiba_30_no65.jpg",
+        "https://api.shangjiacigar.com/static/1775549089245-cohiba_31_no63.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-4-siglo-iv-15",
+      "status": "success",
+      "product_id": "prod_01KMJ3DH4NS293XQFWMSYE6EBV",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549090862-cohiba_32_no68.jpg",
+        "https://api.shangjiacigar.com/static/1775549091035-cohiba_33_no69.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-4-siglo-iv-25",
+      "status": "success",
+      "product_id": "prod_01KMJ3DHM26NG1HMFDQRG72XBW",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549092605-cohiba_32_no68.jpg",
+        "https://api.shangjiacigar.com/static/1775549092744-cohiba_34_no71.jpg",
+        "https://api.shangjiacigar.com/static/1775549092898-cohiba_35_no70.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-5-maduro-5-secretos-25",
+      "status": "success",
+      "product_id": "prod_01KMJ3DBAS4VSXB903FT5D81SY",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549094778-cohiba_9_18089_Cohiba_Magicos_Maduro_No5_10S_sta_pac.jpeg",
+        "https://api.shangjiacigar.com/static/1775549095101-cohiba_10_no20.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-5-siglo-v-25",
+      "status": "success",
+      "product_id": "prod_01KMJ3DJ3BA4BPXBBKMN52MZTJ",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549096868-cohiba_38_no77.jpg",
+        "https://api.shangjiacigar.com/static/1775549097193-cohiba_39_no76.jpg",
+        "https://api.shangjiacigar.com/static/1775549097372-cohiba_40_no78.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-52-behike-52-10",
+      "status": "success",
+      "product_id": "prod_01KMJ3D7NTK86ACQSYMBAR45AT",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549099108-cohiba_47_no596.jpg",
+        "https://api.shangjiacigar.com/static/1775549099333-cohiba_48_no597.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-54-behike-54-10",
+      "status": "success",
+      "product_id": "prod_01KMJ3D864NAK1B2F071EFA949",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549100947-cohiba_4_no598.jpg",
+        "https://api.shangjiacigar.com/static/1775549102127-cohiba_5_no599.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-55-2021-55-aniversario-2021-li",
+      "status": "success",
+      "product_id": "prod_01KMJ3DNJKGSKPVNNTA3N1K7KT",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549103720-cohiba_13_Cohiba_55_Aniversario_Cigar_Limited_Edition_2021_Boxof10_EGM_Cigars.jpg",
+        "https://api.shangjiacigar.com/static/1775549103905-cohiba_14_Cohiba_55_Aniversario_Cigar_Limited_Edition_2021_Single_EGM_Cigars.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-56-behike-56-10",
+      "status": "success",
+      "product_id": "prod_01KMJ3D8XXHX600TT4MTR3JCJ7",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549105567-cohiba_53_Cohiba_Behike_56_Cigar_Box_-_EGM_Cigars.jpg",
+        "https://api.shangjiacigar.com/static/1775549105697-cohiba_54_no601.jpg",
+        "https://api.shangjiacigar.com/static/1775549105896-cohiba_55_Behike_56.jpg",
+        "https://api.shangjiacigar.com/static/1775549106111-cohiba_56_IMG_0388.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-6-siglo-vi-10",
+      "status": "success",
+      "product_id": "prod_01KMJ3DJJ6263SDHQ1DN8BFMMN",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549107706-cohiba_42_Cohiba_Siglo_VI_Cigar_Box_of_25_Cigars_EGM_Cigars.jpg",
+        "https://api.shangjiacigar.com/static/1775549107816-cohiba_43_Cohiba_Siglo_VI_Cigar_Single_EGM_Cigars.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-6-siglo-vi-25",
+      "status": "success",
+      "product_id": "prod_01KMJ3DK18MA3BC55S189BB19G",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549109370-cohiba_42_Cohiba_Siglo_VI_Cigar_Box_of_25_Cigars_EGM_Cigars.jpg",
+        "https://api.shangjiacigar.com/static/1775549109600-cohiba_45_no83.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-ambar",
+      "status": "success",
+      "product_id": "prod_01KMJ3DS4XTHNQX7368YYH7JMC",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549111090-cohiba_17_no595.jpg",
+        "https://api.shangjiacigar.com/static/1775549111337-cohiba_18_no594.jpg",
+        "https://api.shangjiacigar.com/static/1775549111495-cohiba_19_04.CohibaAmbarCamadaDetalles.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-esplendidos-15",
+      "status": "success",
+      "product_id": "prod_01KMJ3DMKSA1AN54EJA2WERTYZ",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549113651-cohiba_51_no8.jpg",
+        "https://api.shangjiacigar.com/static/1775549113901-cohiba_52_no7.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-genios-10",
+      "status": "success",
+      "product_id": "prod_01KMJ3DBSY4Y60QTANJK68Q11G",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549115592-cohiba_9_18089_Cohiba_Magicos_Maduro_No5_10S_sta_pac.jpeg"
+      ]
+    },
+    {
+      "handle": "cohiba-genios-25",
+      "status": "success",
+      "product_id": "prod_01KMJ3DCA94BDFP66J1AZJTJP2",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549117175-cohiba_9_18089_Cohiba_Magicos_Maduro_No5_10S_sta_pac.jpeg"
+      ]
+    },
+    {
+      "handle": "cohiba-magicos-10",
+      "status": "success",
+      "product_id": "prod_01KMJ3DQKCMKKD6S7E737KVNT5",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549118694-cohiba_9_18089_Cohiba_Magicos_Maduro_No5_10S_sta_pac.jpeg",
+        "https://api.shangjiacigar.com/static/1775549118800-cohiba_10_no20.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-medio-siglo-25",
+      "status": "success",
+      "product_id": "prod_01KMJ3DD9YW0SW81GNGX0E3J9Y",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549120351-cohiba_7_Medio_Siglo_Tubos_Pack_EGM_Cigars.jpg",
+        "https://api.shangjiacigar.com/static/1775549120530-cohiba_8_EGM_MEDIO_SIGLO.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-medio-siglo-a-t-15",
+      "status": "success",
+      "product_id": "prod_01KMJ3DCV77MC5M4MBFDNPJFPH",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549122061-cohiba_7_Medio_Siglo_Tubos_Pack_EGM_Cigars.jpg",
+        "https://api.shangjiacigar.com/static/1775549122171-cohiba_8_EGM_MEDIO_SIGLO.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-panetelas-25",
+      "status": "success",
+      "product_id": "prod_01KMJ3DKMGRH11WWR16D2XYMSX",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549123633-cohiba_11_no28.jpg",
+        "https://api.shangjiacigar.com/static/1775549123733-cohiba_12_no27.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-piramides-extra-10",
+      "status": "success",
+      "product_id": "prod_01KMJ3DR3FE1QKMV0RMVQBQQGQ",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549125126-cohiba_57_no31.jpg",
+        "https://api.shangjiacigar.com/static/1775549125264-cohiba_58_no32.jpg",
+        "https://api.shangjiacigar.com/static/1775549126274-cohiba_59_no33.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-robusto-a-t-15",
+      "status": "success",
+      "product_id": "prod_01KMJ3D9P7A8H5MWTC41ABCENB",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549127725-cohiba_49_cohiba_robusto_supremos_cigar_Limited_Edition_2014_single.jpg",
+        "https://api.shangjiacigar.com/static/1775549127952-cohiba_50_CohibaRobustosSupremos.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-robusto-a-t-3",
+      "status": "success",
+      "product_id": "prod_01KMJ3DA6M1QADAHAM8Y2RGDP6",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549129496-cohiba_49_cohiba_robusto_supremos_cigar_Limited_Edition_2014_single.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-robustos-25",
+      "status": "success",
+      "product_id": "prod_01KMJ3DAW6B0H4C4SWQBBS89F7",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549131564-cohiba_49_cohiba_robusto_supremos_cigar_Limited_Edition_2014_single.jpg",
+        "https://api.shangjiacigar.com/static/1775549131718-cohiba_50_CohibaRobustosSupremos.jpg"
+      ]
+    },
+    {
+      "handle": "cohiba-siglo-de-oro-year-of-the-rabbi",
+      "status": "success",
+      "product_id": "prod_01KMJ3DN2F93HMYA9BCSS8MRYE",
+      "urls": [
+        "https://api.shangjiacigar.com/static/1775549133197-cohiba_15_Cohiba_Siglo_de_Oro_Cigar_EGM.jpg",
+        "https://api.shangjiacigar.com/static/1775549133551-cohiba_16_Cohiba_Siglo_de_Oro_Cigar_Single_EGM.jpg"
+      ]
+    }
+  ],
+  "end_time": "2026-04-07T16:05:34+08:00",
+  "summary": {
+    "total": 30,
+    "success": 30,
+    "failed": 0
+  }
+}

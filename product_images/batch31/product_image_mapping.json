@@ -1,0 +1,118 @@
+{
+  "batch": "batch31",
+  "source": "EGM Cigars (https://zh-cn.egmcigars.com)",
+  "date": "2026-04-03",
+  "description": "高希霸系列高质量图片更新",
+  "mappings": [
+    {
+      "handle": "cohiba-54-behike-54-10",
+      "product_name": "贝伊可54 BEHIKE 54(10枝)",
+      "new_images": [
+        "product_images/batch31/cohiba_4_no598.jpg",
+        "product_images/batch31/cohiba_5_no599.jpg"
+      ],
+      "notes": "Behike 54 高质量产品图"
+    },
+    {
+      "handle": "cohiba-2-siglo-ii-25",
+      "product_name": "世纪2号 Siglo II (25枝)",
+      "new_images": [
+        "product_images/batch31/cohiba_6_no58.jpg"
+      ],
+      "notes": "Siglo II 盒装图"
+    },
+    {
+      "handle": "cohiba-2-siglo-ii-a-t-15",
+      "product_name": "世纪2号铝管 Siglo II A/T(15枝)",
+      "new_images": [
+        "product_images/batch31/cohiba_6_no58.jpg"
+      ],
+      "notes": "Siglo II 可用于铝管版本"
+    },
+    {
+      "handle": "cohiba-medio-siglo-a-t-15",
+      "product_name": "半世纪铝管 MEDIO SIGLO A/T (15枝)",
+      "new_images": [
+        "product_images/batch31/cohiba_7_Medio_Siglo_Tubos_Pack_EGM_Cigars.jpg",
+        "product_images/batch31/cohiba_8_EGM_MEDIO_SIGLO.jpg"
+      ],
+      "notes": "Medio Siglo 铝管装和单支图"
+    },
+    {
+      "handle": "cohiba-medio-siglo-25",
+      "product_name": "半世纪 MEDIO SIGLO (25枝)",
+      "new_images": [
+        "product_images/batch31/cohiba_7_Medio_Siglo_Tubos_Pack_EGM_Cigars.jpg",
+        "product_images/batch31/cohiba_8_EGM_MEDIO_SIGLO.jpg"
+      ],
+      "notes": "Medio Siglo 盒装版本"
+    },
+    {
+      "handle": "cohiba-5-maduro-5-secretos-25",
+      "product_name": "马杜罗5奥秘小天才 MADURO 5 SECRETOS (25枝)",
+      "new_images": [
+        "product_images/batch31/cohiba_9_18089_Cohiba_Magicos_Maduro_No5_10S_sta_pac.jpeg",
+        "product_images/batch31/cohiba_10_no20.jpg"
+      ],
+      "notes": "Maduro 5 Secretos 高质量图"
+    },
+    {
+      "handle": "cohiba-magicos-10",
+      "product_name": "魔术师 Magicos (10枝)",
+      "new_images": [
+        "product_images/batch31/cohiba_9_18089_Cohiba_Magicos_Maduro_No5_10S_sta_pac.jpeg",
+        "product_images/batch31/cohiba_10_no20.jpg"
+      ],
+      "notes": "Magicos 系列图片"
+    },
+    {
+      "handle": "cohiba-panetelas-25",
+      "product_name": "宾利 PANETELAS (25枝)",
+      "new_images": [
+        "product_images/batch31/cohiba_11_no28.jpg",
+        "product_images/batch31/cohiba_12_no27.jpg"
+      ],
+      "notes": "Panetelas 盒装和单支图"
+    },
+    {
+      "handle": "cohiba-55-2021-55-aniversario-2021-li",
+      "product_name": "55周年2021限量版 55 ANIVERSARIO 2021 LIMITED EDITION (10枝)",
+      "new_images": [
+        "product_images/batch31/cohiba_13_Cohiba_55_Aniversario_Cigar_Limited_Edition_2021_Boxof10_EGM_Cigars.jpg",
+        "product_images/batch31/cohiba_14_Cohiba_55_Aniversario_Cigar_Limited_Edition_2021_Single_EGM_Cigars.jpg"
+      ],
+      "notes": "55周年限量版盒装和单支"
+    },
+    {
+      "handle": "cohiba-siglo-de-oro-year-of-the-rabbi",
+      "product_name": "黄金岁月兔年限量版 SIGLO DE ORO YEAR OF THE RABBIT (18枝)",
+      "new_images": [
+        "product_images/batch31/cohiba_15_Cohiba_Siglo_de_Oro_Cigar_EGM.jpg",
+        "product_images/batch31/cohiba_16_Cohiba_Siglo_de_Oro_Cigar_Single_EGM.jpg"
+      ],
+      "notes": "Siglo de Oro 兔年限量版"
+    },
+    {
+      "handle": "cohiba-ambar",
+      "product_name": "Ambar高希霸安巴尔（琥珀）",
+      "new_images": [
+        "product_images/batch31/cohiba_17_no595.jpg",
+        "product_images/batch31/cohiba_18_no594.jpg",
+        "product_images/batch31/cohiba_19_04.CohibaAmbarCamadaDetalles.jpg",
+        "product_images/batch31/cohiba_20_07.CohibaAmbarCajaDetalles.jpg"
+      ],
+      "notes": "Cohiba Ambar 高质量产品图，包含盒装和细节图"
+    }
+  ],
+  "summary": {
+    "total_products": 11,
+    "total_images": 21,
+    "quality": "高质量产品图，来自 EGM Cigars 官方网站",
+    "recommendations": [
+      "建议替换所有使用 placeholder.png 的高希霸产品",
+      "Behike 54 图片质量优秀，可直接使用",
+      "Siglo 系列和 Medio Siglo 图片清晰度高",
+      "55周年限量版图片包含盒装和单支，展示效果好"
+    ]
+  }
+}
