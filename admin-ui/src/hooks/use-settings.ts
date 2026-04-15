@@ -26,11 +26,11 @@ export function useStore() {
   })
 }
 
-export function useUpdateStore() {
+export function useUpdateStore(storeId: string) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (data: { name?: string }) =>
-      adminFetch<{ store: AdminStore }>("/admin/stores", {
+      adminFetch<{ store: AdminStore }>(`/admin/stores/${storeId}`, {
         method: "POST",
         body: data,
       }),

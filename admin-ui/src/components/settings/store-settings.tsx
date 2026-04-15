@@ -12,7 +12,7 @@ import { Save, Loader2, Store } from "lucide-react"
 export function StoreSettings() {
   const t = useTranslations("settings")
   const { data, isLoading } = useStore()
-  const updateStore = useUpdateStore()
+  const updateStore = useUpdateStore(data?.store?.id || "")
   const [name, setName] = React.useState("")
   const [saved, setSaved] = React.useState(false)
 
