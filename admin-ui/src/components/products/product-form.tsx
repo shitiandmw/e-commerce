@@ -10,6 +10,7 @@ import {
   Product,
   useCreateProduct,
   useUpdateProduct,
+  useUpdateVariant,
   useCategories,
   useLinkProductCategory,
   useUnlinkProductCategory,
@@ -103,6 +104,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
   const router = useRouter()
   const createProduct = useCreateProduct()
   const updateProduct = useUpdateProduct(product?.id || "")
+  const updateVariant = useUpdateVariant(product?.id || "")
   const { data: categoriesData } = useCategories()
   const { data: brandsData } = useBrands({ limit: 100 })
   const linkProductBrand = useLinkProductBrand()
@@ -318,6 +320,52 @@ export function ProductForm({ product, mode }: ProductFormProps) {
         }
       } else {
         await updateProduct.mutateAsync(payload)
+
+        // Update existing variants (price, SKU, inventory_quantity)
+        if (product?.variants && data.variants) {
+          for (let i = 0; i < data.variants.length; i++) {
+            const existingVariant = product.variants[i]
+            if (!existingVariant) continue
+
+            const formVariant = data.variants[i]
+            const variantPayload: Record<string, any> = {}
+
+            if (formVariant.title !== existingVariant.title) {
+              variantPayload.title = formVariant.title
+            }
+
+            const oldSku = existingVariant.sku || ""
+            if (formVariant.sku !== oldSku) {
+              variantPayload.sku = formVariant.sku || null
+            }
+
+            if (formVariant.manage_inventory !== (existingVariant.manage_inventory ?? true)) {
+              variantPayload.manage_inventory = formVariant.manage_inventory
+            }
+
+            const oldPrice = existingVariant.prices?.[0]
+            const newPriceAmount = Math.round(formVariant.price * 100)
+            if (
+              !oldPrice ||
+              oldPrice.amount !== newPriceAmount ||
+              oldPrice.currency_code !== formVariant.currency_code
+            ) {
+              variantPayload.prices = [
+                {
+                  amount: newPriceAmount,
+                  currency_code: formVariant.currency_code,
+                },
+              ]
+            }
+
+            if (Object.keys(variantPayload).length > 0) {
+              await updateVariant.mutateAsync({
+                variantId: existingVariant.id,
+                data: variantPayload,
+              })
+            }
+          }
+        }
 
         // Handle brand link changes
         const oldBrandId = resolveBrand(product?.brand)?.id
@@ -784,11 +832,25 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                   </div>
                   <div className="space-y-2">
                     <Label>{t("form.variantInventory")}</Label>
-                    <Input
-                      type="number"
-                      {...register(`variants.${index}.inventory_quantity`)}
-                      placeholder="0"
-                    />
+                    {mode === "edit" ? (
+                      <div>
+                        <Input
+                          type="number"
+                          value={product?.variants?.[index]?.inventory_quantity ?? 0}
+                          disabled
+                          className="bg-muted"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {t("form.variantInventoryHint")}
+                        </p>
+                      </div>
+                    ) : (
+                      <Input
+                        type="number"
+                        {...register(`variants.${index}.inventory_quantity`)}
+                        placeholder="0"
+                      />
+                    )}
                   </div>
                   <div className="flex items-end space-x-2 pb-2">
                     <input

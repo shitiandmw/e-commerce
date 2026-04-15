@@ -91,6 +91,7 @@
       "variantPricePlaceholder": "0.00",
       "variantCurrency": "货币",
       "variantInventory": "库存",
+      "variantInventoryHint": "库存数量需在「库存管理」页面中调整",
       "manageInventory": "管理库存",
       "status": "状态",
       "brand": "品牌",

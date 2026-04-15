@@ -91,6 +91,7 @@
       "variantPricePlaceholder": "0.00",
       "variantCurrency": "Currency",
       "variantInventory": "Inventory",
+      "variantInventoryHint": "Manage stock quantities in the Inventory page",
       "manageInventory": "Manage inventory",
       "status": "Status",
       "brand": "Brand",

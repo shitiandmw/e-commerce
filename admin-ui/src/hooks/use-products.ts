@@ -188,6 +188,29 @@ export function useDeleteProduct() {
   })
 }
 
+export function useUpdateVariant(productId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      variantId,
+      data,
+    }: {
+      variantId: string
+      data: Record<string, any>
+    }) =>
+      adminFetch(`/admin/products/${productId}/variants/${variantId}`, {
+        method: "POST",
+        body: data,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] })
+      queryClient.invalidateQueries({ queryKey: ["product", productId] })
+      queryClient.invalidateQueries({ queryKey: ["inventory-items"] })
+    },
+  })
+}
+
 export function useCategories() {
   return useQuery<{ product_categories: ProductCategory[] }>({
     queryKey: ["product-categories"],
