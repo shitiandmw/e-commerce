@@ -30,6 +30,14 @@ const TRANSLATABLE_RESOURCES = [
     displayField: "title",
   },
   {
+    reference: "article_category",
+    entity: "article_category",
+    label: "文章分类",
+    labelEn: "Article Categories",
+    fields: ["name", "description"],
+    displayField: "name",
+  },
+  {
     reference: "brand",
     entity: "brand",
     label: "品牌",
