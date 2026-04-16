@@ -41,8 +41,7 @@ export default async function BrandPage({
   const brand = await fetchBrand(handle)
   if (!brand) notFound()
 
-  // Get product IDs from brand, then fetch full product data
-  const productIds = brand.products?.map((p) => p.id) ?? []
+  const productIds = brand.products?.filter(Boolean).map((p) => p.id) ?? []
   const region = await getRegion()
 
   let productsData = { products: [] as Awaited<ReturnType<typeof fetchProducts>>["products"], count: 0, offset: 0, limit: PAGE_SIZE }

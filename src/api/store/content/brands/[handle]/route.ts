@@ -25,5 +25,10 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     return
   }
 
-  res.json({ brand: brands[0] })
+  const brand = brands[0] as Record<string, any>
+  if (Array.isArray(brand.products)) {
+    brand.products = brand.products.filter(Boolean)
+  }
+
+  res.json({ brand })
 }

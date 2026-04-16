@@ -91,16 +91,20 @@ export async function generateAIResponse(
 </constraints>
 </customer_service_agent>`
 
+  const openaiSettings: Record<string, string> = {
+    name: "custom-openai",
+    apiKey: config.ai_api_key,
+  }
+  if (config.ai_api_url) openaiSettings.baseURL = config.ai_api_url
+
+  const anthropicSettings: Record<string, string> = {
+    apiKey: config.ai_api_key,
+  }
+  if (config.ai_api_url) anthropicSettings.baseURL = config.ai_api_url
+
   const model = config.ai_provider === "openai"
-    ? createOpenAICompatible({
-        name: "custom-openai",
-        apiKey: config.ai_api_key,
-        ...(config.ai_api_url ? { baseURL: config.ai_api_url } : {}),
-      })(config.ai_model)
-    : createAnthropic({
-        apiKey: config.ai_api_key,
-        ...(config.ai_api_url ? { baseURL: config.ai_api_url } : {}),
-      })(config.ai_model)
+    ? createOpenAICompatible(openaiSettings as any)(config.ai_model)
+    : createAnthropic(anthropicSettings as any)(config.ai_model)
 
   const { text } = await generateText({
     model,
