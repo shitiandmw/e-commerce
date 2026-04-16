@@ -28,7 +28,7 @@ export function buildProductCategoryTree(
 
   function walk(parentId: string | null, depth: number) {
     const children = childrenMap.get(parentId) ?? []
-    for (const child of children.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""))) {
+    for (const child of children.sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0) || (a.name ?? "").localeCompare(b.name ?? ""))) {
       result.push({ category: child, depth })
       walk(child.id, depth + 1)
     }
