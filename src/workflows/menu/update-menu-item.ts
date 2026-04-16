@@ -11,11 +11,11 @@ type UpdateMenuItemInput = {
   id: string
   label?: string
   url?: string
-  icon_url?: string
+  icon_url?: string | null
   sort_order?: number
   is_enabled?: boolean
-  metadata?: Record<string, unknown>
-  parent_id?: string
+  metadata?: Record<string, unknown> | null
+  parent_id?: string | null
   translations?: Record<string, any>
 }
 

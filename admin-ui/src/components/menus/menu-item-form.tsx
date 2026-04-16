@@ -63,7 +63,7 @@ interface MenuItemFormProps {
   onSubmit: (data: {
     label: string
     url: string
-    icon_url?: string
+    icon_url?: string | null
     is_enabled: boolean
     parent_id?: string | null
     metadata?: Record<string, unknown>
@@ -155,7 +155,7 @@ export function MenuItemForm({
     await onSubmit({
       label: data.label,
       url: data.url,
-      icon_url: data.icon_url || undefined,
+      icon_url: data.icon_url || null,
       is_enabled: data.is_enabled,
       parent_id: data.parent_id || null,
       metadata,

@@ -176,7 +176,7 @@ export function MenuTreeEditor({ menuId, items: initialItems }: MenuTreeEditorPr
   const handleItemFormSubmit = async (data: {
     label: string
     url: string
-    icon_url?: string
+    icon_url?: string | null
     is_enabled: boolean
     parent_id?: string | null
     metadata?: Record<string, unknown>

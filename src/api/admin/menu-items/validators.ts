@@ -13,11 +13,11 @@ export const PostAdminCreateMenuItem = z.object({
 export const PostAdminUpdateMenuItem = z.object({
   label: z.string().min(1).optional(),
   url: z.string().optional(),
-  icon_url: z.string().optional(),
+  icon_url: z.string().nullable().optional(),
   sort_order: z.number().int().optional(),
   is_enabled: z.boolean().optional(),
-  metadata: z.record(z.unknown()).optional(),
-  parent_id: z.string().optional(),
+  metadata: z.record(z.unknown()).nullable().optional(),
+  parent_id: z.string().nullable().optional(),
 })
 
 export const PostAdminReorderMenuItems = z.object({
