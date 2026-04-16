@@ -190,6 +190,7 @@ export function MenuTreeEditor({ menuId, items: initialItems }: MenuTreeEditorPr
       } else {
         await createMenuItem.mutateAsync({
           ...data,
+          icon_url: data.icon_url ?? undefined,
           sort_order: 999, // Append to end
         })
       }
