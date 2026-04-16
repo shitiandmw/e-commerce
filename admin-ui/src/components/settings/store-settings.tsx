@@ -66,21 +66,6 @@ export function StoreSettings() {
             />
           </div>
 
-          {store && (
-            <div className="grid grid-cols-2 gap-4 pt-2 text-sm">
-              <div>
-                <span className="text-muted-foreground">{t("storeInfo.storeId")}</span>
-                <p className="font-mono text-xs mt-1 break-all">{store.id}</p>
-              </div>
-              <div>
-                <span className="text-muted-foreground">{t("storeInfo.created")}</span>
-                <p className="mt-1">
-                  {new Date(store.created_at).toLocaleDateString()}
-                </p>
-              </div>
-            </div>
-          )}
-
           {updateStore.error && (
             <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
               {updateStore.error instanceof Error
@@ -114,30 +99,6 @@ export function StoreSettings() {
         </div>
       </div>
 
-      {/* Supported Currencies */}
-      {store?.supported_currencies && store.supported_currencies.length > 0 && (
-        <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
-          <h2 className="text-lg font-semibold">{t("storeInfo.supportedCurrencies")}</h2>
-          <p className="text-sm text-muted-foreground">
-            {t("storeInfo.currenciesDescription")}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {store.supported_currencies.map((c) => (
-              <span
-                key={c.currency_code}
-                className="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium"
-              >
-                {c.currency_code.toUpperCase()}
-                {c.is_default && (
-                  <span className="ml-1 text-xs bg-primary/10 text-primary rounded-full px-1.5 py-0.5">
-                    {t("storeInfo.default")}
-                  </span>
-                )}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   )
 }

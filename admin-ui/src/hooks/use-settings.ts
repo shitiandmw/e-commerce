@@ -22,7 +22,10 @@ export interface AdminStore {
 export function useStore() {
   return useQuery<{ store: AdminStore }>({
     queryKey: ["admin-store"],
-    queryFn: () => adminFetch<{ store: AdminStore }>("/admin/stores"),
+    queryFn: async () => {
+      const res = await adminFetch<{ stores: AdminStore[] }>("/admin/stores")
+      return { store: res.stores[0] }
+    },
   })
 }
 
