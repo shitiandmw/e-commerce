@@ -21,6 +21,10 @@ import {
   useUnlinkProductBrand,
 } from "@/hooks/use-brands"
 import {
+  useStockLocations,
+  ensureInventoryForVariant,
+} from "@/hooks/use-inventory"
+import {
   useTags,
   useLinkProductTag,
   useUnlinkProductTag,
@@ -114,6 +118,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
   const unlinkProductTag = useUnlinkProductTag()
   const linkProductCategory = useLinkProductCategory()
   const unlinkProductCategory = useUnlinkProductCategory()
+  const { data: stockLocationsData } = useStockLocations()
 
   const categories = categoriesData?.product_categories ?? []
   const brands = brandsData?.brands ?? []
@@ -363,6 +368,20 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                 variantId: existingVariant.id,
                 data: variantPayload,
               })
+            }
+
+            const wasDisabled = existingVariant.manage_inventory === false
+            const isNowEnabled = formVariant.manage_inventory === true
+            if (wasDisabled && isNowEnabled) {
+              const defaultLocation = stockLocationsData?.stock_locations?.[0]
+              if (defaultLocation) {
+                await ensureInventoryForVariant({
+                  variantId: existingVariant.id,
+                  sku: formVariant.sku || existingVariant.sku,
+                  title: product?.title ?? data.title,
+                  locationId: defaultLocation.id,
+                })
+              }
             }
           }
         }

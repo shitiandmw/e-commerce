@@ -50,6 +50,15 @@
       "locationsCount": "{count} 个仓库"
     },
 
+    "emptyState": {
+      "title": "尚未启用库存管理",
+      "description": "当前所有商品变体的「管理库存」未开启，系统未生成库存项。点击下方按钮可一键为全部商品启用库存管理并关联默认仓库。",
+      "enableAll": "批量启用库存管理",
+      "enabling": "正在启用中…",
+      "enabledCount": "已为 {count} 个变体启用库存管理",
+      "enableFailed": "启用失败，请稍后重试。"
+    },
+
     "detail": {
       "backToInventory": "返回库存列表",
       "itemNotFound": "库存项不存在或加载失败。",

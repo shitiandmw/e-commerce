@@ -12,6 +12,8 @@ import {
 } from "@tanstack/react-table"
 import {
   useInventoryItems,
+  useStockLocations,
+  useBulkEnableInventory,
   InventoryItem,
   getStockStatus,
   LOW_STOCK_THRESHOLD,
@@ -41,6 +43,8 @@ import {
   AlertTriangle,
   PackageX,
   Package,
+  Loader2,
+  Settings2,
 } from "lucide-react"
 
 type StockFilter = "all" | "in_stock" | "low_stock" | "out_of_stock"
@@ -56,6 +60,9 @@ export function InventoryTable() {
     pageSize: 20,
   })
   const [itemToAdjust, setItemToAdjust] = React.useState<InventoryItem | null>(null)
+  const { data: locationsData } = useStockLocations()
+  const bulkEnable = useBulkEnableInventory()
+  const [bulkProgress, setBulkProgress] = React.useState<string | null>(null)
 
   // Debounce search
   React.useEffect(() => {
@@ -269,12 +276,55 @@ export function InventoryTable() {
               </TableRow>
             ) : table.getRowModel().rows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  <div className="text-muted-foreground">
-                    {debouncedSearch || stockFilter !== "all"
-                      ? t("table.noMatchingItems")
-                      : t("table.noItemsFound")}
-                  </div>
+                <TableCell colSpan={columns.length} className="text-center">
+                  {!debouncedSearch && stockFilter === "all" ? (
+                    <div className="py-12 space-y-4">
+                      <Warehouse className="h-12 w-12 mx-auto text-muted-foreground/40" />
+                      <div>
+                        <p className="text-base font-medium">{t("emptyState.title")}</p>
+                        <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">
+                          {t("emptyState.description")}
+                        </p>
+                      </div>
+                      {locationsData?.stock_locations?.[0] && (
+                        <Button
+                          variant="default"
+                          onClick={async () => {
+                            const loc = locationsData.stock_locations[0]
+                            setBulkProgress(t("emptyState.enabling"))
+                            try {
+                              const result = await bulkEnable.mutateAsync(loc.id)
+                              setBulkProgress(
+                                t("emptyState.enabledCount", { count: result.enabled })
+                              )
+                            } catch {
+                              setBulkProgress(t("emptyState.enableFailed"))
+                            }
+                          }}
+                          disabled={bulkEnable.isPending}
+                        >
+                          {bulkEnable.isPending ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              {bulkProgress || t("emptyState.enabling")}
+                            </>
+                          ) : (
+                            <>
+                              <Settings2 className="mr-2 h-4 w-4" />
+                              {t("emptyState.enableAll")}
+                            </>
+                          )}
+                        </Button>
+                      )}
+                      {bulkProgress && !bulkEnable.isPending && (
+                        <p className="text-sm text-muted-foreground">{bulkProgress}</p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="py-8 text-muted-foreground">
+                      {t("table.noMatchingItems")}
+                    </div>
+                  )}
                 </TableCell>
               </TableRow>
             ) : (

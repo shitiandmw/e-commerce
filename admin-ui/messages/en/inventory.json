@@ -50,6 +50,15 @@
       "locationsCount": "{count} locations"
     },
 
+    "emptyState": {
+      "title": "Inventory management not enabled",
+      "description": "All product variants have \"Manage Inventory\" turned off, so no inventory items exist. Click below to enable inventory management for all products and link them to the default stock location.",
+      "enableAll": "Enable Inventory for All Products",
+      "enabling": "Enabling...",
+      "enabledCount": "Enabled inventory for {count} variants",
+      "enableFailed": "Failed to enable. Please try again."
+    },
+
     "detail": {
       "backToInventory": "Back to Inventory",
       "itemNotFound": "Inventory item not found or failed to load.",

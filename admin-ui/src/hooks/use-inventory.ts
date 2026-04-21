@@ -192,6 +192,101 @@ export function useUpdateInventoryItem(id: string) {
   })
 }
 
+/**
+ * Create an inventory item for a variant and associate it with the default
+ * stock location. Medusa v2 only auto-creates inventory items when a variant
+ * is first created with manage_inventory=true. Toggling the flag on an
+ * existing variant does NOT back-fill the item, so we do it here.
+ */
+export async function ensureInventoryForVariant(opts: {
+  variantId: string
+  sku?: string | null
+  title?: string | null
+  locationId: string
+}) {
+  const item = await adminFetch<{ inventory_item: InventoryItem }>(
+    "/admin/inventory-items",
+    {
+      method: "POST",
+      body: {
+        sku: opts.sku ?? undefined,
+        title: opts.title ?? undefined,
+      },
+    }
+  )
+
+  const inventoryItemId = item.inventory_item.id
+
+  await adminFetch(
+    `/admin/inventory-items/${inventoryItemId}/location-levels`,
+    {
+      method: "POST",
+      body: { location_id: opts.locationId, stocked_quantity: 0 },
+    }
+  )
+
+  return item.inventory_item
+}
+
+export function useBulkEnableInventory() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (locationId: string) => {
+      let offset = 0
+      const limit = 100
+      let enabled = 0
+
+      while (true) {
+        const data = await adminFetch<{
+          products: Array<{
+            id: string
+            title: string
+            variants?: Array<{
+              id: string
+              sku?: string | null
+              manage_inventory?: boolean
+            }>
+          }>
+          count: number
+        }>(
+          `/admin/products?offset=${offset}&limit=${limit}&fields=id,title,variants.*`
+        )
+
+        for (const product of data.products) {
+          if (!product.variants) continue
+          for (const variant of product.variants) {
+            if (variant.manage_inventory !== false) continue
+
+            await adminFetch(
+              `/admin/products/${product.id}/variants/${variant.id}`,
+              { method: "POST", body: { manage_inventory: true } }
+            )
+
+            await ensureInventoryForVariant({
+              variantId: variant.id,
+              sku: variant.sku,
+              title: product.title,
+              locationId,
+            })
+
+            enabled++
+          }
+        }
+
+        offset += limit
+        if (offset >= data.count) break
+      }
+
+      return { enabled }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inventory-items"] })
+      queryClient.invalidateQueries({ queryKey: ["products"] })
+    },
+  })
+}
+
 // ---- Helpers ----
 
 /** Low stock threshold - items with available quantity below this are flagged */
