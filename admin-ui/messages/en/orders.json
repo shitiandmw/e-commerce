@@ -130,7 +130,9 @@
 
       "address": {
         "noShippingAddress": "No shipping address provided.",
-        "sameAsShipping": "Same as shipping address."
+        "sameAsShipping": "Same as shipping address.",
+        "pickupSelected": "Customer selected in-store pickup. No shipping required — contact customer to arrange collection.",
+        "shippingMethod": "Shipping Method"
       },
 
       "orderMeta": {

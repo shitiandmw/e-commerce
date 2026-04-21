@@ -44,11 +44,11 @@ export function ShippingOptionForm({
   const { data: regionsData } = useRegions()
 
   const [name, setName] = useState("")
-  const [priceType, setPriceType] = useState("flat")
   const [shippingProfileId, setShippingProfileId] = useState("")
   const [providerId, setProviderId] = useState("")
   const [amount, setAmount] = useState("")
   const [currencyCode, setCurrencyCode] = useState("usd")
+  const [metadataType, setMetadataType] = useState<"pickup" | "delivery" | "">("delivery")
 
   const profiles = profilesData?.shipping_profiles || []
   const providers = providersData?.fulfillment_providers || []
@@ -57,9 +57,9 @@ export function ShippingOptionForm({
   useEffect(() => {
     if (editOption) {
       setName(editOption.name)
-      setPriceType(editOption.price_type || "flat")
       setShippingProfileId(editOption.shipping_profile_id || "")
       setProviderId(editOption.provider_id || "")
+      setMetadataType((editOption.metadata?.type as "pickup" | "delivery") || "delivery")
       const price = editOption.prices?.[0]
       if (price) {
         setAmount(String(price.amount / 100))
@@ -67,9 +67,9 @@ export function ShippingOptionForm({
       }
     } else {
       setName("")
-      setPriceType("flat")
       setShippingProfileId(profiles[0]?.id || "")
       setProviderId(providers[0]?.id || "")
+      setMetadataType("delivery")
       setAmount("")
       setCurrencyCode(regions[0]?.currency_code || "usd")
     }
@@ -78,9 +78,12 @@ export function ShippingOptionForm({
   const handleSubmit = () => {
     if (!name.trim()) return
 
+    const isPickup = metadataType === "pickup"
+
     const payload: Record<string, unknown> = {
       name: name.trim(),
-      price_type: priceType,
+      price_type: "flat",
+      metadata: { type: metadataType || "delivery" },
     }
 
     if (shippingProfileId) {
@@ -90,7 +93,9 @@ export function ShippingOptionForm({
       payload.provider_id = providerId
     }
 
-    if (priceType === "flat" && amount) {
+    if (isPickup) {
+      payload.prices = [{ amount: 0, currency_code: currencyCode }]
+    } else if (amount) {
       payload.prices = [
         {
           amount: Math.round(parseFloat(amount) * 100),
@@ -137,18 +142,18 @@ export function ShippingOptionForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="price-type">{t("options.form.priceType")}</Label>
+            <Label htmlFor="metadata-type">{t("options.form.type")}</Label>
             <Select
-              id="price-type"
-              value={priceType}
-              onChange={(e) => setPriceType(e.target.value)}
+              id="metadata-type"
+              value={metadataType}
+              onChange={(e) => setMetadataType(e.target.value as "pickup" | "delivery")}
             >
-              <option value="flat">{t("options.form.flatRate")}</option>
-              <option value="calculated">{t("options.form.calculated")}</option>
+              <option value="delivery">{t("options.form.typeDelivery")}</option>
+              <option value="pickup">{t("options.form.typePickup")}</option>
             </Select>
           </div>
 
-          {priceType === "flat" && (
+          {metadataType !== "pickup" && (
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="amount">{t("options.form.amount")}</Label>
@@ -176,24 +181,6 @@ export function ShippingOptionForm({
                   ))}
                 </Select>
               </div>
-            </div>
-          )}
-
-          {profiles.length > 0 && (
-            <div className="space-y-2">
-              <Label htmlFor="shipping-profile">{t("options.form.shippingProfile")}</Label>
-              <Select
-                id="shipping-profile"
-                value={shippingProfileId}
-                onChange={(e) => setShippingProfileId(e.target.value)}
-              >
-                <option value="">{t("options.form.selectProfile")}</option>
-                {profiles.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </Select>
             </div>
           )}
 

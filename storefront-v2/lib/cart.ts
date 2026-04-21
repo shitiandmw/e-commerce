@@ -56,6 +56,10 @@ export interface ShippingOption {
   amount: number
   price_type?: string
   provider_id?: string
+  metadata?: {
+    type?: "pickup" | "delivery"
+    [key: string]: unknown
+  }
 }
 
 export interface Cart {

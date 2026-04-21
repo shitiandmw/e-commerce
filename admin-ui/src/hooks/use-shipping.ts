@@ -26,6 +26,10 @@ export interface ShippingOption {
   shipping_profile_id?: string
   provider_id?: string
   data?: Record<string, unknown>
+  metadata?: {
+    type?: "pickup" | "delivery"
+    [key: string]: unknown
+  }
   rules?: ShippingOptionRule[]
   prices?: ShippingOptionPrice[]
   type?: {

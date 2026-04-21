@@ -629,46 +629,69 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
               {t("detail.sections.shippingAddress")}
             </h2>
 
-            {order.shipping_address ? (
-              <div className="space-y-2 text-sm">
-                {(order.shipping_address.first_name ||
-                  order.shipping_address.last_name) && (
-                  <p className="font-medium">
-                    {[
-                      order.shipping_address.first_name,
-                      order.shipping_address.last_name,
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                  </p>
-                )}
-                {order.shipping_address.company && (
-                  <div className="flex items-center gap-2">
-                    <Building className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-muted-foreground">
-                      {order.shipping_address.company}
-                    </span>
-                  </div>
-                )}
-                {formatAddress(order.shipping_address)?.map((line, i) => (
-                  <p key={i} className="text-muted-foreground">
-                    {line}
-                  </p>
-                ))}
-                {order.shipping_address.phone && (
-                  <div className="flex items-center gap-2 mt-2">
-                    <Phone className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-muted-foreground">
-                      {order.shipping_address.phone}
-                    </span>
-                  </div>
-                )}
+            {/* Shipping method row */}
+            {order.shipping_methods && order.shipping_methods.length > 0 && (
+              <div className="flex items-center gap-2 text-sm pb-2 border-b">
+                <Truck className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                <span className="text-muted-foreground">{t("detail.address.shippingMethod")}:</span>
+                <span className="font-medium">{order.shipping_methods[0].name}</span>
               </div>
-            ) : (
-              <p className="text-sm text-muted-foreground italic">
-                {t("detail.address.noShippingAddress")}
-              </p>
             )}
+
+            {(() => {
+              const isPickup = order.shipping_address?.address_1 === "門市自提"
+              if (isPickup) {
+                return (
+                  <div className="flex items-start gap-2 rounded-md bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">
+                    <Package className="h-4 w-4 mt-0.5 shrink-0" />
+                    <p>{t("detail.address.pickupSelected")}</p>
+                  </div>
+                )
+              }
+              if (!order.shipping_address) {
+                return (
+                  <p className="text-sm text-muted-foreground italic">
+                    {t("detail.address.noShippingAddress")}
+                  </p>
+                )
+              }
+              return (
+                <div className="space-y-2 text-sm">
+                  {(order.shipping_address.first_name ||
+                    order.shipping_address.last_name) && (
+                    <p className="font-medium">
+                      {[
+                        order.shipping_address.first_name,
+                        order.shipping_address.last_name,
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    </p>
+                  )}
+                  {order.shipping_address.company && (
+                    <div className="flex items-center gap-2">
+                      <Building className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-muted-foreground">
+                        {order.shipping_address.company}
+                      </span>
+                    </div>
+                  )}
+                  {formatAddress(order.shipping_address)?.map((line, i) => (
+                    <p key={i} className="text-muted-foreground">
+                      {line}
+                    </p>
+                  ))}
+                  {order.shipping_address.phone && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <Phone className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-muted-foreground">
+                        {order.shipping_address.phone}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )
+            })()}
           </div>
 
           {/* Billing Address */}

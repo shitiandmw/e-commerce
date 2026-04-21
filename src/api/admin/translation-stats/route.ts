@@ -85,6 +85,14 @@ const TRANSLATABLE_RESOURCES = [
     fields: ["name", "description"],
     displayField: "name",
   },
+  {
+    reference: "shipping_option",
+    entity: "shipping_option",
+    label: "配送方式",
+    labelEn: "Shipping Options",
+    fields: ["name"],
+    displayField: "name",
+  },
 ] as const
 
 type TranslationStat = {

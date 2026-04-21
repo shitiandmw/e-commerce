@@ -116,6 +116,7 @@ export function ShippingOptionsTable() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{t("options.columns.name")}</TableHead>
+                  <TableHead>{t("options.columns.type")}</TableHead>
                   <TableHead>{t("options.columns.priceType")}</TableHead>
                   <TableHead>{t("options.columns.price")}</TableHead>
                   <TableHead>{t("options.columns.provider")}</TableHead>
@@ -128,6 +129,15 @@ export function ShippingOptionsTable() {
                   <TableRow key={option.id}>
                     <TableCell className="font-medium">
                       {option.name}
+                    </TableCell>
+                    <TableCell>
+                      {option.metadata?.type === "pickup" ? (
+                        <Badge variant="secondary">{t("options.form.typePickup")}</Badge>
+                      ) : option.metadata?.type === "delivery" ? (
+                        <Badge variant="outline">{t("options.form.typeDelivery")}</Badge>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">{option.price_type}</Badge>

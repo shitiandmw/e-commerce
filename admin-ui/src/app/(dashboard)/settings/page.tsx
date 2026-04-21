@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 import { StoreSettings } from "@/components/settings/store-settings"
 import { RegionSettings } from "@/components/settings/region-settings"
 import { SalesChannelSettings } from "@/components/settings/sales-channel-settings"
-import { ShippingSettings } from "@/components/settings/shipping-settings"
+import { ShippingOptionsTable } from "@/components/shipping/shipping-options-table"
 import { PaymentSettings } from "@/components/settings/payment-settings"
 import { UserSettings } from "@/components/settings/user-settings"
 import { ApiKeySettings } from "@/components/settings/api-key-settings"
@@ -91,7 +91,7 @@ export default function SettingsPage() {
           {activeTab === "store" && <StoreSettings />}
           {activeTab === "regions" && <RegionSettings />}
           {activeTab === "channels" && <SalesChannelSettings />}
-          {activeTab === "shipping" && <ShippingSettings />}
+          {activeTab === "shipping" && <ShippingOptionsTable />}
           {activeTab === "payments" && <PaymentSettings />}
           {activeTab === "team" && <UserSettings />}
           {activeTab === "api-keys" && <ApiKeySettings />}

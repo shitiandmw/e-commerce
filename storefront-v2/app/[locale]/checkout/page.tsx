@@ -8,6 +8,7 @@ import {
   ChevronDown,
   Lock,
   Truck,
+  MapPin,
   CheckCircle2,
   Loader2,
 } from "lucide-react"
@@ -95,6 +96,7 @@ export default function CheckoutPage() {
   const items = cart?.items ?? []
   const checkout = useCheckout()
   const { step, form, updateField, loading, error } = checkout
+  const { deliveryMethod } = checkout
   const [showOrderSummary, setShowOrderSummary] = useState(false)
 
   const t = useTranslations()
@@ -169,7 +171,41 @@ export default function CheckoutPage() {
               <div>
                 <h2 className="text-lg font-serif text-foreground mb-6">{t("checkout_contact_title")}</h2>
 
-                <SavedAddresses onSelect={checkout.fillFromSavedAddress} />
+                {/* delivery method toggle */}
+                <div className="mb-8">
+                  <h3 className="text-xs text-gold uppercase tracking-widest mb-4">{t("checkout_receive_method")}</h3>
+                  <div className="flex flex-col gap-3">
+                    {(["delivery", "pickup"] as const).map((method) => {
+                      const isSelected = deliveryMethod === method
+                      return (
+                        <button
+                          key={method}
+                          type="button"
+                          onClick={() => checkout.setDeliveryMethod(method)}
+                          className={cn(
+                            "flex items-center gap-3 p-4 border transition-colors text-left",
+                            isSelected ? "border-gold/50 bg-gold/5" : "border-border/30 hover:border-gold/30"
+                          )}
+                        >
+                          <div className={cn(
+                            "size-4 rounded-full border-2 flex items-center justify-center shrink-0",
+                            isSelected ? "border-gold" : "border-border/50"
+                          )}>
+                            {isSelected && <div className="size-2 rounded-full bg-gold" />}
+                          </div>
+                          <div>
+                            <p className="text-sm text-foreground">
+                              {method === "delivery" ? t("checkout_delivery_option") : t("checkout_pickup_option")}
+                            </p>
+                            <p className="text-[11px] text-muted-foreground mt-0.5">
+                              {method === "delivery" ? t("checkout_delivery_option_desc") : t("checkout_pickup_option_desc")}
+                            </p>
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
 
                 {/* contact */}
                 <div className="mb-8">
@@ -180,41 +216,52 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                {/* shipping address */}
-                <div>
-                  <h3 className="text-xs text-gold uppercase tracking-widest mb-4">{t("checkout_shipping_address")}</h3>
-                  <div className="flex flex-col gap-4">
-                    <div className="flex gap-4">
-                      <FormInput label={t("checkout_first_name")} id="first-name" placeholder={t("checkout_first_name")} required half value={form.firstName} onChange={(v) => updateField("firstName", v)} />
-                      <FormInput label={t("checkout_last_name")} id="last-name" placeholder={t("checkout_last_name")} required half value={form.lastName} onChange={(v) => updateField("lastName", v)} />
-                    </div>
-                    <FormInput label={t("checkout_address_line1")} id="address1" placeholder={t("street_address")} required value={form.address1} onChange={(v) => updateField("address1", v)} />
-                    <FormInput label={t("checkout_address_line2")} id="address2" placeholder={t("checkout_address_line2_placeholder")} value={form.address2} onChange={(v) => updateField("address2", v)} />
-                    <div className="flex gap-4">
-                      <FormInput label={t("checkout_city")} id="city" placeholder={t("checkout_city")} required half value={form.city} onChange={(v) => updateField("city", v)} />
-                      <FormInput label={t("checkout_postal_code")} id="zip" placeholder="000000" half value={form.postalCode} onChange={(v) => updateField("postalCode", v)} />
-                    </div>
-                    <div>
-                      <label htmlFor="country" className="block text-xs text-foreground/70 mb-1.5">
-                        {t("checkout_country")}<span className="text-gold ml-0.5">*</span>
-                      </label>
-                      <select
-                        id="country"
-                        value={form.countryCode}
-                        onChange={(e) => updateField("countryCode", e.target.value)}
-                        className="w-full h-10 bg-background border border-border/50 rounded-sm px-3 text-sm text-foreground focus:outline-none focus:border-gold/50 transition-colors appearance-none"
-                      >
-                        <option value="gb">{t("checkout_country_uk")}</option>
-                        <option value="de">Germany</option>
-                        <option value="dk">Denmark</option>
-                        <option value="se">Sweden</option>
-                        <option value="fr">France</option>
-                        <option value="es">Spain</option>
-                        <option value="it">Italy</option>
-                      </select>
+                {/* shipping address — delivery only */}
+                {deliveryMethod === "delivery" ? (
+                  <div>
+                    <h3 className="text-xs text-gold uppercase tracking-widest mb-4">{t("checkout_shipping_address")}</h3>
+
+                    <SavedAddresses onSelect={checkout.fillFromSavedAddress} />
+
+                    <div className="flex flex-col gap-4">
+                      <div className="flex gap-4">
+                        <FormInput label={t("checkout_first_name")} id="first-name" placeholder={t("checkout_first_name")} required half value={form.firstName} onChange={(v) => updateField("firstName", v)} />
+                        <FormInput label={t("checkout_last_name")} id="last-name" placeholder={t("checkout_last_name")} required half value={form.lastName} onChange={(v) => updateField("lastName", v)} />
+                      </div>
+                      <FormInput label={t("checkout_address_line1")} id="address1" placeholder={t("street_address")} required value={form.address1} onChange={(v) => updateField("address1", v)} />
+                      <FormInput label={t("checkout_address_line2")} id="address2" placeholder={t("checkout_address_line2_placeholder")} value={form.address2} onChange={(v) => updateField("address2", v)} />
+                      <div className="flex gap-4">
+                        <FormInput label={t("checkout_city")} id="city" placeholder={t("checkout_city")} required half value={form.city} onChange={(v) => updateField("city", v)} />
+                        <FormInput label={t("checkout_postal_code")} id="zip" placeholder="000000" half value={form.postalCode} onChange={(v) => updateField("postalCode", v)} />
+                      </div>
+                      <div>
+                        <label htmlFor="country" className="block text-xs text-foreground/70 mb-1.5">
+                          {t("checkout_country")}<span className="text-gold ml-0.5">*</span>
+                        </label>
+                        <select
+                          id="country"
+                          value={form.countryCode}
+                          onChange={(e) => updateField("countryCode", e.target.value)}
+                          className="w-full h-10 bg-background border border-border/50 rounded-sm px-3 text-sm text-foreground focus:outline-none focus:border-gold/50 transition-colors appearance-none"
+                        >
+                          <option value="gb">{t("checkout_country_uk")}</option>
+                          <option value="de">Germany</option>
+                          <option value="dk">Denmark</option>
+                          <option value="se">Sweden</option>
+                          <option value="fr">France</option>
+                          <option value="es">Spain</option>
+                          <option value="it">Italy</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  /* pickup notice */
+                  <div className="p-4 bg-secondary/30 border border-border/20 flex items-start gap-3">
+                    <MapPin className="size-4 text-gold/60 mt-0.5 shrink-0" />
+                    <p className="text-xs text-muted-foreground leading-relaxed">{t("checkout_pickup_notice")}</p>
+                  </div>
+                )}
               </div>
             )}
             {/* ── step 2: shipping ── */}

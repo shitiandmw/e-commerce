@@ -12,6 +12,7 @@
       "deleteConfirm": "确定要删除此配送方案吗？",
       "columns": {
         "name": "名称",
+        "type": "类型",
         "priceType": "价格类型",
         "price": "价格",
         "provider": "提供商",
@@ -34,6 +35,9 @@
         "selectProfile": "选择配置文件",
         "provider": "物流提供商",
         "selectProvider": "选择提供商",
+        "type": "配送类型",
+        "typeDelivery": "邮寄配送",
+        "typePickup": "门店自提",
         "cancel": "取消",
         "create": "创建",
         "creating": "创建中...",

@@ -12,6 +12,7 @@
       "deleteConfirm": "Are you sure you want to delete this shipping option?",
       "columns": {
         "name": "Name",
+        "type": "Type",
         "priceType": "Price Type",
         "price": "Price",
         "provider": "Provider",
@@ -34,6 +35,9 @@
         "selectProfile": "Select Profile",
         "provider": "Fulfillment Provider",
         "selectProvider": "Select Provider",
+        "type": "Option Type",
+        "typeDelivery": "Delivery",
+        "typePickup": "In-store Pickup",
         "cancel": "Cancel",
         "create": "Create",
         "creating": "Creating...",
