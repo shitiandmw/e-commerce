@@ -22,8 +22,8 @@ import { StripePayment } from "@/components/checkout/stripe-payment"
 
 /* ─── step definitions ─── */
 const steps: { key: Step; labelKey: string; num: number }[] = [
-  { key: "info", labelKey: "checkout_contact_title", num: 1 },
-  { key: "shipping", labelKey: "checkout_shipping_method", num: 2 },
+  { key: "shipping", labelKey: "checkout_shipping_method", num: 1 },
+  { key: "info", labelKey: "checkout_contact_title", num: 2 },
   { key: "payment", labelKey: "checkout_payment_method", num: 3 },
 ]
 
@@ -96,15 +96,29 @@ export default function CheckoutPage() {
   const items = cart?.items ?? []
   const checkout = useCheckout()
   const { step, form, updateField, loading, error } = checkout
-  const { deliveryMethod } = checkout
   const [showOrderSummary, setShowOrderSummary] = useState(false)
 
   const t = useTranslations()
 
   const subtotal = cart?.item_total ?? 0
-  const shippingCost = cart?.shipping_total ?? 0
-  const hasShipping = step !== "info"
-  const total = cart?.total ?? subtotal
+  const selectedShippingOption = checkout.shippingOptions.find((opt) => opt.id === checkout.selectedShippingId) ?? null
+  const appliedShippingId = cart?.shipping_methods?.[0]?.shipping_option_id ?? null
+  const appliedShippingCost = cart?.shipping_total ?? 0
+  const previewShippingCost = selectedShippingOption?.amount ?? null
+  const hasPendingShippingSelection = Boolean(
+    checkout.selectedShippingId &&
+    checkout.selectedShippingId !== appliedShippingId
+  )
+  const shippingCost = hasPendingShippingSelection
+    ? previewShippingCost
+    : appliedShippingId
+      ? appliedShippingCost
+      : previewShippingCost
+  const hasShipping = shippingCost !== null
+  const baseTotal = appliedShippingId
+    ? (cart?.total ?? subtotal + appliedShippingCost) - appliedShippingCost
+    : (cart?.total ?? subtotal)
+  const total = baseTotal + (shippingCost ?? 0)
   const itemCount = items.reduce((s, i) => s + i.quantity, 0)
   const currencyCode = cart?.currency_code || "usd"
 
@@ -166,108 +180,10 @@ export default function CheckoutPage() {
                 {error}
               </div>
             )}
-            {/* ── step 1: info ── */}
-            {step === "info" && (
-              <div>
-                <h2 className="text-lg font-serif text-foreground mb-6">{t("checkout_contact_title")}</h2>
-
-                {/* delivery method toggle */}
-                <div className="mb-8">
-                  <h3 className="text-xs text-gold uppercase tracking-widest mb-4">{t("checkout_receive_method")}</h3>
-                  <div className="flex flex-col gap-3">
-                    {(["delivery", "pickup"] as const).map((method) => {
-                      const isSelected = deliveryMethod === method
-                      return (
-                        <button
-                          key={method}
-                          type="button"
-                          onClick={() => checkout.setDeliveryMethod(method)}
-                          className={cn(
-                            "flex items-center gap-3 p-4 border transition-colors text-left",
-                            isSelected ? "border-gold/50 bg-gold/5" : "border-border/30 hover:border-gold/30"
-                          )}
-                        >
-                          <div className={cn(
-                            "size-4 rounded-full border-2 flex items-center justify-center shrink-0",
-                            isSelected ? "border-gold" : "border-border/50"
-                          )}>
-                            {isSelected && <div className="size-2 rounded-full bg-gold" />}
-                          </div>
-                          <div>
-                            <p className="text-sm text-foreground">
-                              {method === "delivery" ? t("checkout_delivery_option") : t("checkout_pickup_option")}
-                            </p>
-                            <p className="text-[11px] text-muted-foreground mt-0.5">
-                              {method === "delivery" ? t("checkout_delivery_option_desc") : t("checkout_pickup_option_desc")}
-                            </p>
-                          </div>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-
-                {/* contact */}
-                <div className="mb-8">
-                  <h3 className="text-xs text-gold uppercase tracking-widest mb-4">{t("checkout_contact_method")}</h3>
-                  <div className="flex flex-col gap-4">
-                    <FormInput label={t("checkout_email_label")} id="email" type="email" placeholder="your@email.com" required value={form.email} onChange={(v) => updateField("email", v)} />
-                    <FormInput label={t("checkout_phone_label")} id="phone" type="tel" placeholder="+852 xxxx xxxx" required value={form.phone} onChange={(v) => updateField("phone", v)} />
-                  </div>
-                </div>
-
-                {/* shipping address — delivery only */}
-                {deliveryMethod === "delivery" ? (
-                  <div>
-                    <h3 className="text-xs text-gold uppercase tracking-widest mb-4">{t("checkout_shipping_address")}</h3>
-
-                    <SavedAddresses onSelect={checkout.fillFromSavedAddress} />
-
-                    <div className="flex flex-col gap-4">
-                      <div className="flex gap-4">
-                        <FormInput label={t("checkout_first_name")} id="first-name" placeholder={t("checkout_first_name")} required half value={form.firstName} onChange={(v) => updateField("firstName", v)} />
-                        <FormInput label={t("checkout_last_name")} id="last-name" placeholder={t("checkout_last_name")} required half value={form.lastName} onChange={(v) => updateField("lastName", v)} />
-                      </div>
-                      <FormInput label={t("checkout_address_line1")} id="address1" placeholder={t("street_address")} required value={form.address1} onChange={(v) => updateField("address1", v)} />
-                      <FormInput label={t("checkout_address_line2")} id="address2" placeholder={t("checkout_address_line2_placeholder")} value={form.address2} onChange={(v) => updateField("address2", v)} />
-                      <div className="flex gap-4">
-                        <FormInput label={t("checkout_city")} id="city" placeholder={t("checkout_city")} required half value={form.city} onChange={(v) => updateField("city", v)} />
-                        <FormInput label={t("checkout_postal_code")} id="zip" placeholder="000000" half value={form.postalCode} onChange={(v) => updateField("postalCode", v)} />
-                      </div>
-                      <div>
-                        <label htmlFor="country" className="block text-xs text-foreground/70 mb-1.5">
-                          {t("checkout_country")}<span className="text-gold ml-0.5">*</span>
-                        </label>
-                        <select
-                          id="country"
-                          value={form.countryCode}
-                          onChange={(e) => updateField("countryCode", e.target.value)}
-                          className="w-full h-10 bg-background border border-border/50 rounded-sm px-3 text-sm text-foreground focus:outline-none focus:border-gold/50 transition-colors appearance-none"
-                        >
-                          <option value="gb">{t("checkout_country_uk")}</option>
-                          <option value="de">Germany</option>
-                          <option value="dk">Denmark</option>
-                          <option value="se">Sweden</option>
-                          <option value="fr">France</option>
-                          <option value="es">Spain</option>
-                          <option value="it">Italy</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  /* pickup notice */
-                  <div className="p-4 bg-secondary/30 border border-border/20 flex items-start gap-3">
-                    <MapPin className="size-4 text-gold/60 mt-0.5 shrink-0" />
-                    <p className="text-xs text-muted-foreground leading-relaxed">{t("checkout_pickup_notice")}</p>
-                  </div>
-                )}
-              </div>
-            )}
-            {/* ── step 2: shipping ── */}
+            {/* ── step 1: shipping ── */}
             {step === "shipping" && (
               <div>
-                <h2 className="text-lg font-serif text-foreground mb-6">{t("checkout_shipping_method")}</h2>
+                <h2 className="text-lg font-serif text-foreground mb-6">{t("checkout_select_shipping_title")}</h2>
                 {checkout.shippingOptions.length === 0 ? (
                   loading ? (
                     <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
@@ -287,7 +203,8 @@ export default function CheckoutPage() {
                     {checkout.shippingOptions.map((opt) => (
                       <button
                         key={opt.id}
-                        onClick={() => checkout.submitShipping(opt.id)}
+                        type="button"
+                        onClick={() => checkout.selectShippingOption(opt.id)}
                         disabled={loading}
                         className={cn(
                           "flex items-center justify-between p-4 border transition-colors text-left",
@@ -326,6 +243,66 @@ export default function CheckoutPage() {
                 </div>
               </div>
             )}
+            {/* ── step 2: info ── */}
+            {step === "info" && (
+              <div>
+                <h2 className="text-lg font-serif text-foreground mb-6">{t("checkout_contact_title")}</h2>
+
+                <div className="mb-8">
+                  <h3 className="text-xs text-gold uppercase tracking-widest mb-4">{t("checkout_contact_method")}</h3>
+                  <div className="flex flex-col gap-4">
+                    <div className="flex gap-4">
+                      <FormInput label={t("checkout_first_name")} id="first-name" placeholder={t("checkout_first_name")} required half value={form.firstName} onChange={(v) => updateField("firstName", v)} />
+                      <FormInput label={t("checkout_last_name")} id="last-name" placeholder={t("checkout_last_name")} required half value={form.lastName} onChange={(v) => updateField("lastName", v)} />
+                    </div>
+                    <FormInput label={t("checkout_email_label")} id="email" type="email" placeholder="your@email.com" required value={form.email} onChange={(v) => updateField("email", v)} />
+                    <FormInput label={t("checkout_phone_label")} id="phone" type="tel" placeholder="+852 xxxx xxxx" required value={form.phone} onChange={(v) => updateField("phone", v)} />
+                  </div>
+                </div>
+
+                {checkout.isPickup ? (
+                  <div className="rounded-md border border-gold/20 bg-gold/5 p-4 flex items-start gap-3">
+                    <MapPin className="size-4 text-gold mt-0.5 shrink-0" />
+                    <p className="text-sm text-foreground/80">{t("checkout_pickup_notice")}</p>
+                  </div>
+                ) : (
+                  <div>
+                    <SavedAddresses onSelect={checkout.fillFromSavedAddress} />
+
+                    <div>
+                      <h3 className="text-xs text-gold uppercase tracking-widest mb-4">{t("checkout_shipping_address")}</h3>
+                      <div className="flex flex-col gap-4">
+                        <FormInput label={t("checkout_address_line1")} id="address1" placeholder={t("street_address")} required value={form.address1} onChange={(v) => updateField("address1", v)} />
+                        <FormInput label={t("checkout_address_line2")} id="address2" placeholder={t("checkout_address_line2_placeholder")} value={form.address2} onChange={(v) => updateField("address2", v)} />
+                        <div className="flex gap-4">
+                          <FormInput label={t("checkout_city")} id="city" placeholder={t("checkout_city")} required half value={form.city} onChange={(v) => updateField("city", v)} />
+                          <FormInput label={t("checkout_postal_code")} id="zip" placeholder="000000" half value={form.postalCode} onChange={(v) => updateField("postalCode", v)} />
+                        </div>
+                        <div>
+                          <label htmlFor="country" className="block text-xs text-foreground/70 mb-1.5">
+                            {t("checkout_country")}<span className="text-gold ml-0.5">*</span>
+                          </label>
+                          <select
+                            id="country"
+                            value={form.countryCode}
+                            onChange={(e) => updateField("countryCode", e.target.value)}
+                            className="w-full h-10 bg-background border border-border/50 rounded-sm px-3 text-sm text-foreground focus:outline-none focus:border-gold/50 transition-colors appearance-none"
+                          >
+                            <option value="gb">{t("checkout_country_uk")}</option>
+                            <option value="de">Germany</option>
+                            <option value="dk">Denmark</option>
+                            <option value="se">Sweden</option>
+                            <option value="fr">France</option>
+                            <option value="es">Spain</option>
+                            <option value="it">Italy</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
             {/* ── step 3: payment ── */}
             {step === "payment" && checkout.clientSecret && (
               <div>
@@ -349,8 +326,8 @@ export default function CheckoutPage() {
                 </label>
               </div>
             )}
-            {/* navigation buttons — only for info step; shipping selects directly; payment has its own submit */}
-            {step === "info" && (
+            {/* navigation buttons */}
+            {step === "shipping" && (
               <div className="flex items-center justify-between mt-8 pt-6 border-t border-border/20">
                 <Link
                   href="/cart"
@@ -360,6 +337,29 @@ export default function CheckoutPage() {
                   {t("checkout_back_to_cart")}
                 </Link>
                 <button
+                  type="button"
+                  onClick={() => checkout.selectedShippingId && checkout.submitShipping(checkout.selectedShippingId)}
+                  disabled={loading || !checkout.selectedShippingId}
+                  className="flex items-center gap-2 bg-gold text-primary-foreground px-8 py-3 text-sm font-medium tracking-wide hover:bg-gold-light transition-colors disabled:opacity-50"
+                >
+                  {loading ? <Loader2 className="size-4 animate-spin" /> : null}
+                  {t("checkout_continue")}
+                </button>
+              </div>
+            )}
+
+            {step === "info" && (
+              <div className="flex items-center justify-between mt-8 pt-6 border-t border-border/20">
+                <button
+                  type="button"
+                  onClick={checkout.goBack}
+                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-gold transition-colors"
+                >
+                  <ChevronLeft className="size-4" />
+                  {t("checkout_prev_step")}
+                </button>
+                <button
+                  type="button"
                   onClick={checkout.submitInfo}
                   disabled={loading}
                   className="flex items-center gap-2 bg-gold text-primary-foreground px-8 py-3 text-sm font-medium tracking-wide hover:bg-gold-light transition-colors disabled:opacity-50"
@@ -370,9 +370,10 @@ export default function CheckoutPage() {
               </div>
             )}
 
-            {(step === "shipping" || step === "payment") && (
+            {step === "payment" && (
               <div className="flex items-center mt-8 pt-6 border-t border-border/20">
                 <button
+                  type="button"
                   onClick={checkout.goBack}
                   className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-gold transition-colors"
                 >

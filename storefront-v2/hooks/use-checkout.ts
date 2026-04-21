@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import {
   type CartAddress,
   type ShippingOption,
@@ -13,8 +13,7 @@ import {
 } from "@/lib/cart"
 import { useCart } from "@/lib/cart-store"
 
-export type Step = "info" | "shipping" | "payment"
-export type DeliveryMethod = "delivery" | "pickup"
+export type Step = "shipping" | "info" | "payment"
 
 export interface CheckoutForm {
   email: string
@@ -33,15 +32,15 @@ interface UseCheckoutReturn {
   form: CheckoutForm
   setForm: React.Dispatch<React.SetStateAction<CheckoutForm>>
   updateField: (field: keyof CheckoutForm, value: string) => void
-  deliveryMethod: DeliveryMethod
-  setDeliveryMethod: (method: DeliveryMethod) => void
   shippingOptions: ShippingOption[]
   selectedShippingId: string | null
+  selectShippingOption: (optionId: string) => void
+  isPickup: boolean
   clientSecret: string | null
   loading: boolean
   error: string | null
   submitInfo: () => Promise<void>
-  submitShipping: (optionId: string) => Promise<void>
+  submitShipping: (optionId: string) => void
   submitOrder: () => Promise<string>
   goBack: () => void
   fillFromSavedAddress: (addr: SavedAddress) => void
@@ -71,23 +70,58 @@ const initialForm: CheckoutForm = {
   countryCode: "gb",
 }
 
-function isPickupOption(opt: ShippingOption): boolean {
-  if (opt.metadata?.type) return opt.metadata.type === "pickup"
-  // fallback: name-based detection for options without metadata
-  const name = opt.name?.toLowerCase() ?? ""
+function isPickupOption(option: ShippingOption): boolean {
+  if (option.metadata?.type) {
+    return option.metadata.type.toLowerCase() === "pickup"
+  }
+
+  // Fallback for options returned without metadata.type.
+  const name = option.name?.toLowerCase() ?? ""
   return name.includes("自提") || name.includes("pickup") || name.includes("pick-up") || name.includes("self-pick")
 }
 
 export function useCheckout(): UseCheckoutReturn {
-  const { initCart } = useCart()
-  const [step, setStep] = useState<Step>("info")
+  const { cart, initCart } = useCart()
+  const [step, setStep] = useState<Step>("shipping")
   const [form, setForm] = useState<CheckoutForm>(initialForm)
-  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("delivery")
   const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([])
   const [selectedShippingId, setSelectedShippingId] = useState<string | null>(null)
   const [clientSecret, setClientSecret] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const appliedShippingId = cart?.shipping_methods?.[0]?.shipping_option_id ?? null
+
+  useEffect(() => {
+    let cancelled = false
+
+    setLoading(true)
+    getShippingOptions()
+      .then((options) => {
+        if (cancelled) return
+        setShippingOptions(options)
+        setSelectedShippingId((prev) => (
+          prev && options.some((option) => option.id === prev) ? prev : null
+        ))
+      })
+      .catch(() => {
+        if (!cancelled) setShippingOptions([])
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    if (selectedShippingId || !appliedShippingId || shippingOptions.length === 0) return
+    if (shippingOptions.some((option) => option.id === appliedShippingId)) {
+      setSelectedShippingId(appliedShippingId)
+    }
+  }, [appliedShippingId, selectedShippingId, shippingOptions])
+
   const updateField = useCallback((field: keyof CheckoutForm, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }))
   }, [])
@@ -106,19 +140,32 @@ export function useCheckout(): UseCheckoutReturn {
     }))
   }, [])
 
+  const selectShippingOption = useCallback((optionId: string) => {
+    setError(null)
+    setSelectedShippingId(optionId)
+  }, [])
+
+  const selectedOption = shippingOptions.find((option) => option.id === selectedShippingId) ?? null
+  const isPickup = selectedOption ? isPickupOption(selectedOption) : false
+
   const submitInfo = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
-      const address: CartAddress = deliveryMethod === "pickup"
+      if (!selectedShippingId || !selectedOption) {
+        throw new Error("Please select a shipping method")
+      }
+
+      const address: CartAddress = isPickupOption(selectedOption)
         ? {
-            first_name: form.firstName || "自提",
-            last_name: form.lastName || "客戶",
+            first_name: form.firstName.trim() || "Pickup",
+            last_name: form.lastName.trim() || "Customer",
             phone: form.phone,
-            address_1: "門市自提",
-            city: "Store",
+            address_1: "Pickup Order",
+            address_2: selectedOption.name,
+            city: "Pickup",
             postal_code: "000000",
-            country_code: form.countryCode,
+            country_code: form.countryCode || initialForm.countryCode,
           }
         : {
             first_name: form.firstName,
@@ -130,30 +177,9 @@ export function useCheckout(): UseCheckoutReturn {
             postal_code: form.postalCode,
             country_code: form.countryCode,
           }
-      await updateCartAddress(address, form.email)
-      const allOptions = await getShippingOptions()
-      const pickupOptions = allOptions.filter(isPickupOption)
-      const deliveryOptions = allOptions.filter((o) => !isPickupOption(o))
-      const filtered = deliveryMethod === "pickup"
-        ? (pickupOptions.length > 0 ? pickupOptions : allOptions)
-        : (deliveryOptions.length > 0 ? deliveryOptions : allOptions)
-      setShippingOptions(filtered)
-      if (filtered.length > 0) setSelectedShippingId(filtered[0].id)
-      await initCart()
-      setStep("shipping")
-    } catch (e: any) {
-      setError(e.message || "Failed to update address")
-    } finally {
-      setLoading(false)
-    }
-  }, [form, deliveryMethod, initCart])
 
-  const submitShipping = useCallback(async (optionId: string) => {
-    setLoading(true)
-    setError(null)
-    try {
-      setSelectedShippingId(optionId)
-      await setShippingMethodApi(optionId)
+      await updateCartAddress(address, form.email)
+      await setShippingMethodApi(selectedShippingId)
       const cartWithPayment = await initPaymentSessions("pp_stripe_stripe")
       const sessions = cartWithPayment.payment_collection?.payment_sessions
       const stripeSession = sessions?.find((s) => s.provider_id === "pp_stripe_stripe")
@@ -163,11 +189,17 @@ export function useCheckout(): UseCheckoutReturn {
       await initCart()
       setStep("payment")
     } catch (e: any) {
-      setError(e.message || "Failed to set shipping method")
+      setError(e.message || "Failed to continue to payment")
     } finally {
       setLoading(false)
     }
-  }, [initCart])
+  }, [form, initCart, selectedOption, selectedShippingId])
+
+  const submitShipping = useCallback((optionId: string) => {
+    setError(null)
+    setSelectedShippingId(optionId)
+    setStep("info")
+  }, [])
 
   const submitOrder = useCallback(async (): Promise<string> => {
     setLoading(true)
@@ -190,14 +222,13 @@ export function useCheckout(): UseCheckoutReturn {
 
   const goBack = useCallback(() => {
     setError(null)
-    if (step === "payment") setStep("shipping")
-    else if (step === "shipping") setStep("info")
+    if (step === "payment") setStep("info")
+    else if (step === "info") setStep("shipping")
   }, [step])
 
   return {
     step, form, setForm, updateField,
-    deliveryMethod, setDeliveryMethod,
-    shippingOptions, selectedShippingId, clientSecret,
+    shippingOptions, selectedShippingId, selectShippingOption, isPickup, clientSecret,
     loading, error,
     submitInfo, submitShipping, submitOrder, goBack, fillFromSavedAddress,
   }
