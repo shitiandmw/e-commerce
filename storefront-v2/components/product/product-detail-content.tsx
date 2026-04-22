@@ -101,8 +101,9 @@ export function ProductDetailContent({
   // Inventory
   const inventory = selectedVariant?.inventory_quantity
   const manageInventory = selectedVariant?.manage_inventory !== false
-  const isOutOfStock = manageInventory && inventory !== undefined && inventory <= 0
-  const isLowStock = manageInventory && inventory !== undefined && inventory > 0 && inventory <= 5
+  const inventoryKnown = inventory !== undefined && inventory !== null
+  const isOutOfStock = manageInventory && (!inventoryKnown || inventory <= 0)
+  const isLowStock = manageInventory && inventoryKnown && inventory > 0 && inventory <= 5
   const canAddToCart = !!selectedVariant && !isOutOfStock
 
   // Cigar-specific metadata (may or may not exist)

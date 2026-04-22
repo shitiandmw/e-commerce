@@ -38,8 +38,13 @@ function MedusaProductCard({
   const isLimited = meta.is_limited === "true"
   const brandObj = Array.isArray(product.brand) ? product.brand[0] : product.brand
   const brandNameEn = brandObj?.name ?? meta.brand_name_en
+  const firstVariant = product.variants?.[0]
   const hasSingleVariant = (product.variants?.length ?? 0) === 1
-  const firstVariantId = product.variants?.[0]?.id
+  const firstVariantId = firstVariant?.id
+  const manageInventory = firstVariant?.manage_inventory !== false
+  const inventoryQty = firstVariant?.inventory_quantity
+  const isOutOfStock = manageInventory && (inventoryQty === undefined || inventoryQty === null || inventoryQty <= 0)
+  const canQuickAdd = hasSingleVariant && !!firstVariantId && !isOutOfStock
 
   const handleQuickAdd = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -81,7 +86,7 @@ function MedusaProductCard({
         >
           <Heart className="size-4" />
         </button>
-        {hasSingleVariant && firstVariantId && (
+        {canQuickAdd && (
           <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
             <button
               className="w-full flex items-center justify-center gap-2 bg-gold/90 text-primary-foreground py-3 text-xs font-medium tracking-wide hover:bg-gold transition-colors disabled:opacity-70"
@@ -104,13 +109,16 @@ function MedusaProductCard({
         {product.subtitle && (
           <p className="mt-0.5 text-xs text-muted-foreground">{product.subtitle}</p>
         )}
-        <div className="mt-3">
+        <div className="mt-3 flex items-center justify-between">
           {priceInfo ? (
             <span className="text-gold font-bold">
               {formatPrice(priceInfo.amount, priceInfo.currency_code)}
             </span>
           ) : (
             <span className="text-muted-foreground font-bold">{t("price_tbd")}</span>
+          )}
+          {isOutOfStock && (
+            <span className="text-[10px] text-destructive font-medium">{t("out_of_stock")}</span>
           )}
         </div>
       </div>

@@ -193,13 +193,16 @@ export function useUpdateInventoryItem(id: string) {
 }
 
 /**
- * Create an inventory item for a variant and associate it with the default
- * stock location. Medusa v2 only auto-creates inventory items when a variant
- * is first created with manage_inventory=true. Toggling the flag on an
- * existing variant does NOT back-fill the item, so we do it here.
+ * Create an inventory item for a variant, associate it with the variant and
+ * the default stock location.
+ *
+ * Medusa v2 only auto-creates inventory items when a variant is first created
+ * with manage_inventory=true. Toggling the flag on an existing variant does
+ * NOT back-fill the item, so we do it here.
  */
 export async function ensureInventoryForVariant(opts: {
   variantId: string
+  productId: string
   sku?: string | null
   title?: string | null
   locationId: string
@@ -222,6 +225,22 @@ export async function ensureInventoryForVariant(opts: {
     {
       method: "POST",
       body: { location_id: opts.locationId, stocked_quantity: 0 },
+    }
+  )
+
+  await adminFetch(
+    `/admin/products/${opts.productId}/variants/inventory-items/batch`,
+    {
+      method: "POST",
+      body: {
+        create: [
+          {
+            inventory_item_id: inventoryItemId,
+            variant_id: opts.variantId,
+            required_quantity: 1,
+          },
+        ],
+      },
     }
   )
 
@@ -265,6 +284,7 @@ export function useBulkEnableInventory() {
 
             await ensureInventoryForVariant({
               variantId: variant.id,
+              productId: product.id,
               sku: variant.sku,
               title: product.title,
               locationId,

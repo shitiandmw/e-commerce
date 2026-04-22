@@ -374,13 +374,20 @@ export function ProductForm({ product, mode }: ProductFormProps) {
             const isNowEnabled = formVariant.manage_inventory === true
             if (wasDisabled && isNowEnabled) {
               const defaultLocation = stockLocationsData?.stock_locations?.[0]
-              if (defaultLocation) {
-                await ensureInventoryForVariant({
-                  variantId: existingVariant.id,
-                  sku: formVariant.sku || existingVariant.sku,
-                  title: product?.title ?? data.title,
-                  locationId: defaultLocation.id,
-                })
+              if (defaultLocation && product?.id) {
+                try {
+                  await ensureInventoryForVariant({
+                    variantId: existingVariant.id,
+                    productId: product.id,
+                    sku: formVariant.sku || existingVariant.sku,
+                    title: product?.title ?? data.title,
+                    locationId: defaultLocation.id,
+                  })
+                } catch {
+                  console.warn(
+                    `Failed to create inventory for variant ${existingVariant.id}, can be retried from inventory page`
+                  )
+                }
               }
             }
           }

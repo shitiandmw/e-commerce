@@ -466,7 +466,7 @@ export async function fetchProducts(params: FetchProductsParams): Promise<Medusa
   const queryParams: Record<string, string | string[]> = {
     limit: String(params.limit ?? 20),
     offset: String(params.offset ?? 0),
-    fields: "id,title,handle,subtitle,description,thumbnail,*variants,*variants.prices,*variants.calculated_price,*images,*categories,*brand",
+    fields: "id,title,handle,subtitle,description,thumbnail,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*images,*categories,*brand",
   }
   if (params.region_id) {
     queryParams.region_id = params.region_id
@@ -498,7 +498,7 @@ export async function fetchProduct(handle: string, locale?: string, regionId?: s
   try {
     const params: Record<string, string> = {
       handle,
-      fields: "id,title,handle,subtitle,description,thumbnail,collection_id,metadata,*variants,*variants.prices,*variants.calculated_price,*variants.options,*options,*options.values,*images,*categories,*tags,*brand",
+      fields: "id,title,handle,subtitle,description,thumbnail,collection_id,metadata,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*variants.options,*options,*options.values,*images,*categories,*tags,*brand",
     }
     if (regionId) {
       params.region_id = regionId
@@ -520,7 +520,7 @@ export async function fetchRelatedProducts(
   locale?: string,
   regionId?: string,
 ): Promise<MedusaProduct[]> {
-  const fields = "id,title,handle,thumbnail,*variants,*variants.prices,*variants.calculated_price"
+  const fields = "id,title,handle,thumbnail,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory"
   const categoryId = product.categories?.[0]?.id
 
   try {
