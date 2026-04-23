@@ -123,8 +123,8 @@ export function StockLocationForm({
       if (isEdit) {
         await updateMutation.mutateAsync(payload)
         const prevIds = new Set(editLocation!.sales_channels?.map((sc) => sc.id) ?? [])
-        const add = [...selectedChannelIds].filter((id) => !prevIds.has(id))
-        const remove = [...prevIds].filter((id) => !selectedChannelIds.has(id))
+        const add = Array.from(selectedChannelIds).filter((id) => !prevIds.has(id))
+        const remove = Array.from(prevIds).filter((id) => !selectedChannelIds.has(id))
         if (add.length || remove.length) {
           await channelsMutation.mutateAsync({
             add: add.length ? add : undefined,
@@ -137,7 +137,7 @@ export function StockLocationForm({
         if (selectedChannelIds.size > 0) {
           await adminFetch(`/admin/stock-locations/${newId}/sales-channels`, {
             method: "POST",
-            body: { add: [...selectedChannelIds] },
+            body: { add: Array.from(selectedChannelIds) },
           })
         }
       }
