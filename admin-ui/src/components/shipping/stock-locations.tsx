@@ -11,7 +11,7 @@ import { StockLocationForm } from "./stock-location-form"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Plus, Pencil, Trash2, Warehouse, MapPin } from "lucide-react"
+import { Plus, Pencil, Trash2, Warehouse, MapPin, AlertTriangle, ShoppingBag } from "lucide-react"
 
 export function StockLocations() {
   const t = useTranslations("shipping")
@@ -113,10 +113,23 @@ export function StockLocations() {
                     </Button>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <Badge variant="secondary" className="text-xs">
                     {t("locations.fulfillmentSets", { count: fsCount })}
                   </Badge>
+                  {(loc.sales_channels?.length ?? 0) > 0 ? (
+                    loc.sales_channels!.map((sc) => (
+                      <Badge key={sc.id} variant="outline" className="text-xs gap-1">
+                        <ShoppingBag className="h-3 w-3" />
+                        {sc.name}
+                      </Badge>
+                    ))
+                  ) : (
+                    <Badge variant="destructive" className="text-xs gap-1">
+                      <AlertTriangle className="h-3 w-3" />
+                      {t("locations.noSalesChannelWarning")}
+                    </Badge>
+                  )}
                 </div>
               </div>
             )

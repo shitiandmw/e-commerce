@@ -219,6 +219,11 @@ export function useFulfillmentProviders() {
 
 // ---- Stock Locations ----
 
+export interface SalesChannelRef {
+  id: string
+  name: string
+}
+
 export interface StockLocation {
   id: string
   name: string
@@ -229,6 +234,7 @@ export interface StockLocation {
     postal_code?: string
     province?: string
   }
+  sales_channels?: SalesChannelRef[]
   created_at: string
   updated_at: string
 }
@@ -273,6 +279,7 @@ export interface FulfillmentSet {
 
 export interface StockLocationWithZones extends StockLocation {
   fulfillment_sets: FulfillmentSet[]
+  sales_channels?: SalesChannelRef[]
 }
 
 interface StockLocationsWithZonesResponse {
@@ -288,7 +295,7 @@ export function useStockLocationsWithZones() {
         params: {
           limit: "50",
           fields:
-            "*fulfillment_sets,*fulfillment_sets.service_zones,*fulfillment_sets.service_zones.geo_zones",
+            "*fulfillment_sets,*fulfillment_sets.service_zones,*fulfillment_sets.service_zones.geo_zones,*sales_channels",
         },
       }),
   })
@@ -413,6 +420,21 @@ export function useDeleteStockLocation() {
   return useMutation({
     mutationFn: (id: string) =>
       adminFetch(`/admin/stock-locations/${id}`, { method: "DELETE" }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["stock-locations"] })
+      qc.invalidateQueries({ queryKey: ["stock-locations-zones"] })
+    },
+  })
+}
+
+export function useUpdateStockLocationSalesChannels(locationId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { add?: string[]; remove?: string[] }) =>
+      adminFetch<{ stock_location: StockLocation }>(
+        `/admin/stock-locations/${locationId}/sales-channels`,
+        { method: "POST", body: data }
+      ),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["stock-locations"] })
       qc.invalidateQueries({ queryKey: ["stock-locations-zones"] })

@@ -1,0 +1,120 @@
+- generic [ref=e1]:
+  - alert [ref=e13]
+  - generic [ref=e14]:
+    - generic [ref=e15]:
+      - generic [ref=e16]:
+        - img [ref=e17]
+        - generic [ref=e22]: E-Commerce
+      - navigation [ref=e23]:
+        - generic [ref=e24]:
+          - link "仪表盘" [ref=e25] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e26]
+            - generic [ref=e31]: 仪表盘
+          - generic [ref=e32]:
+            - button "商品" [ref=e33] [cursor=pointer]:
+              - img [ref=e34]
+              - generic [ref=e38]: 商品
+              - img [ref=e39]
+            - generic [ref=e163]:
+              - link "商品管理" [ref=e164] [cursor=pointer]:
+                - /url: /products
+                - img [ref=e165]
+                - text: 商品管理
+              - link "品牌管理" [ref=e169] [cursor=pointer]:
+                - /url: /brands
+                - img [ref=e170]
+                - text: 品牌管理
+              - link "标签管理" [ref=e173] [cursor=pointer]:
+                - /url: /tags
+                - img [ref=e174]
+                - text: 标签管理
+              - link "商品分类" [ref=e176] [cursor=pointer]:
+                - /url: /product-categories
+                - img [ref=e177]
+                - text: 商品分类
+              - link "商品集合" [ref=e182] [cursor=pointer]:
+                - /url: /collections
+                - img [ref=e183]
+                - text: 商品集合
+              - link "库存管理" [ref=e188] [cursor=pointer]:
+                - /url: /inventory
+                - img [ref=e189]
+                - text: 库存管理
+          - button "销售" [ref=e42] [cursor=pointer]:
+            - img [ref=e43]
+            - generic [ref=e47]: 销售
+            - img [ref=e48]
+          - button "内容" [ref=e51] [cursor=pointer]:
+            - img [ref=e52]
+            - generic [ref=e55]: 内容
+            - img [ref=e56]
+          - button "站点" [ref=e59] [cursor=pointer]:
+            - img [ref=e60]
+            - generic [ref=e63]: 站点
+            - img [ref=e64]
+          - link "客服" [ref=e66] [cursor=pointer]:
+            - /url: /chat
+            - img [ref=e67]
+            - generic [ref=e69]: 客服
+          - link "数据报表" [ref=e70] [cursor=pointer]:
+            - /url: /analytics
+            - img [ref=e71]
+            - generic [ref=e73]: 数据报表
+          - link "系统设置" [active] [ref=e74] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e75]
+            - generic [ref=e78]: 系统设置
+      - generic [ref=e79]:
+        - button "中文" [ref=e80] [cursor=pointer]:
+          - img [ref=e81]
+          - generic [ref=e84]: 中文
+        - button "退出登录" [ref=e85] [cursor=pointer]:
+          - img [ref=e86]
+          - text: 退出登录
+    - main [ref=e89]:
+      - generic [ref=e192]:
+        - generic [ref=e193]:
+          - heading "系统设置" [level=1] [ref=e194]
+          - paragraph [ref=e195]: 管理店铺配置、区域、支付和团队。
+        - generic [ref=e196]:
+          - navigation [ref=e197]:
+            - generic [ref=e198]:
+              - button "店铺" [ref=e199] [cursor=pointer]:
+                - img [ref=e200]
+                - text: 店铺
+              - button "区域" [ref=e205] [cursor=pointer]:
+                - img [ref=e206]
+                - text: 区域
+              - button "销售渠道" [ref=e209] [cursor=pointer]:
+                - img [ref=e210]
+                - text: 销售渠道
+              - button "配送" [ref=e213] [cursor=pointer]:
+                - img [ref=e214]
+                - text: 配送
+              - button "支付" [ref=e219] [cursor=pointer]:
+                - img [ref=e220]
+                - text: 支付
+              - button "团队" [ref=e222] [cursor=pointer]:
+                - img [ref=e223]
+                - text: 团队
+              - button "API 密钥" [ref=e228] [cursor=pointer]:
+                - img [ref=e229]
+                - text: API 密钥
+              - button "翻译" [ref=e233] [cursor=pointer]:
+                - img [ref=e234]
+                - text: 翻译
+          - generic [ref=e240]:
+            - generic [ref=e241]:
+              - img [ref=e242]
+              - heading "店铺信息" [level=2] [ref=e247]
+            - paragraph [ref=e248]: 配置店铺的基本信息。
+            - generic [ref=e249]:
+              - generic [ref=e250]:
+                - text: 店铺名称
+                - textbox "店铺名称" [ref=e251]:
+                  - /placeholder: 我的店铺
+                  - text: SHANGJIA
+              - button "保存更改" [ref=e252] [cursor=pointer]:
+                - img [ref=e253]
+                - text: 保存更改

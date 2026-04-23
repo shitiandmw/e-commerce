@@ -6,8 +6,11 @@ import { useTranslations } from "next-intl"
 import {
   useCreateStockLocation,
   useUpdateStockLocation,
+  useUpdateStockLocationSalesChannels,
   type StockLocationWithZones,
 } from "@/hooks/use-shipping"
+import { useSalesChannels } from "@/hooks/use-settings"
+import { adminFetch } from "@/lib/admin-api"
 import { COUNTRY_GROUPS } from "@/lib/countries"
 import {
   Dialog,
@@ -46,6 +49,10 @@ export function StockLocationForm({
   const isEdit = !!editLocation
   const createMutation = useCreateStockLocation()
   const updateMutation = useUpdateStockLocation(editLocation?.id ?? "")
+  const channelsMutation = useUpdateStockLocationSalesChannels(editLocation?.id ?? "")
+  const { data: salesChannelsData } = useSalesChannels()
+  const allChannels = salesChannelsData?.sales_channels ?? []
+  const [selectedChannelIds, setSelectedChannelIds] = useState<Set<string>>(new Set())
   const [submitError, setSubmitError] = useState("")
 
   const {
@@ -78,13 +85,26 @@ export function StockLocationForm({
           postal_code: editLocation.address?.postal_code ?? "",
           country_code: editLocation.address?.country_code ?? "",
         })
+        setSelectedChannelIds(
+          new Set(editLocation.sales_channels?.map((sc) => sc.id) ?? [])
+        )
       } else {
         reset({ name: "", address_1: "", city: "", province: "", postal_code: "", country_code: "" })
+        setSelectedChannelIds(new Set())
       }
     }
   }, [open, editLocation, reset])
 
-  const isPending = createMutation.isPending || updateMutation.isPending
+  const toggleChannel = (id: string) => {
+    setSelectedChannelIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const isPending = createMutation.isPending || updateMutation.isPending || channelsMutation.isPending
 
   const onSubmit = async (values: FormValues) => {
     setSubmitError("")
@@ -102,8 +122,24 @@ export function StockLocationForm({
     try {
       if (isEdit) {
         await updateMutation.mutateAsync(payload)
+        const prevIds = new Set(editLocation!.sales_channels?.map((sc) => sc.id) ?? [])
+        const add = [...selectedChannelIds].filter((id) => !prevIds.has(id))
+        const remove = [...prevIds].filter((id) => !selectedChannelIds.has(id))
+        if (add.length || remove.length) {
+          await channelsMutation.mutateAsync({
+            add: add.length ? add : undefined,
+            remove: remove.length ? remove : undefined,
+          })
+        }
       } else {
-        await createMutation.mutateAsync(payload)
+        const res = await createMutation.mutateAsync(payload)
+        const newId = res.stock_location.id
+        if (selectedChannelIds.size > 0) {
+          await adminFetch(`/admin/stock-locations/${newId}/sales-channels`, {
+            method: "POST",
+            body: { add: [...selectedChannelIds] },
+          })
+        }
       }
       onOpenChange(false)
     } catch (err: any) {
@@ -163,6 +199,28 @@ export function StockLocationForm({
               </Select>
             </div>
           </div>
+          {allChannels.length > 0 && (
+            <div className="space-y-2">
+              <Label>{t("locations.salesChannels")}</Label>
+              <p className="text-xs text-muted-foreground">{t("locations.selectSalesChannels")}</p>
+              <div className="rounded-md border p-3 space-y-2 max-h-40 overflow-y-auto">
+                {allChannels.map((ch) => (
+                  <label key={ch.id} className="flex items-center gap-2 cursor-pointer text-sm">
+                    <input
+                      type="checkbox"
+                      checked={selectedChannelIds.has(ch.id)}
+                      onChange={() => toggleChannel(ch.id)}
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <span>{ch.name}</span>
+                    {ch.is_disabled && (
+                      <span className="text-xs text-muted-foreground">(disabled)</span>
+                    )}
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
           {submitError && <p className="text-sm text-destructive">{submitError}</p>}
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

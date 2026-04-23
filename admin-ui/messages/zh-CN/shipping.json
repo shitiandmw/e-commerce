@@ -127,6 +127,10 @@
       "noLocations": "暂无仓库。",
       "deleteConfirm": "确定要删除此仓库吗？",
       "fulfillmentSets": "{count} 个物流集合",
+      "salesChannels": "销售渠道",
+      "selectSalesChannels": "选择此仓库服务的销售渠道",
+      "noSalesChannelWarning": "未关联销售渠道，库存将不会在店铺中显示",
+      "channelCount": "{count} 个销售渠道",
       "form": {
         "name": "名称 *",
         "namePlaceholder": "例如：欧洲仓库",

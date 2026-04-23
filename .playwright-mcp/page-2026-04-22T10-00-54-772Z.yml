@@ -1,0 +1,1 @@
+- generic [ref=e2]: "{\"type\":\"not_allowed\",\"message\":\"Publishable API key required in the request header: x-publishable-api-key. You can manage your keys in settings in the dashboard.\"}"

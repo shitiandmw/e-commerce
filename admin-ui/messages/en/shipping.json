@@ -127,6 +127,10 @@
       "noLocations": "No stock locations yet.",
       "deleteConfirm": "Are you sure you want to delete this stock location?",
       "fulfillmentSets": "{count} fulfillment sets",
+      "salesChannels": "Sales Channels",
+      "selectSalesChannels": "Select sales channels served by this location",
+      "noSalesChannelWarning": "No sales channels linked — inventory won't be visible in the storefront",
+      "channelCount": "{count} sales channel(s)",
       "form": {
         "name": "Name *",
         "namePlaceholder": "e.g. European Warehouse",

@@ -1,0 +1,206 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e5]:
+      - link "SHANGJIA 上茄" [ref=e6] [cursor=pointer]:
+        - /url: /zh-CN
+        - generic [ref=e7]: SHANGJIA
+        - generic [ref=e8]: 上茄
+      - navigation [ref=e9]:
+        - generic [ref=e10]:
+          - link "古巴雪茄" [ref=e12] [cursor=pointer]:
+            - /url: /zh-CN/category/cigar-cuban
+            - text: 古巴雪茄
+            - img [ref=e13]
+          - link "非古巴雪茄" [ref=e16] [cursor=pointer]:
+            - /url: /zh-CN/category/cigar-world
+            - text: 非古巴雪茄
+            - img [ref=e17]
+          - link "雪茄配件" [ref=e20] [cursor=pointer]:
+            - /url: /zh-CN/category/accessories
+          - link "新品上市" [ref=e22] [cursor=pointer]:
+            - /url: /zh-CN/category/new-arrivals
+          - link "特惠专区" [ref=e24] [cursor=pointer]:
+            - /url: /zh-CN/category/deals
+          - link "雪茄知识" [ref=e26] [cursor=pointer]:
+            - /url: /zh-CN/articles
+            - text: 雪茄知识
+            - img [ref=e27]
+      - generic [ref=e29]:
+        - button "切换主题" [ref=e30]:
+          - img
+          - generic [ref=e31]: 切换主题
+        - button "語言切換" [ref=e33]:
+          - img [ref=e34]
+          - generic [ref=e37]: 简中
+          - img [ref=e38]
+        - link "搜尋" [ref=e40] [cursor=pointer]:
+          - /url: /zh-CN/search
+          - img [ref=e41]
+        - link "登入" [ref=e44] [cursor=pointer]:
+          - /url: /zh-CN/login
+          - img [ref=e45]
+        - link "購物車" [ref=e48] [cursor=pointer]:
+          - /url: /zh-CN/cart
+          - img [ref=e49]
+  - main [ref=e52]:
+    - generic [ref=e53]:
+      - navigation "breadcrumb" [ref=e54]:
+        - list [ref=e55]:
+          - listitem [ref=e56]:
+            - link "首页" [ref=e57] [cursor=pointer]:
+              - /url: /zh-CN
+          - listitem [ref=e58]:
+            - img [ref=e59]
+          - listitem [ref=e61]:
+            - link "蒙特" [ref=e62] [cursor=pointer]:
+              - /url: /zh-CN/category/montecristo
+          - listitem [ref=e63]:
+            - img [ref=e64]
+          - listitem [ref=e66]: 2025年限 Elba Edición Limitada2025（5支）
+      - generic [ref=e67]:
+        - generic [ref=e68]:
+          - generic [ref=e69]:
+            - generic [ref=e70]:
+              - button "2025年限 Elba Edición Limitada2025（5支） - 1" [ref=e71]:
+                - img "2025年限 Elba Edición Limitada2025（5支） - 1" [ref=e72]
+              - button "2025年限 Elba Edición Limitada2025（5支） - 2" [ref=e73]:
+                - img "2025年限 Elba Edición Limitada2025（5支） - 2" [ref=e74]
+              - button "2025年限 Elba Edición Limitada2025（5支） - 3" [ref=e75]:
+                - img "2025年限 Elba Edición Limitada2025（5支） - 3" [ref=e76]
+            - img "2025年限 Elba Edición Limitada2025（5支）" [ref=e78]
+          - generic [ref=e79]:
+            - paragraph [ref=e80]: MONTECRISTO
+            - heading "2025年限 Elba Edición Limitada2025（5支）" [level=1] [ref=e81]
+            - generic [ref=e82]:
+              - generic [ref=e84]: $1,159.00
+              - generic [ref=e87]: 缺货
+            - generic [ref=e88]:
+              - generic [ref=e89]:
+                - generic [ref=e90]: 数量
+                - generic [ref=e91]:
+                  - button "减少数量" [ref=e92]:
+                    - img [ref=e93]
+                  - generic [ref=e94]: "1"
+                  - button "增加数量" [ref=e95]:
+                    - img [ref=e96]
+              - generic [ref=e97]:
+                - button "缺货中" [disabled] [ref=e98]:
+                  - img [ref=e99]
+                  - text: 缺货中
+                - button "加入收藏" [ref=e102]:
+                  - img [ref=e103]
+                - button "分享" [ref=e105]:
+                  - img [ref=e106]
+              - button "立即购买" [disabled] [ref=e112]
+        - generic [ref=e114]:
+          - generic [ref=e115]:
+            - paragraph [ref=e116]: Brand Heritage
+            - heading "MONTECRISTO" [level=2] [ref=e117]
+            - paragraph [ref=e118]: 蒙特 - 全球最畅销的古巴雪茄品牌，以大仲马小说命名
+          - link "探索更多 MONTECRISTO 雪茄" [ref=e119] [cursor=pointer]:
+            - /url: /zh-CN/brand/01KMJ1M32WZSER9P20E66PZVQN
+        - generic [ref=e121]:
+          - tablist [ref=e122]:
+            - tab "详细介绍" [selected] [ref=e123]
+          - tabpanel "详细介绍" [ref=e124]:
+            - generic [ref=e125]:
+              - generic [ref=e126]:
+                - generic [ref=e127]: 长度
+                - generic [ref=e128]: "146"
+              - generic [ref=e129]:
+                - generic [ref=e130]: 环径
+                - generic [ref=e131]: "54"
+        - generic [ref=e132]:
+          - heading "您可能也喜欢" [level=2] [ref=e133]
+          - generic [ref=e134]:
+            - link "短号 SHORT (100枝) 加入收藏 短号 SHORT (100枝) $230.00 缺货" [ref=e135] [cursor=pointer]:
+              - /url: /zh-CN/product/montecristo-short-100
+              - generic [ref=e136]:
+                - img "短号 SHORT (100枝)" [ref=e137]
+                - button "加入收藏" [ref=e138]:
+                  - img [ref=e139]
+              - generic [ref=e141]:
+                - heading "短号 SHORT (100枝)" [level=3] [ref=e142]
+                - generic [ref=e143]:
+                  - generic [ref=e144]: $230.00
+                  - generic [ref=e145]: 缺货
+            - link "蒙特A Montecristo A (5枝) 加入收藏 蒙特A Montecristo A (5枝) $1,362.00 缺货" [ref=e146] [cursor=pointer]:
+              - /url: /zh-CN/product/montecristo-a-montecristo-a-5
+              - generic [ref=e147]:
+                - img "蒙特A Montecristo A (5枝)" [ref=e148]
+                - button "加入收藏" [ref=e149]:
+                  - img [ref=e150]
+              - generic [ref=e152]:
+                - heading "蒙特A Montecristo A (5枝)" [level=3] [ref=e153]
+                - generic [ref=e154]:
+                  - generic [ref=e155]: $1,362.00
+                  - generic [ref=e156]: 缺货
+            - link "1号 No.1 (25枝) 加入收藏 1号 No.1 (25枝) $930.00 缺货" [ref=e157] [cursor=pointer]:
+              - /url: /zh-CN/product/montecristo-1-no-1-25
+              - generic [ref=e158]:
+                - img "1号 No.1 (25枝)" [ref=e159]
+                - button "加入收藏" [ref=e160]:
+                  - img [ref=e161]
+              - generic [ref=e163]:
+                - heading "1号 No.1 (25枝)" [level=3] [ref=e164]
+                - generic [ref=e165]:
+                  - generic [ref=e166]: $930.00
+                  - generic [ref=e167]: 缺货
+            - link "小2号 PETIT No.2 (25枝) 加入收藏 小2号 PETIT No.2 (25枝) $993.00 缺货" [ref=e168] [cursor=pointer]:
+              - /url: /zh-CN/product/montecristo-2-petit-no-2-25
+              - generic [ref=e169]:
+                - img "小2号 PETIT No.2 (25枝)" [ref=e170]
+                - button "加入收藏" [ref=e171]:
+                  - img [ref=e172]
+              - generic [ref=e174]:
+                - heading "小2号 PETIT No.2 (25枝)" [level=3] [ref=e175]
+                - generic [ref=e176]:
+                  - generic [ref=e177]: $993.00
+                  - generic [ref=e178]: 缺货
+  - contentinfo [ref=e179]:
+    - generic [ref=e181]:
+      - generic [ref=e182]:
+        - link "SHANGJIA SHANGJIA" [ref=e183] [cursor=pointer]:
+          - /url: /zh-CN
+          - text: SHANGJIA
+          - paragraph [ref=e184]: SHANGJIA
+        - paragraph [ref=e185]: 您的雪茄网购平台，提供古巴雪茄、非古雪茄、迷你雪茄等顶级品牌的正品保证。
+        - generic [ref=e186]:
+          - link "Instagram" [ref=e187] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e188]
+          - link "Facebook" [ref=e190] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e191]
+          - link "WhatsApp" [ref=e193] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e194]
+      - generic [ref=e196]:
+        - generic [ref=e197]:
+          - heading "快速链接" [level=3] [ref=e198]
+          - list [ref=e199]:
+            - listitem [ref=e200]:
+              - link "首页" [ref=e201] [cursor=pointer]:
+                - /url: /zh-CN
+            - listitem [ref=e202]:
+              - link "古巴雪茄" [ref=e203] [cursor=pointer]:
+                - /url: /zh-CN/category/cigar-cuban
+            - listitem [ref=e204]:
+              - link "非古雪茄" [ref=e205] [cursor=pointer]:
+                - /url: /zh-CN/category/cigar-world
+        - generic [ref=e206]:
+          - heading "商品分类" [level=3] [ref=e207]
+          - list [ref=e208]:
+            - listitem [ref=e209]:
+              - link "雪茄" [ref=e210] [cursor=pointer]:
+                - /url: /zh-CN/category/cigars
+            - listitem [ref=e211]:
+              - link "雪茄配件" [ref=e212] [cursor=pointer]:
+                - /url: /zh-CN/category/accessories
+    - generic [ref=e215]:
+      - paragraph [ref=e216]: © 2026 ShangJia. All rights reserved.
+      - paragraph [ref=e217]: 吸烟危害健康。本网站仅供年满18岁人士浏览及购买。雪茄产品图片仅供参考，实际产品可能略有差异。
+  - region "Notifications alt+T"
+  - alert [ref=e218]
+  - button [ref=e220] [cursor=pointer]:
+    - img [ref=e221]

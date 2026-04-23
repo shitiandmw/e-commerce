@@ -1,0 +1,246 @@
+- generic:
+  - banner:
+    - generic:
+      - generic:
+        - generic:
+          - link:
+            - /url: /zh-CN
+            - generic: SHANGJIA
+            - generic: 上茄
+          - navigation:
+            - generic:
+              - generic:
+                - link:
+                  - /url: /zh-CN/category/cigar-cuban
+                  - text: 古巴雪茄
+                  - img
+              - generic:
+                - link:
+                  - /url: /zh-CN/category/cigar-world
+                  - text: 非古巴雪茄
+                  - img
+              - generic:
+                - link:
+                  - /url: /zh-CN/category/accessories
+                  - text: 雪茄配件
+              - generic:
+                - link:
+                  - /url: /zh-CN/category/new-arrivals
+                  - text: 新品上市
+              - generic:
+                - link:
+                  - /url: /zh-CN/category/deals
+                  - text: 特惠专区
+              - generic:
+                - link:
+                  - /url: /zh-CN/articles
+                  - text: 雪茄知识
+                  - img
+          - generic:
+            - button:
+              - img
+              - generic: 切换主题
+            - generic:
+              - button:
+                - img
+                - generic: 简中
+                - img
+            - link:
+              - /url: /zh-CN/search
+              - img
+            - link:
+              - /url: /zh-CN/login
+              - img
+            - link:
+              - /url: /zh-CN/cart
+              - img
+  - main:
+    - generic:
+      - navigation:
+        - list:
+          - listitem:
+            - link:
+              - /url: /zh-CN
+              - text: 首页
+          - listitem:
+            - img
+          - listitem:
+            - link:
+              - /url: /zh-CN/category/montecristo
+              - text: 蒙特
+          - listitem:
+            - img
+          - listitem: 2025年限 Elba Edición Limitada2025（5支）
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - button:
+                - img
+              - button:
+                - img
+              - button:
+                - img
+            - generic:
+              - img
+          - generic:
+            - paragraph: MONTECRISTO
+            - heading [level=1]: 2025年限 Elba Edición Limitada2025（5支）
+            - generic:
+              - generic:
+                - generic: $1,159.00
+              - generic:
+                - generic: 缺货
+            - generic:
+              - generic:
+                - generic: 数量
+                - generic:
+                  - button:
+                    - img
+                  - generic: "1"
+                  - button:
+                    - img
+              - generic:
+                - button [disabled]:
+                  - img
+                  - text: 缺货中
+                - button:
+                  - img
+                - button:
+                  - img
+              - button [disabled]: 立即购买
+        - generic:
+          - generic:
+            - generic:
+              - paragraph: Brand Heritage
+              - heading [level=2]: MONTECRISTO
+              - paragraph: 蒙特 - 全球最畅销的古巴雪茄品牌，以大仲马小说命名
+            - link:
+              - /url: /zh-CN/brand/01KMJ1M32WZSER9P20E66PZVQN
+              - text: 探索更多 MONTECRISTO 雪茄
+        - generic:
+          - generic:
+            - tablist:
+              - tab [selected]: 详细介绍
+            - tabpanel:
+              - generic:
+                - generic:
+                  - generic: 长度
+                  - generic: "146"
+                - generic:
+                  - generic: 环径
+                  - generic: "54"
+        - generic:
+          - heading [level=2]: 您可能也喜欢
+          - generic:
+            - link:
+              - /url: /zh-CN/product/montecristo-short-100
+              - generic:
+                - img
+                - button:
+                  - img
+              - generic:
+                - heading [level=3]: 短号 SHORT (100枝)
+                - generic:
+                  - generic: $230.00
+                  - generic: 缺货
+            - link:
+              - /url: /zh-CN/product/montecristo-a-montecristo-a-5
+              - generic:
+                - img
+                - button:
+                  - img
+              - generic:
+                - heading [level=3]: 蒙特A Montecristo A (5枝)
+                - generic:
+                  - generic: $1,362.00
+                  - generic: 缺货
+            - link:
+              - /url: /zh-CN/product/montecristo-1-no-1-25
+              - generic:
+                - img
+                - button:
+                  - img
+              - generic:
+                - heading [level=3]: 1号 No.1 (25枝)
+                - generic:
+                  - generic: $930.00
+                  - generic: 缺货
+            - link:
+              - /url: /zh-CN/product/montecristo-2-petit-no-2-25
+              - generic:
+                - img
+                - button:
+                  - img
+              - generic:
+                - heading [level=3]: 小2号 PETIT No.2 (25枝)
+                - generic:
+                  - generic: $993.00
+                  - generic: 缺货
+  - contentinfo:
+    - generic:
+      - generic:
+        - generic:
+          - link:
+            - /url: /zh-CN
+            - text: SHANGJIA
+            - paragraph: SHANGJIA
+          - paragraph: 您的雪茄网购平台，提供古巴雪茄、非古雪茄、迷你雪茄等顶级品牌的正品保证。
+          - generic:
+            - link:
+              - /url: "#"
+              - img
+            - link:
+              - /url: "#"
+              - img
+            - link:
+              - /url: "#"
+              - img
+        - generic:
+          - generic:
+            - heading [level=3]: 快速链接
+            - list:
+              - listitem:
+                - link:
+                  - /url: /zh-CN
+                  - text: 首页
+              - listitem:
+                - link:
+                  - /url: /zh-CN/category/cigar-cuban
+                  - text: 古巴雪茄
+              - listitem:
+                - link:
+                  - /url: /zh-CN/category/cigar-world
+                  - text: 非古雪茄
+          - generic:
+            - heading [level=3]: 商品分类
+            - list:
+              - listitem:
+                - link:
+                  - /url: /zh-CN/category/cigars
+                  - text: 雪茄
+              - listitem:
+                - link:
+                  - /url: /zh-CN/category/accessories
+                  - text: 雪茄配件
+    - generic:
+      - generic:
+        - generic:
+          - paragraph: © 2026 ShangJia. All rights reserved.
+          - paragraph: 吸烟危害健康。本网站仅供年满18岁人士浏览及购买。雪茄产品图片仅供参考，实际产品可能略有差异。
+  - region "Notifications alt+T"
+  - alert
+  - dialog "您是否已年满18周岁？" [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]: SHANGJIA
+      - heading "您是否已年满18周岁？" [level=2] [ref=e5]
+      - paragraph [ref=e6]: 本网站包含烟草相关内容，仅面向法定吸烟年龄以上的成年人。进入本网站即表示您确认已达到所在地区的法定吸烟年龄。
+    - generic [ref=e7]:
+      - button "是的，进入网站" [active] [ref=e8]
+      - button "我未满 18 岁" [ref=e9]
+    - paragraph [ref=e10]: 吸烟有害健康
+    - generic [ref=e11]:
+      - img [ref=e12]
+      - button "繁體中文" [ref=e15]
+      - button "简体中文" [ref=e16]
+      - button "English" [ref=e17]
