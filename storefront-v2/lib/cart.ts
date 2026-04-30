@@ -215,7 +215,19 @@ export async function clearCart(): Promise<Cart> {
   return cart
 }
 
-export async function initPaymentSessions(providerId = "pp_stripe_stripe"): Promise<Cart & { payment_collection?: { payment_sessions?: PaymentSession[] } }> {
+export interface PaymentMethod {
+  provider_id: string
+  display_name: string | null
+  description: string | null
+  sandbox_mode?: boolean
+}
+
+export async function getPaymentMethods(): Promise<PaymentMethod[]> {
+  const data = await apiFetch<{ payment_methods: PaymentMethod[] }>("/api/payment-methods")
+  return data.payment_methods || []
+}
+
+export async function initPaymentSessions(providerId: string): Promise<Cart & { payment_collection?: { payment_sessions?: PaymentSession[] } }> {
   const cartId = getCartId()
   if (!cartId) throw new Error("No cart found")
   const data = await apiFetch<{ cart: Cart & { payment_collection?: { payment_sessions?: PaymentSession[] } } }>(

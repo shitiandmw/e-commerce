@@ -42,10 +42,11 @@ import {
 import Link from "next/link"
 import { format } from "date-fns"
 
-function formatCurrency(amount: number, currency: string) {
+function formatCurrency(amount: number, currency?: string) {
+  const code = (currency || "usd").toUpperCase()
   return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: currency.toUpperCase(),
+    currency: code,
   }).format(amount / 100)
 }
 
@@ -525,7 +526,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                               <p className="font-medium text-sm">
                                 {formatCurrency(
                                   payment.amount,
-                                  payment.currency_code
+                                  payment.currency_code || order.currency_code
                                 )}
                               </p>
                               {payment.captured_at && (

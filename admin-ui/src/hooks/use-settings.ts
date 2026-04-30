@@ -326,6 +326,57 @@ export function formatProviderName(id: string): string {
     .join(" ")
 }
 
+// ---- Payment Settings (Runtime Config) ----
+
+export interface AdminPaymentSetting {
+  id: string
+  provider_id: string
+  is_enabled: boolean
+  display_name: string | null
+  description: string | null
+  sandbox_mode: boolean
+  api_key_masked: string | null
+  is_api_key_set: boolean
+  webhook_secret_masked: string | null
+  is_webhook_secret_set: boolean
+  created_at: string
+  updated_at: string
+}
+
+interface PaymentSettingsResponse {
+  payment_settings: AdminPaymentSetting[]
+}
+
+export function usePaymentSettings() {
+  return useQuery<PaymentSettingsResponse>({
+    queryKey: ["admin-payment-settings"],
+    queryFn: () =>
+      adminFetch<PaymentSettingsResponse>("/admin/payment-settings"),
+  })
+}
+
+export function useUpdatePaymentSettings() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: {
+      provider_id: string
+      is_enabled?: boolean
+      display_name?: string
+      description?: string
+      sandbox_mode?: boolean
+      api_key?: string
+      webhook_secret?: string
+    }) =>
+      adminFetch<{ payment_setting: AdminPaymentSetting }>("/admin/payment-settings", {
+        method: "POST",
+        body: data,
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-payment-settings"] })
+    },
+  })
+}
+
 // ---- Tax Regions ----
 
 export interface AdminTaxRegion {

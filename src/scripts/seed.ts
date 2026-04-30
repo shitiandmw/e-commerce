@@ -118,7 +118,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
           name: "Europe",
           currency_code: "usd",
           countries,
-          payment_providers: ["pp_system_default", "pp_stripe_stripe"],
+          payment_providers: ["pp_system_default", "pp_stripe_stripe", "pp_wooshpay_wooshpay"],
         },
       ],
     },
@@ -831,4 +831,42 @@ export default async function seedDemoData({ container }: ExecArgs) {
   });
 
   logger.info("Finished seeding inventory levels data.");
+
+  logger.info("Seeding payment provider settings...");
+  const paymentSettingsService = container.resolve("payment_settings");
+
+  const paymentSettingsSeed = [
+    {
+      provider_id: "pp_system_default",
+      is_enabled: true,
+      display_name: "Direct Order",
+      description: "Place order without online payment.",
+      sandbox_mode: false,
+    },
+    {
+      provider_id: "pp_stripe_stripe",
+      is_enabled: !!process.env.STRIPE_API_KEY,
+      display_name: "Credit / Debit Card",
+      description: "Pay securely with Stripe.",
+      sandbox_mode: false,
+    },
+    {
+      provider_id: "pp_wooshpay_wooshpay",
+      is_enabled: false,
+      display_name: "WooShPay",
+      description: "Pay via WooShPay.",
+      sandbox_mode: true,
+    },
+  ];
+
+  for (const setting of paymentSettingsSeed) {
+    const existing = await paymentSettingsService.listPaymentProviderSettings({
+      provider_id: setting.provider_id,
+    });
+    if (existing.length === 0) {
+      await paymentSettingsService.createPaymentProviderSettings(setting);
+    }
+  }
+
+  logger.info("Finished seeding payment provider settings.");
 }

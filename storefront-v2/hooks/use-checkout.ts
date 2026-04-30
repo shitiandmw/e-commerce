@@ -4,16 +4,18 @@ import { useState, useCallback, useEffect } from "react"
 import {
   type CartAddress,
   type ShippingOption,
+  type PaymentMethod,
   updateCartAddress,
   getShippingOptions,
   setShippingMethod as setShippingMethodApi,
   initPaymentSessions,
   completeCart,
   removeCartId,
+  getPaymentMethods,
 } from "@/lib/cart"
 import { useCart } from "@/lib/cart-store"
 
-export type Step = "shipping" | "info" | "payment"
+export type Step = "shipping" | "info" | "payment-method" | "payment"
 
 export interface CheckoutForm {
   email: string
@@ -44,7 +46,12 @@ interface UseCheckoutReturn {
   submitOrder: () => Promise<string>
   goBack: () => void
   fillFromSavedAddress: (addr: SavedAddress) => void
+  paymentMethods: PaymentMethod[]
+  selectedPaymentMethod: string | null
+  selectPaymentMethod: (providerId: string) => Promise<void>
+  setSelectedPaymentMethod: (id: string | null) => void
 }
+
 export interface SavedAddress {
   id: string
   first_name: string
@@ -74,8 +81,6 @@ function isPickupOption(option: ShippingOption): boolean {
   if (option.metadata?.type) {
     return option.metadata.type.toLowerCase() === "pickup"
   }
-
-  // Fallback for options returned without metadata.type.
   const name = option.name?.toLowerCase() ?? ""
   return name.includes("自提") || name.includes("pickup") || name.includes("pick-up") || name.includes("self-pick")
 }
@@ -89,11 +94,12 @@ export function useCheckout(): UseCheckoutReturn {
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([])
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null)
   const appliedShippingId = cart?.shipping_methods?.[0]?.shipping_option_id ?? null
 
   useEffect(() => {
     let cancelled = false
-
     setLoading(true)
     getShippingOptions()
       .then((options) => {
@@ -109,10 +115,7 @@ export function useCheckout(): UseCheckoutReturn {
       .finally(() => {
         if (!cancelled) setLoading(false)
       })
-
-    return () => {
-      cancelled = true
-    }
+    return () => { cancelled = true }
   }, [])
 
   useEffect(() => {
@@ -180,20 +183,38 @@ export function useCheckout(): UseCheckoutReturn {
 
       await updateCartAddress(address, form.email)
       await setShippingMethodApi(selectedShippingId)
-      const cartWithPayment = await initPaymentSessions("pp_stripe_stripe")
-      const sessions = cartWithPayment.payment_collection?.payment_sessions
-      const stripeSession = sessions?.find((s) => s.provider_id === "pp_stripe_stripe")
-      const secret = stripeSession?.data?.client_secret as string | undefined
-      if (!secret) throw new Error("Failed to get Stripe client secret")
-      setClientSecret(secret)
       await initCart()
-      setStep("payment")
+
+      // Fetch available payment methods
+      const methods = await getPaymentMethods()
+      setPaymentMethods(methods)
+      setStep("payment-method")
     } catch (e: any) {
-      setError(e.message || "Failed to continue to payment")
+      setError(e.message || "Failed to continue")
     } finally {
       setLoading(false)
     }
   }, [form, initCart, selectedOption, selectedShippingId])
+
+  const selectPaymentMethod = useCallback(async (providerId: string) => {
+    setLoading(true)
+    setError(null)
+    setSelectedPaymentMethod(providerId)
+    try {
+      const cartWithPayment = await initPaymentSessions(providerId)
+      const sessions = cartWithPayment.payment_collection?.payment_sessions
+      const session = sessions?.find((s) => s.provider_id === providerId)
+      const secret = (session?.data?.client_secret as string) ?? null
+      // For providers without client_secret (e.g. WooShPay), store full session data
+      setClientSecret(secret || (session?.data ? JSON.stringify(session.data) : null))
+      await initCart()
+      setStep("payment")
+    } catch (e: any) {
+      setError(e.message || "Failed to initialize payment")
+    } finally {
+      setLoading(false)
+    }
+  }, [initCart])
 
   const submitShipping = useCallback((optionId: string) => {
     setError(null)
@@ -222,7 +243,8 @@ export function useCheckout(): UseCheckoutReturn {
 
   const goBack = useCallback(() => {
     setError(null)
-    if (step === "payment") setStep("info")
+    if (step === "payment") setStep("payment-method")
+    else if (step === "payment-method") setStep("info")
     else if (step === "info") setStep("shipping")
   }, [step])
 
@@ -231,5 +253,6 @@ export function useCheckout(): UseCheckoutReturn {
     shippingOptions, selectedShippingId, selectShippingOption, isPickup, clientSecret,
     loading, error,
     submitInfo, submitShipping, submitOrder, goBack, fillFromSavedAddress,
+    paymentMethods, selectedPaymentMethod, selectPaymentMethod, setSelectedPaymentMethod,
   }
 }

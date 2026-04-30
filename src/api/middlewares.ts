@@ -73,6 +73,9 @@ import {
   PostAdminUpdateConversation,
   PostAdminUpdateChatSettings,
 } from "./admin/chat/validators"
+import {
+  PostAdminUpdatePaymentSettings,
+} from "./admin/payment-settings/validators"
 import { initSocketIO, setContainer } from "../lib/socket-io"
 
 export const GetBrandsSchema = createFindParams().merge(z.object({ q: z.string().optional() }))
@@ -676,6 +679,14 @@ export default defineMiddlewares({
       method: "POST",
       middlewares: [
         validateAndTransformBody(PostAdminUpdateChatSettings),
+      ],
+    },
+    // Payment settings routes
+    {
+      matcher: "/admin/payment-settings",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminUpdatePaymentSettings),
       ],
     },
   ],

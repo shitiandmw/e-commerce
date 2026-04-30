@@ -98,6 +98,26 @@
       "disabled": "Disabled"
     },
 
+    "paymentConfig": {
+      "title": "Payment Configuration",
+      "description": "Manage the enabled status and configuration of each payment method.",
+      "displayName": "Display Name",
+      "displayNamePlaceholder": "e.g. Credit Card Payment",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "e.g. Supports Visa, Mastercard",
+      "sandboxMode": "Sandbox Mode",
+      "apiKey": "API Key",
+      "apiKeyPlaceholder": "Enter API key",
+      "webhookSecret": "Webhook Secret",
+      "webhookSecretPlaceholder": "Enter webhook secret",
+      "configured": "Configured",
+      "stripeEnvNote": "Stripe API key is configured via the STRIPE_API_KEY environment variable. No configuration needed here.",
+      "save": "Save",
+      "saving": "Saving...",
+      "savedSuccess": "Payment configuration saved successfully.",
+      "saveFailed": "Failed to save payment configuration"
+    },
+
     "regionSettings": {
       "title": "Sales Regions",
       "addRegion": "Add Region",

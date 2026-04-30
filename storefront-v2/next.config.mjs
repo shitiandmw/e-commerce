@@ -4,6 +4,9 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  turbopack: {
+    root: process.cwd(),
+  },
   output: "standalone",
   typescript: {
     ignoreBuildErrors: true,

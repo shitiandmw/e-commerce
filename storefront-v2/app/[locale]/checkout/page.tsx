@@ -19,15 +19,19 @@ import { useTranslations } from "next-intl"
 import { useCheckout, type Step } from "@/hooks/use-checkout"
 import { SavedAddresses } from "@/components/checkout/saved-addresses"
 import { StripePayment } from "@/components/checkout/stripe-payment"
+import { PaymentMethodSelector } from "@/components/checkout/payment-method-selector"
+import { DirectOrderPayment } from "@/components/checkout/direct-order-payment"
+import { WooShPayPayment } from "@/components/checkout/wooshpay-payment"
 
-/* ─── step definitions ─── */
+/* step definitions */
 const steps: { key: Step; labelKey: string; num: number }[] = [
   { key: "shipping", labelKey: "checkout_shipping_method", num: 1 },
   { key: "info", labelKey: "checkout_contact_title", num: 2 },
-  { key: "payment", labelKey: "checkout_payment_method", num: 3 },
+  { key: "payment-method", labelKey: "checkout_payment_method", num: 3 },
+  { key: "payment", labelKey: "checkout_confirm_payment_title", num: 4 },
 ]
 
-/* ─── shared input ─── */
+/* shared input */
 function FormInput({
   label, id, type = "text", placeholder, required = false, half = false,
   value, onChange,
@@ -49,7 +53,8 @@ function FormInput({
     </div>
   )
 }
-/* ─── step indicator ─── */
+
+/* step indicator */
 function StepIndicator({ current, t }: { current: Step; t: (key: string) => string }) {
   return (
     <div className="flex items-center gap-2 mb-8">
@@ -89,7 +94,7 @@ function StepIndicator({ current, t }: { current: Step; t: (key: string) => stri
     </div>
   )
 }
-/* ═══════════════ CHECKOUT PAGE ═══════════════ */
+
 export default function CheckoutPage() {
   const router = useRouter()
   const { cart } = useCart()
@@ -147,6 +152,7 @@ export default function CheckoutPage() {
       // error is set in useCheckout
     }
   }
+
   return (
     <div className="min-h-screen bg-background">
       {/* checkout header */}
@@ -180,7 +186,8 @@ export default function CheckoutPage() {
                 {error}
               </div>
             )}
-            {/* ── step 1: shipping ── */}
+
+            {/* step 1: shipping */}
             {step === "shipping" && (
               <div>
                 <h2 className="text-lg font-serif text-foreground mb-6">{t("checkout_select_shipping_title")}</h2>
@@ -243,7 +250,8 @@ export default function CheckoutPage() {
                 </div>
               </div>
             )}
-            {/* ── step 2: info ── */}
+
+            {/* step 2: info */}
             {step === "info" && (
               <div>
                 <h2 className="text-lg font-serif text-foreground mb-6">{t("checkout_contact_title")}</h2>
@@ -303,15 +311,44 @@ export default function CheckoutPage() {
                 )}
               </div>
             )}
-            {/* ── step 3: payment ── */}
-            {step === "payment" && checkout.clientSecret && (
+
+            {/* step 3: payment method selection */}
+            {step === "payment-method" && (
+              <PaymentMethodSelector
+                methods={checkout.paymentMethods}
+                selected={checkout.selectedPaymentMethod}
+                onSelect={checkout.setSelectedPaymentMethod}
+                loading={loading}
+                onContinue={() => {
+                  if (checkout.selectedPaymentMethod) {
+                    checkout.selectPaymentMethod(checkout.selectedPaymentMethod)
+                  }
+                }}
+              />
+            )}
+
+            {/* step 4: payment confirmation */}
+            {step === "payment" && (
               <div>
-                <h2 className="text-lg font-serif text-foreground mb-6">{t("checkout_payment_method")}</h2>
-                <StripePayment
-                  clientSecret={checkout.clientSecret}
-                  onSuccess={handlePaymentSuccess}
-                  totalLabel={t("checkout_confirm_payment", { total: fmtPrice(total) })}
-                />
+                <h2 className="text-lg font-serif text-foreground mb-6">{t("checkout_confirm_payment_title")}</h2>
+                {checkout.selectedPaymentMethod === "pp_system_default" && (
+                  <DirectOrderPayment
+                    onSuccess={handlePaymentSuccess}
+                    totalLabel={t("checkout_confirm_payment_label", { total: fmtPrice(total) })}
+                  />
+                )}
+                {checkout.selectedPaymentMethod === "pp_stripe_stripe" && checkout.clientSecret && (
+                  <StripePayment
+                    clientSecret={checkout.clientSecret}
+                    onSuccess={handlePaymentSuccess}
+                    totalLabel={t("checkout_confirm_payment_label", { total: fmtPrice(total) })}
+                  />
+                )}
+                {checkout.selectedPaymentMethod === "pp_wooshpay_wooshpay" && (
+                  <WooShPayPayment
+                    clientSecret={checkout.clientSecret}
+                  />
+                )}
 
                 {/* terms */}
                 <label className="flex items-start gap-3 mt-6 cursor-pointer">
@@ -326,6 +363,7 @@ export default function CheckoutPage() {
                 </label>
               </div>
             )}
+
             {/* navigation buttons */}
             {step === "shipping" && (
               <div className="flex items-center justify-between mt-8 pt-6 border-t border-border/20">
@@ -370,6 +408,19 @@ export default function CheckoutPage() {
               </div>
             )}
 
+            {step === "payment-method" && (
+              <div className="flex items-center mt-8 pt-6 border-t border-border/20">
+                <button
+                  type="button"
+                  onClick={checkout.goBack}
+                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-gold transition-colors"
+                >
+                  <ChevronLeft className="size-4" />
+                  {t("checkout_prev_step")}
+                </button>
+              </div>
+            )}
+
             {step === "payment" && (
               <div className="flex items-center mt-8 pt-6 border-t border-border/20">
                 <button
@@ -383,6 +434,7 @@ export default function CheckoutPage() {
               </div>
             )}
           </div>
+
           {/* right: order summary sidebar */}
           <div className="lg:w-[360px] shrink-0">
             {/* mobile toggle */}

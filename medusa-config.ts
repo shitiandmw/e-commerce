@@ -40,20 +40,28 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/chat",
     },
-    ...(process.env.STRIPE_API_KEY ? [{
+    {
+      resolve: "./src/modules/payment-settings",
+    },
+    {
       resolve: "@medusajs/medusa/payment",
       options: {
         providers: [
-          {
+          ...(process.env.STRIPE_API_KEY ? [{
             resolve: "@medusajs/payment-stripe",
             id: "stripe",
             options: {
               apiKey: process.env.STRIPE_API_KEY,
             },
-          },
+          }] : []),
+          ...(process.env.WOOSHPAY_ENABLED !== "false" ? [{
+            resolve: "./src/providers/wooshpay-provider",
+            id: "wooshpay",
+            options: {},
+          }] : []),
         ],
       },
-    }] : []),
+    },
     {
       resolve: "@medusajs/medusa/translation",
     },
