@@ -11,6 +11,23 @@ import {
 } from "@/components/ui/table"
 import { useTranslations } from "next-intl"
 
+interface TrackingEvent {
+  status: string
+  description: string
+  location: string | null
+  occurred_at: string
+}
+
+interface TrackingInfo {
+  id: string
+  tracking_number: string
+  carrier: string
+  carrier_name: string
+  status: string
+  tracking_url: string | null
+  events: TrackingEvent[]
+}
+
 interface OrderItem {
   id: string
   title: string
@@ -93,6 +110,38 @@ export default function OrdersPage() {
   const formatDate = (d: string) => new Date(d).toLocaleDateString("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit" })
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
+  const [trackingInfo, setTrackingInfo] = useState<TrackingInfo[]>([])
+  const [trackingLoading, setTrackingLoading] = useState(false)
+
+  const loadTracking = useCallback(async (orderId: string) => {
+    setTrackingLoading(true)
+    try {
+      const token = getToken()
+      const res = await fetch(`/api/account/orders/${orderId}/tracking`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setTrackingInfo(data.tracking || [])
+      }
+    } catch { /* empty */ }
+    setTrackingLoading(false)
+  }, [])
+
+  useEffect(() => {
+    if (detail) loadTracking(detail.id)
+    else setTrackingInfo([])
+  }, [detail, loadTracking])
+
+  const trackingStatusLabel = (s: string) => {
+    const map: Record<string, string> = {
+      pending: t("tracking_pending"), in_transit: t("tracking_in_transit"),
+      out_for_delivery: t("tracking_out_for_delivery"), delivered: t("tracking_delivered"),
+      exception: t("tracking_exception"), expired: t("tracking_expired"),
+    }
+    return map[s] || s
+  }
+
   if (detail) {
     return (
       <div className="space-y-6">
@@ -109,6 +158,51 @@ export default function OrdersPage() {
               <div><span className="text-muted-foreground">{t("logistics_label")}</span>{fulfillmentLabel(detail.fulfillment_status)}</div>
               <div><span className="text-muted-foreground">{t("total_label")}</span>{formatPrice(detail.total, detail.currency_code)}</div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Tracking Information */}
+        <Card className="border-border bg-card">
+          <CardHeader><CardTitle className="text-lg">{t("tracking_title")}</CardTitle></CardHeader>
+          <CardContent>
+            {trackingLoading ? (
+              <div className="h-16 animate-pulse rounded bg-muted" />
+            ) : trackingInfo.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t("tracking_none")}</p>
+            ) : (
+              <div className="space-y-6">
+                {trackingInfo.map((tr) => (
+                  <div key={tr.id} className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{tr.carrier_name}</p>
+                        <p className="text-xs text-muted-foreground">{t("tracking_number_label")}{tr.tracking_number}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline">{trackingStatusLabel(tr.status)}</Badge>
+                        {tr.tracking_url && (
+                          <a href={tr.tracking_url} target="_blank" rel="noopener noreferrer"
+                            className="text-xs text-gold hover:text-gold/80">{t("tracking_track_link")}</a>
+                        )}
+                      </div>
+                    </div>
+                    {tr.events.length > 0 && (
+                      <div className="space-y-2 pl-4 border-l-2 border-border ml-1">
+                        {tr.events.map((evt, idx) => (
+                          <div key={idx} className="text-sm">
+                            <p className="text-foreground">{evt.description}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {evt.location && `${evt.location} · `}
+                              {new Date(evt.occurred_at).toLocaleString()}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 

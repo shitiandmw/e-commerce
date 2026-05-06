@@ -12,8 +12,16 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { AdminOrder } from "@/hooks/use-orders"
-import { AlertTriangle, Ban, CheckCircle, RotateCcw } from "lucide-react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { AdminOrder, useCarriers, useCreateShipment, useCreateTrackingRecord } from "@/hooks/use-orders"
+import { AdminOrderFulfillment } from "@/lib/admin-api"
+import { AlertTriangle, Ban, CheckCircle, RotateCcw, Truck, Package } from "lucide-react"
 import { useTranslations } from "next-intl"
 
 // ---- Cancel Order Dialog ----
@@ -275,6 +283,240 @@ export function RefundDialog({
             disabled={isLoading || !capturedPayment}
           >
             {isLoading ? t("dialogs.refund.processing") : t("dialogs.refund.issueRefund")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// ---- Create Shipment Dialog (mark as shipped + enter tracking) ----
+
+interface CreateShipmentDialogProps {
+  order: AdminOrder | null
+  fulfillment: AdminOrderFulfillment | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+
+export function CreateShipmentDialog({
+  order,
+  fulfillment,
+  open,
+  onOpenChange,
+}: CreateShipmentDialogProps) {
+  const t = useTranslations("orders")
+  const createShipment = useCreateShipment()
+  const createTracking = useCreateTrackingRecord()
+  const { data: carriersData } = useCarriers()
+
+  const [carrier, setCarrier] = React.useState("")
+  const [trackingNumber, setTrackingNumber] = React.useState("")
+  const [trackingUrl, setTrackingUrl] = React.useState("")
+  const [error, setError] = React.useState("")
+
+  const carriers = carriersData?.carriers || []
+
+  React.useEffect(() => {
+    if (open) {
+      setCarrier("")
+      setTrackingNumber("")
+      setTrackingUrl("")
+      setError("")
+    }
+  }, [open])
+
+  React.useEffect(() => {
+    if (carrier && trackingNumber) {
+      const selected = carriers.find((c) => c.id === carrier)
+      if (selected?.trackingUrlTemplate) {
+        setTrackingUrl(
+          selected.trackingUrlTemplate.replace("{number}", encodeURIComponent(trackingNumber))
+        )
+      }
+    }
+  }, [carrier, trackingNumber, carriers])
+
+  const handleSubmit = async () => {
+    if (!order || !fulfillment) return
+    if (!trackingNumber.trim()) {
+      setError(t("dialogs.shipment.trackingRequired"))
+      return
+    }
+    if (!carrier) {
+      setError(t("dialogs.shipment.carrierRequired"))
+      return
+    }
+
+    setError("")
+
+    try {
+      const fulItems = fulfillment.items || []
+      await createShipment.mutateAsync({
+        order_id: order.id,
+        fulfillment_id: fulfillment.id,
+        items: fulItems.map((item: any) => ({
+          id: item.id || item.line_item_id,
+          quantity: item.quantity,
+        })),
+        labels: [{
+          tracking_number: trackingNumber.trim(),
+          tracking_url: trackingUrl.trim() || undefined,
+        }],
+      })
+
+      const selectedCarrier = carriers.find((c) => c.id === carrier)
+      await createTracking.mutateAsync({
+        fulfillment_id: fulfillment.id,
+        tracking_number: trackingNumber.trim(),
+        carrier: carrier,
+        carrier_name: selectedCarrier?.name || carrier,
+        tracking_url: trackingUrl.trim() || undefined,
+      })
+
+      onOpenChange(false)
+    } catch (err: any) {
+      setError(err.message || t("dialogs.shipment.error"))
+    }
+  }
+
+  const isLoading = createShipment.isPending || createTracking.isPending
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent onClose={() => onOpenChange(false)}>
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Truck className="h-5 w-5 text-blue-600" />
+            {t("dialogs.shipment.title")}
+          </DialogTitle>
+          <DialogDescription>
+            {t("dialogs.shipment.description")}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-2">
+          <div className="space-y-2">
+            <Label>{t("dialogs.shipment.carrier")}</Label>
+            <Select value={carrier} onValueChange={setCarrier}>
+              <SelectTrigger>
+                <SelectValue placeholder={t("dialogs.shipment.selectCarrier")} />
+              </SelectTrigger>
+              <SelectContent>
+                {carriers.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="tracking-number">{t("dialogs.shipment.trackingNumber")}</Label>
+            <Input
+              id="tracking-number"
+              value={trackingNumber}
+              onChange={(e) => {
+                setTrackingNumber(e.target.value)
+                setError("")
+              }}
+              placeholder={t("dialogs.shipment.trackingPlaceholder")}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="tracking-url">{t("dialogs.shipment.trackingUrl")}</Label>
+            <Input
+              id="tracking-url"
+              value={trackingUrl}
+              onChange={(e) => setTrackingUrl(e.target.value)}
+              placeholder={t("dialogs.shipment.urlPlaceholder")}
+            />
+            <p className="text-xs text-muted-foreground">
+              {t("dialogs.shipment.urlAutoGenerated")}
+            </p>
+          </div>
+
+          {error && <p className="text-sm text-destructive">{error}</p>}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
+            {t("dialogs.shipment.cancel")}
+          </Button>
+          <Button onClick={handleSubmit} disabled={isLoading}>
+            {isLoading ? t("dialogs.shipment.processing") : t("dialogs.shipment.confirmShipment")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// ---- Fulfill Order Dialog ----
+
+interface FulfillOrderDialogProps {
+  order: AdminOrder | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onConfirm: () => Promise<void>
+  isLoading: boolean
+}
+
+export function FulfillOrderDialog({
+  order,
+  open,
+  onOpenChange,
+  onConfirm,
+  isLoading,
+}: FulfillOrderDialogProps) {
+  const t = useTranslations("orders")
+
+  const unfulfilledItems = React.useMemo(() => {
+    if (!order?.items) return []
+    return order.items.filter((item) => item.quantity > 0)
+  }, [order])
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent onClose={() => onOpenChange(false)}>
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Package className="h-5 w-5 text-green-600" />
+            {t("dialogs.fulfill.title")}
+          </DialogTitle>
+          <DialogDescription>
+            {t("dialogs.fulfill.description", { id: String(order?.display_id) })}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-3 py-2">
+          <p className="text-sm font-medium">{t("dialogs.fulfill.itemsToFulfill")}</p>
+          {unfulfilledItems.map((item) => (
+            <div key={item.id} className="flex items-center justify-between rounded-md border p-3 text-sm">
+              <div className="flex items-center gap-3">
+                {item.thumbnail && (
+                  <img src={item.thumbnail} alt={item.title} className="h-10 w-10 rounded object-cover" />
+                )}
+                <div>
+                  <p className="font-medium">{item.product_title || item.title}</p>
+                  {item.variant_title && (
+                    <p className="text-xs text-muted-foreground">{item.variant_title}</p>
+                  )}
+                </div>
+              </div>
+              <span className="text-muted-foreground">x{item.quantity}</span>
+            </div>
+          ))}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
+            {t("dialogs.fulfill.cancel")}
+          </Button>
+          <Button onClick={onConfirm} disabled={isLoading || unfulfilledItems.length === 0}>
+            {isLoading ? t("dialogs.fulfill.processing") : t("dialogs.fulfill.confirmFulfill")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -8,8 +8,11 @@ import {
   useCancelOrder,
   useCompleteOrder,
   useCreateRefund,
+  useCreateFulfillment,
+  useTrackingRecords,
   AdminOrder,
 } from "@/hooks/use-orders"
+import { useStockLocations } from "@/hooks/use-shipping"
 import {
   getOrderStatusBadge,
   getPaymentStatusBadge,
@@ -19,7 +22,10 @@ import {
   CancelOrderDialog,
   CompleteOrderDialog,
   RefundDialog,
+  FulfillOrderDialog,
+  CreateShipmentDialog,
 } from "./order-actions"
+import { AdminOrderFulfillment } from "@/lib/admin-api"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -74,12 +80,25 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
   const cancelOrder = useCancelOrder()
   const completeOrder = useCompleteOrder()
   const createRefund = useCreateRefund()
+  const createFulfillment = useCreateFulfillment()
+  const { data: stockLocationsData } = useStockLocations()
 
   const [showCancelDialog, setShowCancelDialog] = React.useState(false)
   const [showCompleteDialog, setShowCompleteDialog] = React.useState(false)
   const [showRefundDialog, setShowRefundDialog] = React.useState(false)
+  const [showFulfillDialog, setShowFulfillDialog] = React.useState(false)
+  const [showShipmentDialog, setShowShipmentDialog] = React.useState(false)
+  const [selectedFulfillment, setSelectedFulfillment] = React.useState<AdminOrderFulfillment | null>(null)
 
   const order = data?.order
+
+  const fulfillmentIds = React.useMemo(
+    () => (order?.fulfillments || []).map((f) => f.id),
+    [order?.fulfillments]
+  )
+  const { data: trackingData } = useTrackingRecords(
+    fulfillmentIds.length > 0 ? fulfillmentIds : undefined
+  )
 
   const handleCancel = async () => {
     try {
@@ -162,6 +181,41 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
   const canCancel = order.status !== "canceled" && order.status !== "completed"
   const canComplete = order.status !== "canceled" && order.status !== "completed"
   const canRefund = order.status !== "canceled"
+  const canFulfill = order.status !== "canceled" &&
+    order.fulfillment_status !== "fulfilled" &&
+    order.fulfillment_status !== "delivered"
+
+  const handleFulfill = async () => {
+    if (!order?.items) return
+    const locations = stockLocationsData?.stock_locations
+    const locationId = locations?.[0]?.id
+    if (!locationId) return
+
+    try {
+      await createFulfillment.mutateAsync({
+        order_id: order.id,
+        location_id: locationId,
+        items: order.items.map((item) => ({
+          title: item.product_title || item.title,
+          quantity: item.quantity,
+          line_item_id: item.id,
+          inventory_item_id: item.id,
+        })),
+      })
+      setShowFulfillDialog(false)
+    } catch {
+      // Error handled by mutation
+    }
+  }
+
+  const handleOpenShipment = (ful: AdminOrderFulfillment) => {
+    setSelectedFulfillment(ful)
+    setShowShipmentDialog(true)
+  }
+
+  const trackingRecords = trackingData?.tracking_records || []
+  const getTrackingForFulfillment = (fulId: string) =>
+    trackingRecords.filter((r) => r.fulfillment_id === fulId)
 
   return (
     <div className="space-y-8">
@@ -188,6 +242,15 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           </div>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
+          {canFulfill && (
+            <Button
+              variant="outline"
+              onClick={() => setShowFulfillDialog(true)}
+            >
+              <Package className="mr-2 h-4 w-4" />
+              {t("detail.fulfill")}
+            </Button>
+          )}
           {canComplete && (
             <Button
               variant="outline"
@@ -411,6 +474,17 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                         </p>
                       )}
                     </div>
+                    {/* Ship button for unfulfilled shipments */}
+                    {!ful.shipped_at && !ful.canceled_at && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleOpenShipment(ful)}
+                      >
+                        <Truck className="mr-1.5 h-3.5 w-3.5" />
+                        {t("detail.fulfillments.markShipped")}
+                      </Button>
+                    )}
                     {/* Tracking */}
                     {ful.labels && ful.labels.length > 0 && (
                       <div className="space-y-1">
@@ -435,6 +509,41 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                         ))}
                       </div>
                     )}
+                    {/* Tracking Timeline */}
+                    {(() => {
+                      const trackingForFul = getTrackingForFulfillment(ful.id)
+                      if (trackingForFul.length === 0) return null
+                      return trackingForFul.map((tr) => (
+                        <div key={tr.id} className="space-y-2 border-t pt-2 mt-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-medium">
+                              {tr.carrier_name} · {tr.tracking_number}
+                            </span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted capitalize">
+                              {tr.status.replace(/_/g, " ")}
+                            </span>
+                          </div>
+                          {tr.events && tr.events.length > 0 && (
+                            <div className="space-y-1.5 pl-3 border-l-2 border-muted ml-1">
+                              {tr.events.slice(0, 5).map((evt) => (
+                                <div key={evt.id} className="text-xs">
+                                  <p className="text-foreground">{evt.description}</p>
+                                  <p className="text-muted-foreground">
+                                    {evt.location && `${evt.location} · `}
+                                    {new Date(evt.occurred_at).toLocaleString()}
+                                  </p>
+                                </div>
+                              ))}
+                              {tr.events.length > 5 && (
+                                <p className="text-xs text-muted-foreground">
+                                  +{tr.events.length - 5} {t("detail.fulfillments.moreEvents")}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    })()}
                     {/* Items */}
                     {ful.items && ful.items.length > 0 && (
                       <div className="text-xs text-muted-foreground">
@@ -788,6 +897,19 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
         onOpenChange={setShowRefundDialog}
         onConfirm={handleRefund}
         isLoading={createRefund.isPending}
+      />
+      <FulfillOrderDialog
+        order={order}
+        open={showFulfillDialog}
+        onOpenChange={setShowFulfillDialog}
+        onConfirm={handleFulfill}
+        isLoading={createFulfillment.isPending}
+      />
+      <CreateShipmentDialog
+        order={order}
+        fulfillment={selectedFulfillment}
+        open={showShipmentDialog}
+        onOpenChange={setShowShipmentDialog}
       />
     </div>
   )

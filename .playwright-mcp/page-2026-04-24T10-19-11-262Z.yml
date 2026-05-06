@@ -1,0 +1,162 @@
+- generic [active] [ref=e1]:
+  - alert [ref=e2]
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - img [ref=e6]
+        - generic [ref=e11]: E-Commerce
+      - navigation [ref=e12]:
+        - generic [ref=e13]:
+          - link "仪表盘" [ref=e14] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e15]
+            - generic [ref=e20]: 仪表盘
+          - button "商品" [ref=e22] [cursor=pointer]:
+            - img [ref=e23]
+            - generic [ref=e27]: 商品
+            - img [ref=e28]
+          - generic [ref=e30]:
+            - button "销售" [ref=e31] [cursor=pointer]:
+              - img [ref=e32]
+              - generic [ref=e36]: 销售
+              - img [ref=e37]
+            - generic [ref=e39]:
+              - link "订单管理" [ref=e40] [cursor=pointer]:
+                - /url: /orders
+                - img [ref=e41]
+                - text: 订单管理
+              - link "客户管理" [ref=e45] [cursor=pointer]:
+                - /url: /customers
+                - img [ref=e46]
+                - text: 客户管理
+              - link "促销活动" [ref=e51] [cursor=pointer]:
+                - /url: /promotions
+                - img [ref=e52]
+                - text: 促销活动
+              - link "物流管理" [ref=e56] [cursor=pointer]:
+                - /url: /shipping
+                - img [ref=e57]
+                - text: 物流管理
+          - button "内容" [ref=e63] [cursor=pointer]:
+            - img [ref=e64]
+            - generic [ref=e67]: 内容
+            - img [ref=e68]
+          - button "站点" [ref=e71] [cursor=pointer]:
+            - img [ref=e72]
+            - generic [ref=e75]: 站点
+            - img [ref=e76]
+          - link "客服" [ref=e78] [cursor=pointer]:
+            - /url: /chat
+            - img [ref=e79]
+            - generic [ref=e81]: 客服
+          - link "数据报表" [ref=e82] [cursor=pointer]:
+            - /url: /analytics
+            - img [ref=e83]
+            - generic [ref=e85]: 数据报表
+          - link "系统设置" [ref=e86] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e87]
+            - generic [ref=e90]: 系统设置
+      - generic [ref=e91]:
+        - button "中文" [ref=e92] [cursor=pointer]:
+          - img [ref=e93]
+          - generic [ref=e96]: 中文
+        - button "退出登录" [ref=e97] [cursor=pointer]:
+          - img [ref=e98]
+          - text: 退出登录
+    - main [ref=e101]:
+      - generic [ref=e102]:
+        - generic [ref=e103]:
+          - heading "订单管理" [level=1] [ref=e104]
+          - paragraph [ref=e105]: 管理客户订单、跟踪物流和处理支付
+        - generic [ref=e106]:
+          - generic [ref=e107]:
+            - generic [ref=e108]:
+              - generic [ref=e110]:
+                - img [ref=e111]
+                - textbox "搜索订单..." [ref=e114]
+              - button "导出" [ref=e115] [cursor=pointer]:
+                - img [ref=e116]
+                - text: 导出
+            - generic [ref=e119]:
+              - button "全部状态" [ref=e121] [cursor=pointer]:
+                - generic [ref=e122]: 全部状态
+                - img [ref=e123]
+              - button "全部支付" [ref=e126] [cursor=pointer]:
+                - generic [ref=e127]: 全部支付
+                - img [ref=e128]
+              - button "全部物流" [ref=e131] [cursor=pointer]:
+                - generic [ref=e132]: 全部物流
+                - img [ref=e133]
+          - table [ref=e137]:
+            - rowgroup [ref=e138]:
+              - row "订单 客户 状态 支付 物流 商品 金额 日期" [ref=e139]:
+                - columnheader "订单" [ref=e140]:
+                  - button "订单" [ref=e141] [cursor=pointer]:
+                    - text: 订单
+                    - img [ref=e142]
+                - columnheader "客户" [ref=e145]
+                - columnheader "状态" [ref=e146]
+                - columnheader "支付" [ref=e147]
+                - columnheader "物流" [ref=e148]
+                - columnheader "商品" [ref=e149]
+                - columnheader "金额" [ref=e150]:
+                  - button "金额" [ref=e151] [cursor=pointer]:
+                    - text: 金额
+                    - img [ref=e152]
+                - columnheader "日期" [ref=e155]:
+                  - button "日期" [ref=e156] [cursor=pointer]:
+                    - text: 日期
+                    - img [ref=e157]
+                - columnheader [ref=e160]
+            - rowgroup [ref=e161]:
+              - row [ref=e162]:
+                - cell [ref=e163]
+                - cell [ref=e165]
+                - cell [ref=e169]
+                - cell [ref=e171]
+                - cell [ref=e173]
+                - cell [ref=e175]
+                - cell [ref=e177]
+                - cell [ref=e179]
+                - cell [ref=e181]
+              - row [ref=e183]:
+                - cell [ref=e184]
+                - cell [ref=e186]
+                - cell [ref=e190]
+                - cell [ref=e192]
+                - cell [ref=e194]
+                - cell [ref=e196]
+                - cell [ref=e198]
+                - cell [ref=e200]
+                - cell [ref=e202]
+              - row [ref=e204]:
+                - cell [ref=e205]
+                - cell [ref=e207]
+                - cell [ref=e211]
+                - cell [ref=e213]
+                - cell [ref=e215]
+                - cell [ref=e217]
+                - cell [ref=e219]
+                - cell [ref=e221]
+                - cell [ref=e223]
+              - row [ref=e225]:
+                - cell [ref=e226]
+                - cell [ref=e228]
+                - cell [ref=e232]
+                - cell [ref=e234]
+                - cell [ref=e236]
+                - cell [ref=e238]
+                - cell [ref=e240]
+                - cell [ref=e242]
+                - cell [ref=e244]
+              - row [ref=e246]:
+                - cell [ref=e247]
+                - cell [ref=e249]
+                - cell [ref=e253]
+                - cell [ref=e255]
+                - cell [ref=e257]
+                - cell [ref=e259]
+                - cell [ref=e261]
+                - cell [ref=e263]
+                - cell [ref=e265]

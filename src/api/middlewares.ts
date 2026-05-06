@@ -76,6 +76,10 @@ import {
 import {
   PostAdminUpdatePaymentSettings,
 } from "./admin/payment-settings/validators"
+import {
+  PostAdminCreateTrackingRecord,
+  PostAdminUpdateTrackingStatus,
+} from "./admin/tracking/validators"
 import { initSocketIO, setContainer } from "../lib/socket-io"
 
 export const GetBrandsSchema = createFindParams().merge(z.object({ q: z.string().optional() }))
@@ -588,6 +592,28 @@ export default defineMiddlewares({
       method: "POST",
       middlewares: [
         validateAndTransformBody(PostAdminUpdateAttributeTemplate),
+      ],
+    },
+    // Tracking routes (admin)
+    {
+      matcher: "/admin/tracking",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminCreateTrackingRecord),
+      ],
+    },
+    {
+      matcher: "/admin/tracking/:id",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminUpdateTrackingStatus),
+      ],
+    },
+    // Store tracking route (customer authentication required)
+    {
+      matcher: "/store/tracking/:orderId",
+      middlewares: [
+        authenticate("customer", ["session", "bearer"]),
       ],
     },
     // Wishlist routes (customer authentication required)

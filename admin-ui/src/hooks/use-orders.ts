@@ -139,6 +139,127 @@ export function useCreateFulfillment() {
 }
 
 /**
+ * Create a shipment for a fulfillment.
+ * POST /admin/orders/:orderId/fulfillment/:fulfillmentId/shipment
+ */
+export function useCreateShipment() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (payload: {
+      order_id: string
+      fulfillment_id: string
+      items: Array<{ id: string; quantity: number }>
+      labels?: Array<{
+        tracking_number?: string
+        tracking_url?: string
+        label_url?: string
+      }>
+    }) => {
+      return adminFetch<{ order: AdminOrder }>(
+        `/admin/orders/${payload.order_id}/fulfillment/${payload.fulfillment_id}/shipment`,
+        {
+          method: "POST",
+          body: {
+            items: payload.items,
+            labels: payload.labels,
+          },
+        }
+      )
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] })
+      queryClient.invalidateQueries({
+        queryKey: ["order", variables.order_id],
+      })
+    },
+  })
+}
+
+/**
+ * Create a tracking record for a fulfillment.
+ * POST /admin/tracking
+ */
+export function useCreateTrackingRecord() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (payload: {
+      fulfillment_id: string
+      tracking_number: string
+      carrier: string
+      carrier_name: string
+      tracking_url?: string
+    }) => {
+      return adminFetch<{ tracking_record: unknown }>("/admin/tracking", {
+        method: "POST",
+        body: payload,
+      })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tracking"] })
+      queryClient.invalidateQueries({ queryKey: ["orders"] })
+    },
+  })
+}
+
+/**
+ * List tracking records, optionally filtered by fulfillment_id
+ */
+export function useTrackingRecords(fulfillmentIds?: string[]) {
+  return useQuery({
+    queryKey: ["tracking", fulfillmentIds],
+    queryFn: async () => {
+      const params = new URLSearchParams()
+      if (fulfillmentIds && fulfillmentIds.length > 0) {
+        fulfillmentIds.forEach((id) => params.append("fulfillment_id", id))
+      }
+      params.set("limit", "100")
+      return adminFetch<{
+        tracking_records: Array<{
+          id: string
+          fulfillment_id: string
+          tracking_number: string
+          carrier: string
+          carrier_name: string
+          status: string
+          tracking_url: string | null
+          last_synced_at: string | null
+          estimated_delivery: string | null
+          events: Array<{
+            id: string
+            status: string
+            description: string
+            location: string | null
+            occurred_at: string
+          }>
+          created_at: string
+        }>
+        count: number
+      }>(`/admin/tracking?${params.toString()}`)
+    },
+    enabled: fulfillmentIds === undefined || fulfillmentIds.length > 0,
+  })
+}
+
+/**
+ * Get available carriers list
+ */
+export function useCarriers() {
+  return useQuery({
+    queryKey: ["carriers"],
+    queryFn: () =>
+      adminFetch<{
+        carriers: Array<{
+          id: string
+          name: string
+          trackingUrlTemplate: string | null
+        }>
+      }>("/admin/tracking/carriers"),
+  })
+}
+
+/**
  * Create a refund for a payment.
  * POST /admin/payments/:id/refund
  */

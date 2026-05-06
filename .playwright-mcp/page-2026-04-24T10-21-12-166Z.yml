@@ -1,0 +1,467 @@
+- generic:
+  - banner:
+    - generic:
+      - generic:
+        - generic:
+          - link:
+            - /url: /zh-CN
+            - generic: SHANGJIA
+            - generic: 上茄
+          - navigation:
+            - generic:
+              - generic:
+                - link:
+                  - /url: /zh-CN/categories/cuban-cigars
+                  - text: 古巴雪茄
+              - generic:
+                - link:
+                  - /url: /zh-CN/brands
+                  - text: 世界品牌
+              - generic:
+                - link:
+                  - /url: /zh-CN/categories/accessories
+                  - text: 雪茄配件
+                  - img
+              - generic:
+                - link:
+                  - /url: /zh-CN/categories/new-arrivals
+                  - text: 新品上市
+              - generic:
+                - link:
+                  - /url: /zh-CN/categories/deals
+                  - text: 特惠专区
+              - generic:
+                - link:
+                  - /url: /zh-CN/articles
+                  - text: 雪茄知识
+                  - img
+          - generic:
+            - button:
+              - img
+              - generic: 切换主题
+            - generic:
+              - button:
+                - img
+                - generic: 简中
+                - img
+            - link:
+              - /url: /zh-CN/search
+              - img
+            - link:
+              - /url: /zh-CN/login
+              - img
+            - link:
+              - /url: /zh-CN/cart
+              - img
+  - main:
+    - region:
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - img
+              - generic:
+                - generic:
+                  - generic:
+                    - paragraph: ShangJia
+                    - heading [level=1]: 探索古巴雪茄的世界
+                    - paragraph: 精选哈瓦那顶级雪茄，品味百年传承
+                    - link:
+                      - /url: /zh-CN/categories/cuban-cigars
+                      - text: 了解更多
+                      - img
+          - generic:
+            - generic:
+              - img
+              - generic:
+                - generic:
+                  - generic:
+                    - paragraph: ShangJia
+                    - heading [level=1]: 世界品牌精选
+                    - paragraph: 来自多米尼加、尼加拉瓜的顶级雪茄
+                    - link:
+                      - /url: /zh-CN/categories/world-brands
+                      - text: 了解更多
+                      - img
+          - generic:
+            - generic:
+              - img
+              - generic:
+                - generic:
+                  - generic:
+                    - paragraph: ShangJia
+                    - heading [level=1]: 新品上市
+                    - paragraph: 最新到货的限量版雪茄，先到先得
+                    - link:
+                      - /url: /zh-CN/categories/new-arrivals
+                      - text: 了解更多
+                      - img
+      - button:
+        - img
+      - button:
+        - img
+      - generic:
+        - button
+        - button
+        - button
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - paragraph: Hot Picks
+            - heading [level=2]: 热销商品
+          - link:
+            - /url: /zh-CN/collection/hot-picks
+            - text: 查看更多 →
+        - generic:
+          - link:
+            - /url: /zh-CN/product/cohiba-siglo-vi
+            - generic:
+              - img
+              - generic:
+                - img
+                - text: HOT
+              - generic:
+                - generic:
+                  - img
+                  - text: 商品详情
+            - generic:
+              - heading [level=3]: Cohiba Siglo VI
+              - generic: $48.00
+          - link:
+            - /url: /zh-CN/product/montecristo-no2
+            - generic:
+              - img
+              - generic:
+                - img
+                - text: HOT
+              - generic:
+                - generic:
+                  - img
+                  - text: 商品详情
+            - generic:
+              - heading [level=3]: Montecristo No.2
+              - generic: $24.00
+          - link:
+            - /url: /zh-CN/product/partagas-serie-d-no4
+            - generic:
+              - img
+              - generic:
+                - img
+                - text: HOT
+              - generic:
+                - generic:
+                  - img
+                  - text: 商品详情
+            - generic:
+              - heading [level=3]: Partagas Serie D No.4
+              - generic: $20.00
+          - link:
+            - /url: /zh-CN/product/ryj-wide-churchill
+            - generic:
+              - img
+              - generic:
+                - img
+                - text: HOT
+              - generic:
+                - generic:
+                  - img
+                  - text: 商品详情
+            - generic:
+              - heading [level=3]: Romeo y Julieta Wide Churchill
+              - generic: $22.00
+    - generic:
+      - generic:
+        - generic:
+          - paragraph: Featured Selection
+          - heading [level=2]: 古巴雪茄焦点推介
+          - paragraph: 精选古巴最顶级的雪茄品牌，每一支都是大师级工艺的结晶
+        - generic:
+          - link:
+            - /url: /zh-CN/product/davidoff-winston-churchill
+            - generic:
+              - img
+              - generic:
+                - heading [level=3]: Davidoff Winston Churchill
+                - generic:
+                  - generic: $35.00
+                  - generic:
+                    - text: 查看更多
+                    - img
+          - link:
+            - /url: /zh-CN/product/padron-1926-no1
+            - generic:
+              - img
+              - generic:
+                - heading [level=3]: Padron 1926 Serie No.1
+                - generic:
+                  - generic: $30.00
+                  - generic:
+                    - text: 查看更多
+                    - img
+          - link:
+            - /url: /zh-CN/product/arturo-fuente-opusx
+            - generic:
+              - img
+              - generic:
+                - heading [level=3]: Arturo Fuente OpusX
+                - generic:
+                  - generic: $38.00
+                  - generic:
+                    - text: 查看更多
+                    - img
+        - generic:
+          - link:
+            - /url: /zh-CN/collection/featured-cuban
+            - text: 浏览全部商品
+            - img
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - paragraph: Limited Edition
+            - heading [level=2]: 限量版
+            - paragraph: 每年仅生产极少数量的珍藏版雪茄，融合了品牌最顶尖的制茄工艺与最珍贵的陈年烟叶。一经售罄，便不再重现。
+            - link:
+              - /url: /zh-CN/collection/limited-editions
+              - text: 查看更多
+              - img
+          - generic:
+            - link:
+              - /url: /zh-CN/product/partagas-serie-d-no4
+              - generic:
+                - img
+                - generic: LIMITED
+                - generic:
+                  - heading [level=3]: Partagas Serie D No.4
+                  - paragraph: $20.00
+            - link:
+              - /url: /zh-CN/product/h-upmann-magnum-46
+              - generic:
+                - img
+                - generic: LIMITED
+                - generic:
+                  - heading [level=3]: H. Upmann Magnum 46
+                  - paragraph: $18.00
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - img
+          - generic:
+            - paragraph: For Beginners
+            - heading [level=2]: 新手入门指南
+            - paragraph: 不知道如何选择第一支雪茄？让我们为您推荐最适合入门的雪茄系列。从轻度到中度，从迷你到标准尺寸，找到属于您的第一支好茄。
+            - list:
+              - listitem:
+                - generic: "1"
+                - text: 专业选茄指南，根据口味偏好推荐
+              - listitem:
+                - generic: "2"
+                - text: 新手友好的轻度至中度雪茄系列
+              - listitem:
+                - generic: "3"
+                - text: 完整的雪茄品鉴教学与搭配建议
+            - generic:
+              - link:
+                - /url: /zh-CN/articles/beginner-first-cigar
+                - text: 阅读指南
+                - img
+              - link:
+                - /url: /zh-CN/category/mini-cigars
+                - text: 入门推荐
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - img
+            - generic:
+              - generic:
+                - paragraph: Brand Story
+                - heading [level=2]: 古巴制茄的百年传承
+                - paragraph: 从Vuelta Abajo的肥沃土壤到哈瓦那的制茄工坊，每一支古巴雪茄都承载着几代人的智慧与热情。了解这些传奇品牌背后的故事，感受真正的古巴灵魂。
+                - generic:
+                  - generic:
+                    - generic: "27"
+                    - generic: 个活跃古巴雪茄品牌
+                  - generic:
+                    - generic: 500+
+                    - generic: 年的烟草种植历史
+                - link:
+                  - /url: /zh-CN/brand-story
+                  - text: 探索品牌故事
+                  - img
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - img
+            - generic:
+              - heading [level=3]: 100% 正品保证
+              - paragraph: 所有产品均由原厂授权渠道直接供货
+          - generic:
+            - generic:
+              - img
+            - generic:
+              - heading [level=3]: 全球免费配送
+              - paragraph: 满 HK$2,000 即享免运费服务
+          - generic:
+            - generic:
+              - img
+            - generic:
+              - heading [level=3]: 会员专属优惠
+              - paragraph: 注册会员享首单 9 折及积分回馈
+          - generic:
+            - generic:
+              - img
+            - generic:
+              - heading [level=3]: 全程邮包追踪
+              - paragraph: 实时追踪您的包裹配送状态
+    - generic:
+      - generic:
+        - generic:
+          - paragraph: Join Us
+          - heading [level=2]: 加入 SHANGJIA
+          - paragraph: 成为会员，享受专属优惠与最新资讯
+          - generic:
+            - link:
+              - /url: /zh-CN/register
+              - text: 免费注册
+              - img
+            - link:
+              - /url: /zh-CN/login
+              - text: 已有账户？ 登录
+  - contentinfo:
+    - generic:
+      - generic:
+        - generic:
+          - link:
+            - /url: /zh-CN
+            - text: SHANGJIA
+            - paragraph: SHANGJIA
+          - paragraph: 您的雪茄网购平台，提供古巴雪茄、非古雪茄、迷你雪茄等顶级品牌的正品保证。
+          - generic:
+            - link:
+              - /url: "#"
+              - img
+            - link:
+              - /url: "#"
+              - img
+            - link:
+              - /url: "#"
+              - img
+        - generic:
+          - generic:
+            - heading [level=3]: 快速連結
+            - list:
+              - listitem:
+                - link:
+                  - /url: /zh-CN
+                  - text: 首頁
+              - listitem:
+                - link:
+                  - /url: /zh-CN/products
+                  - text: 所有商品
+              - listitem:
+                - link:
+                  - /url: /zh-CN/categories/cuban-cigars
+                  - text: 古巴雪茄
+              - listitem:
+                - link:
+                  - /url: /zh-CN/brands
+                  - text: 世界品牌
+              - listitem:
+                - link:
+                  - /url: /zh-CN/categories/new-arrivals
+                  - text: 新品上市
+              - listitem:
+                - link:
+                  - /url: /zh-CN/categories/deals
+                  - text: 特惠專區
+          - generic:
+            - heading [level=3]: 商品分類
+            - list:
+              - listitem:
+                - link:
+                  - /url: /zh-CN/categories/cigars
+                  - text: 雪茄
+              - listitem:
+                - link:
+                  - /url: /zh-CN/categories/mini-cigars
+                  - text: 迷你雪茄
+              - listitem:
+                - link:
+                  - /url: /zh-CN/categories/accessories
+                  - text: 雪茄配件
+              - listitem:
+                - link:
+                  - /url: /zh-CN/categories/humidors
+                  - text: 保濕盒
+              - listitem:
+                - link:
+                  - /url: /zh-CN/categories/lighters
+                  - text: 打火機
+              - listitem:
+                - link:
+                  - /url: /zh-CN/categories/cutters
+                  - text: 雪茄剪
+          - generic:
+            - heading [level=3]: 客戶服務
+            - list:
+              - listitem:
+                - link:
+                  - /url: /zh-CN/contact
+                  - text: 聯繫我們
+              - listitem:
+                - link:
+                  - /url: /zh-CN/faq
+                  - text: 常見問題
+              - listitem:
+                - link:
+                  - /url: /zh-CN/shipping
+                  - text: 配送說明
+              - listitem:
+                - link:
+                  - /url: /zh-CN/returns
+                  - text: 退換貨政策
+              - listitem:
+                - link:
+                  - /url: /zh-CN/privacy
+                  - text: 隱私政策
+          - generic:
+            - heading [level=3]: 關於我們
+            - list:
+              - listitem:
+                - link:
+                  - /url: /zh-CN/about
+                  - text: 品牌故事
+              - listitem:
+                - link:
+                  - /url: /zh-CN/articles
+                  - text: 雪茄知識
+              - listitem:
+                - link:
+                  - /url: /zh-CN/blog
+                  - text: 最新文章
+    - generic:
+      - generic:
+        - generic:
+          - paragraph: © 2026 ShangJia. All rights reserved.
+          - paragraph: 吸烟危害健康。本网站仅供年满18岁人士浏览及购买。雪茄产品图片仅供参考，实际产品可能略有差异。
+  - region "Notifications alt+T"
+  - alert
+  - dialog "您是否已年满18周岁？" [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]: SHANGJIA
+      - heading "您是否已年满18周岁？" [level=2] [ref=e5]
+      - paragraph [ref=e6]: 本网站包含烟草相关内容，仅面向法定吸烟年龄以上的成年人。进入本网站即表示您确认已达到所在地区的法定吸烟年龄。
+    - generic [ref=e7]:
+      - button "是的，进入网站" [active] [ref=e8]
+      - button "我未满 18 岁" [ref=e9]
+    - paragraph [ref=e10]: 吸烟有害健康
+    - generic [ref=e11]:
+      - img [ref=e12]
+      - button "繁體中文" [ref=e15]
+      - button "简体中文" [ref=e16]
+      - button "English" [ref=e17]
