@@ -474,7 +474,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                       <p className="text-sm font-medium">
                         {t("detail.payment.collection")}{" "}
                         <code className="text-xs bg-muted px-1.5 py-0.5 rounded ml-1">
-                          {pc.id.slice(0, 16)}...
+                          {pc.id}
                         </code>
                       </p>
                       <Badge
@@ -590,14 +590,14 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                   <div className="flex items-center gap-2">
                     <Mail className="h-3.5 w-3.5 text-muted-foreground" />
                     <span className="text-muted-foreground truncate">
-                      {order.customer.email || order.email || "-"}
+                      {order.email || order.customer.email || "-"}
                     </span>
                   </div>
-                  {order.customer.phone && (
+                  {(order.customer.phone || order.shipping_address?.phone) && (
                     <div className="flex items-center gap-2">
                       <Phone className="h-3.5 w-3.5 text-muted-foreground" />
                       <span className="text-muted-foreground">
-                        {order.customer.phone}
+                        {order.customer.phone || order.shipping_address?.phone}
                       </span>
                     </div>
                   )}
@@ -618,7 +618,15 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                     {order.email || "-"}
                   </span>
                 </div>
-                <p className="text-muted-foreground italic">{t("detail.customer.guestCheckout")}</p>
+                {order.shipping_address?.phone && (
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-muted-foreground">{order.shipping_address.phone}</span>
+                  </div>
+                )}
+                <p className="text-muted-foreground italic">
+                  {order.customer_id ? t("detail.customer.registered") : t("detail.customer.guestCheckout")}
+                </p>
               </div>
             )}
           </div>
@@ -640,12 +648,25 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
             )}
 
             {(() => {
-              const isPickup = order.shipping_address?.address_1 === "門市自提"
+              const isPickup = order.shipping_address?.address_1 === "Pickup Order"
               if (isPickup) {
                 return (
-                  <div className="flex items-start gap-2 rounded-md bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">
-                    <Package className="h-4 w-4 mt-0.5 shrink-0" />
-                    <p>{t("detail.address.pickupSelected")}</p>
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-2 rounded-md bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">
+                      <Package className="h-4 w-4 mt-0.5 shrink-0" />
+                      <div>
+                        <p>{t("detail.address.pickupSelected")}</p>
+                        {order.shipping_address?.address_2 && (
+                          <p className="mt-0.5 text-amber-700">{order.shipping_address.address_2}</p>
+                        )}
+                      </div>
+                    </div>
+                    {order.shipping_address?.phone && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Phone className="h-3.5 w-3.5 text-muted-foreground" />
+                        <span className="text-muted-foreground">{order.shipping_address.phone}</span>
+                      </div>
+                    )}
                   </div>
                 )
               }
@@ -693,44 +714,6 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                 </div>
               )
             })()}
-          </div>
-
-          {/* Billing Address */}
-          <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <CreditCard className="h-5 w-5" />
-              {t("detail.sections.billingAddress")}
-            </h2>
-
-            {order.billing_address ? (
-              <div className="space-y-2 text-sm">
-                {(order.billing_address.first_name ||
-                  order.billing_address.last_name) && (
-                  <p className="font-medium">
-                    {[
-                      order.billing_address.first_name,
-                      order.billing_address.last_name,
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                  </p>
-                )}
-                {order.billing_address.company && (
-                  <p className="text-muted-foreground">
-                    {order.billing_address.company}
-                  </p>
-                )}
-                {formatAddress(order.billing_address)?.map((line, i) => (
-                  <p key={i} className="text-muted-foreground">
-                    {line}
-                  </p>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground italic">
-                {t("detail.address.sameAsShipping")}
-              </p>
-            )}
           </div>
 
           {/* Order Meta */}

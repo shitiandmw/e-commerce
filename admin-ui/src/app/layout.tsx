@@ -4,6 +4,7 @@ import "./globals.css"
 import { QueryProvider } from "@/lib/query-client"
 import { NextIntlClientProvider } from "next-intl"
 import { getLocale, getMessages } from "next-intl/server"
+import { Toaster } from "sonner"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -25,6 +26,7 @@ export default async function RootLayout({
       <body className={inter.className}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <QueryProvider>{children}</QueryProvider>
+          <Toaster />
         </NextIntlClientProvider>
       </body>
     </html>

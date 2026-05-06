@@ -35,7 +35,7 @@ export function useOrders(params: OrderListParams = {}) {
       if (params.order) query.order = params.order
       // Fields: request expanded relations for the list view
       query.fields =
-        "+items,+customer,+shipping_address,+fulfillments,+payment_collections"
+        "+items,*customer,+email,+shipping_address,+fulfillments,+payment_collections"
 
       // Build the query string manually to support arrays
       const searchParams = new URLSearchParams()
@@ -57,7 +57,7 @@ export function useOrder(id: string) {
     queryKey: ["order", id],
     queryFn: () =>
       adminFetch<{ order: AdminOrder }>(
-        `/admin/orders/${id}?fields=+items,+items.variant,+customer,+shipping_address,+billing_address,+shipping_methods,+fulfillments,+fulfillments.items,+fulfillments.labels,+payment_collections,+payment_collections.payments,+region,+sales_channel`
+        `/admin/orders/${id}?fields=+email,+customer_id,+items,+items.variant,*customer,+shipping_address,+billing_address,+shipping_methods,+fulfillments,+fulfillments.items,+fulfillments.labels,+payment_collections,+payment_collections.payments,+region,+sales_channel`
       ),
     enabled: !!id,
   })

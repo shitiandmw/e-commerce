@@ -350,17 +350,6 @@ export default function CheckoutPage() {
                   />
                 )}
 
-                {/* terms */}
-                <label className="flex items-start gap-3 mt-6 cursor-pointer">
-                  <input type="checkbox" className="mt-0.5 accent-[#c8a96e]" />
-                  <span className="text-xs text-muted-foreground leading-relaxed">
-                    {t("checkout_terms_agree")}
-                    <Link href="/terms" className="text-gold hover:underline mx-0.5">{t("checkout_terms")}</Link>
-                    {t("checkout_and")}
-                    <Link href="/privacy" className="text-gold hover:underline mx-0.5">{t("checkout_privacy")}</Link>
-                    。
-                  </span>
-                </label>
               </div>
             )}
 

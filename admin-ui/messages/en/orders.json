@@ -125,6 +125,7 @@
         "guest": "Guest",
         "registered": "Registered",
         "guestCheckout": "Guest checkout",
+        "checkoutEmail": "Checkout email",
         "viewProfile": "View Customer Profile"
       },
 

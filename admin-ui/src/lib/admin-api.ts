@@ -131,6 +131,7 @@ export interface AdminOrder {
   created_at: string
   updated_at: string
   email?: string | null
+  customer_id?: string | null
   currency_code: string
   total: number
   subtotal: number

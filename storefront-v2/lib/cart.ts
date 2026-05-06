@@ -1,5 +1,7 @@
 "use client"
 
+import { getToken } from "./auth"
+
 const CART_ID_KEY = "medusa_cart_id"
 
 export function getCartId(): string | null {
@@ -90,9 +92,14 @@ export interface PaymentSession {
 const FIELDS = "fields=*items,*items.variant,*items.variant.product"
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+  const token = getToken()
   const res = await fetch(path, {
     ...options,
-    headers: { "Content-Type": "application/json", ...options?.headers },
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options?.headers,
+    },
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))

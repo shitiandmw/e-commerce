@@ -125,6 +125,7 @@
         "guest": "游客",
         "registered": "注册用户",
         "guestCheckout": "游客下单",
+        "checkoutEmail": "下单邮箱",
         "viewProfile": "查看客户资料"
       },
 

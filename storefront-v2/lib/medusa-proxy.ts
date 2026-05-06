@@ -12,6 +12,9 @@ export async function medusaProxy(request: NextRequest, medusaPath: string) {
     "x-publishable-api-key": PUBLISHABLE_KEY,
   }
 
+  const authHeader = request.headers.get("authorization")
+  if (authHeader) headers["authorization"] = authHeader
+
   const opts: RequestInit = { method: request.method, headers }
   if (request.method !== "GET" && request.method !== "HEAD") {
     try {

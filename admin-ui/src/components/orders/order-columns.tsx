@@ -101,9 +101,9 @@ export function getOrderColumns(t: TranslationFn): ColumnDef<AdminOrder>[] {
       cell: ({ row }) => (
         <Link
           href={`/orders/${row.original.id}`}
-          className="font-medium text-primary hover:underline"
+          className="font-medium text-primary hover:underline font-mono text-xs"
         >
-          #{row.original.display_id}
+          {row.original.id.slice(-8).toUpperCase()}
         </Link>
       ),
       size: 100,
