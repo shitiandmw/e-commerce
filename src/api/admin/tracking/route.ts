@@ -6,13 +6,15 @@ import { TRACKING_MODULE } from "../../../modules/tracking"
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const trackingService = req.scope.resolve(TRACKING_MODULE)
 
-  const fulfillmentId = req.query.fulfillment_id as string | undefined
+  const rawIds = req.query.fulfillment_id
+  const fulfillmentIds = Array.isArray(rawIds) ? rawIds : rawIds ? [rawIds as string] : undefined
   const status = req.query.status as string | undefined
   const limit = parseInt(req.query.limit as string) || 20
   const offset = parseInt(req.query.offset as string) || 0
 
   const filters: Record<string, any> = {}
-  if (fulfillmentId) filters.fulfillment_id = fulfillmentId
+  if (fulfillmentIds?.length === 1) filters.fulfillment_id = fulfillmentIds[0]
+  else if (fulfillmentIds?.length) filters.fulfillment_id = { $in: fulfillmentIds }
   if (status) filters.status = status
 
   const [records, count] = await trackingService.listAndCountTrackingRecords(

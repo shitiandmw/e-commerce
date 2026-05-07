@@ -9,6 +9,9 @@ import {
   useCompleteOrder,
   useCreateRefund,
   useCreateFulfillment,
+  useCreateShipment,
+  useCreateTrackingRecord,
+  useCarriers,
   useTrackingRecords,
   AdminOrder,
 } from "@/hooks/use-orders"
@@ -81,6 +84,8 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
   const completeOrder = useCompleteOrder()
   const createRefund = useCreateRefund()
   const createFulfillment = useCreateFulfillment()
+  const createShipment = useCreateShipment()
+  const createTrackingRecord = useCreateTrackingRecord()
   const { data: stockLocationsData } = useStockLocations()
 
   const [showCancelDialog, setShowCancelDialog] = React.useState(false)
@@ -185,27 +190,57 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
     order.fulfillment_status !== "fulfilled" &&
     order.fulfillment_status !== "delivered"
 
-  const handleFulfill = async () => {
+  const handleFulfill = async (params: {
+    carrier: string
+    carrierName: string
+    trackingNumber: string
+    trackingUrl: string
+  }) => {
     if (!order?.items) return
     const locations = stockLocationsData?.stock_locations
     const locationId = locations?.[0]?.id
-    if (!locationId) return
-
-    try {
-      await createFulfillment.mutateAsync({
-        order_id: order.id,
-        location_id: locationId,
-        items: order.items.map((item) => ({
-          title: item.product_title || item.title,
-          quantity: item.quantity,
-          line_item_id: item.id,
-          inventory_item_id: item.id,
-        })),
-      })
-      setShowFulfillDialog(false)
-    } catch {
-      // Error handled by mutation
+    if (!locationId) {
+      alert(t("detail.fulfill.noLocation"))
+      return
     }
+
+    await createFulfillment.mutateAsync({
+      order_id: order.id,
+      location_id: locationId,
+      items: order.items.map((item) => ({
+        id: item.id,
+        quantity: item.quantity,
+      })),
+    })
+
+    const { adminFetch } = await import("@/lib/admin-api")
+    const refreshed = await adminFetch<{ order: AdminOrder }>(
+      `/admin/orders/${order.id}?fields=+fulfillments`
+    )
+    const newFulfillment = refreshed.order?.fulfillments?.slice(-1)[0]
+    if (!newFulfillment) return
+
+    await createShipment.mutateAsync({
+      order_id: order.id,
+      fulfillment_id: newFulfillment.id,
+      labels: [{
+        tracking_number: params.trackingNumber,
+        tracking_url: params.trackingUrl || "",
+        label_url: "",
+      }],
+    })
+
+    if (params.trackingNumber) {
+      await createTrackingRecord.mutateAsync({
+        fulfillment_id: newFulfillment.id,
+        tracking_number: params.trackingNumber,
+        carrier: params.carrier,
+        carrier_name: params.carrierName,
+        tracking_url: params.trackingUrl || undefined,
+      })
+    }
+
+    setShowFulfillDialog(false)
   }
 
   const handleOpenShipment = (ful: AdminOrderFulfillment) => {
@@ -903,7 +938,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
         open={showFulfillDialog}
         onOpenChange={setShowFulfillDialog}
         onConfirm={handleFulfill}
-        isLoading={createFulfillment.isPending}
+        isLoading={createFulfillment.isPending || createShipment.isPending || createTrackingRecord.isPending}
       />
       <CreateShipmentDialog
         order={order}

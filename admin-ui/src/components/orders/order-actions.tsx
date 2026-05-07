@@ -14,12 +14,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
   Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select"
-import { AdminOrder, useCarriers, useCreateShipment, useCreateTrackingRecord } from "@/hooks/use-orders"
+import { AdminOrder, useCarriers, useCreateShipment, useCreateTrackingRecord, useCreateFulfillment } from "@/hooks/use-orders"
 import { AdminOrderFulfillment } from "@/lib/admin-api"
 import { AlertTriangle, Ban, CheckCircle, RotateCcw, Truck, Package } from "lucide-react"
 import { useTranslations } from "next-intl"
@@ -351,17 +347,13 @@ export function CreateShipmentDialog({
     setError("")
 
     try {
-      const fulItems = fulfillment.items || []
       await createShipment.mutateAsync({
         order_id: order.id,
         fulfillment_id: fulfillment.id,
-        items: fulItems.map((item: any) => ({
-          id: item.id || item.line_item_id,
-          quantity: item.quantity,
-        })),
         labels: [{
           tracking_number: trackingNumber.trim(),
-          tracking_url: trackingUrl.trim() || undefined,
+          tracking_url: trackingUrl.trim() || "",
+          label_url: "",
         }],
       })
 
@@ -398,17 +390,16 @@ export function CreateShipmentDialog({
         <div className="space-y-4 py-2">
           <div className="space-y-2">
             <Label>{t("dialogs.shipment.carrier")}</Label>
-            <Select value={carrier} onValueChange={setCarrier}>
-              <SelectTrigger>
-                <SelectValue placeholder={t("dialogs.shipment.selectCarrier")} />
-              </SelectTrigger>
-              <SelectContent>
-                {carriers.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
+            <Select
+              value={carrier}
+              onChange={(e) => setCarrier(e.target.value)}
+            >
+              <option value="">{t("dialogs.shipment.selectCarrier")}</option>
+              {carriers.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
             </Select>
           </div>
 
@@ -460,7 +451,12 @@ interface FulfillOrderDialogProps {
   order: AdminOrder | null
   open: boolean
   onOpenChange: (open: boolean) => void
-  onConfirm: () => Promise<void>
+  onConfirm: (params: {
+    carrier: string
+    carrierName: string
+    trackingNumber: string
+    trackingUrl: string
+  }) => Promise<void>
   isLoading: boolean
 }
 
@@ -472,18 +468,72 @@ export function FulfillOrderDialog({
   isLoading,
 }: FulfillOrderDialogProps) {
   const t = useTranslations("orders")
+  const { data: carriersData } = useCarriers()
+
+  const [carrier, setCarrier] = React.useState("")
+  const [trackingNumber, setTrackingNumber] = React.useState("")
+  const [trackingUrl, setTrackingUrl] = React.useState("")
+  const [error, setError] = React.useState("")
+
+  const carriers = carriersData?.carriers || []
+
+  React.useEffect(() => {
+    if (open) {
+      setCarrier("")
+      setTrackingNumber("")
+      setTrackingUrl("")
+      setError("")
+    }
+  }, [open])
+
+  React.useEffect(() => {
+    if (carrier && trackingNumber) {
+      const selected = carriers.find((c) => c.id === carrier)
+      if (selected?.trackingUrlTemplate) {
+        setTrackingUrl(
+          selected.trackingUrlTemplate.replace("{number}", encodeURIComponent(trackingNumber))
+        )
+      }
+    }
+  }, [carrier, trackingNumber, carriers])
 
   const unfulfilledItems = React.useMemo(() => {
     if (!order?.items) return []
-    return order.items.filter((item) => item.quantity > 0)
+    return order.items.filter((item) => {
+      const fulfilledQty = (item as any).detail?.fulfilled_quantity ?? 0
+      return item.quantity - fulfilledQty > 0
+    })
   }, [order])
+
+  const handleSubmit = async () => {
+    if (!trackingNumber.trim()) {
+      setError(t("dialogs.shipment.trackingRequired"))
+      return
+    }
+    if (!carrier) {
+      setError(t("dialogs.shipment.carrierRequired"))
+      return
+    }
+    setError("")
+    try {
+      const selectedCarrier = carriers.find((c) => c.id === carrier)
+      await onConfirm({
+        carrier,
+        carrierName: selectedCarrier?.name || carrier,
+        trackingNumber: trackingNumber.trim(),
+        trackingUrl: trackingUrl.trim(),
+      })
+    } catch (err: any) {
+      setError(err?.message || t("dialogs.shipment.error"))
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent onClose={() => onOpenChange(false)}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5 text-green-600" />
+            <Truck className="h-5 w-5 text-blue-600" />
             {t("dialogs.fulfill.title")}
           </DialogTitle>
           <DialogDescription>
@@ -491,31 +541,71 @@ export function FulfillOrderDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-3 py-2">
-          <p className="text-sm font-medium">{t("dialogs.fulfill.itemsToFulfill")}</p>
-          {unfulfilledItems.map((item) => (
-            <div key={item.id} className="flex items-center justify-between rounded-md border p-3 text-sm">
-              <div className="flex items-center gap-3">
-                {item.thumbnail && (
-                  <img src={item.thumbnail} alt={item.title} className="h-10 w-10 rounded object-cover" />
-                )}
-                <div>
-                  <p className="font-medium">{item.product_title || item.title}</p>
-                  {item.variant_title && (
-                    <p className="text-xs text-muted-foreground">{item.variant_title}</p>
+        <div className="space-y-4 py-2">
+          <div className="space-y-2">
+            <p className="text-sm font-medium">{t("dialogs.fulfill.itemsToFulfill")}</p>
+            {unfulfilledItems.map((item) => (
+              <div key={item.id} className="flex items-center justify-between rounded-md border p-3 text-sm">
+                <div className="flex items-center gap-3">
+                  {item.thumbnail && (
+                    <img src={item.thumbnail} alt={item.title} className="h-10 w-10 rounded object-cover" />
                   )}
+                  <div>
+                    <p className="font-medium">{item.product_title || item.title}</p>
+                    {item.variant_title && (
+                      <p className="text-xs text-muted-foreground">{item.variant_title}</p>
+                    )}
+                  </div>
                 </div>
+                <span className="text-muted-foreground">x{item.quantity}</span>
               </div>
-              <span className="text-muted-foreground">x{item.quantity}</span>
+            ))}
+          </div>
+
+          <div className="border-t pt-4 space-y-3">
+            <div className="space-y-2">
+              <Label>{t("dialogs.shipment.carrier")}</Label>
+              <Select
+                value={carrier}
+                onChange={(e) => { setCarrier(e.target.value); setError("") }}
+              >
+                <option value="">{t("dialogs.shipment.selectCarrier")}</option>
+                {carriers.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </Select>
             </div>
-          ))}
+
+            <div className="space-y-2">
+              <Label htmlFor="fulfill-tracking">{t("dialogs.shipment.trackingNumber")}</Label>
+              <Input
+                id="fulfill-tracking"
+                value={trackingNumber}
+                onChange={(e) => { setTrackingNumber(e.target.value); setError("") }}
+                placeholder={t("dialogs.shipment.trackingPlaceholder")}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="fulfill-tracking-url">{t("dialogs.shipment.trackingUrl")}</Label>
+              <Input
+                id="fulfill-tracking-url"
+                value={trackingUrl}
+                onChange={(e) => setTrackingUrl(e.target.value)}
+                placeholder={t("dialogs.shipment.urlPlaceholder")}
+              />
+              <p className="text-xs text-muted-foreground">{t("dialogs.shipment.urlAutoGenerated")}</p>
+            </div>
+          </div>
+
+          {error && <p className="text-sm text-destructive">{error}</p>}
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
             {t("dialogs.fulfill.cancel")}
           </Button>
-          <Button onClick={onConfirm} disabled={isLoading || unfulfilledItems.length === 0}>
+          <Button onClick={handleSubmit} disabled={isLoading || unfulfilledItems.length === 0}>
             {isLoading ? t("dialogs.fulfill.processing") : t("dialogs.fulfill.confirmFulfill")}
           </Button>
         </DialogFooter>

@@ -105,7 +105,7 @@ export function useCompleteOrder() {
 
 /**
  * Create a fulfillment for an order.
- * Simplified: we auto-fulfill all unfulfilled items.
+ * POST /admin/orders/:id/fulfillments
  */
 export function useCreateFulfillment() {
   const queryClient = useQueryClient()
@@ -115,19 +115,20 @@ export function useCreateFulfillment() {
       order_id: string
       location_id: string
       items: Array<{
-        title: string
+        id: string
         quantity: number
-        line_item_id: string
-        inventory_item_id: string
       }>
     }) => {
-      return adminFetch<{ fulfillment: unknown }>("/admin/fulfillments", {
-        method: "POST",
-        body: {
-          ...payload,
-          provider_id: "manual_manual", // default manual provider
-        },
-      })
+      return adminFetch<{ order: AdminOrder }>(
+        `/admin/orders/${payload.order_id}/fulfillments`,
+        {
+          method: "POST",
+          body: {
+            location_id: payload.location_id,
+            items: payload.items,
+          },
+        }
+      )
     },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["orders"] })
@@ -140,7 +141,7 @@ export function useCreateFulfillment() {
 
 /**
  * Create a shipment for a fulfillment.
- * POST /admin/orders/:orderId/fulfillment/:fulfillmentId/shipment
+ * POST /admin/fulfillments/:id/shipment
  */
 export function useCreateShipment() {
   const queryClient = useQueryClient()
@@ -149,20 +150,18 @@ export function useCreateShipment() {
     mutationFn: async (payload: {
       order_id: string
       fulfillment_id: string
-      items: Array<{ id: string; quantity: number }>
       labels?: Array<{
         tracking_number?: string
         tracking_url?: string
         label_url?: string
       }>
     }) => {
-      return adminFetch<{ order: AdminOrder }>(
-        `/admin/orders/${payload.order_id}/fulfillment/${payload.fulfillment_id}/shipment`,
+      return adminFetch<{ fulfillment: unknown }>(
+        `/admin/fulfillments/${payload.fulfillment_id}/shipment`,
         {
           method: "POST",
           body: {
-            items: payload.items,
-            labels: payload.labels,
+            labels: payload.labels ?? [],
           },
         }
       )
