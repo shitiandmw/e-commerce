@@ -44,3 +44,6 @@ test-snap/
 admin-ui/.next/
 admin-ui/node_modules/
 admin-ui/.env.local
+
+
+TASK_DONE.md
