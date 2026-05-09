@@ -42,10 +42,15 @@ type WooShPaySessionData = {
   raw?: unknown
 }
 
+type WooShPayRequestOptions = {
+  idempotencyKey?: string
+}
+
 const BASE_URL_TEST = "https://apitest.wooshpay.com"
 const BASE_URL_PROD = "https://api.wooshpay.com"
 const PROVIDER_ID = "pp_wooshpay_wooshpay"
 const CACHE_TTL = 60_000
+const IDEMPOTENCY_KEY_MAX_LENGTH = 255
 
 class WooShPayPaymentProvider extends AbstractPaymentProvider {
   static identifier = "wooshpay"
@@ -77,7 +82,12 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
     }
   }
 
-  private async request(path: string, method: string, body?: Record<string, unknown>): Promise<WooShPayObject> {
+  private async request(
+    path: string,
+    method: string,
+    body?: Record<string, unknown>,
+    options: WooShPayRequestOptions = {}
+  ): Promise<WooShPayObject> {
     const config = await this.getConfig()
     if (!config.api_key) {
       throw new Error("WooShPay API key is not configured for provider pp_wooshpay_wooshpay")
@@ -85,14 +95,19 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
 
     const baseUrl = this.getBaseUrl(config.sandbox_mode ?? true)
     const auth = Buffer.from(`${config.api_key}:`).toString("base64")
+    const headers: Record<string, string> = {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "Authorization": `Basic ${auth}`,
+    }
+
+    if (method.toUpperCase() === "POST" && options.idempotencyKey) {
+      headers["Idempotency-Key"] = options.idempotencyKey
+    }
 
     const res = await fetch(`${baseUrl}${path}`, {
       method,
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-        "Authorization": `Basic ${auth}`,
-      },
+      headers,
       body: body ? JSON.stringify(body) : undefined,
     })
 
@@ -138,6 +153,49 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
     ]
 
     return candidates.find((value): value is string => typeof value === "string" && value.length > 0)
+  }
+
+  private getStableIdempotencyKey(
+    operation: string,
+    input: { data?: Record<string, unknown>; context?: Record<string, unknown> },
+    ...extraCandidates: unknown[]
+  ): string | undefined {
+    const data = input.data ?? {}
+    const context = input.context ?? {}
+    const raw = data.raw as WooShPayObject | undefined
+    const base = this.firstString(
+      context.idempotency_key,
+      data.idempotency_key,
+      ...extraCandidates,
+      data.refund_id,
+      data.payment_id,
+      data.payment_session_id,
+      data.session_id,
+      data.medusa_payment_session_id,
+      raw?.metadata?.medusa_payment_session_id,
+      raw?.metadata?.session_id
+    )
+
+    if (!base) return undefined
+
+    const key = `medusa-wooshpay-${operation}-${base}`
+    return key.length > IDEMPOTENCY_KEY_MAX_LENGTH
+      ? crypto.createHash("sha256").update(key).digest("hex")
+      : key
+  }
+
+  private getRefundIdempotencyKey(input: RefundPaymentInput): string | undefined {
+    const data = input.data ?? {}
+    const context = input.context ?? {}
+    const refundId = this.firstString(
+      context.idempotency_key,
+      data.idempotency_key,
+      data.refund_id,
+      (data.refund as WooShPayObject | undefined)?.id,
+      data.provider_refund_id
+    )
+
+    return refundId ? this.getStableIdempotencyKey("refund", input, refundId) : undefined
   }
 
   private getReturnUrl(input: InitiatePaymentInput): string {
@@ -199,7 +257,7 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
 
   private toSessionData(checkout: WooShPayObject, fallbackAmount: number, fallbackCurrency: string): WooShPaySessionData {
     const url = this.firstString(checkout.url, checkout.redirect_url)
-    const paymentIntentId = this.firstString(
+    const paymentIntentId = this.firstPaymentIntentId(
       checkout.payment_intent,
       checkout.payment_intent_id,
       checkout.payment_intent?.id
@@ -223,12 +281,33 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
     return values.find((value): value is string => typeof value === "string" && value.length > 0)
   }
 
+  private firstPaymentIntentId(...values: unknown[]): string | undefined {
+    return this.firstString(...values.filter((value) => {
+      return typeof value === "string" && !value.startsWith("cs_")
+    }))
+  }
+
   private getPaymentIntentId(data?: Record<string, unknown>): string {
-    return this.firstString(
+    return this.firstPaymentIntentId(
       data?.payment_intent_id,
       data?.payment_intent,
       (data?.raw as WooShPayObject | undefined)?.payment_intent,
-      (data?.raw as WooShPayObject | undefined)?.payment_intent?.id
+      (data?.raw as WooShPayObject | undefined)?.payment_intent?.id,
+      (data?.raw as WooShPayObject | undefined)?.payment_intent_id
+    ) ?? ""
+  }
+
+  private getRefundPaymentIntentId(data?: Record<string, unknown>): string {
+    const id = this.getPaymentIntentId(data)
+    if (id) return id
+
+    const raw = data?.raw as WooShPayObject | undefined
+    const charges = Array.isArray(raw?.charges?.data) ? raw?.charges?.data : []
+    return this.firstPaymentIntentId(
+      raw?.payment_intent,
+      raw?.payment_intent?.id,
+      ...charges.map((charge) => charge?.payment_intent),
+      ...charges.map((charge) => charge?.payment_intent?.id)
     ) ?? ""
   }
 
@@ -271,10 +350,54 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
     }
   }
 
+  private isTerminalSuccessStatus(data?: Record<string, unknown>): boolean {
+    const raw = data?.raw as WooShPayObject | undefined
+    const status = String(raw?.payment_status ?? raw?.status ?? data?.status ?? "").toLowerCase()
+    return ["succeeded", "paid", "complete", "captured"].includes(status)
+  }
+
+  private isTerminalCancelError(error: unknown): boolean {
+    if (!(error instanceof Error)) return false
+
+    const message = error.message.toLowerCase()
+    return [
+      "already succeeded",
+      "already captured",
+      "already canceled",
+      "already cancelled",
+      "already expired",
+      "\"status\":\"succeeded\"",
+      "\"status\":\"paid\"",
+      "\"status\":\"complete\"",
+      "\"status\":\"captured\"",
+      "\"status\":\"canceled\"",
+      "\"status\":\"cancelled\"",
+      "\"status\":\"expired\"",
+    ].some((token) => message.includes(token))
+  }
+
+  private appendRefundData(data: Record<string, unknown> | undefined, refund: WooShPayObject): Record<string, unknown> {
+    const current = data ?? {}
+    const existingRefunds = Array.isArray(current.refunds) ? current.refunds : []
+
+    return {
+      ...current,
+      refunds: [...existingRefunds, refund],
+      last_refund_id: this.firstString(refund.id),
+      raw_last_refund: refund,
+    }
+  }
+
   async initiatePayment(input: InitiatePaymentInput): Promise<InitiatePaymentOutput> {
     const amount = this.toMinorUnits(input.amount)
     const currency = input.currency_code.toLowerCase()
-    const result = await this.request("/v1/checkout/sessions", "POST", this.buildCheckoutPayload(input))
+    const sessionId = this.extractSessionId(input)
+    const result = await this.request(
+      "/v1/checkout/sessions",
+      "POST",
+      this.buildCheckoutPayload(input),
+      { idempotencyKey: this.getStableIdempotencyKey("checkout", input, sessionId) }
+    )
     const data = this.toSessionData(result, amount, currency)
 
     if (!data.url && !data.redirect_url) {
@@ -300,20 +423,86 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
     const id = this.getPaymentIntentId(input.data)
     if (!id) return { data: input.data }
 
-    const result = await this.request(`/v1/payment_intents/${id}/capture`, "POST")
+    const result = await this.request(
+      `/v1/payment_intents/${id}/capture`,
+      "POST",
+      undefined,
+      { idempotencyKey: this.getStableIdempotencyKey("capture", input, id) }
+    )
     return { data: { ...input.data, raw: result } }
   }
 
   async refundPayment(input: RefundPaymentInput): Promise<RefundPaymentOutput> {
-    return { data: input.data }
+    let paymentIntentId = this.getRefundPaymentIntentId(input.data)
+    let resolvedSession: WooShPayObject | undefined
+    const checkoutSessionId = this.getCheckoutSessionId(input.data)
+
+    if (!paymentIntentId && checkoutSessionId) {
+      resolvedSession = await this.request(`/v1/checkout/sessions/${checkoutSessionId}`, "GET")
+      paymentIntentId = this.getRefundPaymentIntentId({ raw: resolvedSession })
+    }
+
+    const amount = this.toMinorUnits(input.amount)
+
+    if (!paymentIntentId) {
+      throw new Error("WooShPay refund requires a payment_intent_id in provider data or retrievable checkout session")
+    }
+
+    const result = await this.request(
+      "/v1/refunds",
+      "POST",
+      {
+        payment_intent: paymentIntentId,
+        amount,
+      },
+      { idempotencyKey: this.getRefundIdempotencyKey(input) }
+    )
+
+    return {
+      data: this.appendRefundData({
+        ...input.data,
+        payment_intent_id: input.data?.payment_intent_id ?? paymentIntentId,
+        raw: input.data?.raw ?? resolvedSession,
+      }, result),
+    }
   }
 
   async cancelPayment(input: CancelPaymentInput): Promise<CancelPaymentOutput> {
+    if (this.isTerminalSuccessStatus(input.data)) {
+      return { data: input.data }
+    }
+
+    const checkoutSessionId = this.getCheckoutSessionId(input.data)
+    if (checkoutSessionId) {
+      try {
+        const result = await this.request(
+          `/v1/checkout/sessions/${checkoutSessionId}/expire`,
+          "POST",
+          undefined,
+          { idempotencyKey: this.getStableIdempotencyKey("cancel", input, checkoutSessionId) }
+        )
+        return { data: { ...input.data, raw: result } }
+      } catch (error) {
+        if (this.isTerminalCancelError(error)) return { data: input.data }
+        throw error
+      }
+    }
+
     const id = this.getPaymentIntentId(input.data)
     if (!id) return { data: input.data }
 
-    const result = await this.request(`/v1/payment_intents/${id}/cancel`, "POST")
-    return { data: { ...input.data, raw: result } }
+    try {
+      const result = await this.request(
+        `/v1/payment_intents/${id}/cancel`,
+        "POST",
+        { cancellation_reason: "requested_by_customer" },
+        { idempotencyKey: this.getStableIdempotencyKey("cancel", input, id) }
+      )
+      return { data: { ...input.data, raw: result } }
+    } catch (error) {
+      if (this.isTerminalCancelError(error)) return { data: input.data }
+      throw error
+    }
   }
 
   async deletePayment(input: DeletePaymentInput): Promise<DeletePaymentOutput> {
@@ -389,6 +578,16 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
       case "payment_intent.canceled":
       case "payment_intent.cancelled":
         return actionData ? { action: "failed", data: actionData } : { action: "not_supported" }
+      case "checkout.session.expired":
+      case "refund.created":
+      case "refund.succeeded":
+      case "refund.updated":
+      case "refund.failed":
+      case "charge.refunded":
+      case "charge.dispute.created":
+      case "charge.dispute.updated":
+      case "charge.dispute.closed":
+        return actionData ? { action: "not_supported", data: actionData } : { action: "not_supported" }
       default:
         return actionData ? { action: "not_supported", data: actionData } : { action: "not_supported" }
     }
