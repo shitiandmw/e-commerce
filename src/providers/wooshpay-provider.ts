@@ -22,6 +22,7 @@ import {
   WebhookActionResult,
 } from "@medusajs/framework/types"
 import crypto from "crypto"
+import { Pool } from "pg"
 
 type WooShPayConfig = {
   api_key?: string | null
@@ -30,6 +31,11 @@ type WooShPayConfig = {
 }
 
 type WooShPayObject = Record<string, any>
+type PaymentSettingsRow = {
+  api_key?: string | null
+  webhook_secret?: string | null
+  sandbox_mode?: boolean | null
+}
 
 type WooShPaySessionData = {
   id: string
@@ -51,6 +57,7 @@ const BASE_URL_PROD = "https://api.wooshpay.com"
 const PROVIDER_ID = "pp_wooshpay_wooshpay"
 const CACHE_TTL = 60_000
 const IDEMPOTENCY_KEY_MAX_LENGTH = 255
+let paymentSettingsPool: Pool | null = null
 
 class WooShPayPaymentProvider extends AbstractPaymentProvider {
   static identifier = "wooshpay"
@@ -60,26 +67,107 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
     return sandbox ? BASE_URL_TEST : BASE_URL_PROD
   }
 
+  private getContainerValue<T = any>(key: string): T | undefined {
+    try {
+      return (this.container as any)[key] as T
+    } catch {
+      return undefined
+    }
+  }
+
+  private async getConfigFromService(): Promise<WooShPayConfig | null> {
+    const svc = this.getContainerValue("payment_settings")
+    if (!svc?.listPaymentProviderSettings) return null
+
+    const settings = await svc.listPaymentProviderSettings(
+      { provider_id: PROVIDER_ID }
+    )
+
+    return settings[0] ? this.normalizeConfig(settings[0]) : null
+  }
+
+  private async getConfigFromManager(): Promise<WooShPayConfig | null> {
+    const manager = this.getContainerValue("manager")
+    if (!manager?.execute) return null
+
+    const rows = await manager.execute(
+      `
+        SELECT api_key, webhook_secret, sandbox_mode
+        FROM payment_provider_settings
+        WHERE provider_id = ?
+          AND deleted_at IS NULL
+        LIMIT 1
+      `,
+      [PROVIDER_ID]
+    ) as PaymentSettingsRow[]
+
+    return rows?.[0] ? this.normalizeConfig(rows[0]) : null
+  }
+
+  private async getConfigFromDatabaseUrl(): Promise<WooShPayConfig | null> {
+    const databaseUrl = process.env.DATABASE_URL
+    if (!databaseUrl) return null
+
+    if (!paymentSettingsPool) {
+      paymentSettingsPool = new Pool({
+        connectionString: databaseUrl,
+        ssl: false,
+        max: 1,
+      })
+    }
+
+    const result = await paymentSettingsPool.query<PaymentSettingsRow>(
+      `
+        SELECT api_key, webhook_secret, sandbox_mode
+        FROM payment_provider_settings
+        WHERE provider_id = $1
+          AND deleted_at IS NULL
+        LIMIT 1
+      `,
+      [PROVIDER_ID]
+    )
+
+    return result.rows?.[0] ? this.normalizeConfig(result.rows[0]) : null
+  }
+
+  private normalizeConfig(row?: PaymentSettingsRow | null): WooShPayConfig {
+    return {
+      api_key: row?.api_key ?? null,
+      webhook_secret: row?.webhook_secret ?? null,
+      sandbox_mode: row?.sandbox_mode ?? true,
+    }
+  }
+
+  private hasStoredConfig(config: WooShPayConfig): boolean {
+    return Boolean(config.api_key || config.webhook_secret)
+  }
+
   private async getConfig(): Promise<WooShPayConfig> {
     const cacheKey = "wooshpay"
     const cached = this.configCache.get(cacheKey)
     if (cached && Date.now() - cached.ts < CACHE_TTL) return cached.config
 
-    try {
-      const svc = (this.container as any).resolve("payment_settings")
-      const settings = await svc.listPaymentProviderSettings(
-        { provider_id: PROVIDER_ID }
-      )
-      const cfg: WooShPayConfig = {
-        api_key: settings[0]?.api_key ?? null,
-        webhook_secret: settings[0]?.webhook_secret ?? null,
-        sandbox_mode: settings[0]?.sandbox_mode ?? true,
+    const loaders = [
+      () => this.getConfigFromService(),
+      () => this.getConfigFromManager(),
+      () => this.getConfigFromDatabaseUrl(),
+    ]
+
+    for (const load of loaders) {
+      try {
+        const cfg = await load()
+        if (cfg && this.hasStoredConfig(cfg)) {
+          this.configCache.set(cacheKey, { ts: Date.now(), config: cfg })
+          return cfg
+        }
+      } catch {
+        // Try the next runtime config source.
       }
-      this.configCache.set(cacheKey, { ts: Date.now(), config: cfg })
-      return cfg
-    } catch {
-      return { api_key: null, webhook_secret: null, sandbox_mode: true }
     }
+
+    const empty = this.normalizeConfig()
+    this.configCache.set(cacheKey, { ts: Date.now(), config: empty })
+    return empty
   }
 
   private async request(

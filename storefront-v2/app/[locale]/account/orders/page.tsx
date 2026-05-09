@@ -36,6 +36,30 @@ interface OrderItem {
   thumbnail?: string
 }
 
+interface ShippingAddress {
+  first_name?: string | null
+  last_name?: string | null
+  phone?: string | null
+  address_1?: string | null
+  address_2?: string | null
+  city?: string | null
+  province?: string | null
+  postal_code?: string | null
+  country_code?: string | null
+}
+
+interface ShippingMethod {
+  id?: string
+  name?: string | null
+  amount?: number
+  shipping_option_id?: string | null
+  metadata?: { type?: unknown; [key: string]: unknown } | null
+  shipping_option?: {
+    name?: string | null
+    metadata?: { type?: unknown; [key: string]: unknown } | null
+  } | null
+}
+
 interface Order {
   id: string
   display_id: number
@@ -44,10 +68,9 @@ interface Order {
   total: number
   currency_code: string
   items: OrderItem[]
-  shipping_address?: {
-    first_name: string; last_name: string; address_1: string
-    city: string; province?: string; postal_code: string
-  }
+  email?: string | null
+  shipping_address?: ShippingAddress | null
+  shipping_methods?: ShippingMethod[]
   payment_status?: string
   fulfillment_status?: string
 }
@@ -86,15 +109,62 @@ export default function OrdersPage() {
     }
     return map[s] || s
   }
+  const getPrimaryShippingMethod = (order: Order) => order.shipping_methods?.[0] ?? null
+  const getRawShippingMethodName = (order: Order) => {
+    const method = getPrimaryShippingMethod(order)
+    const pickupName = order.shipping_address?.address_1 === "Pickup Order"
+      ? order.shipping_address?.address_2
+      : ""
+    return method?.name || method?.shipping_option?.name || pickupName || ""
+  }
+  const getShippingMethodName = (order: Order) => getRawShippingMethodName(order) || t("no_shipping_method")
+  const isPickupOrder = (order: Order) => {
+    const method = getPrimaryShippingMethod(order)
+    const metadataType = method?.metadata?.type ?? method?.shipping_option?.metadata?.type
+    const methodName = getRawShippingMethodName(order).toLowerCase()
+    return String(metadataType || "").toLowerCase() === "pickup"
+      || order.shipping_address?.address_1 === "Pickup Order"
+      || methodName.includes("pickup")
+      || methodName.includes("pick-up")
+      || methodName.includes("self-pick")
+      || methodName.includes("自提")
+      || methodName.includes("自取")
+  }
+  const deliveryTypeLabel = (order: Order) => (
+    isPickupOrder(order) ? t("delivery_type_pickup") : t("delivery_type_shipping")
+  )
+  const hasSpecificShippingMethod = (order: Order) => {
+    const methodName = getRawShippingMethodName(order).trim().toLowerCase()
+    if (!methodName) return false
+
+    const genericNames = isPickupOrder(order)
+      ? ["pickup", "pick-up", "self-pick", "自提", "自取"]
+      : ["shipping", "delivery", "物流配送", "配送"]
+
+    return !genericNames.some((name) => methodName === name)
+  }
+  const getContactName = (order: Order) => {
+    const firstName = order.shipping_address?.first_name?.trim()
+    const lastName = order.shipping_address?.last_name?.trim()
+    return [lastName, firstName].filter(Boolean).join(" ") || "-"
+  }
+  const getContactPhone = (order: Order) => order.shipping_address?.phone?.trim() || ""
+  const formatAddressLines = (address?: ShippingAddress | null) => {
+    if (!address) return []
+    return [
+      [address.address_1, address.address_2].filter(Boolean).join(" "),
+      [address.city, address.province, address.postal_code].filter(Boolean).join(", "),
+      address.country_code,
+    ].filter(Boolean)
+  }
 
   const loadOrders = useCallback(async () => {
     setLoading(true)
     try {
       const token = getToken()
-      const fields = encodeURIComponent("+items,+items.thumbnail,+shipping_address")
       const res = await fetch(
-        `/api/account/orders?limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}&fields=${fields}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        `/api/account/orders?limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`,
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
       )
       if (res.ok) {
         const data = await res.json()
@@ -106,6 +176,20 @@ export default function OrdersPage() {
   }, [page])
 
   useEffect(() => { loadOrders() }, [loadOrders])
+
+  const openDetail = useCallback(async (order: Order) => {
+    setDetail(order)
+    try {
+      const token = getToken()
+      const res = await fetch(`/api/account/orders/${order.id}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+      if (res.ok) {
+        const data = await res.json() as { order?: Order }
+        if (data.order) setDetail(data.order)
+      }
+    } catch { /* empty */ }
+  }, [])
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit" })
   const totalPages = Math.ceil(total / PAGE_SIZE)
@@ -143,6 +227,14 @@ export default function OrdersPage() {
   }
 
   if (detail) {
+    const detailContactName = getContactName(detail)
+    const detailContactPhone = getContactPhone(detail)
+    const detailHasContact = detailContactName !== "-" || Boolean(detail.email) || Boolean(detailContactPhone)
+    const detailIsPickup = isPickupOrder(detail)
+    const detailAddressLines = formatAddressLines(detail.shipping_address)
+    const detailShippingMethodName = getShippingMethodName(detail)
+    const detailHasSpecificShippingMethod = hasSpecificShippingMethod(detail)
+
     return (
       <div className="space-y-6">
         <button onClick={() => setDetail(null)} className="text-sm text-gold hover:text-gold/80">{t("back_to_orders")}</button>
@@ -156,7 +248,58 @@ export default function OrdersPage() {
               <div><span className="text-muted-foreground">{t("status_label")}</span><Badge variant="outline">{statusLabel(detail.status)}</Badge></div>
               <div><span className="text-muted-foreground">{t("payment_label")}</span>{paymentLabel(detail.payment_status)}</div>
               <div><span className="text-muted-foreground">{t("logistics_label")}</span>{fulfillmentLabel(detail.fulfillment_status)}</div>
+              <div><span className="text-muted-foreground">{t("delivery_type_label")}</span><Badge variant="outline">{deliveryTypeLabel(detail)}</Badge></div>
               <div><span className="text-muted-foreground">{t("total_label")}</span>{formatPrice(detail.total, detail.currency_code)}</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border bg-card">
+          <CardHeader><CardTitle className="text-lg">{t("contact_info")}</CardTitle></CardHeader>
+          <CardContent>
+            {detailHasContact ? (
+              <div className="grid gap-2 text-sm sm:grid-cols-2">
+                {detailContactName !== "-" && (
+                  <div><span className="text-muted-foreground">{t("contact_name_label")}</span>{detailContactName}</div>
+                )}
+                {detail.email && (
+                  <div><span className="text-muted-foreground">{t("email_label")}</span>{detail.email}</div>
+                )}
+                {detailContactPhone && (
+                  <div><span className="text-muted-foreground">{t("phone_label")}</span>{detailContactPhone}</div>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">{t("no_contact_info")}</p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="border-border bg-card">
+          <CardHeader><CardTitle className="text-lg">{t("delivery_info")}</CardTitle></CardHeader>
+          <CardContent>
+            <div className="space-y-3 text-sm">
+              <div><span className="text-muted-foreground">{t("delivery_type_label")}</span>{deliveryTypeLabel(detail)}</div>
+              {detailHasSpecificShippingMethod && (
+                <div><span className="text-muted-foreground">{t("shipping_method_label")}</span>{detailShippingMethodName}</div>
+              )}
+              {detailIsPickup ? (
+                <div className="rounded-md border border-gold/20 bg-gold/5 p-3 text-sm text-foreground">
+                  <p>{t("pickup_order_notice")}</p>
+                  {detailHasSpecificShippingMethod && detail.shipping_address?.address_2 && (
+                    <p className="mt-1 text-muted-foreground">{detail.shipping_address.address_2}</p>
+                  )}
+                </div>
+              ) : detail.shipping_address ? (
+                <div>
+                  <p className="mb-1 font-medium text-foreground">{detailContactName}</p>
+                  {detailAddressLines.map((line, index) => (
+                    <p key={index} className="text-muted-foreground">{line}</p>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-muted-foreground">{t("no_shipping_address")}</p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -225,17 +368,6 @@ export default function OrdersPage() {
             </CardContent>
           </Card>
         )}
-
-        {detail.shipping_address && (
-          <Card className="border-border bg-card">
-            <CardHeader><CardTitle className="text-lg">{t("shipping_address")}</CardTitle></CardHeader>
-            <CardContent>
-              <p className="text-sm text-foreground">{detail.shipping_address.last_name} {detail.shipping_address.first_name}</p>
-              <p className="text-sm text-muted-foreground">{detail.shipping_address.address_1}</p>
-              <p className="text-sm text-muted-foreground">{detail.shipping_address.city}{detail.shipping_address.province ? `, ${detail.shipping_address.province}` : ""} {detail.shipping_address.postal_code}</p>
-            </CardContent>
-          </Card>
-        )}
       </div>
     )
   }
@@ -262,6 +394,8 @@ export default function OrdersPage() {
                     <TableHead>{t("order_id_header")}</TableHead>
                     <TableHead>{t("date_header")}</TableHead>
                     <TableHead>{t("status_header")}</TableHead>
+                    <TableHead>{t("delivery_header")}</TableHead>
+                    <TableHead>{t("contact_header")}</TableHead>
                     <TableHead className="text-right">{t("amount_header")}</TableHead>
                     <TableHead className="text-right">{t("action_header")}</TableHead>
                   </TableRow>
@@ -272,9 +406,24 @@ export default function OrdersPage() {
                       <TableCell className="font-medium">#{order.display_id}</TableCell>
                       <TableCell className="text-muted-foreground">{formatDate(order.created_at)}</TableCell>
                       <TableCell><Badge variant="outline">{statusLabel(order.status)}</Badge></TableCell>
+                      <TableCell className="whitespace-normal">
+                        <div className="flex min-w-36 flex-col gap-1">
+                          <Badge variant="outline" className="w-fit">{deliveryTypeLabel(order)}</Badge>
+                          {hasSpecificShippingMethod(order) && (
+                            <span className="text-xs text-muted-foreground">{getShippingMethodName(order)}</span>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="whitespace-normal">
+                        <div className="flex min-w-40 flex-col gap-1 text-xs">
+                          <span className="text-foreground">{getContactName(order)}</span>
+                          {getContactPhone(order) && <span className="text-muted-foreground">{getContactPhone(order)}</span>}
+                          {order.email && <span className="text-muted-foreground">{order.email}</span>}
+                        </div>
+                      </TableCell>
                       <TableCell className="text-right">{formatPrice(order.total, order.currency_code)}</TableCell>
                       <TableCell className="text-right">
-                        <button onClick={() => setDetail(order)} className="text-sm text-gold hover:text-gold/80">{t("view_details")}</button>
+                        <button onClick={() => openDetail(order)} className="text-sm text-gold hover:text-gold/80">{t("view_details")}</button>
                       </TableCell>
                     </TableRow>
                   ))}
