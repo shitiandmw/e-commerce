@@ -2,6 +2,61 @@ import { NextRequest, NextResponse } from "next/server"
 
 const MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
 const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
+const WOOSHPAY_PROVIDER_ID = "pp_wooshpay_wooshpay"
+const SUPPORTED_LOCALES = new Set(["zh-TW", "zh-CN", "en"])
+
+function getRequestOrigin(req: NextRequest): string {
+  const forwardedProto = req.headers.get("x-forwarded-proto")
+  const forwardedHost = req.headers.get("x-forwarded-host")
+  if (forwardedProto && forwardedHost) {
+    return `${forwardedProto}://${forwardedHost}`
+  }
+
+  return req.headers.get("origin") || new URL(req.url).origin
+}
+
+function getLocale(req: NextRequest): string {
+  const referer = req.headers.get("referer")
+  if (referer) {
+    try {
+      const [, locale] = new URL(referer).pathname.split("/")
+      if (SUPPORTED_LOCALES.has(locale)) return locale
+    } catch {
+      // fall through to route prefix fallback
+    }
+  }
+
+  return "zh-TW"
+}
+
+function withWooShPayReturnUrls(
+  req: NextRequest,
+  cartId: string,
+  body: Record<string, unknown>
+): Record<string, unknown> {
+  if (body.provider_id !== WOOSHPAY_PROVIDER_ID) return body
+
+  const data = typeof body.data === "object" && body.data !== null
+    ? { ...(body.data as Record<string, unknown>) }
+    : {}
+  const origin = getRequestOrigin(req)
+  const locale = getLocale(req)
+  const returnUrl = new URL(`/${locale}/checkout/return`, origin)
+  returnUrl.searchParams.set("cart_id", cartId)
+
+  const cancelUrl = new URL(returnUrl.toString())
+  cancelUrl.searchParams.set("status", "cancelled")
+
+  return {
+    ...body,
+    data: {
+      ...data,
+      success_url: typeof data.success_url === "string" ? data.success_url : returnUrl.toString(),
+      return_url: typeof data.return_url === "string" ? data.return_url : returnUrl.toString(),
+      cancel_url: typeof data.cancel_url === "string" ? data.cancel_url : cancelUrl.toString(),
+    },
+  }
+}
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ cartId: string }> }) {
   const { cartId } = await params
@@ -37,7 +92,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ car
     }
 
     // Step 3: Create payment session on the payment collection
-    const body = await req.text().catch(() => "{}")
+    const rawBody = await req.text().catch(() => "{}")
+    const parsedBody = rawBody ? JSON.parse(rawBody) : {}
+    const body = JSON.stringify(withWooShPayReturnUrls(req, cartId, parsedBody))
     const sessionRes = await fetch(
       `${MEDUSA_BACKEND_URL}/store/payment-collections/${paymentCollectionId}/payment-sessions`,
       { method: "POST", headers, body }

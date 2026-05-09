@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl"
 import { ExternalLink, Loader2, Shield } from "lucide-react"
 import { useState } from "react"
+import { getCartId } from "@/lib/cart"
 
 interface WooShPayPaymentProps {
   clientSecret: string | null
@@ -27,6 +28,14 @@ export function WooShPayPayment({ clientSecret, orderId }: WooShPayPaymentProps)
       if (!redirectUrl) {
         throw new Error("No redirect URL from payment provider")
       }
+      sessionStorage.setItem("wooshpay_payment_session", JSON.stringify({
+        checkout_session_id: inner.checkout_session_id,
+        payment_intent_id: inner.payment_intent_id,
+        provider_session_id: inner.id || parsed.id,
+        redirect_url: inner.redirect_url,
+        url: inner.url,
+        cart_id: getCartId(),
+      }))
       window.location.href = redirectUrl
     } catch (e: any) {
       setError(e.message || "Payment redirect failed")

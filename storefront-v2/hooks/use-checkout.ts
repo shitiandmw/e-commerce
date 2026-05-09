@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useCallback, useEffect } from "react"
+import { useLocale } from "next-intl"
 import {
   type CartAddress,
   type ShippingOption,
@@ -77,6 +78,8 @@ const initialForm: CheckoutForm = {
   countryCode: "gb",
 }
 
+const WOOSHPAY_PROVIDER_ID = "pp_wooshpay_wooshpay"
+
 function isPickupOption(option: ShippingOption): boolean {
   if (option.metadata?.type) {
     return option.metadata.type.toLowerCase() === "pickup"
@@ -87,6 +90,7 @@ function isPickupOption(option: ShippingOption): boolean {
 
 export function useCheckout(): UseCheckoutReturn {
   const { cart, initCart } = useCart()
+  const locale = useLocale()
   const [step, setStep] = useState<Step>("shipping")
   const [form, setForm] = useState<CheckoutForm>(initialForm)
   const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([])
@@ -201,7 +205,24 @@ export function useCheckout(): UseCheckoutReturn {
     setError(null)
     setSelectedPaymentMethod(providerId)
     try {
-      const cartWithPayment = await initPaymentSessions(providerId)
+      const paymentData = providerId === WOOSHPAY_PROVIDER_ID && cart?.id && typeof window !== "undefined"
+        ? (() => {
+            const returnUrl = new URL(window.location.href)
+            returnUrl.pathname = `/${locale}/checkout/return`
+            returnUrl.search = ""
+            returnUrl.searchParams.set("cart_id", cart.id)
+
+            const cancelUrl = new URL(returnUrl.toString())
+            cancelUrl.searchParams.set("status", "cancelled")
+
+            return {
+              success_url: returnUrl.toString(),
+              return_url: returnUrl.toString(),
+              cancel_url: cancelUrl.toString(),
+            }
+          })()
+        : undefined
+      const cartWithPayment = await initPaymentSessions(providerId, paymentData)
       const sessions = cartWithPayment.payment_collection?.payment_sessions
       const session = sessions?.find((s) => s.provider_id === providerId)
       const secret = (session?.data?.client_secret as string) ?? null
@@ -214,7 +235,7 @@ export function useCheckout(): UseCheckoutReturn {
     } finally {
       setLoading(false)
     }
-  }, [initCart])
+  }, [cart?.id, initCart, locale])
 
   const submitShipping = useCallback((optionId: string) => {
     setError(null)

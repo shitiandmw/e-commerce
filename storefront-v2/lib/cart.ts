@@ -234,12 +234,15 @@ export async function getPaymentMethods(): Promise<PaymentMethod[]> {
   return data.payment_methods || []
 }
 
-export async function initPaymentSessions(providerId: string): Promise<Cart & { payment_collection?: { payment_sessions?: PaymentSession[] } }> {
+export async function initPaymentSessions(
+  providerId: string,
+  sessionData?: Record<string, unknown>
+): Promise<Cart & { payment_collection?: { payment_sessions?: PaymentSession[] } }> {
   const cartId = getCartId()
   if (!cartId) throw new Error("No cart found")
   const data = await apiFetch<{ cart: Cart & { payment_collection?: { payment_sessions?: PaymentSession[] } } }>(
     `/api/cart/${cartId}/payment-sessions`,
-    { method: "POST", body: JSON.stringify({ provider_id: providerId }) }
+    { method: "POST", body: JSON.stringify({ provider_id: providerId, data: sessionData }) }
   )
   return data.cart
 }

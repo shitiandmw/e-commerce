@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "@/i18n/navigation"
 import { isLoggedIn } from "@/lib/auth"
 
 const PROTECTED_PATHS = ["/checkout", "/account", "/orders"]
+const PUBLIC_PATHS = ["/checkout/return", "/checkout/success"]
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -12,7 +13,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [checked, setChecked] = useState(false)
 
   useEffect(() => {
-    const needsAuth = PROTECTED_PATHS.some((p) => pathname.startsWith(p))
+    const isPublicPath = PUBLIC_PATHS.some((p) => pathname.startsWith(p))
+    const needsAuth = !isPublicPath && PROTECTED_PATHS.some((p) => pathname.startsWith(p))
     if (needsAuth && !isLoggedIn()) {
       router.replace(`/login?redirect=${encodeURIComponent(pathname)}`)
     } else {
