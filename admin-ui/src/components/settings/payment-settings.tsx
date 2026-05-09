@@ -195,6 +195,28 @@ export function PaymentSettings() {
                           />
                         </div>
                       </div>
+
+                      <div className="rounded-md bg-secondary/30 p-3 text-xs text-muted-foreground space-y-2">
+                        <div className="flex items-center gap-2 font-medium text-foreground">
+                          <Globe className="h-3.5 w-3.5 shrink-0" />
+                          <span>{t("paymentConfig.wooshpayWebhookUrl")}</span>
+                        </div>
+                        <div className="space-y-1">
+                          <p>
+                            {t("paymentConfig.wooshpayWebhookDirect")}:{" "}
+                            <code className="font-mono text-foreground break-all">
+                              https://{"<api-domain>"}/hooks/payment/wooshpay_wooshpay
+                            </code>
+                          </p>
+                          <p>
+                            {t("paymentConfig.wooshpayWebhookProxy")}:{" "}
+                            <code className="font-mono text-foreground break-all">
+                              https://{"<storefront-domain>"}/api/webhooks/wooshpay
+                            </code>
+                          </p>
+                        </div>
+                        <p>{t("paymentConfig.wooshpayConfigNote")}</p>
+                      </div>
                     </div>
                   )}
 

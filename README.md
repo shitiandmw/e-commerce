@@ -43,6 +43,7 @@ AUTH_CORS=https://your-admin-domain.com,https://your-store-domain.com
 
 STRIPE_API_KEY=<Stripe 密钥>
 STRIPE_WEBHOOK_SECRET=<Stripe Webhook 密钥>
+WOOSHPAY_ENABLED=true
 
 NEXT_PUBLIC_MEDUSA_BACKEND_URL_ADMIN=https://your-api-domain.com
 NEXT_PUBLIC_MEDUSA_BACKEND_URL_STORE=https://your-api-domain.com
@@ -51,6 +52,7 @@ NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=<Publishable API Key>
 
 注意：
 - 所有生产环境 `docker compose` 命令都应显式带上 `--env-file .env.production`
+- WooshPay 的 API key 和 webhook secret 在 Admin UI 的支付配置中填写；当前 provider 不读取 `WOOSHPAY_API_KEY` 环境变量
 - `POSTGRES_PASSWORD` 只在 PostgreSQL 数据卷首次初始化时生效。卷已存在时修改该值，不会自动同步数据库中的 `medusa` 用户密码；此时需要重置数据卷或手动执行 `ALTER USER`/`\password`
 
 ### 2. 构建并启动服务
@@ -62,6 +64,10 @@ docker compose --env-file .env.production logs -f medusa
 ```
 
 首次启动时 Medusa 容器会自动执行 `db:migrate` 创建数据库表。
+
+### WooshPay 支付设置
+
+保留 `WOOSHPAY_ENABLED=true` 以注册 WooshPay provider。进入 Admin UI -> Payment Configuration，启用 WooshPay，选择 sandbox/prod，填写 API key 和 webhook secret。在 WooshPay dashboard 配置 webhook URL，可使用 `https://<api-domain>/hooks/payment/wooshpay_wooshpay` 或 `https://<storefront-domain>/api/webhooks/wooshpay`。最后在 storefront checkout 确认 WooshPay 支付方式出现。
 
 ### 3. 创建管理员账号（仅首次部署）
 

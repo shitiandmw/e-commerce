@@ -41,9 +41,14 @@ NEXT_PUBLIC_SOCKET_URL=https://api.your-store.com:49001
 STRIPE_API_KEY=sk_live_xxx
 STRIPE_WEBHOOK_SECRET=whsec_xxx
 
+# WooshPay 支付（可选）
+WOOSHPAY_ENABLED=true
+
 # Publishable Key（从 Medusa Admin 获取）
 NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_xxx
 ```
+
+WooshPay 的 API key 和 webhook secret 通过 Admin UI 的 Payment Configuration 写入 runtime payment settings；当前 provider 不读取 `WOOSHPAY_API_KEY` 环境变量。
 
 ### 2. 启动服务
 
@@ -125,6 +130,10 @@ docker compose --env-file .env.production --profile seed up seed
    AI_API_KEY=xxx
    AI_MODEL=gpt-4o-mini
    ```
+
+### WooshPay 支付
+
+生产环境保留 `WOOSHPAY_ENABLED=true` 以注册 WooshPay provider。进入 Admin UI -> Payment Configuration，启用 WooshPay，选择 sandbox/prod，填写 API key 和 webhook secret。在 WooshPay dashboard 配置 webhook URL，可使用 Direct Medusa endpoint `https://<api-domain>/hooks/payment/wooshpay_wooshpay`，也可使用 Storefront proxy endpoint `https://<storefront-domain>/api/webhooks/wooshpay`。配置完成后，在 storefront checkout 确认 WooshPay 支付方式出现。
 
 ## 常用命令
 
