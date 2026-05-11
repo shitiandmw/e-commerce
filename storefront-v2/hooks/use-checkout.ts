@@ -8,6 +8,7 @@ import {
   type PaymentMethod,
   updateCartAddress,
   getShippingOptions,
+  transferCartToCustomer,
   setShippingMethod as setShippingMethodApi,
   initPaymentSessions,
   completeCart,
@@ -104,23 +105,29 @@ export function useCheckout(): UseCheckoutReturn {
 
   useEffect(() => {
     let cancelled = false
-    setLoading(true)
-    getShippingOptions()
-      .then((options) => {
+    async function loadShippingOptions() {
+      setLoading(true)
+      try {
+        await transferCartToCustomer()
+        if (cancelled) return
+        await initCart()
+        if (cancelled) return
+        const options = await getShippingOptions()
         if (cancelled) return
         setShippingOptions(options)
         setSelectedShippingId((prev) => (
           prev && options.some((option) => option.id === prev) ? prev : null
         ))
-      })
-      .catch(() => {
+      } catch {
         if (!cancelled) setShippingOptions([])
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) setLoading(false)
-      })
+      }
+    }
+
+    loadShippingOptions()
     return () => { cancelled = true }
-  }, [])
+  }, [initCart])
 
   useEffect(() => {
     if (selectedShippingId || !appliedShippingId || shippingOptions.length === 0) return

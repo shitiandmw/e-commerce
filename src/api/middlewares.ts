@@ -1,5 +1,8 @@
 import {
   defineMiddlewares,
+  MedusaNextFunction,
+  MedusaRequest,
+  MedusaResponse,
   validateAndTransformBody,
   validateAndTransformQuery,
   authenticate,
@@ -108,6 +111,33 @@ export const GetStoreContentSchema = createFindParams().merge(z.object({
   q: z.string().optional(),
   category: z.string().optional(),
 }))
+
+const verifyStoreOrderOwnership = async (
+  req: MedusaRequest,
+  res: MedusaResponse,
+  next: MedusaNextFunction
+) => {
+  const customerId = (req as any).auth_context?.actor_id
+  if (!customerId) {
+    return res.status(401).json({ message: "Unauthorized" })
+  }
+
+  const { id } = req.params
+  const query = req.scope.resolve("query")
+
+  const { data: orders } = await query.graph({
+    entity: "order",
+    fields: ["id", "customer_id"],
+    filters: { id },
+  })
+
+  const order = orders?.[0] as { customer_id?: string | null } | undefined
+  if (!order || order.customer_id !== customerId) {
+    return res.status(404).json({ message: "Order not found" })
+  }
+
+  return next()
+}
 
 export default defineMiddlewares({
   routes: [
@@ -607,6 +637,15 @@ export default defineMiddlewares({
       method: "POST",
       middlewares: [
         validateAndTransformBody(PostAdminUpdateTrackingStatus),
+      ],
+    },
+    // Store order details must be scoped to the authenticated customer.
+    {
+      matcher: "/store/orders/:id",
+      method: "GET",
+      middlewares: [
+        authenticate("customer", ["session", "bearer"]),
+        verifyStoreOrderOwnership,
       ],
     },
     // Store tracking route (customer authentication required)

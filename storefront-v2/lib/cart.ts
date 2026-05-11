@@ -222,6 +222,19 @@ export async function clearCart(): Promise<Cart> {
   return cart
 }
 
+export async function transferCartToCustomer(): Promise<Cart | null> {
+  const cartId = getCartId()
+  const token = getToken()
+  if (!cartId || !token) return null
+
+  const { cart } = await apiFetch<{ cart: Cart }>(
+    `/api/cart/${cartId}/customer?${FIELDS}`,
+    { method: "POST" }
+  )
+  setCartId(cart.id)
+  return cart
+}
+
 export interface PaymentMethod {
   provider_id: string
   display_name: string | null

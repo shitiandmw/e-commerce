@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { proxyToMedusa } from "@/lib/proxy"
 
 const DETAIL_FIELDS = [
@@ -13,6 +13,10 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ orderId: string }> }
 ) {
+  if (!req.headers.get("authorization")) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+  }
+
   const { orderId } = await params
   const { searchParams } = new URL(req.url)
   const fields = searchParams.get("fields") || DETAIL_FIELDS

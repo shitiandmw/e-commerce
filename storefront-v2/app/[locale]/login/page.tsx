@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Link, useRouter } from "@/i18n/navigation"
 import { useSearchParams } from "next/navigation"
 import { login, isLoggedIn } from "@/lib/auth"
+import { getCartId, transferCartToCustomer } from "@/lib/cart"
 import { useTranslations } from "next-intl"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -41,6 +42,15 @@ export default function LoginPage() {
     setLoading(true)
     try {
       await login(email, password)
+      try {
+        if (getCartId()) {
+          await transferCartToCustomer()
+        }
+      } catch {
+        setServerError(t("checkout_order_failed"))
+        setLoading(false)
+        return
+      }
       router.push(redirect)
     } catch {
       setServerError(t("login_failed"))

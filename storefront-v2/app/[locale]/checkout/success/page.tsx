@@ -20,16 +20,27 @@ export default function CheckoutSuccessPage() {
   const searchParams = useSearchParams()
   const orderId = searchParams.get("order_id")
   const [order, setOrder] = useState<Order | null>(null)
-  const [loading, setLoading] = useState(!!orderId)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (!orderId) return
     const token = getToken()
-    fetch(`/api/account/orders/${orderId}`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    })
-      .then((r) => r.json())
-      .then((data) => setOrder(data.order || null))
+    if (!token) return
+
+    setLoading(true)
+    fetch(
+      `/api/account/orders/${orderId}?fields=${encodeURIComponent("id,display_id,status,total,currency_code")}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
+      .then((r) => {
+        if (!r.ok) return null
+        return r.json()
+      })
+      .then((data) => {
+        if (data) setOrder(data.order || null)
+      })
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [orderId])
