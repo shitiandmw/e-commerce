@@ -5,8 +5,7 @@ import { fetchProducts } from "@/lib/data/products"
 import { getRegion } from "@/lib/region"
 import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
-
-const PAGE_SIZE = 18
+import { BRAND_PAGE_SIZE, loadBrandPageData } from "./load-brand-page-data"
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; handle: string }> }): Promise<Metadata> {
   const { locale, handle } = await params
@@ -28,42 +27,20 @@ export default async function BrandPage({
 }) {
   const { locale, handle } = await params
   const sp = await searchParams
-  const page = Math.max(1, parseInt(String(sp.page ?? "1"), 10))
-  const sort = String(sp.sort ?? "recommended")
-  const offset = (page - 1) * PAGE_SIZE
-
-  let order: string | undefined
-  switch (sort) {
-    case "name": order = "title"; break
-    default: order = undefined
-  }
-
-  const brand = await fetchBrand(handle)
-  if (!brand) notFound()
-
-  const productIds = brand.products?.filter(Boolean).map((p) => p.id) ?? []
-  const region = await getRegion()
-
-  let productsData = { products: [] as Awaited<ReturnType<typeof fetchProducts>>["products"], count: 0, offset: 0, limit: PAGE_SIZE }
-  if (productIds.length > 0) {
-    // Slice IDs for current page, then fetch those products
-    const pageIds = productIds.slice(offset, offset + PAGE_SIZE)
-    if (pageIds.length > 0) {
-      const data = await fetchProducts({ ids: pageIds, limit: PAGE_SIZE, order, locale, region_id: region.id })
-      productsData = { ...data, count: productIds.length }
-    } else {
-      productsData = { products: [], count: productIds.length, offset, limit: PAGE_SIZE }
-    }
-  }
+  const data = await loadBrandPageData(
+    { locale, handle, searchParams: sp },
+    { fetchBrand, fetchProducts, getRegion }
+  )
+  if (!data) notFound()
 
   return (
     <BrandPageContent
-      brand={brand}
-      medusaProducts={productsData.products}
-      totalCount={productsData.count}
-      currentPage={page}
-      pageSize={PAGE_SIZE}
-      currentSort={sort}
+      brand={data.brand}
+      medusaProducts={data.productsData.products}
+      totalCount={data.productsData.count}
+      currentPage={data.page}
+      pageSize={BRAND_PAGE_SIZE}
+      currentSort={data.sort}
     />
   )
 }

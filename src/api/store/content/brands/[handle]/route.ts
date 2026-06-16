@@ -1,9 +1,10 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { getStoreContentLocale } from "../request-locale"
 
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const query = req.scope.resolve("query")
   const { handle } = req.params
-  const locale = (req as any).locale as string | undefined
+  const locale = getStoreContentLocale(req as any)
 
   const { data: brands } = await query.graph(
     {
