@@ -55,7 +55,7 @@ export async function BeginnerSection() {
                 {t("beginner_read_guide")} <ArrowRight className="size-4" />
               </Link>
               <Link
-                href="/category/mini-cigars"
+                href="/collection/beginner-picks"
                 className="inline-flex items-center gap-2 border border-border text-foreground/70 px-6 py-3 text-sm tracking-wide hover:border-gold hover:text-gold transition-colors"
               >
                 {t("beginner_recommendations")}
