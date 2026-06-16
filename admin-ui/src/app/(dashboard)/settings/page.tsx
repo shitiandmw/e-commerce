@@ -8,6 +8,7 @@ import { RegionSettings } from "@/components/settings/region-settings"
 import { SalesChannelSettings } from "@/components/settings/sales-channel-settings"
 import { ShippingOptionsTable } from "@/components/shipping/shipping-options-table"
 import { PaymentSettings } from "@/components/settings/payment-settings"
+import { PickupLocationSettings } from "@/components/settings/pickup-location-settings"
 import { UserSettings } from "@/components/settings/user-settings"
 import { ApiKeySettings } from "@/components/settings/api-key-settings"
 import { TranslationSettings } from "@/components/settings/translation-settings"
@@ -20,9 +21,10 @@ import {
   Users,
   Key,
   Languages,
+  MapPin,
 } from "lucide-react"
 
-const tabIds = ["store", "regions", "channels", "shipping", "payments", "team", "api-keys", "translations"] as const
+const tabIds = ["store", "regions", "channels", "shipping", "pickup-locations", "payments", "team", "api-keys", "translations"] as const
 type TabId = (typeof tabIds)[number]
 
 const tabIcons: Record<TabId, typeof Store> = {
@@ -30,6 +32,7 @@ const tabIcons: Record<TabId, typeof Store> = {
   regions: Globe,
   channels: ShoppingBag,
   shipping: Truck,
+  "pickup-locations": MapPin,
   payments: CreditCard,
   team: Users,
   "api-keys": Key,
@@ -41,6 +44,7 @@ const tabLabelKeys: Record<TabId, string> = {
   regions: "tabs.regions",
   channels: "tabs.channels",
   shipping: "tabs.shipping",
+  "pickup-locations": "tabs.pickupLocations",
   payments: "tabs.payments",
   team: "tabs.team",
   "api-keys": "tabs.apiKeys",
@@ -92,6 +96,7 @@ export default function SettingsPage() {
           {activeTab === "regions" && <RegionSettings />}
           {activeTab === "channels" && <SalesChannelSettings />}
           {activeTab === "shipping" && <ShippingOptionsTable />}
+          {activeTab === "pickup-locations" && <PickupLocationSettings />}
           {activeTab === "payments" && <PaymentSettings />}
           {activeTab === "team" && <UserSettings />}
           {activeTab === "api-keys" && <ApiKeySettings />}

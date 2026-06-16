@@ -80,6 +80,10 @@ import {
   PostAdminUpdatePaymentSettings,
 } from "./admin/payment-settings/validators"
 import {
+  PostAdminCreatePickupLocation,
+  PostAdminUpdatePickupLocation,
+} from "./admin/pickup-locations/validators"
+import {
   PostAdminCreateTrackingRecord,
   PostAdminUpdateTrackingStatus,
 } from "./admin/tracking/validators"
@@ -100,6 +104,7 @@ export const GetArticleCategoriesSchema = createFindParams()
 export const GetCuratedCollectionsSchema = createFindParams()
 export const GetMenusSchema = createFindParams()
 export const GetAttributeTemplatesSchema = createFindParams()
+export const GetPickupLocationsSchema = createFindParams()
 
 export const GetConversationsSchema = createFindParams().merge(z.object({
   q: z.string().optional(),
@@ -752,6 +757,37 @@ export default defineMiddlewares({
       method: "POST",
       middlewares: [
         validateAndTransformBody(PostAdminUpdatePaymentSettings),
+      ],
+    },
+    // Pickup location routes
+    {
+      matcher: "/admin/pickup-locations",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(
+          GetPickupLocationsSchema,
+          {
+            defaults: [
+              "id", "name", "address", "phone", "hours", "note",
+              "sort_order", "is_enabled", "created_at", "updated_at",
+            ],
+            isList: true,
+          }
+        ),
+      ],
+    },
+    {
+      matcher: "/admin/pickup-locations",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminCreatePickupLocation),
+      ],
+    },
+    {
+      matcher: "/admin/pickup-locations/:id",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminUpdatePickupLocation),
       ],
     },
   ],

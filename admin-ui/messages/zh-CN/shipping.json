@@ -29,6 +29,12 @@
         "priceType": "价格类型",
         "flatRate": "固定价格",
         "calculated": "计算价格",
+        "serviceZone": "服务区域 *",
+        "selectServiceZone": "选择服务区域",
+        "currentServiceZone": "当前服务区域（{id}...）",
+        "noServiceZones": "暂无可用服务区域，请先创建服务区域。",
+        "serviceZoneReadonlyHint": "编辑时不能修改服务区域。如需使用其他服务区域，请创建新的配送方案。",
+        "shippingOptionType": "配送方案类型",
         "amount": "金额",
         "currencyCode": "货币代码",
         "shippingProfile": "配送配置文件",
@@ -42,7 +48,8 @@
         "create": "创建",
         "creating": "创建中...",
         "update": "更新",
-        "updating": "更新中..."
+        "updating": "更新中...",
+        "saveFailed": "保存失败，请检查输入后重试。"
       }
     },
 

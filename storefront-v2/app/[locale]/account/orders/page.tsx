@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table"
+import { PickupLocationsCard } from "@/components/checkout/pickup-locations-card"
 import { useTranslations } from "next-intl"
 
 interface TrackingEvent {
@@ -284,11 +285,14 @@ export default function OrdersPage() {
                 <div><span className="text-muted-foreground">{t("shipping_method_label")}</span>{detailShippingMethodName}</div>
               )}
               {detailIsPickup ? (
-                <div className="rounded-md border border-gold/20 bg-gold/5 p-3 text-sm text-foreground">
-                  <p>{t("pickup_order_notice")}</p>
-                  {detailHasSpecificShippingMethod && detail.shipping_address?.address_2 && (
-                    <p className="mt-1 text-muted-foreground">{detail.shipping_address.address_2}</p>
-                  )}
+                <div className="space-y-3">
+                  <div className="rounded-md border border-gold/20 bg-gold/5 p-3 text-sm text-foreground">
+                    <p>{t("pickup_order_notice")}</p>
+                    {detailHasSpecificShippingMethod && detail.shipping_address?.address_2 && (
+                      <p className="mt-1 text-muted-foreground">{detail.shipping_address.address_2}</p>
+                    )}
+                  </div>
+                  <PickupLocationsCard descriptionKey="order_pickup_locations_desc" />
                 </div>
               ) : detail.shipping_address ? (
                 <div>

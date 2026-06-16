@@ -13,6 +13,7 @@
       "regions": "区域",
       "channels": "销售渠道",
       "shipping": "配送",
+      "pickupLocations": "自提点",
       "payments": "支付",
       "team": "团队",
       "apiKeys": "API 密钥",
@@ -120,6 +121,53 @@
       "saving": "保存中...",
       "savedSuccess": "支付配置已成功保存。",
       "saveFailed": "保存支付配置失败"
+    },
+
+    "pickupLocations": {
+      "title": "自提点",
+      "description": "管理结账页选择自提后展示的全站统一自提点列表。",
+      "add": "添加自提点",
+      "empty": "暂无自提点配置。",
+      "errorLoading": "加载自提点失败",
+      "unknownError": "未知错误",
+      "errorOccurred": "发生错误",
+      "createTitle": "创建自提点",
+      "createDescription": "添加一个将在结账页展示的自提地点。",
+      "editTitle": "编辑自提点",
+      "editDescription": "更新自提点信息。",
+      "deleteTitle": "删除自提点",
+      "deleteDescription": "确定要删除 {name} 吗？此操作无法撤销。",
+      "cancel": "取消",
+      "create": "创建",
+      "save": "保存",
+      "saving": "保存中...",
+      "delete": "删除",
+      "deleting": "删除中...",
+      "columns": {
+        "sort": "排序",
+        "name": "名称",
+        "address": "地址",
+        "hours": "营业时间",
+        "phone": "电话",
+        "enabled": "启用",
+        "actions": "操作"
+      },
+      "form": {
+        "name": "名称",
+        "namePlaceholder": "例如：中环自提点",
+        "nameRequired": "请输入名称。",
+        "address": "地址",
+        "addressPlaceholder": "详细自提地址",
+        "addressRequired": "请输入地址。",
+        "phone": "电话",
+        "phonePlaceholder": "联系电话",
+        "hours": "营业时间",
+        "hoursPlaceholder": "例如：周一至周六 11:00-20:00",
+        "note": "备注",
+        "notePlaceholder": "可选的取货说明",
+        "sortOrder": "排序",
+        "enabled": "启用"
+      }
     },
 
     "regionSettings": {

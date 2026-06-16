@@ -22,6 +22,7 @@ import { StripePayment } from "@/components/checkout/stripe-payment"
 import { PaymentMethodSelector } from "@/components/checkout/payment-method-selector"
 import { DirectOrderPayment } from "@/components/checkout/direct-order-payment"
 import { WooShPayPayment } from "@/components/checkout/wooshpay-payment"
+import { PickupLocationsCard } from "@/components/checkout/pickup-locations-card"
 
 /* step definitions */
 const steps: { key: Step; labelKey: string; num: number }[] = [
@@ -207,37 +208,44 @@ export default function CheckoutPage() {
                   )
                 ) : (
                   <div className="flex flex-col gap-3">
-                    {checkout.shippingOptions.map((opt) => (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        onClick={() => checkout.selectShippingOption(opt.id)}
-                        disabled={loading}
-                        className={cn(
-                          "flex items-center justify-between p-4 border transition-colors text-left",
-                          checkout.selectedShippingId === opt.id
-                            ? "border-gold/50 bg-gold/5"
-                            : "border-border/30 hover:border-gold/30"
-                        )}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div
+                    {checkout.shippingOptions.map((opt) => {
+                      const isSelected = checkout.selectedShippingId === opt.id
+                      const isPickup = checkout.isPickupOption(opt)
+
+                      return (
+                        <div key={opt.id} className="space-y-3">
+                          <button
+                            type="button"
+                            onClick={() => checkout.selectShippingOption(opt.id)}
+                            disabled={loading}
                             className={cn(
-                              "size-4 rounded-full border-2 flex items-center justify-center",
-                              checkout.selectedShippingId === opt.id ? "border-gold" : "border-border/50"
+                              "flex w-full items-center justify-between p-4 border transition-colors text-left",
+                              isSelected
+                                ? "border-gold/50 bg-gold/5"
+                                : "border-border/30 hover:border-gold/30"
                             )}
                           >
-                            {checkout.selectedShippingId === opt.id && <div className="size-2 rounded-full bg-gold" />}
-                          </div>
-                          <div>
-                            <p className="text-sm text-foreground">{opt.name}</p>
-                          </div>
+                            <div className="flex items-center gap-3">
+                              <div
+                                className={cn(
+                                  "size-4 rounded-full border-2 flex items-center justify-center",
+                                  isSelected ? "border-gold" : "border-border/50"
+                                )}
+                              >
+                                {isSelected && <div className="size-2 rounded-full bg-gold" />}
+                              </div>
+                              <div>
+                                <p className="text-sm text-foreground">{opt.name}</p>
+                              </div>
+                            </div>
+                            <span className={cn("text-sm font-medium", opt.amount === 0 ? "text-gold" : "text-foreground")}>
+                              {opt.amount === 0 ? t("checkout_free_label") : fmtPrice(opt.amount)}
+                            </span>
+                          </button>
+                          {isSelected && isPickup && <PickupLocationsCard />}
                         </div>
-                        <span className={cn("text-sm font-medium", opt.amount === 0 ? "text-gold" : "text-foreground")}>
-                          {opt.amount === 0 ? t("checkout_free_label") : fmtPrice(opt.amount)}
-                        </span>
-                      </button>
-                    ))}
+                      )
+                    })}
                   </div>
                 )}
 

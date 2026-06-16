@@ -13,6 +13,7 @@
       "regions": "Regions",
       "channels": "Sales Channels",
       "shipping": "Shipping",
+      "pickupLocations": "Pickup Locations",
       "payments": "Payments",
       "team": "Team",
       "apiKeys": "API Keys",
@@ -120,6 +121,53 @@
       "saving": "Saving...",
       "savedSuccess": "Payment configuration saved successfully.",
       "saveFailed": "Failed to save payment configuration"
+    },
+
+    "pickupLocations": {
+      "title": "Pickup Locations",
+      "description": "Manage the global pickup locations shown at checkout when a customer selects pickup.",
+      "add": "Add Location",
+      "empty": "No pickup locations configured yet.",
+      "errorLoading": "Failed to load pickup locations",
+      "unknownError": "Unknown error",
+      "errorOccurred": "An error occurred",
+      "createTitle": "Create Pickup Location",
+      "createDescription": "Add a pickup point customers can see at checkout.",
+      "editTitle": "Edit Pickup Location",
+      "editDescription": "Update pickup point details.",
+      "deleteTitle": "Delete Pickup Location",
+      "deleteDescription": "Are you sure you want to delete {name}? This action cannot be undone.",
+      "cancel": "Cancel",
+      "create": "Create",
+      "save": "Save",
+      "saving": "Saving...",
+      "delete": "Delete",
+      "deleting": "Deleting...",
+      "columns": {
+        "sort": "Sort",
+        "name": "Name",
+        "address": "Address",
+        "hours": "Hours",
+        "phone": "Phone",
+        "enabled": "Enabled",
+        "actions": "Actions"
+      },
+      "form": {
+        "name": "Name",
+        "namePlaceholder": "e.g. Central Pickup Point",
+        "nameRequired": "Name is required.",
+        "address": "Address",
+        "addressPlaceholder": "Detailed pickup address",
+        "addressRequired": "Address is required.",
+        "phone": "Phone",
+        "phonePlaceholder": "Contact phone number",
+        "hours": "Business Hours",
+        "hoursPlaceholder": "e.g. Mon-Sat 11:00-20:00",
+        "note": "Note",
+        "notePlaceholder": "Optional pickup instructions",
+        "sortOrder": "Sort Order",
+        "enabled": "Enabled"
+      }
     },
 
     "regionSettings": {

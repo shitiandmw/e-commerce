@@ -39,6 +39,7 @@ interface UseCheckoutReturn {
   shippingOptions: ShippingOption[]
   selectedShippingId: string | null
   selectShippingOption: (optionId: string) => void
+  isPickupOption: (option: ShippingOption) => boolean
   isPickup: boolean
   clientSecret: string | null
   loading: boolean
@@ -278,7 +279,7 @@ export function useCheckout(): UseCheckoutReturn {
 
   return {
     step, form, setForm, updateField,
-    shippingOptions, selectedShippingId, selectShippingOption, isPickup, clientSecret,
+    shippingOptions, selectedShippingId, selectShippingOption, isPickupOption, isPickup, clientSecret,
     loading, error,
     submitInfo, submitShipping, submitOrder, goBack, fillFromSavedAddress,
     paymentMethods, selectedPaymentMethod, selectPaymentMethod, setSelectedPaymentMethod,

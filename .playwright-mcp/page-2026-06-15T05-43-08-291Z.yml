@@ -1,0 +1,168 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e14]:
+    - generic [ref=e15]:
+      - generic [ref=e16]:
+        - img [ref=e17]
+        - generic [ref=e22]: E-Commerce
+      - navigation [ref=e23]:
+        - generic [ref=e24]:
+          - link "仪表盘" [ref=e25] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e26]
+            - generic [ref=e31]: 仪表盘
+          - button "商品" [ref=e33] [cursor=pointer]:
+            - img [ref=e34]
+            - generic [ref=e38]: 商品
+            - img [ref=e39]
+          - button "销售" [ref=e42] [cursor=pointer]:
+            - img [ref=e43]
+            - generic [ref=e47]: 销售
+            - img [ref=e48]
+          - button "内容" [ref=e51] [cursor=pointer]:
+            - img [ref=e52]
+            - generic [ref=e55]: 内容
+            - img [ref=e56]
+          - button "站点" [ref=e59] [cursor=pointer]:
+            - img [ref=e60]
+            - generic [ref=e63]: 站点
+            - img [ref=e64]
+          - link "客服" [ref=e66] [cursor=pointer]:
+            - /url: /chat
+            - img [ref=e67]
+            - generic [ref=e69]: 客服
+          - link "数据报表" [ref=e70] [cursor=pointer]:
+            - /url: /analytics
+            - img [ref=e71]
+            - generic [ref=e73]: 数据报表
+          - link "系统设置" [ref=e74] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e75]
+            - generic [ref=e78]: 系统设置
+      - generic [ref=e79]:
+        - button "中文" [ref=e80] [cursor=pointer]:
+          - img [ref=e81]
+          - generic [ref=e84]: 中文
+        - button "退出登录" [ref=e85] [cursor=pointer]:
+          - img [ref=e86]
+          - text: 退出登录
+    - main [ref=e89]:
+      - generic [ref=e90]:
+        - generic [ref=e91]:
+          - generic [ref=e92]:
+            - heading "仪表盘" [level=1] [ref=e93]
+            - paragraph [ref=e94]: 店铺运营数据概览
+          - button "刷新" [ref=e95] [cursor=pointer]:
+            - img [ref=e96]
+            - text: 刷新
+        - generic [ref=e101]:
+          - generic [ref=e102]:
+            - generic [ref=e103]:
+              - paragraph [ref=e104]: 总收入
+              - img [ref=e106]
+            - generic [ref=e108]:
+              - paragraph [ref=e109]: $2,886.35
+              - paragraph [ref=e110]: 较上月 -100%
+          - generic [ref=e111]:
+            - generic [ref=e112]:
+              - paragraph [ref=e113]: 订单数
+              - img [ref=e115]
+            - generic [ref=e119]:
+              - paragraph [ref=e120]: "9"
+              - paragraph [ref=e121]: 较上月 -100%
+          - generic [ref=e122]:
+            - generic [ref=e123]:
+              - paragraph [ref=e124]: 客户数
+              - img [ref=e126]
+            - generic [ref=e131]:
+              - paragraph [ref=e132]: "13"
+              - paragraph [ref=e133]: 较上月 +0%
+          - generic [ref=e134]:
+            - generic [ref=e135]:
+              - paragraph [ref=e136]: 商品数
+              - img [ref=e138]
+            - paragraph [ref=e143]: "20"
+        - generic [ref=e144]:
+          - generic [ref=e145]:
+            - heading "销售趋势" [level=2] [ref=e146]
+            - paragraph [ref=e147]: 近 6 个月的收入与订单量
+            - generic [ref=e150]:
+              - img [ref=e151]:
+                - generic [ref=e155]:
+                  - generic [ref=e157]: Feb 2026
+                  - generic [ref=e159]: Apr 2026
+                  - generic [ref=e161]: Jun 2026
+                - generic [ref=e163]:
+                  - generic [ref=e165]: $0
+                  - generic [ref=e167]: $500
+                  - generic [ref=e169]: $1.0k
+                  - generic [ref=e171]: $1.5k
+                  - generic [ref=e173]: $2.0k
+              - list [ref=e181]:
+                - listitem [ref=e182]:
+                  - img [ref=e183]
+                  - text: 收入 ($)
+          - generic [ref=e185]:
+            - heading "订单量" [level=2] [ref=e186]
+            - paragraph [ref=e187]: 每月订单数量
+            - img [ref=e191]:
+              - generic [ref=e195]:
+                - generic [ref=e197]: Feb 2026
+                - generic [ref=e199]: Apr 2026
+                - generic [ref=e201]: Jun 2026
+              - generic [ref=e203]:
+                - generic [ref=e205]: "0"
+                - generic [ref=e207]: "2"
+                - generic [ref=e209]: "4"
+                - generic [ref=e211]: "6"
+                - generic [ref=e213]: "8"
+        - generic [ref=e221]:
+          - generic [ref=e222]:
+            - heading "最近订单" [level=2] [ref=e223]
+            - paragraph [ref=e224]: 店铺最新订单
+          - table [ref=e226]:
+            - rowgroup [ref=e227]:
+              - row "订单 客户 状态 金额 日期" [ref=e228]:
+                - columnheader "订单" [ref=e229]
+                - columnheader "客户" [ref=e230]
+                - columnheader "状态" [ref=e231]
+                - columnheader "金额" [ref=e232]
+                - columnheader "日期" [ref=e233]
+            - rowgroup [ref=e234]:
+              - row "#9 — pending $36.00 about 1 month ago" [ref=e235]:
+                - cell "#9" [ref=e236]
+                - cell "—" [ref=e237]
+                - cell "pending" [ref=e238]:
+                  - generic [ref=e239]: pending
+                - cell "$36.00" [ref=e240]
+                - cell "about 1 month ago" [ref=e241]
+              - row "#8 — pending $18.00 about 1 month ago" [ref=e242]:
+                - cell "#8" [ref=e243]
+                - cell "—" [ref=e244]
+                - cell "pending" [ref=e245]:
+                  - generic [ref=e246]: pending
+                - cell "$18.00" [ref=e247]
+                - cell "about 1 month ago" [ref=e248]
+              - row "#7 — pending $16.00 about 1 month ago" [ref=e249]:
+                - cell "#7" [ref=e250]
+                - cell "—" [ref=e251]
+                - cell "pending" [ref=e252]:
+                  - generic [ref=e253]: pending
+                - cell "$16.00" [ref=e254]
+                - cell "about 1 month ago" [ref=e255]
+              - row "#6 — pending $960.00 about 1 month ago" [ref=e256]:
+                - cell "#6" [ref=e257]
+                - cell "—" [ref=e258]
+                - cell "pending" [ref=e259]:
+                  - generic [ref=e260]: pending
+                - cell "$960.00" [ref=e261]
+                - cell "about 1 month ago" [ref=e262]
+              - row "#5 — pending $440.00 about 2 months ago" [ref=e263]:
+                - cell "#5" [ref=e264]
+                - cell "—" [ref=e265]
+                - cell "pending" [ref=e266]:
+                  - generic [ref=e267]: pending
+                - cell "$440.00" [ref=e268]
+                - cell "about 2 months ago" [ref=e269]
+  - region "Notifications alt+T"
+  - alert [ref=e13]
+  - generic [ref=e270]: "0"

@@ -1,0 +1,241 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e5]:
+      - link "SHANGJIA 上茄" [ref=e6] [cursor=pointer]:
+        - /url: /zh-CN
+        - generic [ref=e7]: SHANGJIA
+        - generic [ref=e8]: 上茄
+      - navigation [ref=e9]:
+        - generic [ref=e10]:
+          - link "古巴雪茄" [ref=e12] [cursor=pointer]:
+            - /url: /zh-CN/categories/cuban-cigars
+          - link "世界品牌" [ref=e14] [cursor=pointer]:
+            - /url: /zh-CN/brands
+          - link "雪茄配件" [ref=e16] [cursor=pointer]:
+            - /url: /zh-CN/categories/accessories
+            - text: 雪茄配件
+            - img [ref=e17]
+          - link "新品上市" [ref=e20] [cursor=pointer]:
+            - /url: /zh-CN/categories/new-arrivals
+          - link "特惠专区" [ref=e22] [cursor=pointer]:
+            - /url: /zh-CN/categories/deals
+          - link "雪茄知识" [ref=e24] [cursor=pointer]:
+            - /url: /zh-CN/articles
+            - text: 雪茄知识
+            - img [ref=e25]
+      - generic [ref=e27]:
+        - button "切换主题" [ref=e28]:
+          - img
+          - generic [ref=e29]: 切换主题
+        - button "語言切換" [ref=e31]:
+          - img [ref=e32]
+          - generic [ref=e35]: 简中
+          - img [ref=e36]
+        - link "搜尋" [ref=e38] [cursor=pointer]:
+          - /url: /zh-CN/search
+          - img [ref=e39]
+        - link "登入" [ref=e42] [cursor=pointer]:
+          - /url: /zh-CN/login
+          - img [ref=e43]
+        - link "購物車" [ref=e46] [cursor=pointer]:
+          - /url: /zh-CN/cart
+          - img [ref=e47]
+  - main [ref=e50]:
+    - generic [ref=e51]:
+      - navigation "breadcrumb" [ref=e52]:
+        - list [ref=e53]:
+          - listitem [ref=e54]:
+            - link "首页" [ref=e55] [cursor=pointer]:
+              - /url: /zh-CN
+          - listitem [ref=e56]:
+            - img [ref=e57]
+          - listitem [ref=e59]: Medusa T-Shirt
+      - generic [ref=e60]:
+        - generic [ref=e61]:
+          - generic [ref=e62]:
+            - generic [ref=e63]:
+              - button "Medusa T-Shirt - 1" [ref=e64]:
+                - img "Medusa T-Shirt - 1" [ref=e65]
+              - button "Medusa T-Shirt - 2" [ref=e66]:
+                - img "Medusa T-Shirt - 2" [ref=e67]
+              - button "Medusa T-Shirt - 3" [ref=e68]:
+                - img "Medusa T-Shirt - 3" [ref=e69]
+              - button "Medusa T-Shirt - 4" [ref=e70]:
+                - img "Medusa T-Shirt - 4" [ref=e71]
+            - img "Medusa T-Shirt" [ref=e73]
+          - generic [ref=e74]:
+            - heading "Medusa T-Shirt" [level=1] [ref=e75]
+            - generic [ref=e78]: 起$0.15
+            - group "商品规格选择" [ref=e79]:
+              - generic [ref=e80]:
+                - paragraph [ref=e81]: Color
+                - generic [ref=e82]:
+                  - button "Black" [ref=e83]
+                  - button "White" [ref=e84]
+              - generic [ref=e85]:
+                - paragraph [ref=e86]: Size
+                - generic [ref=e87]:
+                  - button "S" [ref=e88]
+                  - button "M" [ref=e89]
+                  - button "L" [ref=e90]
+                  - button "XL" [ref=e91]
+            - generic [ref=e92]:
+              - generic [ref=e93]:
+                - generic [ref=e94]: 数量
+                - generic [ref=e95]:
+                  - button "减少数量" [ref=e96]:
+                    - img [ref=e97]
+                  - generic [ref=e98]: "1"
+                  - button "增加数量" [ref=e99]:
+                    - img [ref=e100]
+              - generic [ref=e101]:
+                - button "缺货中" [disabled] [ref=e102]:
+                  - img [ref=e103]
+                  - text: 缺货中
+                - button "加入收藏" [ref=e106]:
+                  - img [ref=e107]
+                - button "分享" [ref=e109]:
+                  - img [ref=e110]
+              - button "立即购买" [disabled] [ref=e116]
+        - generic [ref=e118]:
+          - tablist [ref=e119]:
+            - tab "详细介绍" [selected] [ref=e120]
+          - tabpanel "详细介绍" [ref=e121]:
+            - generic [ref=e122]: Reimagine the feeling of a classic T-shirt. With our cotton T-shirts, everyday essentials no longer have to be ordinary.
+        - generic [ref=e123]:
+          - heading "您可能也喜欢" [level=2] [ref=e124]
+          - generic [ref=e125]:
+            - link "La Gloria Cubana Medaille d'Or No.4 加入收藏 La Gloria Cubana Medaille d'Or No.4 $14.00" [ref=e126] [cursor=pointer]:
+              - /url: /zh-CN/product/lgc-medaille-dor-no4
+              - generic [ref=e127]:
+                - img "La Gloria Cubana Medaille d'Or No.4" [ref=e128]
+                - button "加入收藏" [ref=e129]:
+                  - img [ref=e130]
+              - generic [ref=e132]:
+                - heading "La Gloria Cubana Medaille d'Or No.4" [level=3] [ref=e133]
+                - generic [ref=e135]: $14.00
+            - link "Plasencia Alma Fuerte 加入收藏 Plasencia Alma Fuerte $17.00" [ref=e136] [cursor=pointer]:
+              - /url: /zh-CN/product/plasencia-alma-fuerte
+              - generic [ref=e137]:
+                - img "Plasencia Alma Fuerte" [ref=e138]
+                - button "加入收藏" [ref=e139]:
+                  - img [ref=e140]
+              - generic [ref=e142]:
+                - heading "Plasencia Alma Fuerte" [level=3] [ref=e143]
+                - generic [ref=e145]: $17.00
+            - link "Drew Estate Liga Privada No.9 加入收藏 Drew Estate Liga Privada No.9 $18.00" [ref=e146] [cursor=pointer]:
+              - /url: /zh-CN/product/liga-privada-no9
+              - generic [ref=e147]:
+                - img "Drew Estate Liga Privada No.9" [ref=e148]
+                - button "加入收藏" [ref=e149]:
+                  - img [ref=e150]
+              - generic [ref=e152]:
+                - heading "Drew Estate Liga Privada No.9" [level=3] [ref=e153]
+                - generic [ref=e155]: $18.00
+            - link "Oliva Serie V Melanio 加入收藏 Oliva Serie V Melanio $15.00" [ref=e156] [cursor=pointer]:
+              - /url: /zh-CN/product/oliva-serie-v-melanio
+              - generic [ref=e157]:
+                - img "Oliva Serie V Melanio" [ref=e158]
+                - button "加入收藏" [ref=e159]:
+                  - img [ref=e160]
+              - generic [ref=e162]:
+                - heading "Oliva Serie V Melanio" [level=3] [ref=e163]
+                - generic [ref=e165]: $15.00
+  - contentinfo [ref=e166]:
+    - generic [ref=e168]:
+      - generic [ref=e169]:
+        - link "SHANGJIA SHANGJIA" [ref=e170] [cursor=pointer]:
+          - /url: /zh-CN
+          - text: SHANGJIA
+          - paragraph [ref=e171]: SHANGJIA
+        - paragraph [ref=e172]: 您的雪茄网购平台，提供古巴雪茄、非古雪茄、迷你雪茄等顶级品牌的正品保证。
+        - generic [ref=e173]:
+          - link "Instagram" [ref=e174] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e175]
+          - link "Facebook" [ref=e177] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e178]
+          - link "WhatsApp" [ref=e180] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e181]
+      - generic [ref=e183]:
+        - generic [ref=e184]:
+          - heading "快速連結" [level=3] [ref=e185]
+          - list [ref=e186]:
+            - listitem [ref=e187]:
+              - link "首頁" [ref=e188] [cursor=pointer]:
+                - /url: /zh-CN
+            - listitem [ref=e189]:
+              - link "所有商品" [ref=e190] [cursor=pointer]:
+                - /url: /zh-CN/products
+            - listitem [ref=e191]:
+              - link "古巴雪茄" [ref=e192] [cursor=pointer]:
+                - /url: /zh-CN/categories/cuban-cigars
+            - listitem [ref=e193]:
+              - link "世界品牌" [ref=e194] [cursor=pointer]:
+                - /url: /zh-CN/brands
+            - listitem [ref=e195]:
+              - link "新品上市" [ref=e196] [cursor=pointer]:
+                - /url: /zh-CN/categories/new-arrivals
+            - listitem [ref=e197]:
+              - link "特惠專區" [ref=e198] [cursor=pointer]:
+                - /url: /zh-CN/categories/deals
+        - generic [ref=e199]:
+          - heading "商品分類" [level=3] [ref=e200]
+          - list [ref=e201]:
+            - listitem [ref=e202]:
+              - link "雪茄" [ref=e203] [cursor=pointer]:
+                - /url: /zh-CN/categories/cigars
+            - listitem [ref=e204]:
+              - link "迷你雪茄" [ref=e205] [cursor=pointer]:
+                - /url: /zh-CN/categories/mini-cigars
+            - listitem [ref=e206]:
+              - link "雪茄配件" [ref=e207] [cursor=pointer]:
+                - /url: /zh-CN/categories/accessories
+            - listitem [ref=e208]:
+              - link "保濕盒" [ref=e209] [cursor=pointer]:
+                - /url: /zh-CN/categories/humidors
+            - listitem [ref=e210]:
+              - link "打火機" [ref=e211] [cursor=pointer]:
+                - /url: /zh-CN/categories/lighters
+            - listitem [ref=e212]:
+              - link "雪茄剪" [ref=e213] [cursor=pointer]:
+                - /url: /zh-CN/categories/cutters
+        - generic [ref=e214]:
+          - heading "客戶服務" [level=3] [ref=e215]
+          - list [ref=e216]:
+            - listitem [ref=e217]:
+              - link "聯繫我們" [ref=e218] [cursor=pointer]:
+                - /url: /zh-CN/contact
+            - listitem [ref=e219]:
+              - link "常見問題" [ref=e220] [cursor=pointer]:
+                - /url: /zh-CN/faq
+            - listitem [ref=e221]:
+              - link "配送說明" [ref=e222] [cursor=pointer]:
+                - /url: /zh-CN/shipping
+            - listitem [ref=e223]:
+              - link "退換貨政策" [ref=e224] [cursor=pointer]:
+                - /url: /zh-CN/returns
+            - listitem [ref=e225]:
+              - link "隱私政策" [ref=e226] [cursor=pointer]:
+                - /url: /zh-CN/privacy
+        - generic [ref=e227]:
+          - heading "關於我們" [level=3] [ref=e228]
+          - list [ref=e229]:
+            - listitem [ref=e230]:
+              - link "品牌故事" [ref=e231] [cursor=pointer]:
+                - /url: /zh-CN/about
+            - listitem [ref=e232]:
+              - link "雪茄知識" [ref=e233] [cursor=pointer]:
+                - /url: /zh-CN/articles
+            - listitem [ref=e234]:
+              - link "最新文章" [ref=e235] [cursor=pointer]:
+                - /url: /zh-CN/blog
+    - generic [ref=e238]:
+      - paragraph [ref=e239]: © 2026 ShangJia. All rights reserved.
+      - paragraph [ref=e240]: 吸烟危害健康。本网站仅供年满18岁人士浏览及购买。雪茄产品图片仅供参考，实际产品可能略有差异。
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e246] [cursor=pointer]:
+    - img [ref=e247]
+  - alert [ref=e250]

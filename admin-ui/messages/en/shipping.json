@@ -29,6 +29,12 @@
         "priceType": "Price Type",
         "flatRate": "Flat Rate",
         "calculated": "Calculated",
+        "serviceZone": "Service Zone *",
+        "selectServiceZone": "Select Service Zone",
+        "currentServiceZone": "Current service zone ({id}...)",
+        "noServiceZones": "No service zones available. Create a service zone first.",
+        "serviceZoneReadonlyHint": "Service zone cannot be changed while editing. Create a new shipping option for another service zone.",
+        "shippingOptionType": "Shipping Option Type",
         "amount": "Amount",
         "currencyCode": "Currency Code",
         "shippingProfile": "Shipping Profile",
@@ -42,7 +48,8 @@
         "create": "Create",
         "creating": "Creating...",
         "update": "Update",
-        "updating": "Updating..."
+        "updating": "Updating...",
+        "saveFailed": "Save failed. Please check your input and try again."
       }
     },
 

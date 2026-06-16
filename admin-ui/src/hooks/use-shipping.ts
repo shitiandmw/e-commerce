@@ -98,6 +98,7 @@ export function useCreateShippingOption() {
       ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["shipping-options"] })
+      queryClient.invalidateQueries({ queryKey: ["shipping-option-types"] })
     },
   })
 }
@@ -130,6 +131,34 @@ export function useDeleteShippingOption() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["shipping-options"] })
     },
+  })
+}
+
+// ---- Shipping Option Types ----
+
+export interface ShippingOptionType {
+  id: string
+  label: string
+  code: string
+  description?: string
+  created_at: string
+  updated_at: string
+}
+
+interface ShippingOptionTypesResponse {
+  shipping_option_types: ShippingOptionType[]
+  count: number
+  offset: number
+  limit: number
+}
+
+export function useShippingOptionTypes() {
+  return useQuery<ShippingOptionTypesResponse>({
+    queryKey: ["shipping-option-types"],
+    queryFn: () =>
+      adminFetch<ShippingOptionTypesResponse>("/admin/shipping-option-types", {
+        params: { limit: "50" },
+      }),
   })
 }
 
