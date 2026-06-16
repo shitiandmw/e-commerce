@@ -4,6 +4,10 @@ import { useCallback } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { adminFetch, AdminOrder, AdminCustomer } from "@/lib/admin-api"
 import { generateCSV, downloadCSV } from "@/lib/csv"
+import {
+  getOrderDeliveryType,
+  getShippingMethodName,
+} from "@/lib/order-delivery"
 import { ImportResult } from "@/components/import-export/import-dialog"
 import type { Product, ProductsResponse } from "@/hooks/use-products"
 import type { OrdersResponse } from "@/hooks/use-orders"
@@ -187,7 +191,7 @@ export function useOrderExport() {
       queryParams.set("order", "-created_at")
       queryParams.set(
         "fields",
-        "+items,+customer,+shipping_address,+fulfillments,+payment_collections"
+        "+items,+customer,+shipping_address,*shipping_methods,+fulfillments,+payment_collections"
       )
 
       const data = await adminFetch<OrdersResponse>(
@@ -198,6 +202,15 @@ export function useOrderExport() {
       if (allOrders.length >= data.count) break
       offset += limit
     }
+
+    const shippingOptionsData = await adminFetch<{
+      shipping_options: Array<{
+        id: string
+        name?: string | null
+        metadata?: { type?: unknown; [key: string]: unknown } | null
+      }>
+    }>("/admin/shipping-options?limit=200")
+    const shippingOptions = shippingOptionsData.shipping_options ?? []
 
     const csv = generateCSV(allOrders, [
       { header: "order_id", accessor: (o) => o.id },
@@ -251,6 +264,14 @@ export function useOrderExport() {
       {
         header: "fulfillment_status",
         accessor: (o) => o.fulfillment_status || "",
+      },
+      {
+        header: "delivery_type",
+        accessor: (o) => getOrderDeliveryType(o, shippingOptions),
+      },
+      {
+        header: "shipping_method",
+        accessor: (o) => getShippingMethodName(o, shippingOptions),
       },
       {
         header: "shipping_city",

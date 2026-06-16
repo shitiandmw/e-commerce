@@ -1,0 +1,360 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - img [ref=e5]
+        - generic [ref=e10]: E-Commerce
+      - navigation [ref=e11]:
+        - generic [ref=e12]:
+          - link "仪表盘" [ref=e13] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e14]
+            - generic [ref=e19]: 仪表盘
+          - button "商品" [ref=e21] [cursor=pointer]:
+            - img [ref=e22]
+            - generic [ref=e26]: 商品
+            - img [ref=e27]
+          - generic [ref=e29]:
+            - button "销售" [ref=e30] [cursor=pointer]:
+              - img [ref=e31]
+              - generic [ref=e35]: 销售
+              - img [ref=e36]
+            - generic [ref=e38]:
+              - link "订单管理" [ref=e39] [cursor=pointer]:
+                - /url: /orders
+                - img [ref=e40]
+                - text: 订单管理
+              - link "客户管理" [ref=e44] [cursor=pointer]:
+                - /url: /customers
+                - img [ref=e45]
+                - text: 客户管理
+              - link "促销活动" [ref=e50] [cursor=pointer]:
+                - /url: /promotions
+                - img [ref=e51]
+                - text: 促销活动
+              - link "物流管理" [ref=e55] [cursor=pointer]:
+                - /url: /shipping
+                - img [ref=e56]
+                - text: 物流管理
+          - button "内容" [ref=e62] [cursor=pointer]:
+            - img [ref=e63]
+            - generic [ref=e66]: 内容
+            - img [ref=e67]
+          - button "站点" [ref=e70] [cursor=pointer]:
+            - img [ref=e71]
+            - generic [ref=e74]: 站点
+            - img [ref=e75]
+          - link "客服" [ref=e77] [cursor=pointer]:
+            - /url: /chat
+            - img [ref=e78]
+            - generic [ref=e80]: 客服
+          - link "数据报表" [ref=e81] [cursor=pointer]:
+            - /url: /analytics
+            - img [ref=e82]
+            - generic [ref=e84]: 数据报表
+          - link "系统设置" [ref=e85] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e86]
+            - generic [ref=e89]: 系统设置
+      - generic [ref=e90]:
+        - button "中文" [ref=e91] [cursor=pointer]:
+          - img [ref=e92]
+          - generic [ref=e95]: 中文
+        - button "退出登录" [ref=e96] [cursor=pointer]:
+          - img [ref=e97]
+          - text: 退出登录
+    - main [ref=e100]:
+      - generic [ref=e101]:
+        - generic [ref=e102]:
+          - heading "订单管理" [level=1] [ref=e103]
+          - paragraph [ref=e104]: 管理客户订单、跟踪物流和处理支付
+        - generic [ref=e105]:
+          - generic [ref=e106]:
+            - generic [ref=e107]:
+              - generic [ref=e109]:
+                - img [ref=e110]
+                - textbox "搜索订单..." [ref=e113]
+              - button "导出" [ref=e114] [cursor=pointer]:
+                - img [ref=e115]
+                - text: 导出
+            - generic [ref=e118]:
+              - button "全部类型" [active] [ref=e120] [cursor=pointer]:
+                - generic [ref=e121]: 全部类型
+                - img [ref=e122]
+              - button "全部状态" [ref=e125] [cursor=pointer]:
+                - generic [ref=e126]: 全部状态
+                - img [ref=e127]
+              - button "全部支付" [ref=e130] [cursor=pointer]:
+                - generic [ref=e131]: 全部支付
+                - img [ref=e132]
+              - button "全部物流" [ref=e135] [cursor=pointer]:
+                - generic [ref=e136]: 全部物流
+                - img [ref=e137]
+          - generic [ref=e139]:
+            - table [ref=e141]:
+              - rowgroup [ref=e142]:
+                - row "订单 客户 状态 订单类型 支付 物流 商品 金额 日期" [ref=e143]:
+                  - columnheader "订单" [ref=e144]:
+                    - button "订单" [ref=e273] [cursor=pointer]:
+                      - text: 订单
+                      - img [ref=e274]
+                  - columnheader "客户" [ref=e149]
+                  - columnheader "状态" [ref=e150]
+                  - columnheader "订单类型" [ref=e151]
+                  - columnheader "支付" [ref=e152]
+                  - columnheader "物流" [ref=e153]
+                  - columnheader "商品" [ref=e154]
+                  - columnheader "金额" [ref=e155]:
+                    - button "金额" [ref=e277] [cursor=pointer]:
+                      - text: 金额
+                      - img [ref=e278]
+                  - columnheader "日期" [ref=e160]:
+                    - button "日期" [ref=e281] [cursor=pointer]:
+                      - text: 日期
+                      - img [ref=e282]
+                  - columnheader [ref=e165]
+              - rowgroup [ref=e166]:
+                - row "0RG2T1P3 111213 史蒂夫 dsfdsf@qq.com 待处理 自提 已支付 未发货 1 $48.00 Jun 16, 2026 打开菜单" [ref=e285]:
+                  - cell "0RG2T1P3" [ref=e286]:
+                    - link "0RG2T1P3" [ref=e287] [cursor=pointer]:
+                      - /url: /orders/order_01KV75TD52MZTDAM400RG2T1P3
+                  - cell "111213 史蒂夫 dsfdsf@qq.com" [ref=e288]:
+                    - generic [ref=e289]:
+                      - paragraph [ref=e290]: 111213 史蒂夫
+                      - paragraph [ref=e291]: dsfdsf@qq.com
+                  - cell "待处理" [ref=e292]:
+                    - generic [ref=e293]: 待处理
+                  - cell "自提" [ref=e294]:
+                    - generic [ref=e295]: 自提
+                  - cell "已支付" [ref=e296]:
+                    - generic [ref=e297]: 已支付
+                  - cell "未发货" [ref=e298]:
+                    - generic [ref=e299]: 未发货
+                  - cell "1" [ref=e300]
+                  - cell "$48.00" [ref=e301]
+                  - cell "Jun 16, 2026" [ref=e302]
+                  - cell "打开菜单" [ref=e303]:
+                    - button "打开菜单" [ref=e305] [cursor=pointer]:
+                      - img [ref=e306]
+                      - generic [ref=e310]: 打开菜单
+                - row "JT3WDE16 shitian lu sdfsf@qq.com 待处理 自提 已支付 未发货 2 $36.00 May 11, 2026 打开菜单" [ref=e311]:
+                  - cell "JT3WDE16" [ref=e312]:
+                    - link "JT3WDE16" [ref=e313] [cursor=pointer]:
+                      - /url: /orders/order_01KRAFJDDZA4SA1HCYJT3WDE16
+                  - cell "shitian lu sdfsf@qq.com" [ref=e314]:
+                    - generic [ref=e315]:
+                      - paragraph [ref=e316]: shitian lu
+                      - paragraph [ref=e317]: sdfsf@qq.com
+                  - cell "待处理" [ref=e318]:
+                    - generic [ref=e319]: 待处理
+                  - cell "自提" [ref=e320]:
+                    - generic [ref=e321]: 自提
+                  - cell "已支付" [ref=e322]:
+                    - generic [ref=e323]: 已支付
+                  - cell "未发货" [ref=e324]:
+                    - generic [ref=e325]: 未发货
+                  - cell "2" [ref=e326]
+                  - cell "$36.00" [ref=e327]
+                  - cell "May 11, 2026" [ref=e328]
+                  - cell "打开菜单" [ref=e329]:
+                    - button "打开菜单" [ref=e331] [cursor=pointer]:
+                      - img [ref=e332]
+                      - generic [ref=e336]: 打开菜单
+                - row "KDGZKTH2 dsdfs@qq.com 待处理 自提 已支付 未发货 1 $18.00 May 11, 2026 打开菜单" [ref=e337]:
+                  - cell "KDGZKTH2" [ref=e338]:
+                    - link "KDGZKTH2" [ref=e339] [cursor=pointer]:
+                      - /url: /orders/order_01KRAD4G6V8KQ02XHKKDGZKTH2
+                  - cell "dsdfs@qq.com" [ref=e340]:
+                    - paragraph [ref=e342]: dsdfs@qq.com
+                  - cell "待处理" [ref=e343]:
+                    - generic [ref=e344]: 待处理
+                  - cell "自提" [ref=e345]:
+                    - generic [ref=e346]: 自提
+                  - cell "已支付" [ref=e347]:
+                    - generic [ref=e348]: 已支付
+                  - cell "未发货" [ref=e349]:
+                    - generic [ref=e350]: 未发货
+                  - cell "1" [ref=e351]
+                  - cell "$18.00" [ref=e352]
+                  - cell "May 11, 2026" [ref=e353]
+                  - cell "打开菜单" [ref=e354]:
+                    - button "打开菜单" [ref=e356] [cursor=pointer]:
+                      - img [ref=e357]
+                      - generic [ref=e361]: 打开菜单
+                - row "3ZFKRHQ6 lu shitian 2844845@qq.com 待处理 自提 已支付 未发货 1 $16.00 May 9, 2026 打开菜单" [ref=e362]:
+                  - cell "3ZFKRHQ6" [ref=e363]:
+                    - link "3ZFKRHQ6" [ref=e364] [cursor=pointer]:
+                      - /url: /orders/order_01KR5YA7RNG9BBG6QV3ZFKRHQ6
+                  - cell "lu shitian 2844845@qq.com" [ref=e365]:
+                    - generic [ref=e366]:
+                      - paragraph [ref=e367]: lu shitian
+                      - paragraph [ref=e368]: 2844845@qq.com
+                  - cell "待处理" [ref=e369]:
+                    - generic [ref=e370]: 待处理
+                  - cell "自提" [ref=e371]:
+                    - generic [ref=e372]: 自提
+                  - cell "已支付" [ref=e373]:
+                    - generic [ref=e374]: 已支付
+                  - cell "未发货" [ref=e375]:
+                    - generic [ref=e376]: 未发货
+                  - cell "1" [ref=e377]
+                  - cell "$16.00" [ref=e378]
+                  - cell "May 9, 2026" [ref=e379]
+                  - cell "打开菜单" [ref=e380]:
+                    - button "打开菜单" [ref=e382] [cursor=pointer]:
+                      - img [ref=e383]
+                      - generic [ref=e387]: 打开菜单
+                - row "91C7TK9G sdf@qq.com 待处理 自提 已支付 未发货 1 $960.00 May 9, 2026 打开菜单" [ref=e388]:
+                  - cell "91C7TK9G" [ref=e389]:
+                    - link "91C7TK9G" [ref=e390] [cursor=pointer]:
+                      - /url: /orders/order_01KR5W5CW50R7DG9KQ91C7TK9G
+                  - cell "sdf@qq.com" [ref=e391]:
+                    - paragraph [ref=e393]: sdf@qq.com
+                  - cell "待处理" [ref=e394]:
+                    - generic [ref=e395]: 待处理
+                  - cell "自提" [ref=e396]:
+                    - generic [ref=e397]: 自提
+                  - cell "已支付" [ref=e398]:
+                    - generic [ref=e399]: 已支付
+                  - cell "未发货" [ref=e400]:
+                    - generic [ref=e401]: 未发货
+                  - cell "1" [ref=e402]
+                  - cell "$960.00" [ref=e403]
+                  - cell "May 9, 2026" [ref=e404]
+                  - cell "打开菜单" [ref=e405]:
+                    - button "打开菜单" [ref=e407] [cursor=pointer]:
+                      - img [ref=e408]
+                      - generic [ref=e412]: 打开菜单
+                - row "XD71XY3R lu shitian 284485094@qq.com 待处理 自提 待支付 运输中 1 $440.00 Apr 30, 2026 打开菜单" [ref=e413]:
+                  - cell "XD71XY3R" [ref=e414]:
+                    - link "XD71XY3R" [ref=e415] [cursor=pointer]:
+                      - /url: /orders/order_01KQEK5ZW9A9BA2WVFXD71XY3R
+                  - cell "lu shitian 284485094@qq.com" [ref=e416]:
+                    - generic [ref=e417]:
+                      - paragraph [ref=e418]: lu shitian
+                      - paragraph [ref=e419]: 284485094@qq.com
+                  - cell "待处理" [ref=e420]:
+                    - generic [ref=e421]: 待处理
+                  - cell "自提" [ref=e422]:
+                    - generic [ref=e423]: 自提
+                  - cell "待支付" [ref=e424]:
+                    - generic [ref=e425]: 待支付
+                  - cell "运输中" [ref=e426]:
+                    - generic [ref=e427]: 运输中
+                  - cell "1" [ref=e428]
+                  - cell "$440.00" [ref=e429]
+                  - cell "Apr 30, 2026" [ref=e430]
+                  - cell "打开菜单" [ref=e431]:
+                    - button "打开菜单" [ref=e433] [cursor=pointer]:
+                      - img [ref=e434]
+                      - generic [ref=e438]: 打开菜单
+                - row "Z3TV625S sdfsdf@qq.com 待处理 自提 待支付 运输中 1 $360.00 Apr 30, 2026 打开菜单" [ref=e439]:
+                  - cell "Z3TV625S" [ref=e440]:
+                    - link "Z3TV625S" [ref=e441] [cursor=pointer]:
+                      - /url: /orders/order_01KQE6Y1HT6DDCEBX8Z3TV625S
+                  - cell "sdfsdf@qq.com" [ref=e442]:
+                    - paragraph [ref=e444]: sdfsdf@qq.com
+                  - cell "待处理" [ref=e445]:
+                    - generic [ref=e446]: 待处理
+                  - cell "自提" [ref=e447]:
+                    - generic [ref=e448]: 自提
+                  - cell "待支付" [ref=e449]:
+                    - generic [ref=e450]: 待支付
+                  - cell "运输中" [ref=e451]:
+                    - generic [ref=e452]: 运输中
+                  - cell "1" [ref=e453]
+                  - cell "$360.00" [ref=e454]
+                  - cell "Apr 30, 2026" [ref=e455]
+                  - cell "打开菜单" [ref=e456]:
+                    - button "打开菜单" [ref=e458] [cursor=pointer]:
+                      - img [ref=e459]
+                      - generic [ref=e463]: 打开菜单
+                - row "86M8WSWZ lu shitian lushitian405@gmail.com 待处理 自提 待支付 运输中 1 $960.00 Apr 30, 2026 打开菜单" [ref=e464]:
+                  - cell "86M8WSWZ" [ref=e465]:
+                    - link "86M8WSWZ" [ref=e466] [cursor=pointer]:
+                      - /url: /orders/order_01KQE5VXPA4828FMQX86M8WSWZ
+                  - cell "lu shitian lushitian405@gmail.com" [ref=e467]:
+                    - generic [ref=e468]:
+                      - paragraph [ref=e469]: lu shitian
+                      - paragraph [ref=e470]: lushitian405@gmail.com
+                  - cell "待处理" [ref=e471]:
+                    - generic [ref=e472]: 待处理
+                  - cell "自提" [ref=e473]:
+                    - generic [ref=e474]: 自提
+                  - cell "待支付" [ref=e475]:
+                    - generic [ref=e476]: 待支付
+                  - cell "运输中" [ref=e477]:
+                    - generic [ref=e478]: 运输中
+                  - cell "1" [ref=e479]
+                  - cell "$960.00" [ref=e480]
+                  - cell "Apr 30, 2026" [ref=e481]
+                  - cell "打开菜单" [ref=e482]:
+                    - button "打开菜单" [ref=e484] [cursor=pointer]:
+                      - img [ref=e485]
+                      - generic [ref=e489]: 打开菜单
+                - row "XNRSQATW e2e-test@example.com 已完成 自提 待支付 运输中 2 $96.10 Apr 27, 2026 打开菜单" [ref=e490]:
+                  - cell "XNRSQATW" [ref=e491]:
+                    - link "XNRSQATW" [ref=e492] [cursor=pointer]:
+                      - /url: /orders/order_01KQ7977GN7X1J82Q3XNRSQATW
+                  - cell "e2e-test@example.com" [ref=e493]:
+                    - paragraph [ref=e495]: e2e-test@example.com
+                  - cell "已完成" [ref=e496]:
+                    - generic [ref=e497]: 已完成
+                  - cell "自提" [ref=e498]:
+                    - generic [ref=e499]: 自提
+                  - cell "待支付" [ref=e500]:
+                    - generic [ref=e501]: 待支付
+                  - cell "运输中" [ref=e502]:
+                    - generic [ref=e503]: 运输中
+                  - cell "2" [ref=e504]
+                  - cell "$96.10" [ref=e505]
+                  - cell "Apr 27, 2026" [ref=e506]
+                  - cell "打开菜单" [ref=e507]:
+                    - button "打开菜单" [ref=e509] [cursor=pointer]:
+                      - img [ref=e510]
+                      - generic [ref=e514]: 打开菜单
+                - row "NWX42HS1 e2e-test@test.com 待处理 自提 待支付 已发货 1 $0.25 Apr 27, 2026 打开菜单" [ref=e515]:
+                  - cell "NWX42HS1" [ref=e516]:
+                    - link "NWX42HS1" [ref=e517] [cursor=pointer]:
+                      - /url: /orders/order_01KQ717CS1WQG8M9A7NWX42HS1
+                  - cell "e2e-test@test.com" [ref=e518]:
+                    - paragraph [ref=e520]: e2e-test@test.com
+                  - cell "待处理" [ref=e521]:
+                    - generic [ref=e522]: 待处理
+                  - cell "自提" [ref=e523]:
+                    - generic [ref=e524]: 自提
+                  - cell "待支付" [ref=e525]:
+                    - generic [ref=e526]: 待支付
+                  - cell "已发货" [ref=e527]:
+                    - generic [ref=e528]: 已发货
+                  - cell "1" [ref=e529]
+                  - cell "$0.25" [ref=e530]
+                  - cell "Apr 27, 2026" [ref=e531]
+                  - cell "打开菜单" [ref=e532]:
+                    - button "打开菜单" [ref=e534] [cursor=pointer]:
+                      - img [ref=e535]
+                      - generic [ref=e539]: 打开菜单
+            - generic [ref=e540]:
+              - paragraph [ref=e541]: 显示第 1 到 10 条，共 10 条订单
+              - generic [ref=e542]:
+                - button [disabled]:
+                  - img
+                - button [disabled]:
+                  - img
+                - generic [ref=e543]: 第 1 页，共 1 页
+                - button [disabled]:
+                  - img
+                - button [disabled]:
+                  - img
+  - region "Notifications alt+T"
+  - alert [ref=e272]
+  - generic [ref=e545]:
+    - generic [ref=e546] [cursor=pointer]:
+      - img [ref=e547]
+      - generic [ref=e549]: 全部类型
+    - generic [ref=e550] [cursor=pointer]:
+      - img [ref=e551]
+      - generic [ref=e553]: 自提
+    - generic [ref=e554] [cursor=pointer]:
+      - img [ref=e555]
+      - generic [ref=e557]: 邮寄

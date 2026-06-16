@@ -10,6 +10,7 @@
       "order": "Order",
       "customer": "Customer",
       "status": "Status",
+      "deliveryType": "Order Type",
       "payment": "Payment",
       "fulfillment": "Fulfillment",
       "items": "Items",
@@ -46,8 +47,14 @@
       "unknown": "Unknown"
     },
 
+    "deliveryType": {
+      "pickup": "Pickup",
+      "delivery": "Shipping"
+    },
+
     "filters": {
       "searchPlaceholder": "Search orders...",
+      "allDeliveryTypes": "All Types",
       "allStatus": "All Status",
       "allPayments": "All Payments",
       "allFulfillment": "All Fulfillment"
@@ -70,6 +77,7 @@
       "orderNotFound": "Order not found or failed to load.",
       "fulfill": "Fulfill",
       "complete": "Complete",
+      "markPickedUp": "Mark Picked Up",
       "refund": "Refund",
       "cancel": "Cancel",
 
@@ -78,6 +86,7 @@
         "fulfillments": "Fulfillments",
         "payment": "Payment",
         "customer": "Customer",
+        "pickupInfo": "Pickup Information",
         "shippingAddress": "Shipping Address",
         "billingAddress": "Billing Address",
         "orderInfo": "Order Info"
@@ -164,6 +173,12 @@
         "cancel": "Cancel",
         "completeOrder": "Complete Order",
         "completing": "Completing..."
+      },
+      "pickupComplete": {
+        "title": "Mark Picked Up",
+        "description": "Mark pickup order #{id} as picked up and completed?",
+        "confirm": "Mark Picked Up",
+        "processing": "Completing..."
       },
       "fulfill": {
         "title": "Create Fulfillment",

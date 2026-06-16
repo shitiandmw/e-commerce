@@ -11,6 +11,7 @@ import {
 } from "@tanstack/react-table"
 import { useTranslations } from "next-intl"
 import { useOrders } from "@/hooks/use-orders"
+import { useShippingOptions } from "@/hooks/use-shipping"
 import { getOrderColumns } from "./order-columns"
 import {
   Table,
@@ -42,7 +43,9 @@ export function OrderTable() {
   const [statusFilter, setStatusFilter] = React.useState("all")
   const [paymentFilter, setPaymentFilter] = React.useState("all")
   const [fulfillmentFilter, setFulfillmentFilter] = React.useState("all")
+  const [deliveryTypeFilter, setDeliveryTypeFilter] = React.useState("all")
   const { exportOrders } = useOrderExport()
+  const { data: shippingOptionsData } = useShippingOptions({ limit: 200 })
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: 20,
@@ -74,6 +77,12 @@ export function OrderTable() {
     { value: "canceled", label: t("fulfillmentStatus.canceled") },
   ]
 
+  const DELIVERY_TYPES = [
+    { value: "all", label: t("filters.allDeliveryTypes") },
+    { value: "pickup", label: t("deliveryType.pickup") },
+    { value: "delivery", label: t("deliveryType.delivery") },
+  ]
+
   // Debounce search
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -86,7 +95,7 @@ export function OrderTable() {
   // Reset page when filter changes
   React.useEffect(() => {
     setPagination((p) => ({ ...p, pageIndex: 0 }))
-  }, [statusFilter, paymentFilter, fulfillmentFilter])
+  }, [statusFilter, paymentFilter, fulfillmentFilter, deliveryTypeFilter])
 
   const orderField =
     sorting.length > 0
@@ -95,6 +104,16 @@ export function OrderTable() {
 
   const statusArray =
     statusFilter && statusFilter !== "all" ? [statusFilter] : undefined
+  const paymentStatusArray =
+    paymentFilter && paymentFilter !== "all" ? [paymentFilter] : undefined
+  const fulfillmentStatusArray =
+    fulfillmentFilter && fulfillmentFilter !== "all"
+      ? [fulfillmentFilter]
+      : undefined
+  const deliveryType =
+    deliveryTypeFilter === "pickup" || deliveryTypeFilter === "delivery"
+      ? deliveryTypeFilter
+      : undefined
 
   const { data, isLoading, isError, error } = useOrders({
     offset: pagination.pageIndex * pagination.pageSize,
@@ -102,9 +121,19 @@ export function OrderTable() {
     q: debouncedSearch || undefined,
     order: orderField,
     status: statusArray,
+    payment_status: paymentStatusArray,
+    fulfillment_status: fulfillmentStatusArray,
+    delivery_type: deliveryType,
   })
 
-  const columns = React.useMemo(() => getOrderColumns(t), [t])
+  const shippingOptions = React.useMemo(
+    () => shippingOptionsData?.shipping_options ?? [],
+    [shippingOptionsData?.shipping_options]
+  )
+  const columns = React.useMemo(
+    () => getOrderColumns(t, shippingOptions),
+    [t, shippingOptions]
+  )
 
   const orders = data?.orders ?? []
   const totalCount = data?.count ?? 0
@@ -130,7 +159,8 @@ export function OrderTable() {
     debouncedSearch ||
     statusFilter !== "all" ||
     paymentFilter !== "all" ||
-    fulfillmentFilter !== "all"
+    fulfillmentFilter !== "all" ||
+    deliveryTypeFilter !== "all"
 
   return (
     <div className="space-y-4">
@@ -151,6 +181,17 @@ export function OrderTable() {
           <ExportButton onExport={exportOrders} label={t("table.export")} size="sm" />
         </div>
         <div className="flex items-center gap-2 flex-wrap">
+          <Select
+            value={deliveryTypeFilter}
+            onChange={(e) => setDeliveryTypeFilter(e.target.value)}
+            className="w-[150px]"
+          >
+            {DELIVERY_TYPES.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
+          </Select>
           <Select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}

@@ -21,8 +21,15 @@ export interface OrderListParams {
   status?: string[]
   fulfillment_status?: string[]
   payment_status?: string[]
+  delivery_type?: "pickup" | "delivery"
   created_at?: { gte?: string; lte?: string }
 }
+
+const ORDER_LIST_FIELDS =
+  "+items,*customer,+email,+shipping_address,*shipping_methods,+fulfillments,+payment_collections"
+
+const ORDER_DETAIL_FIELDS =
+  "+email,+customer_id,+items,+items.variant,*customer,+shipping_address,+billing_address,*shipping_methods,+fulfillments,+fulfillments.items,+fulfillments.labels,+payment_collections,+payment_collections.payments,+region,+sales_channel"
 
 export function useOrders(params: OrderListParams = {}) {
   return useQuery({
@@ -33,9 +40,8 @@ export function useOrders(params: OrderListParams = {}) {
       if (params.offset !== undefined) query.offset = String(params.offset)
       if (params.limit !== undefined) query.limit = String(params.limit)
       if (params.order) query.order = params.order
-      // Fields: request expanded relations for the list view
-      query.fields =
-        "+items,*customer,+email,+shipping_address,+fulfillments,+payment_collections"
+      // Fields: request expanded relations for the list view.
+      query.fields = ORDER_LIST_FIELDS
 
       // Build the query string manually to support arrays
       const searchParams = new URLSearchParams()
@@ -44,9 +50,26 @@ export function useOrders(params: OrderListParams = {}) {
       if (params.status && params.status.length > 0) {
         params.status.forEach((s) => searchParams.append("status[]", s))
       }
+      if (params.payment_status && params.payment_status.length > 0) {
+        params.payment_status.forEach((s) =>
+          searchParams.append("payment_status[]", s)
+        )
+      }
+      if (params.fulfillment_status && params.fulfillment_status.length > 0) {
+        params.fulfillment_status.forEach((s) =>
+          searchParams.append("fulfillment_status[]", s)
+        )
+      }
+      if (params.delivery_type) {
+        searchParams.set("delivery_type", params.delivery_type)
+      }
+
+      const endpoint = params.delivery_type
+        ? "/admin/orders-delivery"
+        : "/admin/orders"
 
       return adminFetch<OrdersResponse>(
-        `/admin/orders?${searchParams.toString()}`
+        `${endpoint}?${searchParams.toString()}`
       )
     },
   })
@@ -57,7 +80,7 @@ export function useOrder(id: string) {
     queryKey: ["order", id],
     queryFn: () =>
       adminFetch<{ order: AdminOrder }>(
-        `/admin/orders/${id}?fields=+email,+customer_id,+items,+items.variant,*customer,+shipping_address,+billing_address,+shipping_methods,+fulfillments,+fulfillments.items,+fulfillments.labels,+payment_collections,+payment_collections.payments,+region,+sales_channel`
+        `/admin/orders/${id}?fields=${encodeURIComponent(ORDER_DETAIL_FIELDS)}`
       ),
     enabled: !!id,
   })

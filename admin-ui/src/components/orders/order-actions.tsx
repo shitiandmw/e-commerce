@@ -86,6 +86,7 @@ interface CompleteOrderDialogProps {
   onOpenChange: (open: boolean) => void
   onConfirm: () => Promise<void>
   isLoading: boolean
+  isPickup?: boolean
 }
 
 export function CompleteOrderDialog({
@@ -94,8 +95,19 @@ export function CompleteOrderDialog({
   onOpenChange,
   onConfirm,
   isLoading,
+  isPickup = false,
 }: CompleteOrderDialogProps) {
   const t = useTranslations("orders")
+  const title = isPickup ? t("dialogs.pickupComplete.title") : t("dialogs.complete.title")
+  const description = isPickup
+    ? t("dialogs.pickupComplete.description", { id: String(order?.display_id) })
+    : t("dialogs.complete.description", { id: String(order?.display_id) })
+  const confirmLabel = isPickup
+    ? t("dialogs.pickupComplete.confirm")
+    : t("dialogs.complete.completeOrder")
+  const loadingLabel = isPickup
+    ? t("dialogs.pickupComplete.processing")
+    : t("dialogs.complete.completing")
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -103,10 +115,10 @@ export function CompleteOrderDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CheckCircle className="h-5 w-5 text-green-600" />
-            {t("dialogs.complete.title")}
+            {title}
           </DialogTitle>
           <DialogDescription>
-            {t("dialogs.complete.description", { id: String(order?.display_id) })}
+            {description}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mt-4">
@@ -118,7 +130,7 @@ export function CompleteOrderDialog({
             {t("dialogs.complete.cancel")}
           </Button>
           <Button onClick={onConfirm} disabled={isLoading}>
-            {isLoading ? t("dialogs.complete.completing") : t("dialogs.complete.completeOrder")}
+            {isLoading ? loadingLabel : confirmLabel}
           </Button>
         </DialogFooter>
       </DialogContent>

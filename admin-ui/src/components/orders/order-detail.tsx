@@ -15,12 +15,18 @@ import {
   useTrackingRecords,
   AdminOrder,
 } from "@/hooks/use-orders"
-import { useStockLocations } from "@/hooks/use-shipping"
+import { useShippingOptions, useStockLocations } from "@/hooks/use-shipping"
 import {
   getOrderStatusBadge,
   getPaymentStatusBadge,
   getFulfillmentStatusBadge,
+  getDeliveryTypeBadge,
 } from "./order-columns"
+import {
+  getOrderDeliveryType,
+  getShippingMethodName,
+  isPickupOrder,
+} from "@/lib/order-delivery"
 import {
   CancelOrderDialog,
   CompleteOrderDialog,
@@ -87,6 +93,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
   const createShipment = useCreateShipment()
   const createTrackingRecord = useCreateTrackingRecord()
   const { data: stockLocationsData } = useStockLocations()
+  const { data: shippingOptionsData } = useShippingOptions({ limit: 200 })
 
   const [showCancelDialog, setShowCancelDialog] = React.useState(false)
   const [showCompleteDialog, setShowCompleteDialog] = React.useState(false)
@@ -186,7 +193,12 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
   const canCancel = order.status !== "canceled" && order.status !== "completed"
   const canComplete = order.status !== "canceled" && order.status !== "completed"
   const canRefund = order.status !== "canceled"
-  const canFulfill = order.status !== "canceled" &&
+  const shippingOptions = shippingOptionsData?.shipping_options ?? []
+  const deliveryType = getOrderDeliveryType(order, shippingOptions)
+  const pickupOrder = isPickupOrder(order, shippingOptions)
+  const shippingMethodName = getShippingMethodName(order, shippingOptions)
+  const canFulfill = !pickupOrder &&
+    order.status !== "canceled" &&
     order.fulfillment_status !== "fulfilled" &&
     order.fulfillment_status !== "delivered"
 
@@ -288,11 +300,11 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           )}
           {canComplete && (
             <Button
-              variant="outline"
+              variant={pickupOrder ? "default" : "outline"}
               onClick={() => setShowCompleteDialog(true)}
             >
               <CheckCircle className="mr-2 h-4 w-4" />
-              {t("detail.complete")}
+              {pickupOrder ? t("detail.markPickedUp") : t("detail.complete")}
             </Button>
           )}
           {canRefund && (
@@ -318,6 +330,10 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
 
       {/* Status Badges Row */}
       <div className="flex items-center gap-4 flex-wrap">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">{t("columns.deliveryType")}:</span>
+          {getDeliveryTypeBadge(order, t, shippingOptions)}
+        </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">{t("columns.payment")}:</span>
           {getPaymentStatusBadge(order.payment_status, t) || (
@@ -452,6 +468,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           </div>
 
           {/* Fulfillments */}
+          {!pickupOrder && (
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Truck className="h-5 w-5" />
@@ -597,6 +614,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
               </div>
             )}
           </div>
+          )}
 
           {/* Payment Information */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
@@ -775,33 +793,44 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
             )}
           </div>
 
-          {/* Shipping Address */}
+          {/* Delivery Information */}
           <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <MapPin className="h-5 w-5" />
-              {t("detail.sections.shippingAddress")}
+              {pickupOrder
+                ? t("detail.sections.pickupInfo")
+                : t("detail.sections.shippingAddress")}
             </h2>
 
+            <div className="flex items-center gap-2 text-sm pb-2 border-b">
+              <Package className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+              <span className="text-muted-foreground">{t("columns.deliveryType")}:</span>
+              <span className="font-medium">
+                {deliveryType === "pickup"
+                  ? t("deliveryType.pickup")
+                  : t("deliveryType.delivery")}
+              </span>
+            </div>
+
             {/* Shipping method row */}
-            {order.shipping_methods && order.shipping_methods.length > 0 && (
+            {shippingMethodName && (
               <div className="flex items-center gap-2 text-sm pb-2 border-b">
                 <Truck className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                 <span className="text-muted-foreground">{t("detail.address.shippingMethod")}:</span>
-                <span className="font-medium">{order.shipping_methods[0].name}</span>
+                <span className="font-medium">{shippingMethodName}</span>
               </div>
             )}
 
             {(() => {
-              const isPickup = order.shipping_address?.address_1 === "Pickup Order"
-              if (isPickup) {
+              if (pickupOrder) {
                 return (
                   <div className="space-y-2">
                     <div className="flex items-start gap-2 rounded-md bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">
                       <Package className="h-4 w-4 mt-0.5 shrink-0" />
                       <div>
                         <p>{t("detail.address.pickupSelected")}</p>
-                        {order.shipping_address?.address_2 && (
-                          <p className="mt-0.5 text-amber-700">{order.shipping_address.address_2}</p>
+                        {shippingMethodName && (
+                          <p className="mt-0.5 text-amber-700">{shippingMethodName}</p>
                         )}
                       </div>
                     </div>
@@ -925,6 +954,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
         onOpenChange={setShowCompleteDialog}
         onConfirm={handleComplete}
         isLoading={completeOrder.isPending}
+        isPickup={pickupOrder}
       />
       <RefundDialog
         order={order}

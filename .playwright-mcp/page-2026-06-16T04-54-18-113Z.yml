@@ -1,0 +1,205 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - img [ref=e5]
+        - generic [ref=e10]: E-Commerce
+      - navigation [ref=e11]:
+        - generic [ref=e12]:
+          - link "仪表盘" [ref=e13] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e14]
+            - generic [ref=e19]: 仪表盘
+          - button "商品" [ref=e21] [cursor=pointer]:
+            - img [ref=e22]
+            - generic [ref=e26]: 商品
+            - img [ref=e27]
+          - generic [ref=e29]:
+            - button "销售" [ref=e30] [cursor=pointer]:
+              - img [ref=e31]
+              - generic [ref=e35]: 销售
+              - img [ref=e36]
+            - generic [ref=e38]:
+              - link "订单管理" [ref=e39] [cursor=pointer]:
+                - /url: /orders
+                - img [ref=e40]
+                - text: 订单管理
+              - link "客户管理" [ref=e44] [cursor=pointer]:
+                - /url: /customers
+                - img [ref=e45]
+                - text: 客户管理
+              - link "促销活动" [ref=e50] [cursor=pointer]:
+                - /url: /promotions
+                - img [ref=e51]
+                - text: 促销活动
+              - link "物流管理" [ref=e55] [cursor=pointer]:
+                - /url: /shipping
+                - img [ref=e56]
+                - text: 物流管理
+          - button "内容" [ref=e62] [cursor=pointer]:
+            - img [ref=e63]
+            - generic [ref=e66]: 内容
+            - img [ref=e67]
+          - button "站点" [ref=e70] [cursor=pointer]:
+            - img [ref=e71]
+            - generic [ref=e74]: 站点
+            - img [ref=e75]
+          - link "客服" [ref=e77] [cursor=pointer]:
+            - /url: /chat
+            - img [ref=e78]
+            - generic [ref=e80]: 客服
+          - link "数据报表" [ref=e81] [cursor=pointer]:
+            - /url: /analytics
+            - img [ref=e82]
+            - generic [ref=e84]: 数据报表
+          - link "系统设置" [ref=e85] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e86]
+            - generic [ref=e89]: 系统设置
+      - generic [ref=e90]:
+        - button "中文" [ref=e91] [cursor=pointer]:
+          - img [ref=e92]
+          - generic [ref=e95]: 中文
+        - button "退出登录" [ref=e96] [cursor=pointer]:
+          - img [ref=e97]
+          - text: 退出登录
+    - main [ref=e100]:
+      - generic [ref=e798]:
+        - generic [ref=e799]:
+          - generic [ref=e800]:
+            - link [ref=e801] [cursor=pointer]:
+              - /url: /orders
+              - button [ref=e802]:
+                - img [ref=e803]
+            - generic [ref=e805]:
+              - generic [ref=e806]:
+                - 'heading "订单 #10" [level=1] [ref=e807]'
+                - generic [ref=e808]: 待处理
+              - paragraph [ref=e809]: 下单时间：June 16, 2026 at 10:57 AM
+          - generic [ref=e810]:
+            - button "标记已取货" [ref=e811] [cursor=pointer]:
+              - img [ref=e812]
+              - text: 标记已取货
+            - button "退款" [ref=e815] [cursor=pointer]:
+              - img [ref=e816]
+              - text: 退款
+            - button "取消" [ref=e819] [cursor=pointer]:
+              - img [ref=e820]
+              - text: 取消
+        - generic [ref=e823]:
+          - generic [ref=e824]:
+            - generic [ref=e825]: "订单类型:"
+            - generic [ref=e826]: 自提
+          - generic [ref=e827]:
+            - generic [ref=e828]: "支付:"
+            - generic [ref=e829]: 已支付
+          - generic [ref=e830]:
+            - generic [ref=e831]: "物流:"
+            - generic [ref=e832]: 未发货
+        - generic [ref=e833]:
+          - generic [ref=e834]:
+            - generic [ref=e835]:
+              - heading "商品明细 1" [level=2] [ref=e836]:
+                - img [ref=e837]
+                - text: 商品明细
+                - generic [ref=e841]: "1"
+              - generic [ref=e842]:
+                - generic [ref=e843]:
+                  - img "Cohiba Siglo VI" [ref=e845]
+                  - generic [ref=e846]:
+                    - paragraph [ref=e847]: Cohiba Siglo VI
+                    - paragraph [ref=e848]: 规格：单支
+                    - paragraph [ref=e849]: SKU：cohiba-siglo-vi-single
+                    - paragraph [ref=e850]: $48.00 x 1
+                  - paragraph [ref=e852]: $48.00
+                - generic [ref=e853]:
+                  - generic [ref=e854]:
+                    - generic [ref=e855]: 小计
+                    - generic [ref=e856]: $48.00
+                  - generic [ref=e857]:
+                    - generic [ref=e858]: 合计
+                    - generic [ref=e859]: $48.00
+            - generic [ref=e860]:
+              - heading "支付信息" [level=2] [ref=e861]:
+                - img [ref=e862]
+                - text: 支付信息
+              - generic [ref=e865]:
+                - generic [ref=e866]:
+                  - paragraph [ref=e867]:
+                    - text: 收款单
+                    - code [ref=e868]: pay_col_01KV7404PSZ8ZQS6TAQ3A77BP5
+                  - generic [ref=e869]: completed
+                - generic [ref=e870]:
+                  - generic [ref=e871]: 金额
+                  - generic [ref=e872]: $48.00
+                - generic [ref=e873]:
+                  - paragraph [ref=e874]: 支付记录
+                  - generic [ref=e875]:
+                    - generic [ref=e876]:
+                      - paragraph [ref=e877]: 支付渠道：pp_wooshpay_wooshpay
+                      - paragraph [ref=e878]: Jun 16, 2026
+                    - generic [ref=e879]:
+                      - paragraph [ref=e880]: $48.00
+                      - generic [ref=e881]: 已收款
+          - generic [ref=e882]:
+            - generic [ref=e883]:
+              - heading "客户信息" [level=2] [ref=e884]:
+                - img [ref=e885]
+                - text: 客户信息
+              - generic [ref=e888]:
+                - generic [ref=e889]:
+                  - generic [ref=e891]: 1史
+                  - generic [ref=e892]:
+                    - paragraph [ref=e893]: 111213 史蒂夫
+                    - generic [ref=e894]: 注册用户
+                - generic [ref=e895]:
+                  - generic [ref=e896]:
+                    - img [ref=e897]
+                    - generic [ref=e900]: dsfdsf@qq.com
+                  - generic [ref=e901]:
+                    - img [ref=e902]
+                    - generic [ref=e904]: "17677132122"
+                - link "查看客户资料" [ref=e905] [cursor=pointer]:
+                  - /url: /customers/cus_01KV73Z9BAJX0KFGN7Q3JRG348
+            - generic [ref=e906]:
+              - heading "自提信息" [level=2] [ref=e907]:
+                - img [ref=e908]
+                - text: 自提信息
+              - generic [ref=e911]:
+                - img [ref=e912]
+                - generic [ref=e916]: "订单类型:"
+                - generic [ref=e917]: 自提
+              - generic [ref=e918]:
+                - img [ref=e919]
+                - generic [ref=e924]: "配送方式:"
+                - generic [ref=e925]: 自提
+              - generic [ref=e926]:
+                - generic [ref=e927]:
+                  - img [ref=e928]
+                  - generic [ref=e932]:
+                    - paragraph [ref=e933]: 客户已选择门店自提，无需发货，请联系客户安排取货时间。
+                    - paragraph [ref=e934]: 自提
+                - generic [ref=e935]:
+                  - img [ref=e936]
+                  - generic [ref=e938]: "17677132122"
+            - generic [ref=e939]:
+              - heading "订单信息" [level=2] [ref=e940]
+              - generic [ref=e941]:
+                - generic [ref=e942]:
+                  - generic [ref=e943]:
+                    - img [ref=e944]
+                    - text: 订单 ID
+                  - code [ref=e947]: order_01KV75TD52MZTDAM400RG2T1P3
+                - generic [ref=e948]:
+                  - generic [ref=e949]:
+                    - img [ref=e950]
+                    - text: 创建时间
+                  - generic [ref=e952]: Jun 16, 2026
+                - generic [ref=e953]:
+                  - generic [ref=e954]:
+                    - img [ref=e955]
+                    - text: 更新时间
+                  - generic [ref=e957]: Jun 16, 2026
+                - generic [ref=e959]: 货币
+  - region "Notifications alt+T"
+  - alert [ref=e272]

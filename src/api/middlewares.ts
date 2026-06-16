@@ -7,6 +7,9 @@ import {
   validateAndTransformQuery,
   authenticate,
 } from "@medusajs/framework/http"
+import { PolicyOperation } from "@medusajs/framework/utils"
+import { AdminGetOrdersParams } from "@medusajs/medusa/api/admin/orders/validators"
+import { listTransformQueryConfig as adminOrdersListTransformQueryConfig } from "@medusajs/medusa/api/admin/orders/query-config"
 import { createFindParams } from "@medusajs/medusa/api/utils/validators"
 import { z } from "zod"
 import {
@@ -105,6 +108,14 @@ export const GetCuratedCollectionsSchema = createFindParams()
 export const GetMenusSchema = createFindParams()
 export const GetAttributeTemplatesSchema = createFindParams()
 export const GetPickupLocationsSchema = createFindParams()
+const OrderDeliveryStatusParam = z.union([z.string(), z.array(z.string())]).optional()
+export const GetOrdersDeliverySchema = AdminGetOrdersParams.merge(z.object({
+  delivery_type: z.enum(["pickup", "delivery"]),
+  payment_status: OrderDeliveryStatusParam,
+  "payment_status[]": OrderDeliveryStatusParam,
+  fulfillment_status: OrderDeliveryStatusParam,
+  "fulfillment_status[]": OrderDeliveryStatusParam,
+}))
 
 export const GetConversationsSchema = createFindParams().merge(z.object({
   q: z.string().optional(),
@@ -246,6 +257,23 @@ export default defineMiddlewares({
       method: "POST",
       middlewares: [
         validateAndTransformBody(PostAdminUpdateBrand),
+      ],
+    },
+    // Order delivery type filter route mirrors native order list read policy.
+    {
+      matcher: "/admin/orders-delivery",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(
+          GetOrdersDeliverySchema,
+          adminOrdersListTransformQueryConfig
+        ),
+      ],
+      policies: [
+        {
+          resource: "order",
+          operation: PolicyOperation.read,
+        },
       ],
     },
     // Tag routes

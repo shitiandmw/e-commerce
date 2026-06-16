@@ -124,6 +124,26 @@ export interface AdminPaymentCollection {
   }>
 }
 
+export interface AdminOrderShippingMethod {
+  id: string
+  name?: string | null
+  amount: number
+  tax_total?: number
+  shipping_option_id?: string | null
+  metadata?: {
+    type?: unknown
+    [key: string]: unknown
+  } | null
+  shipping_option?: {
+    id?: string
+    name?: string | null
+    metadata?: {
+      type?: unknown
+      [key: string]: unknown
+    } | null
+  } | null
+}
+
 export interface AdminOrder {
   id: string
   display_id: number
@@ -157,12 +177,7 @@ export interface AdminOrder {
   } | null
   shipping_address?: AdminOrderAddress | null
   billing_address?: AdminOrderAddress | null
-  shipping_methods?: Array<{
-    id: string
-    name?: string
-    amount: number
-    tax_total?: number
-  }>
+  shipping_methods?: AdminOrderShippingMethod[]
   fulfillments?: AdminOrderFulfillment[]
   payment_collections?: AdminPaymentCollection[]
   region?: {

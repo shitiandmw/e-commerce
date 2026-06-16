@@ -10,6 +10,7 @@
       "order": "订单",
       "customer": "客户",
       "status": "状态",
+      "deliveryType": "订单类型",
       "payment": "支付",
       "fulfillment": "物流",
       "items": "商品",
@@ -46,8 +47,14 @@
       "unknown": "未知"
     },
 
+    "deliveryType": {
+      "pickup": "自提",
+      "delivery": "邮寄"
+    },
+
     "filters": {
       "searchPlaceholder": "搜索订单...",
+      "allDeliveryTypes": "全部类型",
       "allStatus": "全部状态",
       "allPayments": "全部支付",
       "allFulfillment": "全部物流"
@@ -70,6 +77,7 @@
       "orderNotFound": "订单不存在或加载失败。",
       "fulfill": "发货",
       "complete": "完成",
+      "markPickedUp": "标记已取货",
       "refund": "退款",
       "cancel": "取消",
 
@@ -78,6 +86,7 @@
         "fulfillments": "物流信息",
         "payment": "支付信息",
         "customer": "客户信息",
+        "pickupInfo": "自提信息",
         "shippingAddress": "收货地址",
         "billingAddress": "账单地址",
         "orderInfo": "订单信息"
@@ -164,6 +173,12 @@
         "cancel": "取消",
         "completeOrder": "完成订单",
         "completing": "处理中..."
+      },
+      "pickupComplete": {
+        "title": "标记已取货",
+        "description": "将自提订单 #{id} 标记为客户已取货并完成？",
+        "confirm": "标记已取货",
+        "processing": "处理中..."
       },
       "fulfill": {
         "title": "创建发货",

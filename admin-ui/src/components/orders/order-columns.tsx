@@ -5,6 +5,10 @@ import { AdminOrder } from "@/hooks/use-orders"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
+  getOrderDeliveryType,
+  ShippingOptionDeliveryInfo,
+} from "@/lib/order-delivery"
+import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
@@ -76,6 +80,19 @@ export function getFulfillmentStatusBadge(status?: string, t?: TranslationFn) {
   }
 }
 
+export function getDeliveryTypeBadge(
+  order: AdminOrder,
+  t?: TranslationFn,
+  shippingOptions?: ShippingOptionDeliveryInfo[]
+) {
+  const type = getOrderDeliveryType(order, shippingOptions)
+  if (type === "pickup") {
+    return <Badge variant="secondary">{t ? t("deliveryType.pickup") : "Pickup"}</Badge>
+  }
+
+  return <Badge variant="outline">{t ? t("deliveryType.delivery") : "Delivery"}</Badge>
+}
+
 function formatCurrency(amount: number, currency: string) {
   const cur = (currency || "USD").toUpperCase()
   return new Intl.NumberFormat("en-US", {
@@ -84,7 +101,10 @@ function formatCurrency(amount: number, currency: string) {
   }).format(amount / 100)
 }
 
-export function getOrderColumns(t: TranslationFn): ColumnDef<AdminOrder>[] {
+export function getOrderColumns(
+  t: TranslationFn,
+  shippingOptions?: ShippingOptionDeliveryInfo[]
+): ColumnDef<AdminOrder>[] {
   return [
     {
       accessorKey: "display_id",
@@ -133,6 +153,12 @@ export function getOrderColumns(t: TranslationFn): ColumnDef<AdminOrder>[] {
       header: t("columns.status"),
       cell: ({ row }) => getOrderStatusBadge(row.original.status, t),
       size: 130,
+    },
+    {
+      id: "delivery_type",
+      header: t("columns.deliveryType"),
+      cell: ({ row }) => getDeliveryTypeBadge(row.original, t, shippingOptions),
+      size: 120,
     },
     {
       id: "payment",
