@@ -9,7 +9,7 @@ import { getRegion } from "@/lib/region"
 import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 18
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
   const { locale, slug } = await params
