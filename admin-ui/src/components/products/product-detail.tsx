@@ -210,11 +210,6 @@ function VariantsWithInventory({ product }: { product: Product }) {
                                   {level.available_quantity}
                                 </span>
                               </span>
-                              {level.incoming_quantity > 0 && (
-                                <span className="text-muted-foreground">
-                                  {t("detail.incoming")}: <span className="font-medium">+{level.incoming_quantity}</span>
-                                </span>
-                              )}
                             </div>
                           </div>
                         )

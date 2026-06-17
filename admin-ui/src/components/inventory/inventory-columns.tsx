@@ -7,7 +7,6 @@ import {
   getTotalStocked,
   getTotalReserved,
   getTotalAvailable,
-  getTotalIncoming,
 } from "@/hooks/use-inventory"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -129,18 +128,6 @@ export function getInventoryColumns(
             }`}
           >
             {available}
-          </span>
-        )
-      },
-    },
-    {
-      id: "incoming",
-      header: t("columns.incoming"),
-      cell: ({ row }) => {
-        const incoming = getTotalIncoming(row.original)
-        return (
-          <span className="text-sm tabular-nums text-muted-foreground">
-            {incoming > 0 ? `+${incoming}` : "—"}
           </span>
         )
       },

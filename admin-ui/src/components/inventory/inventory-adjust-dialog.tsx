@@ -45,7 +45,6 @@ export function InventoryAdjustDialog({
   const [selectedLocationId, setSelectedLocationId] = React.useState<string>("")
   const [adjustmentType, setAdjustmentType] = React.useState<"set" | "add" | "remove">("set")
   const [quantity, setQuantity] = React.useState<string>("")
-  const [incomingQuantity, setIncomingQuantity] = React.useState<string>("")
   const [error, setError] = React.useState<string | null>(null)
 
   const locations = locationsData?.stock_locations ?? []
@@ -55,7 +54,6 @@ export function InventoryAdjustDialog({
     if (open && item) {
       setError(null)
       setQuantity("")
-      setIncomingQuantity("")
       setAdjustmentType("set")
 
       if (preselectedLocationId) {
@@ -104,17 +102,9 @@ export function InventoryAdjustDialog({
     const payload: {
       locationId: string
       stocked_quantity?: number
-      incoming_quantity?: number
     } = {
       locationId: selectedLocationId,
       stocked_quantity: newStockedQuantity,
-    }
-
-    if (incomingQuantity !== "") {
-      const inc = parseInt(incomingQuantity, 10)
-      if (!isNaN(inc) && inc >= 0) {
-        payload.incoming_quantity = inc
-      }
     }
 
     try {
@@ -244,26 +234,6 @@ export function InventoryAdjustDialog({
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 placeholder="0"
-              />
-            </div>
-
-            {/* Incoming quantity */}
-            <div className="space-y-2">
-              <Label htmlFor="incoming-quantity">
-                {t("adjustDialog.incomingQuantity")}{" "}
-                <span className="text-muted-foreground font-normal">{t("adjustDialog.optional")}</span>
-              </Label>
-              <Input
-                id="incoming-quantity"
-                type="number"
-                min="0"
-                value={incomingQuantity}
-                onChange={(e) => setIncomingQuantity(e.target.value)}
-                placeholder={
-                  selectedLevel
-                    ? String(selectedLevel.incoming_quantity)
-                    : "0"
-                }
               />
             </div>
 

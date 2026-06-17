@@ -35,7 +35,6 @@ export function InventoryAddLocationDialog({
 
   const [locationId, setLocationId] = useState("")
   const [stockedQty, setStockedQty] = useState(0)
-  const [incomingQty, setIncomingQty] = useState(0)
   const [error, setError] = useState("")
 
   const existingLocationIds = new Set(
@@ -59,11 +58,9 @@ export function InventoryAddLocationDialog({
       await createLevel.mutateAsync({
         location_id: locationId,
         stocked_quantity: stockedQty,
-        ...(incomingQty > 0 ? { incoming_quantity: incomingQty } : {}),
       })
       setLocationId("")
       setStockedQty(0)
-      setIncomingQty(0)
       onOpenChange(false)
     } catch {
       setError(t("addLocation.errors.createFailed"))
@@ -104,18 +101,6 @@ export function InventoryAddLocationDialog({
               min={0}
               value={stockedQty}
               onChange={(e) => setStockedQty(Number(e.target.value))}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>
-              {t("addLocation.incomingQuantity")}{" "}
-              <span className="text-muted-foreground text-xs">{t("adjustDialog.optional")}</span>
-            </Label>
-            <Input
-              type="number"
-              min={0}
-              value={incomingQty}
-              onChange={(e) => setIncomingQty(Number(e.target.value))}
             />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}

@@ -12,7 +12,6 @@ import {
   getTotalStocked,
   getTotalReserved,
   getTotalAvailable,
-  getTotalIncoming,
   LOW_STOCK_THRESHOLD,
 } from "@/hooks/use-inventory"
 import { InventoryAdjustDialog } from "./inventory-adjust-dialog"
@@ -27,10 +26,8 @@ import {
   PenLine,
   AlertTriangle,
   MapPin,
-  ArrowDownToLine,
   Lock,
   Boxes,
-  TrendingUp,
   Plus,
 } from "lucide-react"
 
@@ -119,7 +116,6 @@ export function InventoryDetail({ inventoryItemId }: InventoryDetailProps) {
   const totalStocked = getTotalStocked(item)
   const totalReserved = getTotalReserved(item)
   const totalAvailable = getTotalAvailable(item)
-  const totalIncoming = getTotalIncoming(item)
 
   return (
     <div className="space-y-8">
@@ -157,7 +153,7 @@ export function InventoryDetail({ inventoryItemId }: InventoryDetailProps) {
       </div>
 
       {/* Summary Stats */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="rounded-lg border bg-card p-5 shadow-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Boxes className="h-4 w-4" />
@@ -189,15 +185,6 @@ export function InventoryDetail({ inventoryItemId }: InventoryDetailProps) {
             }`}
           >
             {totalAvailable}
-          </p>
-        </div>
-        <div className="rounded-lg border bg-card p-5 shadow-sm">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <ArrowDownToLine className="h-4 w-4" />
-            <p className="text-sm font-medium">{t("detail.summary.incoming")}</p>
-          </div>
-          <p className="mt-2 text-3xl font-bold tabular-nums">
-            {totalIncoming > 0 ? `+${totalIncoming}` : "0"}
           </p>
         </div>
       </div>
@@ -270,7 +257,7 @@ export function InventoryDetail({ inventoryItemId }: InventoryDetailProps) {
                           {t("detail.adjust")}
                         </Button>
                       </div>
-                      <div className="grid grid-cols-4 gap-4">
+                      <div className="grid grid-cols-3 gap-4">
                         <div className="text-center rounded-md bg-muted p-2.5">
                           <p className="text-xs text-muted-foreground">
                             {t("detail.locationLevels.stocked")}
@@ -301,16 +288,6 @@ export function InventoryDetail({ inventoryItemId }: InventoryDetailProps) {
                             }`}
                           >
                             {level.available_quantity}
-                          </p>
-                        </div>
-                        <div className="text-center rounded-md bg-muted p-2.5">
-                          <p className="text-xs text-muted-foreground">
-                            {t("detail.locationLevels.incoming")}
-                          </p>
-                          <p className="text-sm font-semibold tabular-nums">
-                            {level.incoming_quantity > 0
-                              ? `+${level.incoming_quantity}`
-                              : "0"}
                           </p>
                         </div>
                       </div>
