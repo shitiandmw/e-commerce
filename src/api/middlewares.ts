@@ -10,6 +10,11 @@ import {
 import { PolicyOperation } from "@medusajs/framework/utils"
 import { AdminGetOrdersParams } from "@medusajs/medusa/api/admin/orders/validators"
 import { listTransformQueryConfig as adminOrdersListTransformQueryConfig } from "@medusajs/medusa/api/admin/orders/query-config"
+import { AdminGetInventoryItemsParams } from "@medusajs/medusa/api/admin/inventory-items/validators"
+import {
+  listTransformQueryConfig as adminInventoryItemsListTransformQueryConfig,
+  Entities as InventoryEntities,
+} from "@medusajs/medusa/api/admin/inventory-items/query-config"
 import { createFindParams } from "@medusajs/medusa/api/utils/validators"
 import { z } from "zod"
 import {
@@ -122,6 +127,7 @@ export const GetOrdersDeliverySchema = AdminGetOrdersParams.merge(z.object({
   fulfillment_status: OrderDeliveryStatusParam,
   "fulfillment_status[]": OrderDeliveryStatusParam,
 }))
+export const GetInventorySummarySchema = AdminGetInventoryItemsParams
 
 export const GetConversationsSchema = createFindParams().merge(z.object({
   q: z.string().optional(),
@@ -278,6 +284,22 @@ export default defineMiddlewares({
       policies: [
         {
           resource: "order",
+          operation: PolicyOperation.read,
+        },
+      ],
+    },
+    {
+      matcher: "/admin/inventory-summary",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(
+          GetInventorySummarySchema,
+          adminInventoryItemsListTransformQueryConfig
+        ),
+      ],
+      policies: [
+        {
+          resource: InventoryEntities.inventory_item,
           operation: PolicyOperation.read,
         },
       ],

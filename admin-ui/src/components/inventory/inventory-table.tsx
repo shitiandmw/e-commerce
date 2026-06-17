@@ -12,11 +12,11 @@ import {
 } from "@tanstack/react-table"
 import {
   useInventoryItems,
+  useInventoryItemsSummary,
   useStockLocations,
   useBulkEnableInventory,
   InventoryItem,
   getStockStatus,
-  LOW_STOCK_THRESHOLD,
 } from "@/hooks/use-inventory"
 import { getInventoryColumns } from "./inventory-columns"
 import { InventoryAdjustDialog } from "./inventory-adjust-dialog"
@@ -89,33 +89,44 @@ export function InventoryTable() {
     q: debouncedSearch || undefined,
     order: orderField,
   })
+  const {
+    data: summaryData,
+    isLoading: isSummaryLoading,
+    isError: isSummaryError,
+    error: summaryError,
+  } = useInventoryItemsSummary({
+    q: debouncedSearch || undefined,
+    order: orderField,
+  })
 
   const columns = React.useMemo(
     () => getInventoryColumns((item) => setItemToAdjust(item), t),
     [t]
   )
 
-  // Client-side stock status filtering (since API doesn't support it natively)
+  // Client-side stock status filtering (since API doesn't support it natively).
+  // The summary query loads every item matching the search so filters and stats
+  // are not limited to the current server-paginated page.
   const allItems = data?.inventory_items ?? []
+  const summaryItems = summaryData?.inventory_items ?? []
+  const statusFilteredItems = React.useMemo(() => {
+    if (stockFilter === "all") return summaryItems
+    return summaryItems.filter((item) => getStockStatus(item) === stockFilter)
+  }, [summaryItems, stockFilter])
   const filteredItems = React.useMemo(() => {
     if (stockFilter === "all") return allItems
-    return allItems.filter((item) => getStockStatus(item) === stockFilter)
-  }, [allItems, stockFilter])
 
-  const totalCount = stockFilter === "all" ? (data?.count ?? 0) : filteredItems.length
-  const pageCount = Math.ceil(
-    (stockFilter === "all" ? (data?.count ?? 0) : filteredItems.length) /
-      pagination.pageSize
-  )
+    const start = pagination.pageIndex * pagination.pageSize
+    return statusFilteredItems.slice(start, start + pagination.pageSize)
+  }, [allItems, pagination.pageIndex, pagination.pageSize, statusFilteredItems, stockFilter])
 
-  // Stats summary
-  const stats = React.useMemo(() => {
-    const items = allItems
-    const lowStock = items.filter((i) => getStockStatus(i) === "low_stock").length
-    const outOfStock = items.filter((i) => getStockStatus(i) === "out_of_stock").length
-    const inStock = items.filter((i) => getStockStatus(i) === "in_stock").length
-    return { lowStock, outOfStock, inStock, total: items.length }
-  }, [allItems])
+  const stats = summaryData?.stats
+  const totalCount = stockFilter === "all" ? (data?.count ?? 0) : statusFilteredItems.length
+  const pageCount = Math.ceil(totalCount / pagination.pageSize)
+  const tableIsLoading = stockFilter === "all" ? isLoading : isSummaryLoading
+  const tableIsError = stockFilter === "all" ? isError : isSummaryError
+  const tableError = stockFilter === "all" ? error : summaryError
+  const statsAreLoading = isSummaryLoading && !summaryData
 
   const table = useReactTable({
     data: filteredItems,
@@ -125,9 +136,9 @@ export function InventoryTable() {
     onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    manualPagination: stockFilter === "all",
+    manualPagination: true,
     manualSorting: true,
-    pageCount: stockFilter === "all" ? pageCount : undefined,
+    pageCount,
   })
 
   return (
@@ -159,7 +170,7 @@ export function InventoryTable() {
             <span className="text-sm text-muted-foreground">{t("stats.inStock")}</span>
           </div>
           <p className="mt-2 text-2xl font-bold tabular-nums text-green-600">
-            {isLoading ? "—" : stats.inStock}
+            {statsAreLoading || isSummaryError ? "—" : stats?.inStock ?? 0}
           </p>
         </button>
         <button
@@ -173,7 +184,7 @@ export function InventoryTable() {
             <span className="text-sm text-muted-foreground">{t("stats.lowStock")}</span>
           </div>
           <p className="mt-2 text-2xl font-bold tabular-nums text-yellow-600">
-            {isLoading ? "—" : stats.lowStock}
+            {statsAreLoading || isSummaryError ? "—" : stats?.lowStock ?? 0}
           </p>
         </button>
         <button
@@ -187,7 +198,7 @@ export function InventoryTable() {
             <span className="text-sm text-muted-foreground">{t("stats.outOfStock")}</span>
           </div>
           <p className="mt-2 text-2xl font-bold tabular-nums text-destructive">
-            {isLoading ? "—" : stats.outOfStock}
+            {statsAreLoading || isSummaryError ? "—" : stats?.outOfStock ?? 0}
           </p>
         </button>
       </div>
@@ -252,7 +263,7 @@ export function InventoryTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {isLoading ? (
+            {tableIsLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <TableRow key={i}>
                   <TableCell><Skeleton className="h-4 w-20" /></TableCell>
@@ -266,11 +277,11 @@ export function InventoryTable() {
                   <TableCell><Skeleton className="h-8 w-8 rounded-md" /></TableCell>
                 </TableRow>
               ))
-            ) : isError ? (
+            ) : tableIsError ? (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   <div className="text-destructive">
-                    {t("table.failedToLoad", { error: error instanceof Error ? error.message : t("table.unknownError") })}
+                    {t("table.failedToLoad", { error: tableError instanceof Error ? tableError.message : t("table.unknownError") })}
                   </div>
                 </TableCell>
               </TableRow>
@@ -345,7 +356,7 @@ export function InventoryTable() {
         </Table>
 
         {/* Pagination */}
-        {!isLoading && totalCount > 0 && (
+        {!tableIsLoading && totalCount > 0 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
             <p className="text-sm text-muted-foreground">
               {t("table.showingPagination", {

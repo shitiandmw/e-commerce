@@ -64,6 +64,19 @@ export interface InventoryItemsResponse {
   limit: number
 }
 
+export interface InventoryStats {
+  total: number
+  inStock: number
+  lowStock: number
+  outOfStock: number
+}
+
+export interface InventoryItemsSummaryResponse {
+  inventory_items: InventoryItem[]
+  count: number
+  stats: InventoryStats
+}
+
 export interface StockLocationsResponse {
   stock_locations: StockLocation[]
   count: number
@@ -83,22 +96,73 @@ export interface InventoryQueryParams {
 
 // ---- Hooks ----
 
+const INVENTORY_ITEMS_FIELDS = "*location_levels"
+
+function buildInventoryItemsPath(params: InventoryQueryParams = {}) {
+  const {
+    offset = 0,
+    limit = 20,
+    q,
+    sku,
+    order,
+    fields = INVENTORY_ITEMS_FIELDS,
+    location_id,
+  } = params
+
+  const queryParams = new URLSearchParams()
+  queryParams.set("offset", String(offset))
+  queryParams.set("limit", String(limit))
+  queryParams.set("fields", fields)
+  if (q) queryParams.set("q", q)
+  if (sku) queryParams.set("sku", sku)
+  if (order) queryParams.set("order", order)
+  if (location_id) queryParams.set("location_levels[location_id]", location_id)
+
+  return `/admin/inventory-items?${queryParams.toString()}`
+}
+
+export function fetchInventoryItems(params: InventoryQueryParams = {}) {
+  return adminFetch<InventoryItemsResponse>(buildInventoryItemsPath(params))
+}
+
 export function useInventoryItems(params: InventoryQueryParams = {}) {
-  const { offset = 0, limit = 20, q, sku, order, location_id } = params
+  const {
+    offset = 0,
+    limit = 20,
+    q,
+    sku,
+    order,
+    fields = INVENTORY_ITEMS_FIELDS,
+    location_id,
+  } = params
 
   return useQuery<InventoryItemsResponse>({
-    queryKey: ["inventory-items", { offset, limit, q, sku, order, location_id }],
+    queryKey: [
+      "inventory-items",
+      { offset, limit, q, sku, order, fields, location_id },
+    ],
+    queryFn: () =>
+      fetchInventoryItems({ offset, limit, q, sku, order, fields, location_id }),
+  })
+}
+
+export function useInventoryItemsSummary(
+  params: Omit<InventoryQueryParams, "offset" | "limit"> = {}
+) {
+  const { q, sku, order, fields = INVENTORY_ITEMS_FIELDS, location_id } = params
+
+  return useQuery<InventoryItemsSummaryResponse>({
+    queryKey: ["inventory-items", "summary", { q, sku, order, fields, location_id }],
     queryFn: () => {
       const queryParams = new URLSearchParams()
-      queryParams.set("offset", String(offset))
-      queryParams.set("limit", String(limit))
-      queryParams.set("fields", "*location_levels")
+      queryParams.set("fields", fields)
       if (q) queryParams.set("q", q)
       if (sku) queryParams.set("sku", sku)
       if (order) queryParams.set("order", order)
       if (location_id) queryParams.set("location_levels[location_id]", location_id)
-      return adminFetch<InventoryItemsResponse>(
-        `/admin/inventory-items?${queryParams.toString()}`
+
+      return adminFetch<InventoryItemsSummaryResponse>(
+        `/admin/inventory-summary?${queryParams.toString()}`
       )
     },
   })
