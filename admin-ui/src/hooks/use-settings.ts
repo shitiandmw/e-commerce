@@ -412,7 +412,8 @@ export interface AdminUser {
   email: string
   first_name?: string | null
   last_name?: string | null
-  role?: string | null
+  avatar_url?: string | null
+  metadata?: Record<string, unknown> | null
   created_at: string
   updated_at: string
 }
@@ -428,69 +429,93 @@ export function useUsers() {
   return useQuery<UsersResponse>({
     queryKey: ["admin-users"],
     queryFn: () =>
-      adminFetch<UsersResponse>("/admin/users", {
+      adminFetch<UsersResponse>("/admin/account-users", {
         params: { limit: "50" },
       }),
   })
 }
 
-export function useInviteUser() {
+export function useCurrentAdminUser() {
+  return useQuery<{ user: AdminUser }>({
+    queryKey: ["admin-current-user"],
+    queryFn: () =>
+      adminFetch<{ user: AdminUser }>("/admin/account-users/me"),
+  })
+}
+
+export function useCreateAdminUser() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (data: { email: string }) =>
-      adminFetch("/admin/invites", {
+    mutationFn: (data: {
+      email: string
+      password: string
+      confirm_password: string
+      first_name?: string
+      last_name?: string
+      avatar_url?: string
+    }) =>
+      adminFetch<{ user: AdminUser }>("/admin/account-users", {
         method: "POST",
         body: data,
       }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-users"] })
-      qc.invalidateQueries({ queryKey: ["admin-invites"] })
     },
   })
 }
 
-export interface AdminInvite {
-  id: string
-  email: string
-  accepted: boolean
-  token?: string
-  expires_at: string
-  created_at: string
-  updated_at: string
+export function useUpdateAdminUser() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      id,
+      ...data
+    }: {
+      id: string
+      first_name?: string | null
+      last_name?: string | null
+      avatar_url?: string | null
+      metadata?: Record<string, unknown> | null
+    }) =>
+      adminFetch<{ user: AdminUser }>(`/admin/account-users/${id}`, {
+        method: "POST",
+        body: data,
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-users"] })
+      qc.invalidateQueries({ queryKey: ["admin-current-user"] })
+    },
+  })
 }
 
-interface InvitesResponse {
-  invites: AdminInvite[]
-  count: number
-  offset: number
-  limit: number
-}
-
-export function useInvites() {
-  return useQuery<InvitesResponse>({
-    queryKey: ["admin-invites"],
-    queryFn: () =>
-      adminFetch<InvitesResponse>("/admin/invites", {
-        params: { limit: "50" },
+export function useResetAdminUserPassword() {
+  return useMutation({
+    mutationFn: (data: {
+      id: string
+      password: string
+      confirm_password: string
+    }) =>
+      adminFetch<{ success: boolean }>(`/admin/account-users/${data.id}/reset-password`, {
+        method: "POST",
+        body: {
+          password: data.password,
+          confirm_password: data.confirm_password,
+        },
       }),
   })
 }
 
-export function useDeleteInvite() {
-  const qc = useQueryClient()
+export function useChangeOwnPassword() {
   return useMutation({
-    mutationFn: (id: string) =>
-      adminFetch(`/admin/invites/${id}`, { method: "DELETE" }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["admin-invites"] })
-    },
-  })
-}
-
-export function useResendInvite() {
-  return useMutation({
-    mutationFn: (id: string) =>
-      adminFetch(`/admin/invites/${id}/resend`, { method: "POST" }),
+    mutationFn: (data: {
+      current_password: string
+      password: string
+      confirm_password: string
+    }) =>
+      adminFetch<{ success: boolean }>("/admin/account-users/me/change-password", {
+        method: "POST",
+        body: data,
+      }),
   })
 }
 

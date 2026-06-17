@@ -90,6 +90,12 @@ import {
   PostAdminCreateTrackingRecord,
   PostAdminUpdateTrackingStatus,
 } from "./admin/tracking/validators"
+import {
+  PostAdminChangeOwnPassword,
+  PostAdminCreateAccountUser,
+  PostAdminResetAccountUserPassword,
+  PostAdminUpdateAccountUser,
+} from "./admin/account-users/validators"
 import { initSocketIO, setContainer } from "../lib/socket-io"
 
 export const GetBrandsSchema = createFindParams().merge(z.object({ q: z.string().optional() }))
@@ -670,6 +676,53 @@ export default defineMiddlewares({
       method: "POST",
       middlewares: [
         validateAndTransformBody(PostAdminUpdateTrackingStatus),
+      ],
+    },
+    // Admin account users routes
+    {
+      matcher: "/admin/account-users",
+      method: "GET",
+      middlewares: [
+        authenticate("user", ["bearer", "session"]),
+      ],
+    },
+    {
+      matcher: "/admin/account-users/me",
+      method: "GET",
+      middlewares: [
+        authenticate("user", ["bearer", "session"]),
+      ],
+    },
+    {
+      matcher: "/admin/account-users",
+      method: "POST",
+      middlewares: [
+        authenticate("user", ["bearer", "session"]),
+        validateAndTransformBody(PostAdminCreateAccountUser),
+      ],
+    },
+    {
+      matcher: "/admin/account-users/:id/reset-password",
+      method: "POST",
+      middlewares: [
+        authenticate("user", ["bearer", "session"]),
+        validateAndTransformBody(PostAdminResetAccountUserPassword),
+      ],
+    },
+    {
+      matcher: "/admin/account-users/me/change-password",
+      method: "POST",
+      middlewares: [
+        authenticate("user", ["bearer", "session"]),
+        validateAndTransformBody(PostAdminChangeOwnPassword),
+      ],
+    },
+    {
+      matcher: "/admin/account-users/:id",
+      method: "POST",
+      middlewares: [
+        authenticate("user", ["bearer", "session"]),
+        validateAndTransformBody(PostAdminUpdateAccountUser),
       ],
     },
     // Store order details must be scoped to the authenticated customer.

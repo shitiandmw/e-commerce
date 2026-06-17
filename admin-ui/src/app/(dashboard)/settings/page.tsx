@@ -9,7 +9,10 @@ import { SalesChannelSettings } from "@/components/settings/sales-channel-settin
 import { ShippingOptionsTable } from "@/components/shipping/shipping-options-table"
 import { PaymentSettings } from "@/components/settings/payment-settings"
 import { PickupLocationSettings } from "@/components/settings/pickup-location-settings"
-import { UserSettings } from "@/components/settings/user-settings"
+import {
+  AdminAccountSettings,
+  MyAccountSettings,
+} from "@/components/settings/user-settings"
 import { ApiKeySettings } from "@/components/settings/api-key-settings"
 import { TranslationSettings } from "@/components/settings/translation-settings"
 import {
@@ -22,9 +25,10 @@ import {
   Key,
   Languages,
   MapPin,
+  UserRound,
 } from "lucide-react"
 
-const tabIds = ["store", "regions", "channels", "shipping", "pickup-locations", "payments", "team", "api-keys", "translations"] as const
+const tabIds = ["store", "regions", "channels", "shipping", "pickup-locations", "payments", "team", "api-keys", "translations", "my-account"] as const
 type TabId = (typeof tabIds)[number]
 
 const tabIcons: Record<TabId, typeof Store> = {
@@ -34,6 +38,7 @@ const tabIcons: Record<TabId, typeof Store> = {
   shipping: Truck,
   "pickup-locations": MapPin,
   payments: CreditCard,
+  "my-account": UserRound,
   team: Users,
   "api-keys": Key,
   translations: Languages,
@@ -46,6 +51,7 @@ const tabLabelKeys: Record<TabId, string> = {
   shipping: "tabs.shipping",
   "pickup-locations": "tabs.pickupLocations",
   payments: "tabs.payments",
+  "my-account": "tabs.myAccount",
   team: "tabs.team",
   "api-keys": "tabs.apiKeys",
   translations: "tabs.translations",
@@ -98,7 +104,8 @@ export default function SettingsPage() {
           {activeTab === "shipping" && <ShippingOptionsTable />}
           {activeTab === "pickup-locations" && <PickupLocationSettings />}
           {activeTab === "payments" && <PaymentSettings />}
-          {activeTab === "team" && <UserSettings />}
+          {activeTab === "my-account" && <MyAccountSettings />}
+          {activeTab === "team" && <AdminAccountSettings />}
           {activeTab === "api-keys" && <ApiKeySettings />}
           {activeTab === "translations" && <TranslationSettings />}
         </div>
