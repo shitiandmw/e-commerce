@@ -1,0 +1,220 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e5]:
+      - button "打開選單" [ref=e6]:
+        - img [ref=e7]
+      - link "SHANGJIA" [ref=e8] [cursor=pointer]:
+        - /url: /zh-TW
+        - generic [ref=e9]: SHANGJIA
+      - generic [ref=e10]:
+        - button "切換主題" [ref=e11]:
+          - img
+          - generic [ref=e12]: 切換主題
+        - link "搜尋" [ref=e13] [cursor=pointer]:
+          - /url: /zh-TW/search
+          - img [ref=e14]
+        - link "登入" [ref=e17] [cursor=pointer]:
+          - /url: /zh-TW/login
+          - img [ref=e18]
+        - link "購物車" [ref=e21] [cursor=pointer]:
+          - /url: /zh-TW/cart
+          - img [ref=e22]
+  - main [ref=e25]:
+    - generic [ref=e26]:
+      - navigation "breadcrumb" [ref=e27]:
+        - list [ref=e28]:
+          - listitem [ref=e29]:
+            - link "首頁" [ref=e30] [cursor=pointer]:
+              - /url: /zh-TW
+          - listitem [ref=e31]:
+            - img [ref=e32]
+          - listitem [ref=e34]:
+            - link "古巴雪茄" [ref=e35] [cursor=pointer]:
+              - /url: /zh-TW/category/cuban-cigars
+          - listitem [ref=e36]:
+            - img [ref=e37]
+          - listitem [ref=e39]: Trinidad Fundadores
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - img "Trinidad Fundadores" [ref=e44]
+          - generic [ref=e45]:
+            - heading "Trinidad Fundadores" [level=1] [ref=e46]
+            - generic [ref=e49]: 起$41.00
+            - group "商品規格選擇" [ref=e50]:
+              - generic [ref=e51]:
+                - paragraph [ref=e52]: 规格
+                - generic [ref=e53]:
+                  - button "单支" [ref=e54]
+                  - button "盒装" [ref=e55]
+            - generic [ref=e56]:
+              - generic [ref=e57]:
+                - generic [ref=e58]: 數量
+                - generic [ref=e59]:
+                  - button "減少數量" [ref=e60]:
+                    - img [ref=e61]
+                  - generic [ref=e62]: "1"
+                  - button "增加數量" [ref=e63]:
+                    - img [ref=e64]
+              - generic [ref=e65]:
+                - button "缺貨中" [disabled] [ref=e66]:
+                  - img [ref=e67]
+                  - text: 缺貨中
+                - button "加入收藏" [ref=e70]:
+                  - img [ref=e71]
+                - button "分享" [ref=e73]:
+                  - img [ref=e74]
+              - button "立即購買" [disabled] [ref=e80]
+        - generic [ref=e82]:
+          - tablist [ref=e83]:
+            - tab "詳細介紹" [selected] [ref=e84]
+          - tabpanel "詳細介紹" [ref=e85]:
+            - generic [ref=e86]: 特立尼达创始人，曾为古巴外交礼品的顶级雪茄
+        - generic [ref=e87]:
+          - heading "您可能也喜歡" [level=2] [ref=e88]
+          - generic [ref=e89]:
+            - link "Cohiba Siglo VI 新品 限量版 加入收藏 Cohiba Siglo VI 中等浓度 古巴产区 $48.00" [ref=e90] [cursor=pointer]:
+              - /url: /zh-TW/product/cohiba-siglo-vi
+              - generic [ref=e91]:
+                - img "Cohiba Siglo VI" [ref=e92]
+                - generic [ref=e93]:
+                  - generic [ref=e95]: 新品
+                  - generic [ref=e97]: 限量版
+                - button "加入收藏" [ref=e98]:
+                  - img [ref=e99]
+              - generic [ref=e101]:
+                - heading "Cohiba Siglo VI" [level=3] [ref=e102]
+                - generic [ref=e103]:
+                  - generic [ref=e106]: 中等浓度
+                  - generic [ref=e109]: 古巴产区
+                - generic [ref=e111]: $48.00
+            - link "Montecristo No.2 熱賣 加入收藏 Montecristo No.2 古巴产区 $24.00" [ref=e112] [cursor=pointer]:
+              - /url: /zh-TW/product/montecristo-no2
+              - generic [ref=e113]:
+                - img "Montecristo No.2" [ref=e114]
+                - generic [ref=e117]: 熱賣
+                - button "加入收藏" [ref=e118]:
+                  - img [ref=e119]
+              - generic [ref=e121]:
+                - heading "Montecristo No.2" [level=3] [ref=e122]
+                - generic [ref=e126]: 古巴产区
+                - generic [ref=e128]: $24.00
+            - link "Partagas Serie D No.4 新品 加入收藏 Partagas Serie D No.4 $20.00" [ref=e129] [cursor=pointer]:
+              - /url: /zh-TW/product/partagas-serie-d-no4
+              - generic [ref=e130]:
+                - img "Partagas Serie D No.4" [ref=e131]
+                - generic [ref=e134]: 新品
+                - button "加入收藏" [ref=e135]:
+                  - img [ref=e136]
+              - generic [ref=e138]:
+                - heading "Partagas Serie D No.4" [level=3] [ref=e139]
+                - generic [ref=e141]: $20.00
+            - link "Romeo y Julieta Wide Churchill 加入收藏 Romeo y Julieta Wide Churchill 中等浓度 木盒装 $22.00" [ref=e142] [cursor=pointer]:
+              - /url: /zh-TW/product/ryj-wide-churchill
+              - generic [ref=e143]:
+                - img "Romeo y Julieta Wide Churchill" [ref=e144]
+                - button "加入收藏" [ref=e145]:
+                  - img [ref=e146]
+              - generic [ref=e148]:
+                - heading "Romeo y Julieta Wide Churchill" [level=3] [ref=e149]
+                - generic [ref=e150]:
+                  - generic [ref=e153]: 中等浓度
+                  - generic [ref=e156]: 木盒装
+                - generic [ref=e158]: $22.00
+  - contentinfo [ref=e159]:
+    - generic [ref=e161]:
+      - generic [ref=e162]:
+        - link "SHANGJIA SHANGJIA" [ref=e163] [cursor=pointer]:
+          - /url: /zh-TW
+          - text: SHANGJIA
+          - paragraph [ref=e164]: SHANGJIA
+        - paragraph [ref=e165]: 您的雪茄網購平台，提供古巴雪茄、非古雪茄、迷你雪茄等頂級品牌的正貨保證。
+        - generic [ref=e166]:
+          - link "Instagram" [ref=e167] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e168]
+          - link "Facebook" [ref=e170] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e171]
+          - link "WhatsApp" [ref=e173] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e174]
+      - generic [ref=e176]:
+        - generic [ref=e177]:
+          - heading "快速連結" [level=3] [ref=e178]
+          - list [ref=e179]:
+            - listitem [ref=e180]:
+              - link "首頁" [ref=e181] [cursor=pointer]:
+                - /url: /zh-TW
+            - listitem [ref=e182]:
+              - link "所有商品" [ref=e183] [cursor=pointer]:
+                - /url: /zh-TW/products
+            - listitem [ref=e184]:
+              - link "古巴雪茄" [ref=e185] [cursor=pointer]:
+                - /url: /zh-TW/categories/cuban-cigars
+            - listitem [ref=e186]:
+              - link "世界品牌" [ref=e187] [cursor=pointer]:
+                - /url: /zh-TW/brands
+            - listitem [ref=e188]:
+              - link "新品上市" [ref=e189] [cursor=pointer]:
+                - /url: /zh-TW/categories/new-arrivals
+            - listitem [ref=e190]:
+              - link "特惠專區" [ref=e191] [cursor=pointer]:
+                - /url: /zh-TW/categories/deals
+        - generic [ref=e192]:
+          - heading "商品分類" [level=3] [ref=e193]
+          - list [ref=e194]:
+            - listitem [ref=e195]:
+              - link "雪茄" [ref=e196] [cursor=pointer]:
+                - /url: /zh-TW/categories/cigars
+            - listitem [ref=e197]:
+              - link "迷你雪茄" [ref=e198] [cursor=pointer]:
+                - /url: /zh-TW/categories/mini-cigars
+            - listitem [ref=e199]:
+              - link "雪茄配件" [ref=e200] [cursor=pointer]:
+                - /url: /zh-TW/categories/accessories
+            - listitem [ref=e201]:
+              - link "保濕盒" [ref=e202] [cursor=pointer]:
+                - /url: /zh-TW/categories/humidors
+            - listitem [ref=e203]:
+              - link "打火機" [ref=e204] [cursor=pointer]:
+                - /url: /zh-TW/categories/lighters
+            - listitem [ref=e205]:
+              - link "雪茄剪" [ref=e206] [cursor=pointer]:
+                - /url: /zh-TW/categories/cutters
+        - generic [ref=e207]:
+          - heading "客戶服務" [level=3] [ref=e208]
+          - list [ref=e209]:
+            - listitem [ref=e210]:
+              - link "聯繫我們" [ref=e211] [cursor=pointer]:
+                - /url: /zh-TW/contact
+            - listitem [ref=e212]:
+              - link "常見問題" [ref=e213] [cursor=pointer]:
+                - /url: /zh-TW/faq
+            - listitem [ref=e214]:
+              - link "配送說明" [ref=e215] [cursor=pointer]:
+                - /url: /zh-TW/shipping
+            - listitem [ref=e216]:
+              - link "退換貨政策" [ref=e217] [cursor=pointer]:
+                - /url: /zh-TW/returns
+            - listitem [ref=e218]:
+              - link "隱私政策" [ref=e219] [cursor=pointer]:
+                - /url: /zh-TW/privacy
+        - generic [ref=e220]:
+          - heading "關於我們" [level=3] [ref=e221]
+          - list [ref=e222]:
+            - listitem [ref=e223]:
+              - link "品牌故事" [ref=e224] [cursor=pointer]:
+                - /url: /zh-TW/about
+            - listitem [ref=e225]:
+              - link "雪茄知識" [ref=e226] [cursor=pointer]:
+                - /url: /zh-TW/articles
+            - listitem [ref=e227]:
+              - link "最新文章" [ref=e228] [cursor=pointer]:
+                - /url: /zh-TW/blog
+    - generic [ref=e231]:
+      - paragraph [ref=e232]: © 2026 ShangJia. All rights reserved.
+      - paragraph [ref=e233]: 吸煙危害健康。本網站僅供年滿18歲人士瀏覽及購買。雪茄產品圖片僅供參考，實際產品可能略有差異。
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e239] [cursor=pointer]:
+    - img [ref=e240]
+  - alert [ref=e243]

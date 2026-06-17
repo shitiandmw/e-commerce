@@ -16,6 +16,7 @@ import { SharePopover } from "@/components/product/share-popover"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
+import { getCustomTags, ProductTagChip } from "@/components/product/product-tag-chip"
 
 export function ProductDetailContent({
   product,
@@ -124,6 +125,9 @@ export function ProductDetailContent({
   const displayBrandNameEn = brandNameEn
   const brandDescription = brand?.description
   const isLimited = meta.is_limited === "true"
+  const customTags = getCustomTags(product)
+  const badgeTags = customTags.filter((tag) => tag.type === "badge")
+  const attributeTags = customTags.filter((tag) => tag.type === "attribute")
 
   // Fetch wishlist on mount if logged in
   useEffect(() => {
@@ -139,7 +143,7 @@ export function ProductDetailContent({
     : []
 
   const hasCigarSpecs = !!(origin || wrapper || binder || filler || cigarLength || ringGauge || strength)
-  const hasSpecs = hasCigarSpecs || customAttributes.length > 0
+  const hasSpecs = hasCigarSpecs || customAttributes.length > 0 || attributeTags.length > 0
 
   return (
     <div>
@@ -204,6 +208,18 @@ export function ProductDetailContent({
             <h1 className="mt-2 text-2xl md:text-3xl font-serif font-bold text-foreground leading-tight">{product.title}</h1>
             {product.subtitle && (
               <p className="mt-1 text-base text-muted-foreground">{product.subtitle}</p>
+            )}
+            {badgeTags.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {badgeTags.map((tag) => (
+                  <ProductTagChip
+                    key={tag.id}
+                    tag={tag}
+                    variant="badge"
+                    className="px-3 py-1.5 text-xs"
+                  />
+                ))}
+              </div>
             )}
 
             {/* Price */}
@@ -509,6 +525,21 @@ export function ProductDetailContent({
                           <span className="text-foreground font-medium">{attr.value}</span>
                         </div>
                       ))}
+                      {attributeTags.length > 0 && (
+                        <div className="col-span-2 md:col-span-4 flex flex-col gap-2">
+                          <span className="text-muted-foreground">{t("spec_tags")}</span>
+                          <div className="flex flex-wrap gap-2">
+                            {attributeTags.map((tag) => (
+                              <ProductTagChip
+                                key={tag.id}
+                                tag={tag}
+                                variant="attribute"
+                                className="px-3 py-1.5 text-xs"
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                   {product.description && (

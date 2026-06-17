@@ -9,6 +9,7 @@ import { formatPrice } from "@/lib/format"
 import { useCart } from "@/lib/cart-store"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
+import { getCustomTags, ProductTagChip } from "@/components/product/product-tag-chip"
 
 function isMedusaProduct(p: Product | MedusaProduct): p is MedusaProduct {
   return "handle" in p && "variants" in p
@@ -45,6 +46,10 @@ function MedusaProductCard({
   const inventoryQty = firstVariant?.inventory_quantity
   const isOutOfStock = manageInventory && (inventoryQty === undefined || inventoryQty === null || inventoryQty <= 0)
   const canQuickAdd = hasSingleVariant && !!firstVariantId && !isOutOfStock
+  const customTags = getCustomTags(product)
+  const badgeTags = customTags.filter((tag) => tag.type === "badge")
+  const attributeTags = customTags.filter((tag) => tag.type === "attribute").slice(0, 2)
+  const visibleBadgeTags = badgeTags.slice(0, isLimited ? 1 : 2)
 
   const handleQuickAdd = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -72,11 +77,16 @@ function MedusaProductCard({
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        {isLimited && (
-          <div className="absolute top-3 left-3">
-            <span className="bg-gold/90 text-primary-foreground text-[10px] font-bold px-2 py-1 tracking-wider">
-              LIMITED
-            </span>
+        {(isLimited || visibleBadgeTags.length > 0) && (
+          <div className="absolute top-3 left-3 right-12 flex flex-wrap items-start gap-1.5">
+            {isLimited && (
+              <span className="bg-gold/90 text-primary-foreground text-[10px] font-bold px-2 py-1 tracking-wider">
+                LIMITED
+              </span>
+            )}
+            {visibleBadgeTags.map((tag) => (
+              <ProductTagChip key={tag.id} tag={tag} variant="badge" />
+            ))}
           </div>
         )}
         <button
@@ -108,6 +118,13 @@ function MedusaProductCard({
         </h3>
         {product.subtitle && (
           <p className="mt-0.5 text-xs text-muted-foreground">{product.subtitle}</p>
+        )}
+        {attributeTags.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {attributeTags.map((tag) => (
+              <ProductTagChip key={tag.id} tag={tag} variant="attribute" />
+            ))}
+          </div>
         )}
         <div className="mt-3 flex items-center justify-between">
           {priceInfo ? (

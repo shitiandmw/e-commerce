@@ -1,0 +1,240 @@
+- generic:
+  - banner:
+    - generic:
+      - generic:
+        - generic:
+          - link:
+            - /url: /zh-TW
+            - generic: SHANGJIA
+            - generic: 上茄
+          - navigation:
+            - generic:
+              - generic:
+                - link:
+                  - /url: /zh-TW/categories/cuban-cigars
+                  - text: 古巴雪茄
+              - generic:
+                - link:
+                  - /url: /zh-TW/brands
+                  - text: 世界品牌
+              - generic:
+                - link:
+                  - /url: /zh-TW/categories/accessories
+                  - text: 雪茄配件
+                  - img
+              - generic:
+                - link:
+                  - /url: /zh-TW/categories/new-arrivals
+                  - text: 新品上市
+              - generic:
+                - link:
+                  - /url: /zh-TW/categories/deals
+                  - text: 特惠专区
+              - generic:
+                - link:
+                  - /url: /zh-TW/articles
+                  - text: 雪茄知识
+                  - img
+          - generic:
+            - button:
+              - img
+              - generic: 切換主題
+            - generic:
+              - button:
+                - img
+                - generic: 繁中
+                - img
+            - link:
+              - /url: /zh-TW/search
+              - img
+            - link:
+              - /url: /zh-TW/login
+              - img
+            - link:
+              - /url: /zh-TW/cart
+              - img
+  - main:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - paragraph: all
+      - generic:
+        - generic:
+          - complementary:
+            - generic:
+              - heading [level=3]: 其他分類
+              - generic:
+                - link:
+                  - /url: /zh-TW/category/cuban-cigars
+                  - text: 古巴雪茄
+                - link:
+                  - /url: /zh-TW/category/world-brands
+                  - text: 世界品牌
+                - link:
+                  - /url: /zh-TW/category/cuban-cigarillos
+                  - text: 古巴小雪茄
+                - link:
+                  - /url: /zh-TW/category/pipe-tobacco
+                  - text: 烟丝
+                - link:
+                  - /url: /zh-TW/category/accessories
+                  - text: 雪茄配件
+                - link:
+                  - /url: /zh-TW/category/bundles
+                  - text: 组合套装
+                - link:
+                  - /url: /zh-TW/category/deals
+                  - text: 特惠专区
+                - link:
+                  - /url: /zh-TW/category/new-arrivals
+                  - text: 新品上市
+          - generic:
+            - generic:
+              - generic: 共 0 款產品
+              - generic:
+                - generic:
+                  - combobox
+                  - img
+                - generic:
+                  - button:
+                    - img
+                  - button:
+                    - img
+            - generic:
+              - paragraph: 暫無商品
+  - contentinfo:
+    - generic:
+      - generic:
+        - generic:
+          - link:
+            - /url: /zh-TW
+            - text: SHANGJIA
+            - paragraph: SHANGJIA
+          - paragraph: 您的雪茄網購平台，提供古巴雪茄、非古雪茄、迷你雪茄等頂級品牌的正貨保證。
+          - generic:
+            - link:
+              - /url: "#"
+              - img
+            - link:
+              - /url: "#"
+              - img
+            - link:
+              - /url: "#"
+              - img
+        - generic:
+          - generic:
+            - heading [level=3]: 快速連結
+            - list:
+              - listitem:
+                - link:
+                  - /url: /zh-TW
+                  - text: 首頁
+              - listitem:
+                - link:
+                  - /url: /zh-TW/products
+                  - text: 所有商品
+              - listitem:
+                - link:
+                  - /url: /zh-TW/categories/cuban-cigars
+                  - text: 古巴雪茄
+              - listitem:
+                - link:
+                  - /url: /zh-TW/brands
+                  - text: 世界品牌
+              - listitem:
+                - link:
+                  - /url: /zh-TW/categories/new-arrivals
+                  - text: 新品上市
+              - listitem:
+                - link:
+                  - /url: /zh-TW/categories/deals
+                  - text: 特惠專區
+          - generic:
+            - heading [level=3]: 商品分類
+            - list:
+              - listitem:
+                - link:
+                  - /url: /zh-TW/categories/cigars
+                  - text: 雪茄
+              - listitem:
+                - link:
+                  - /url: /zh-TW/categories/mini-cigars
+                  - text: 迷你雪茄
+              - listitem:
+                - link:
+                  - /url: /zh-TW/categories/accessories
+                  - text: 雪茄配件
+              - listitem:
+                - link:
+                  - /url: /zh-TW/categories/humidors
+                  - text: 保濕盒
+              - listitem:
+                - link:
+                  - /url: /zh-TW/categories/lighters
+                  - text: 打火機
+              - listitem:
+                - link:
+                  - /url: /zh-TW/categories/cutters
+                  - text: 雪茄剪
+          - generic:
+            - heading [level=3]: 客戶服務
+            - list:
+              - listitem:
+                - link:
+                  - /url: /zh-TW/contact
+                  - text: 聯繫我們
+              - listitem:
+                - link:
+                  - /url: /zh-TW/faq
+                  - text: 常見問題
+              - listitem:
+                - link:
+                  - /url: /zh-TW/shipping
+                  - text: 配送說明
+              - listitem:
+                - link:
+                  - /url: /zh-TW/returns
+                  - text: 退換貨政策
+              - listitem:
+                - link:
+                  - /url: /zh-TW/privacy
+                  - text: 隱私政策
+          - generic:
+            - heading [level=3]: 關於我們
+            - list:
+              - listitem:
+                - link:
+                  - /url: /zh-TW/about
+                  - text: 品牌故事
+              - listitem:
+                - link:
+                  - /url: /zh-TW/articles
+                  - text: 雪茄知識
+              - listitem:
+                - link:
+                  - /url: /zh-TW/blog
+                  - text: 最新文章
+    - generic:
+      - generic:
+        - generic:
+          - paragraph: © 2026 ShangJia. All rights reserved.
+          - paragraph: 吸煙危害健康。本網站僅供年滿18歲人士瀏覽及購買。雪茄產品圖片僅供參考，實際產品可能略有差異。
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e6] [cursor=pointer]:
+    - img [ref=e7]
+  - alert
+  - dialog "您是否已年滿18周歲？" [ref=e11]:
+    - generic [ref=e12]:
+      - generic [ref=e13]: SHANGJIA
+      - heading "您是否已年滿18周歲？" [level=2] [ref=e14]
+      - paragraph [ref=e15]: 本網站包含煙草相關內容，僅面向法定吸煙年齡以上的成年人。進入本網站即表示您確認已達到所在地區的法定吸煙年齡。
+    - generic [ref=e16]:
+      - button "是的，進入網站" [active] [ref=e17]
+      - button "我未滿 18 歲" [ref=e18]
+    - paragraph [ref=e19]: 吸煙有害健康
+    - generic [ref=e20]:
+      - img [ref=e21]
+      - button "繁體中文" [ref=e24]
+      - button "简体中文" [ref=e25]
+      - button "English" [ref=e26]

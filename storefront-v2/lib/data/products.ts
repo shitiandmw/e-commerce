@@ -391,6 +391,13 @@ export interface MedusaBrand {
   origin: string | null
 }
 
+export interface ProductCustomTag {
+  id: string
+  name: string
+  color?: string | null
+  type: "badge" | "attribute"
+}
+
 export interface MedusaProduct {
   id: string
   title: string
@@ -406,10 +413,15 @@ export interface MedusaProduct {
   collection_id: string | null
   metadata: Record<string, unknown> | null
   tags?: { id: string; value: string }[]
+  custom_tags?: ProductCustomTag[]
 }
 
 interface StoreProductResponse {
   products: MedusaProduct[]
+}
+
+interface StoreProductTagsResponse {
+  product_tags: Record<string, ProductCustomTag[]>
 }
 
 export interface MedusaProductListResponse {
@@ -418,6 +430,19 @@ export interface MedusaProductListResponse {
   offset: number
   limit: number
 }
+
+const PRODUCT_LIST_FIELDS_WITH_CUSTOM_TAGS =
+  "id,title,handle,subtitle,description,thumbnail,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*images,*categories,*brand,*custom_tags"
+const PRODUCT_LIST_FIELDS =
+  "id,title,handle,subtitle,description,thumbnail,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*images,*categories,*brand"
+const PRODUCT_DETAIL_FIELDS_WITH_CUSTOM_TAGS =
+  "id,title,handle,subtitle,description,thumbnail,collection_id,metadata,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*variants.options,*options,*options.values,*images,*categories,*tags,*brand,*custom_tags"
+const PRODUCT_DETAIL_FIELDS =
+  "id,title,handle,subtitle,description,thumbnail,collection_id,metadata,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*variants.options,*options,*options.values,*images,*categories,*tags,*brand"
+const RELATED_PRODUCT_FIELDS_WITH_CUSTOM_TAGS =
+  "id,title,handle,subtitle,thumbnail,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*custom_tags"
+const RELATED_PRODUCT_FIELDS =
+  "id,title,handle,subtitle,thumbnail,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory"
 
 export interface FetchProductsParams {
   category_id?: string
@@ -459,6 +484,49 @@ async function medusaFetch<T>(path: string, params?: Record<string, string | str
   return res.json()
 }
 
+async function fetchCustomTagsForProducts(productIds: string[], locale?: string) {
+  const ids = Array.from(new Set(productIds.filter(Boolean)))
+  if (ids.length === 0) return {}
+
+  try {
+    const data = await medusaFetch<StoreProductTagsResponse>(
+      "/store/content/product-tags",
+      { "product_id[]": ids },
+      locale
+    )
+    return data.product_tags ?? {}
+  } catch {
+    return {}
+  }
+}
+
+async function hydrateProductsWithCustomTags<T extends MedusaProduct>(
+  products: T[],
+  locale?: string
+): Promise<T[]> {
+  const productsMissingCustomTags = products.filter((product) => product.custom_tags == null)
+  if (productsMissingCustomTags.length === 0) return products
+
+  const tagsByProduct = await fetchCustomTagsForProducts(
+    productsMissingCustomTags.map((product) => product.id),
+    locale
+  )
+
+  if (Object.keys(tagsByProduct).length === 0) return products
+
+  return products.map((product) => {
+    if (product.custom_tags != null) return product
+
+    const customTags = tagsByProduct[product.id]
+    if (!customTags?.length) return product
+
+    return {
+      ...product,
+      custom_tags: customTags,
+    }
+  })
+}
+
 /**
  * Fetch products from Medusa Store API with optional category filter, pagination, and sorting.
  */
@@ -466,7 +534,7 @@ export async function fetchProducts(params: FetchProductsParams): Promise<Medusa
   const queryParams: Record<string, string | string[]> = {
     limit: String(params.limit ?? 20),
     offset: String(params.offset ?? 0),
-    fields: "id,title,handle,subtitle,description,thumbnail,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*images,*categories,*brand",
+    fields: PRODUCT_LIST_FIELDS_WITH_CUSTOM_TAGS,
   }
   if (params.region_id) {
     queryParams.region_id = params.region_id
@@ -485,9 +553,25 @@ export async function fetchProducts(params: FetchProductsParams): Promise<Medusa
   }
 
   try {
-    return await medusaFetch<MedusaProductListResponse>("/store/products", queryParams, params.locale)
+    const data = await medusaFetch<MedusaProductListResponse>("/store/products", queryParams, params.locale)
+    return {
+      ...data,
+      products: await hydrateProductsWithCustomTags(data.products ?? [], params.locale),
+    }
   } catch {
-    return { products: [], count: 0, offset: 0, limit: params.limit ?? 20 }
+    try {
+      const data = await medusaFetch<MedusaProductListResponse>(
+        "/store/products",
+        { ...queryParams, fields: PRODUCT_LIST_FIELDS },
+        params.locale
+      )
+      return {
+        ...data,
+        products: await hydrateProductsWithCustomTags(data.products ?? [], params.locale),
+      }
+    } catch {
+      return { products: [], count: 0, offset: 0, limit: params.limit ?? 20 }
+    }
   }
 }
 
@@ -498,13 +582,24 @@ export async function fetchProduct(handle: string, locale?: string, regionId?: s
   try {
     const params: Record<string, string> = {
       handle,
-      fields: "id,title,handle,subtitle,description,thumbnail,collection_id,metadata,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*variants.options,*options,*options.values,*images,*categories,*tags,*brand",
+      fields: PRODUCT_DETAIL_FIELDS_WITH_CUSTOM_TAGS,
     }
     if (regionId) {
       params.region_id = regionId
     }
-    const data = await medusaFetch<StoreProductResponse>("/store/products", params, locale)
-    return data?.products?.[0] ?? null
+    try {
+      const data = await medusaFetch<StoreProductResponse>("/store/products", params, locale)
+      const products = await hydrateProductsWithCustomTags(data?.products ?? [], locale)
+      return products?.[0] ?? null
+    } catch {
+      const data = await medusaFetch<StoreProductResponse>(
+        "/store/products",
+        { ...params, fields: PRODUCT_DETAIL_FIELDS },
+        locale
+      )
+      const products = await hydrateProductsWithCustomTags(data?.products ?? [], locale)
+      return products?.[0] ?? null
+    }
   } catch {
     return null
   }
@@ -520,7 +615,6 @@ export async function fetchRelatedProducts(
   locale?: string,
   regionId?: string,
 ): Promise<MedusaProduct[]> {
-  const fields = "id,title,handle,thumbnail,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory"
   const categoryId = product.categories?.[0]?.id
 
   try {
@@ -529,11 +623,17 @@ export async function fetchRelatedProducts(
       const params: Record<string, string> = {
         category_id: categoryId,
         limit: String(limit + 1),
-        fields,
+        fields: RELATED_PRODUCT_FIELDS_WITH_CUSTOM_TAGS,
       }
       if (regionId) params.region_id = regionId
       const data = await medusaFetch<StoreProductResponse>("/store/products", params, locale)
-      const results = (data?.products ?? []).filter((p) => p.id !== product.id).slice(0, limit)
+        .catch(() => medusaFetch<StoreProductResponse>(
+          "/store/products",
+          { ...params, fields: RELATED_PRODUCT_FIELDS },
+          locale
+        ))
+      const products = await hydrateProductsWithCustomTags(data?.products ?? [], locale)
+      const results = products.filter((p) => p.id !== product.id).slice(0, limit)
       if (results.length > 0) return results
     }
 
@@ -541,11 +641,17 @@ export async function fetchRelatedProducts(
     const fallbackParams: Record<string, string> = {
       limit: String(limit + 1),
       order: "-created_at",
-      fields,
+      fields: RELATED_PRODUCT_FIELDS_WITH_CUSTOM_TAGS,
     }
     if (regionId) fallbackParams.region_id = regionId
     const data = await medusaFetch<StoreProductResponse>("/store/products", fallbackParams, locale)
-    return (data?.products ?? []).filter((p) => p.id !== product.id).slice(0, limit)
+      .catch(() => medusaFetch<StoreProductResponse>(
+        "/store/products",
+        { ...fallbackParams, fields: RELATED_PRODUCT_FIELDS },
+        locale
+      ))
+    const products = await hydrateProductsWithCustomTags(data?.products ?? [], locale)
+    return products.filter((p) => p.id !== product.id).slice(0, limit)
   } catch {
     return []
   }
