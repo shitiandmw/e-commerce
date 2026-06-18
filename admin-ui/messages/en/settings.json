@@ -203,7 +203,6 @@
       "title": "Admin Accounts",
       "createUser": "Create Account",
       "description": "Create and manage admin accounts that can sign in to the dashboard.",
-      "emailChangeHint": "Email is the login identity and cannot be edited in this release. To change an email, create a new account and stop using the old one.",
       "noMembers": "No admin accounts found.",
       "joined": "Created",
       "adminRole": "Admin",

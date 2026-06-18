@@ -223,7 +223,6 @@ export function MyAccountSettings() {
             <div className="space-y-2">
               <Label htmlFor="profile-email">{t("users.emailAddress")}</Label>
               <Input id="profile-email" value={currentUser.email} disabled />
-              <p className="text-xs text-muted-foreground">{t("users.emailChangeHint")}</p>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
@@ -520,9 +519,6 @@ export function AdminAccountSettings() {
           </Button>
         </div>
         <p className="text-sm text-muted-foreground">{t("users.description")}</p>
-        <p className="rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">
-          {t("users.emailChangeHint")}
-        </p>
 
         {usersError && (
           <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
@@ -675,7 +671,6 @@ export function AdminAccountSettings() {
             <div className="space-y-2">
               <Label>{t("users.emailAddress")}</Label>
               <Input value={editingUser?.email || ""} disabled />
-              <p className="text-xs text-muted-foreground">{t("users.emailChangeHint")}</p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
