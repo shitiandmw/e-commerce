@@ -39,8 +39,9 @@
         "currencyCode": "货币代码",
         "shippingProfile": "配送配置文件",
         "selectProfile": "选择配置文件",
-        "provider": "物流提供商",
-        "selectProvider": "选择提供商",
+        "provider": "发货方式",
+        "selectProvider": "选择发货方式",
+        "noAvailableProviders": "当前仓未开通发货方式，请先配置仓库发货能力。",
         "type": "配送类型",
         "typeDelivery": "邮寄配送",
         "typePickup": "门店自提",
@@ -153,6 +154,7 @@
         "creating": "创建中...",
         "update": "更新",
         "updating": "更新中...",
+        "createdWithSetupWarning": "仓库已创建，但部分配置未完成。请后续检查仓库发货能力和销售渠道配置，避免重复创建仓库。",
         "saveFailed": "保存失败，请检查输入后重试。"
       }
     }

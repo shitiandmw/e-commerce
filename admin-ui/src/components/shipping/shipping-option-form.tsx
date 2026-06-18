@@ -43,7 +43,6 @@ export function ShippingOptionForm({
   const updateOption = useUpdateShippingOption(editOption?.id || "")
   const { data: profilesData } = useShippingProfiles()
   const { data: optionTypesData, isLoading: isLoadingOptionTypes } = useShippingOptionTypes()
-  const { data: providersData } = useFulfillmentProviders()
   const { data: regionsData } = useRegions()
   const { data: locationsData } = useStockLocationsWithZones()
 
@@ -65,7 +64,6 @@ export function ShippingOptionForm({
 
   const profiles = profilesData?.shipping_profiles || []
   const optionTypes = optionTypesData?.shipping_option_types || []
-  const providers = providersData?.fulfillment_providers || []
   const regions = regionsData?.regions || []
   const serviceZoneOptions = useMemo(
     () =>
@@ -76,11 +74,26 @@ export function ShippingOptionForm({
             name: zone.name,
             fulfillmentSetName: fulfillmentSet.name,
             locationName: location.name,
+            stockLocationId: location.id,
           }))
         )
       ),
     [locationsData]
   )
+  const selectedServiceZone = serviceZoneOptions.find(
+    (zone) => zone.id === serviceZoneId
+  )
+  const selectedStockLocationId = selectedServiceZone?.stockLocationId
+  const { data: providersData, isFetching: isFetchingProviders } =
+    useFulfillmentProviders(
+      selectedStockLocationId ? { stock_location_id: selectedStockLocationId } : {},
+      { enabled: !!selectedStockLocationId }
+    )
+  const providers = selectedStockLocationId
+    ? (providersData?.fulfillment_providers || []).filter(
+        (provider) => provider.is_enabled !== false
+      )
+    : []
   const mutationError = editOption ? updateOption.error : createOption.error
   const currentServiceZoneId = editOption?.service_zone_id || ""
   const shouldShowMissingCurrentZone =
@@ -90,7 +103,14 @@ export function ShippingOptionForm({
   const firstServiceZoneId = serviceZoneOptions[0]?.id || ""
   const firstShippingOptionTypeId = optionTypes[0]?.id || ""
   const firstShippingProfileId = profiles[0]?.id || ""
-  const firstProviderId = providers[0]?.id || ""
+  const firstProviderId = providers.length === 1 ? providers[0]?.id || "" : ""
+  const hasSelectedServiceZoneWithoutStockLocation =
+    !!serviceZoneId && !selectedStockLocationId
+  const hasNoAvailableProviders =
+    !!selectedStockLocationId && !isFetchingProviders && providers.length === 0
+  const shouldShowProviderSelect = providers.length > 1
+  const shouldShowProviderHint =
+    hasNoAvailableProviders || (!editOption && hasSelectedServiceZoneWithoutStockLocation)
   const firstCurrencyCode = regions[0]?.currency_code || ""
   const currencyCodes =
     regions.length > 0
@@ -198,6 +218,34 @@ export function ShippingOptionForm({
   }, [firstProviderId, isEditing, open, providerId])
 
   useEffect(() => {
+    if (!open || !selectedStockLocationId || isFetchingProviders) return
+
+    if (providers.length === 1 && providerId !== providers[0].id) {
+      setProviderId(providers[0].id)
+      return
+    }
+
+    if (
+      providers.length > 1 &&
+      providerId &&
+      !providers.some((provider) => provider.id === providerId)
+    ) {
+      setProviderId("")
+      return
+    }
+
+    if (providers.length === 0 && providerId) {
+      setProviderId("")
+    }
+  }, [
+    isFetchingProviders,
+    open,
+    providerId,
+    providers,
+    selectedStockLocationId,
+  ])
+
+  useEffect(() => {
     if (
       !open ||
       isEditing ||
@@ -212,7 +260,14 @@ export function ShippingOptionForm({
   }, [currencyCode, firstCurrencyCode, isEditing, open])
 
   const handleSubmit = () => {
-    if (!name.trim() || (!editOption && !serviceZoneId)) return
+    if (
+      !name.trim() ||
+      (!editOption && !serviceZoneId) ||
+      (!editOption && hasSelectedServiceZoneWithoutStockLocation) ||
+      (!!selectedStockLocationId && (!providerId || hasNoAvailableProviders))
+    ) {
+      return
+    }
 
     const isPickup = metadataType === "pickup"
 
@@ -267,7 +322,12 @@ export function ShippingOptionForm({
   const isPending = createOption.isPending || updateOption.isPending
   const isSubmitDisabled =
     !name.trim() ||
-    (!editOption && (!serviceZoneId || isLoadingOptionTypes)) ||
+    (!editOption &&
+      (!serviceZoneId ||
+        isLoadingOptionTypes ||
+        hasSelectedServiceZoneWithoutStockLocation)) ||
+    (!!selectedStockLocationId &&
+      (!providerId || isFetchingProviders || hasNoAvailableProviders)) ||
     isPending
 
   return (
@@ -386,7 +446,7 @@ export function ShippingOptionForm({
             </div>
           )}
 
-          {providers.length > 0 && (
+          {shouldShowProviderSelect && (
             <div className="space-y-2">
               <Label htmlFor="provider">{t("options.form.provider")}</Label>
               <Select
@@ -402,6 +462,12 @@ export function ShippingOptionForm({
                 ))}
               </Select>
             </div>
+          )}
+
+          {shouldShowProviderHint && (
+            <p className="rounded-md bg-muted p-3 text-sm text-muted-foreground">
+              {t("options.form.noAvailableProviders")}
+            </p>
           )}
 
           {mutationError && (

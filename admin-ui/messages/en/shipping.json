@@ -39,8 +39,9 @@
         "currencyCode": "Currency Code",
         "shippingProfile": "Shipping Profile",
         "selectProfile": "Select Profile",
-        "provider": "Fulfillment Provider",
-        "selectProvider": "Select Provider",
+        "provider": "Fulfillment Method",
+        "selectProvider": "Select Fulfillment Method",
+        "noAvailableProviders": "This warehouse has no enabled fulfillment method. Configure the warehouse fulfillment capability first.",
         "type": "Option Type",
         "typeDelivery": "Delivery",
         "typePickup": "In-store Pickup",
@@ -153,6 +154,7 @@
         "creating": "Creating...",
         "update": "Update",
         "updating": "Updating...",
+        "createdWithSetupWarning": "The warehouse was created, but part of its setup is incomplete. Check the warehouse fulfillment and sales channel configuration before creating another warehouse.",
         "saveFailed": "Save failed. Please check your input and try again."
       }
     }

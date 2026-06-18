@@ -221,9 +221,19 @@ export function useDeleteShippingProfile() {
 
 // ---- Fulfillment Providers ----
 
+const DEFAULT_FULFILLMENT_PROVIDER_ID = "manual_manual"
+
 export interface FulfillmentProvider {
   id: string
   is_enabled?: boolean
+}
+
+export interface FulfillmentProvidersQueryParams {
+  stock_location_id?: string
+}
+
+interface FulfillmentProvidersQueryOptions {
+  enabled?: boolean
 }
 
 interface FulfillmentProvidersResponse {
@@ -233,16 +243,25 @@ interface FulfillmentProvidersResponse {
   limit: number
 }
 
-export function useFulfillmentProviders() {
+export function useFulfillmentProviders(
+  params: FulfillmentProvidersQueryParams = {},
+  options: FulfillmentProvidersQueryOptions = {}
+) {
+  const { stock_location_id } = params
+  const { enabled = true } = options
+  const queryParams: Record<string, string> = { limit: "50" }
+  if (stock_location_id) queryParams.stock_location_id = stock_location_id
+
   return useQuery<FulfillmentProvidersResponse>({
-    queryKey: ["fulfillment-providers"],
+    queryKey: ["fulfillment-providers", { stock_location_id }],
     queryFn: () =>
       adminFetch<FulfillmentProvidersResponse>(
         "/admin/fulfillment-providers",
         {
-          params: { limit: "50" },
+          params: queryParams,
         }
       ),
+    enabled,
   })
 }
 
@@ -266,6 +285,16 @@ export interface StockLocation {
   sales_channels?: SalesChannelRef[]
   created_at: string
   updated_at: string
+}
+
+export type StockLocationSetupWarning =
+  | "fulfillment_set_failed"
+  | "provider_binding_failed"
+  | "sales_channels_failed"
+
+export interface CreateStockLocationResponse {
+  stock_location: StockLocation
+  setup_warnings?: StockLocationSetupWarning[]
 }
 
 interface StockLocationsResponse {
@@ -396,26 +425,48 @@ export function useCreateStockLocation() {
         country_code?: string
       }
     }) => {
-      const res = await adminFetch<{ stock_location: StockLocation }>(
+      const res = await adminFetch<CreateStockLocationResponse>(
         "/admin/stock-locations",
         { method: "POST", body: data }
       )
+      const setupWarnings: StockLocationSetupWarning[] = []
+
       // Auto-create a fulfillment set so the location can have service zones
-      await adminFetch(
-        `/admin/stock-locations/${res.stock_location.id}/fulfillment-sets`,
-        {
-          method: "POST",
-          body: {
-            name: `${data.name} delivery`,
-            type: "shipping",
-          },
-        }
-      )
-      return res
+      try {
+        await adminFetch(
+          `/admin/stock-locations/${res.stock_location.id}/fulfillment-sets`,
+          {
+            method: "POST",
+            body: {
+              name: `${data.name} delivery`,
+              type: "shipping",
+            },
+          }
+        )
+      } catch {
+        setupWarnings.push("fulfillment_set_failed")
+      }
+
+      try {
+        await adminFetch(
+          `/admin/stock-locations/${res.stock_location.id}/fulfillment-providers`,
+          {
+            method: "POST",
+            body: { add: [DEFAULT_FULFILLMENT_PROVIDER_ID] },
+          }
+        )
+      } catch {
+        setupWarnings.push("provider_binding_failed")
+      }
+
+      return setupWarnings.length > 0
+        ? { ...res, setup_warnings: setupWarnings }
+        : res
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["stock-locations"] })
       qc.invalidateQueries({ queryKey: ["stock-locations-zones"] })
+      qc.invalidateQueries({ queryKey: ["fulfillment-providers"] })
     },
   })
 }

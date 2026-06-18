@@ -3,10 +3,13 @@
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslations } from "next-intl"
+import { useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
 import {
   useCreateStockLocation,
   useUpdateStockLocation,
   useUpdateStockLocationSalesChannels,
+  type StockLocationSetupWarning,
   type StockLocationWithZones,
 } from "@/hooks/use-shipping"
 import { useSalesChannels } from "@/hooks/use-settings"
@@ -50,6 +53,7 @@ export function StockLocationForm({
   const createMutation = useCreateStockLocation()
   const updateMutation = useUpdateStockLocation(editLocation?.id ?? "")
   const channelsMutation = useUpdateStockLocationSalesChannels(editLocation?.id ?? "")
+  const queryClient = useQueryClient()
   const { data: salesChannelsData } = useSalesChannels()
   const allChannels = salesChannelsData?.sales_channels ?? []
   const [selectedChannelIds, setSelectedChannelIds] = useState<Set<string>>(new Set())
@@ -61,7 +65,7 @@ export function StockLocationForm({
     reset,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     defaultValues: {
       name: "",
@@ -104,7 +108,11 @@ export function StockLocationForm({
     })
   }
 
-  const isPending = createMutation.isPending || updateMutation.isPending || channelsMutation.isPending
+  const isPending =
+    isSubmitting ||
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    channelsMutation.isPending
 
   const onSubmit = async (values: FormValues) => {
     setSubmitError("")
@@ -134,12 +142,30 @@ export function StockLocationForm({
       } else {
         const res = await createMutation.mutateAsync(payload)
         const newId = res.stock_location.id
+        const setupWarnings: StockLocationSetupWarning[] = [...(res.setup_warnings ?? [])]
         if (selectedChannelIds.size > 0) {
-          await adminFetch(`/admin/stock-locations/${newId}/sales-channels`, {
-            method: "POST",
-            body: { add: Array.from(selectedChannelIds) },
-          })
+          try {
+            await adminFetch(`/admin/stock-locations/${newId}/sales-channels`, {
+              method: "POST",
+              body: { add: Array.from(selectedChannelIds) },
+            })
+          } catch {
+            setupWarnings.push("sales_channels_failed")
+          } finally {
+            await Promise.allSettled([
+              queryClient.invalidateQueries({ queryKey: ["stock-locations"] }),
+              queryClient.invalidateQueries({ queryKey: ["stock-locations-zones"] }),
+              queryClient.invalidateQueries({ queryKey: ["fulfillment-providers"] }),
+            ])
+          }
         }
+        if (setupWarnings.length) {
+          toast.warning(t("locations.form.createdWithSetupWarning"))
+        }
+      }
+      if (!isEdit) {
+        reset({ name: "", address_1: "", city: "", province: "", postal_code: "", country_code: "" })
+        setSelectedChannelIds(new Set())
       }
       onOpenChange(false)
     } catch (err: any) {
