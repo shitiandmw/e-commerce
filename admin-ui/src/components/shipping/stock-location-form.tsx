@@ -12,6 +12,7 @@ import {
   type StockLocationSetupWarning,
   type StockLocationWithZones,
 } from "@/hooks/use-shipping"
+import { StockLocationFulfillmentCapability } from "./stock-location-fulfillment-capability"
 import { useSalesChannels } from "@/hooks/use-settings"
 import { adminFetch } from "@/lib/admin-api"
 import { COUNTRY_GROUPS } from "@/lib/countries"
@@ -177,7 +178,7 @@ export function StockLocationForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {isEdit ? t("locations.editLocation") : t("locations.addLocation")}
@@ -246,6 +247,9 @@ export function StockLocationForm({
                 ))}
               </div>
             </div>
+          )}
+          {isEdit && editLocation && (
+            <StockLocationFulfillmentCapability locationId={editLocation.id} />
           )}
           {submitError && <p className="text-sm text-destructive">{submitError}</p>}
           <div className="flex justify-end gap-2 pt-2">

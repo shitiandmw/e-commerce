@@ -139,6 +139,20 @@
       "selectSalesChannels": "Select sales channels served by this location",
       "noSalesChannelWarning": "No sales channels linked — inventory won't be visible in the storefront",
       "channelCount": "{count} sales channel(s)",
+      "fulfillment": {
+        "title": "Fulfillment Capability",
+        "description": "Fulfillment capability controls whether this warehouse can be used by shipping options. Manual fulfillment is supported for now.",
+        "enabled": "Enabled",
+        "configured": "Configured",
+        "manualEnabled": "Manual fulfillment",
+        "notConfigured": "Not configured",
+        "statusUnknown": "Status unknown",
+        "noEnabledMethods": "No enabled fulfillment methods.",
+        "enableManual": "Enable manual fulfillment",
+        "enablingManual": "Enabling...",
+        "enableFailed": "Failed to enable manual fulfillment.",
+        "loadFailed": "Failed to load fulfillment capability. Please try again later."
+      },
       "form": {
         "name": "Name *",
         "namePlaceholder": "e.g. European Warehouse",

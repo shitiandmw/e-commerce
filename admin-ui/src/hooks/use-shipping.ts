@@ -221,7 +221,7 @@ export function useDeleteShippingProfile() {
 
 // ---- Fulfillment Providers ----
 
-const DEFAULT_FULFILLMENT_PROVIDER_ID = "manual_manual"
+export const DEFAULT_FULFILLMENT_PROVIDER_ID = "manual_manual"
 
 export interface FulfillmentProvider {
   id: string
@@ -262,6 +262,25 @@ export function useFulfillmentProviders(
         }
       ),
     enabled,
+  })
+}
+
+export function useEnableManualFulfillmentProvider(locationId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: () =>
+      adminFetch(
+        `/admin/stock-locations/${locationId}/fulfillment-providers`,
+        {
+          method: "POST",
+          body: { add: [DEFAULT_FULFILLMENT_PROVIDER_ID] },
+        }
+      ),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["fulfillment-providers"] })
+      qc.invalidateQueries({ queryKey: ["stock-locations"] })
+      qc.invalidateQueries({ queryKey: ["stock-locations-zones"] })
+    },
   })
 }
 

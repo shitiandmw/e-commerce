@@ -139,6 +139,20 @@
       "selectSalesChannels": "选择此仓库服务的销售渠道",
       "noSalesChannelWarning": "未关联销售渠道，库存将不会在店铺中显示",
       "channelCount": "{count} 个销售渠道",
+      "fulfillment": {
+        "title": "发货能力",
+        "description": "发货能力决定该仓库能否被配送方案使用。当前先支持手动发货。",
+        "enabled": "已启用",
+        "configured": "已配置发货",
+        "manualEnabled": "手动发货",
+        "notConfigured": "未配置发货",
+        "statusUnknown": "状态未知",
+        "noEnabledMethods": "暂无已启用发货方式。",
+        "enableManual": "启用手动发货",
+        "enablingManual": "启用中...",
+        "enableFailed": "启用手动发货失败。",
+        "loadFailed": "发货能力加载失败，请稍后重试。"
+      },
       "form": {
         "name": "名称 *",
         "namePlaceholder": "例如：欧洲仓库",

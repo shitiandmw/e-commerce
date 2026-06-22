@@ -8,6 +8,7 @@ import {
   type StockLocationWithZones,
 } from "@/hooks/use-shipping"
 import { StockLocationForm } from "./stock-location-form"
+import { StockLocationFulfillmentCapability } from "./stock-location-fulfillment-capability"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -131,6 +132,10 @@ export function StockLocations() {
                     </Badge>
                   )}
                 </div>
+                <StockLocationFulfillmentCapability
+                  locationId={loc.id}
+                  compact
+                />
               </div>
             )
           })}
