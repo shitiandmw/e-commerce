@@ -5,9 +5,11 @@ import { useTranslations } from "next-intl"
 import Link from "next/link"
 import {
   useInventoryItem,
+  useInventoryProductLinks,
   useStockLocations,
   InventoryItem,
-  InventoryLevel,
+  buildInventoryProductLinkMap,
+  withInventoryProductLinks,
   getStockStatus,
   getTotalStocked,
   getTotalReserved,
@@ -39,11 +41,21 @@ export function InventoryDetail({ inventoryItemId }: InventoryDetailProps) {
   const t = useTranslations("inventory")
   const { data, isLoading, isError, error } = useInventoryItem(inventoryItemId)
   const { data: locationsData } = useStockLocations()
+  const { data: productLinksData } = useInventoryProductLinks()
   const [adjustOpen, setAdjustOpen] = React.useState(false)
   const [adjustLocationId, setAdjustLocationId] = React.useState<string | undefined>()
   const [addLocationOpen, setAddLocationOpen] = React.useState(false)
 
-  const item = data?.inventory_item
+  const item = React.useMemo(() => {
+    if (!data?.inventory_item) return undefined
+    const linksByInventoryItemId = buildInventoryProductLinkMap(
+      productLinksData || []
+    )
+    return withInventoryProductLinks(
+      [data.inventory_item],
+      linksByInventoryItemId
+    )[0]
+  }, [data?.inventory_item, productLinksData])
   const locations = locationsData?.stock_locations ?? []
 
   const getLocationName = (locationId: string) => {
@@ -130,10 +142,19 @@ export function InventoryDetail({ inventoryItemId }: InventoryDetailProps) {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-3xl font-bold tracking-tight">
-                {item.title || item.sku || t("detail.inventoryItem")}
+                {item.product_links?.[0]?.product_title ||
+                  item.title ||
+                  item.sku ||
+                  t("detail.inventoryItem")}
               </h1>
               {getStockBadge(item)}
             </div>
+            {item.product_links?.[0]?.variant_title &&
+              item.product_links[0].variant_title.toLowerCase() !== "default" && (
+                <p className="text-muted-foreground mt-1 text-sm">
+                  {item.product_links[0].variant_title}
+                </p>
+              )}
             {item.sku && (
               <p className="text-muted-foreground mt-1 font-mono text-sm">
                 SKU: {item.sku}
@@ -363,6 +384,29 @@ export function InventoryDetail({ inventoryItemId }: InventoryDetailProps) {
                   <span className="text-sm text-muted-foreground">{t("detail.itemDetails.itemTitle")}</span>
                   <span className="text-sm font-medium">{item.title}</span>
                 </div>
+              )}
+              {item.product_links?.[0] && (
+                <>
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-sm text-muted-foreground">
+                      {t("detail.itemDetails.product")}
+                    </span>
+                    <Link
+                      href={`/products/${item.product_links[0].product_id}`}
+                      className="text-sm font-medium text-right hover:underline"
+                    >
+                      {item.product_links[0].product_title}
+                    </Link>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-sm text-muted-foreground">
+                      {t("detail.itemDetails.variant")}
+                    </span>
+                    <span className="text-sm font-medium text-right">
+                      {item.product_links[0].variant_title}
+                    </span>
+                  </div>
+                </>
               )}
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">

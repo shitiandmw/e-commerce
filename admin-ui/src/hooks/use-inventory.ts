@@ -35,10 +35,41 @@ export interface InventoryItem {
   width: number | null
   metadata?: Record<string, unknown> | null
   location_levels?: InventoryLevel[]
+  product_links?: InventoryProductLink[]
   reserved_quantity?: number
   stocked_quantity?: number
   created_at: string
   updated_at: string
+}
+
+export interface InventoryProductLink {
+  inventory_item_id: string
+  product_id: string
+  product_title: string
+  variant_id: string
+  variant_title: string
+  variant_sku?: string | null
+  manage_inventory?: boolean
+}
+
+interface ProductVariantInventoryLink {
+  inventory_item_id?: string | null
+  required_quantity?: number
+  inventory?: InventoryItem | null
+}
+
+interface ProductVariantInventorySnapshot {
+  id: string
+  title: string
+  sku?: string | null
+  manage_inventory?: boolean
+  inventory_items?: ProductVariantInventoryLink[]
+}
+
+interface ProductInventorySnapshot {
+  id: string
+  title: string
+  variants?: ProductVariantInventorySnapshot[]
 }
 
 export interface StockLocation {
@@ -97,6 +128,10 @@ export interface InventoryQueryParams {
 // ---- Hooks ----
 
 const INVENTORY_ITEMS_FIELDS = "*location_levels"
+const PRODUCT_INVENTORY_FIELDS =
+  "id,title,+variants,+variants.inventory_items,+variants.inventory_items.inventory,+variants.inventory_items.inventory.location_levels"
+const PRODUCT_INVENTORY_LINK_FIELDS =
+  "id,title,+variants,+variants.inventory_items"
 
 function buildInventoryItemsPath(params: InventoryQueryParams = {}) {
   const {
@@ -125,6 +160,58 @@ export function fetchInventoryItems(params: InventoryQueryParams = {}) {
   return adminFetch<InventoryItemsResponse>(buildInventoryItemsPath(params))
 }
 
+export function fetchStockLocations() {
+  return adminFetch<StockLocationsResponse>("/admin/stock-locations", {
+    params: { limit: "100", offset: "0" },
+  })
+}
+
+export function fetchProductInventorySnapshot(productId: string) {
+  return adminFetch<{ product: ProductInventorySnapshot }>(
+    `/admin/products/${productId}?fields=${PRODUCT_INVENTORY_FIELDS}`
+  )
+}
+
+export async function fetchInventoryProductLinks(): Promise<InventoryProductLink[]> {
+  const links: InventoryProductLink[] = []
+  let offset = 0
+  const limit = 100
+
+  while (true) {
+    const data = await adminFetch<{
+      products: ProductInventorySnapshot[]
+      count: number
+    }>(
+      `/admin/products?offset=${offset}&limit=${limit}&fields=${PRODUCT_INVENTORY_LINK_FIELDS}`
+    )
+
+    for (const product of data.products || []) {
+      for (const variant of product.variants || []) {
+        for (const itemLink of variant.inventory_items || []) {
+          const inventoryItemId =
+            itemLink.inventory_item_id || itemLink.inventory?.id
+          if (!inventoryItemId) continue
+
+          links.push({
+            inventory_item_id: inventoryItemId,
+            product_id: product.id,
+            product_title: product.title,
+            variant_id: variant.id,
+            variant_title: variant.title,
+            variant_sku: variant.sku,
+            manage_inventory: variant.manage_inventory,
+          })
+        }
+      }
+    }
+
+    offset += limit
+    if (offset >= (data.count || 0)) break
+  }
+
+  return links
+}
+
 export function useInventoryItems(params: InventoryQueryParams = {}) {
   const {
     offset = 0,
@@ -143,6 +230,14 @@ export function useInventoryItems(params: InventoryQueryParams = {}) {
     ],
     queryFn: () =>
       fetchInventoryItems({ offset, limit, q, sku, order, fields, location_id }),
+  })
+}
+
+export function useInventoryProductLinks(enabled = true) {
+  return useQuery<InventoryProductLink[]>({
+    queryKey: ["inventory-product-links"],
+    queryFn: fetchInventoryProductLinks,
+    enabled,
   })
 }
 
@@ -182,10 +277,7 @@ export function useInventoryItem(id: string) {
 export function useStockLocations() {
   return useQuery<StockLocationsResponse>({
     queryKey: ["stock-locations"],
-    queryFn: () =>
-      adminFetch<StockLocationsResponse>("/admin/stock-locations", {
-        params: { limit: "100", offset: "0" },
-      }),
+    queryFn: fetchStockLocations,
   })
 }
 
@@ -216,6 +308,8 @@ export function useUpdateInventoryLevel(inventoryItemId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["inventory-items"] })
       queryClient.invalidateQueries({ queryKey: ["inventory-item", inventoryItemId] })
+      queryClient.invalidateQueries({ queryKey: ["products"] })
+      queryClient.invalidateQueries({ queryKey: ["product"] })
     },
   })
 }
@@ -236,6 +330,8 @@ export function useCreateInventoryLevel(inventoryItemId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["inventory-items"] })
       queryClient.invalidateQueries({ queryKey: ["inventory-item", inventoryItemId] })
+      queryClient.invalidateQueries({ queryKey: ["products"] })
+      queryClient.invalidateQueries({ queryKey: ["product"] })
     },
   })
 }
@@ -269,44 +365,100 @@ export async function ensureInventoryForVariant(opts: {
   productId: string
   sku?: string | null
   title?: string | null
-  locationId: string
+  productTitle?: string | null
+  locationId?: string
+  stockedQuantity?: number
+  syncStockedQuantity?: boolean
 }) {
+  const snapshot = await fetchProductInventorySnapshot(opts.productId)
+  const variant = snapshot.product.variants?.find((v) => v.id === opts.variantId)
+  const existingLink = variant?.inventory_items?.[0]
+  const desiredTitle = buildInventoryItemTitle(
+    opts.productTitle || snapshot.product.title,
+    opts.title || variant?.title
+  )
+  const desiredMetadata = {
+    product_id: opts.productId,
+    product_title: opts.productTitle || snapshot.product.title,
+    variant_id: opts.variantId,
+    variant_title: opts.title || variant?.title || null,
+  }
+
+  if (existingLink) {
+    const inventoryItemId =
+      existingLink.inventory_item_id || existingLink.inventory?.id
+    if (!inventoryItemId) {
+      throw new Error("Variant inventory link is missing inventory_item_id")
+    }
+
+    const item = await fetchInventoryItem(inventoryItemId)
+    await syncInventoryItemMetadata(item, {
+      sku: opts.sku ?? variant?.sku,
+      title: desiredTitle,
+      metadata: desiredMetadata,
+      variantTitle: variant?.title,
+    })
+    await ensureInventoryLevel(item, {
+      locationId: opts.locationId,
+      stockedQuantity: opts.stockedQuantity,
+      syncStockedQuantity: opts.syncStockedQuantity,
+    })
+
+    return item
+  }
+
+  const reusableItem = opts.sku
+    ? await findInventoryItemBySku(opts.sku)
+    : undefined
+
+  if (reusableItem) {
+    await syncInventoryItemMetadata(reusableItem, {
+      sku: opts.sku ?? variant?.sku,
+      title: desiredTitle,
+      metadata: desiredMetadata,
+      variantTitle: variant?.title,
+    })
+    await ensureInventoryLevel(reusableItem, {
+      locationId: opts.locationId,
+      stockedQuantity: opts.stockedQuantity,
+      syncStockedQuantity: opts.syncStockedQuantity,
+    })
+    await linkInventoryItemToVariant({
+      productId: opts.productId,
+      variantId: opts.variantId,
+      inventoryItemId: reusableItem.id,
+    })
+
+    return reusableItem
+  }
+
   const item = await adminFetch<{ inventory_item: InventoryItem }>(
     "/admin/inventory-items",
     {
       method: "POST",
       body: {
         sku: opts.sku ?? undefined,
-        title: opts.title ?? undefined,
+        title: desiredTitle,
+        metadata: desiredMetadata,
+        location_levels: opts.locationId
+          ? [
+              {
+                location_id: opts.locationId,
+                stocked_quantity: opts.stockedQuantity ?? 0,
+              },
+            ]
+          : undefined,
       },
     }
   )
 
   const inventoryItemId = item.inventory_item.id
 
-  await adminFetch(
-    `/admin/inventory-items/${inventoryItemId}/location-levels`,
-    {
-      method: "POST",
-      body: { location_id: opts.locationId, stocked_quantity: 0 },
-    }
-  )
-
-  await adminFetch(
-    `/admin/products/${opts.productId}/variants/inventory-items/batch`,
-    {
-      method: "POST",
-      body: {
-        create: [
-          {
-            inventory_item_id: inventoryItemId,
-            variant_id: opts.variantId,
-            required_quantity: 1,
-          },
-        ],
-      },
-    }
-  )
+  await linkInventoryItemToVariant({
+    productId: opts.productId,
+    variantId: opts.variantId,
+    inventoryItemId,
+  })
 
   return item.inventory_item
 }
@@ -327,13 +479,14 @@ export function useBulkEnableInventory() {
             title: string
             variants?: Array<{
               id: string
+              title: string
               sku?: string | null
               manage_inventory?: boolean
             }>
           }>
           count: number
         }>(
-          `/admin/products?offset=${offset}&limit=${limit}&fields=id,title,variants.*`
+          `/admin/products?offset=${offset}&limit=${limit}&fields=id,title,+variants`
         )
 
         for (const product of data.products) {
@@ -350,7 +503,8 @@ export function useBulkEnableInventory() {
               variantId: variant.id,
               productId: product.id,
               sku: variant.sku,
-              title: product.title,
+              title: variant.title,
+              productTitle: product.title,
               locationId,
             })
 
@@ -366,6 +520,7 @@ export function useBulkEnableInventory() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["inventory-items"] })
+      queryClient.invalidateQueries({ queryKey: ["inventory-product-links"] })
       queryClient.invalidateQueries({ queryKey: ["products"] })
     },
   })
@@ -424,4 +579,178 @@ export function getTotalIncoming(item: InventoryItem): number {
     (sum, level) => sum + (level.incoming_quantity || 0),
     0
   )
+}
+
+export function buildInventoryProductLinkMap(
+  links: InventoryProductLink[] = []
+): Map<string, InventoryProductLink[]> {
+  const map = new Map<string, InventoryProductLink[]>()
+  for (const link of links) {
+    const existing = map.get(link.inventory_item_id) || []
+    existing.push(link)
+    map.set(link.inventory_item_id, existing)
+  }
+  return map
+}
+
+export function withInventoryProductLinks(
+  items: InventoryItem[] = [],
+  linksByInventoryItemId: Map<string, InventoryProductLink[]>
+): InventoryItem[] {
+  return items.map((item) => ({
+    ...item,
+    product_links: linksByInventoryItemId.get(item.id) || item.product_links || [],
+  }))
+}
+
+export function inventoryItemMatchesSearch(
+  item: InventoryItem,
+  search: string
+): boolean {
+  const query = search.trim().toLowerCase()
+  if (!query) return true
+
+  const values = [
+    item.sku,
+    item.title,
+    item.description,
+    ...(item.product_links || []).flatMap((link) => [
+      link.product_title,
+      link.variant_title,
+      link.variant_sku,
+    ]),
+  ]
+
+  return values.some((value) => value?.toLowerCase().includes(query))
+}
+
+function buildInventoryItemTitle(
+  productTitle?: string | null,
+  variantTitle?: string | null
+) {
+  const product = productTitle?.trim()
+  const variant = variantTitle?.trim()
+
+  if (!product) return variant || undefined
+  if (!variant || variant.toLowerCase() === "default") return product
+  return `${product} - ${variant}`
+}
+
+async function fetchInventoryItem(inventoryItemId: string) {
+  const data = await adminFetch<{ inventory_item: InventoryItem }>(
+    `/admin/inventory-items/${inventoryItemId}?fields=*location_levels`
+  )
+  return data.inventory_item
+}
+
+async function findInventoryItemBySku(sku: string) {
+  const data = await fetchInventoryItems({
+    sku,
+    limit: 1,
+    fields: "*location_levels",
+  })
+  return data.inventory_items?.[0]
+}
+
+async function linkInventoryItemToVariant({
+  productId,
+  variantId,
+  inventoryItemId,
+}: {
+  productId: string
+  variantId: string
+  inventoryItemId: string
+}) {
+  await adminFetch(`/admin/products/${productId}/variants/inventory-items/batch`, {
+    method: "POST",
+    body: {
+      create: [
+        {
+          inventory_item_id: inventoryItemId,
+          variant_id: variantId,
+          required_quantity: 1,
+        },
+      ],
+    },
+  })
+}
+
+async function ensureInventoryLevel(
+  item: InventoryItem,
+  opts: {
+    locationId?: string
+    stockedQuantity?: number
+    syncStockedQuantity?: boolean
+  }
+) {
+  if (!opts.locationId) return
+
+  const existingLevel = item.location_levels?.find(
+    (level) => level.location_id === opts.locationId
+  )
+  const stockedQuantity = opts.stockedQuantity ?? 0
+
+  if (!existingLevel) {
+    await adminFetch(`/admin/inventory-items/${item.id}/location-levels`, {
+      method: "POST",
+      body: {
+        location_id: opts.locationId,
+        stocked_quantity: stockedQuantity,
+      },
+    })
+    return
+  }
+
+  if (
+    opts.syncStockedQuantity &&
+    opts.stockedQuantity !== undefined &&
+    existingLevel.stocked_quantity !== opts.stockedQuantity
+  ) {
+    await adminFetch(
+      `/admin/inventory-items/${item.id}/location-levels/${opts.locationId}`,
+      {
+        method: "POST",
+        body: { stocked_quantity: opts.stockedQuantity },
+      }
+    )
+  }
+}
+
+async function syncInventoryItemMetadata(
+  item: InventoryItem,
+  opts: {
+    sku?: string | null
+    title?: string
+    metadata: Record<string, unknown>
+    variantTitle?: string | null
+  }
+) {
+  const body: Record<string, unknown> = {}
+  const currentTitle = item.title?.trim()
+  const variantTitle = opts.variantTitle?.trim()
+
+  if (
+    opts.title &&
+    (!currentTitle ||
+      currentTitle.toLowerCase() === "default" ||
+      (!!variantTitle && currentTitle === variantTitle))
+  ) {
+    body.title = opts.title
+  }
+
+  if (opts.sku && item.sku !== opts.sku) {
+    body.sku = opts.sku
+  }
+
+  body.metadata = {
+    ...(item.metadata || {}),
+    ...opts.metadata,
+  }
+
+  if (Object.keys(body).length === 0) return
+
+  await adminFetch(`/admin/inventory-items/${item.id}`, {
+    method: "POST",
+    body,
+  })
 }

@@ -28,7 +28,7 @@
     },
 
     "filters": {
-      "searchPlaceholder": "按 SKU、名称搜索...",
+      "searchPlaceholder": "按商品、规格、SKU 搜索...",
       "allStatus": "全部状态",
       "inStock": "有货",
       "lowStock": "低库存",
@@ -95,6 +95,8 @@
         "title": "商品详情",
         "sku": "SKU",
         "itemTitle": "名称",
+        "product": "商品",
+        "variant": "规格",
         "requiresShipping": "需要配送",
         "yes": "是",
         "no": "否",

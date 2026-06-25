@@ -26,6 +26,23 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 
+function getPrimaryProductLink(item: InventoryItem) {
+  return item.product_links?.[0]
+}
+
+function getInventoryDisplayTitle(item: InventoryItem, t: (key: string) => string) {
+  const link = getPrimaryProductLink(item)
+  if (!link) return item.title || t("table.untitled")
+  if (!link.variant_title || link.variant_title.toLowerCase() === "default") {
+    return link.product_title
+  }
+  return `${link.product_title} - ${link.variant_title}`
+}
+
+function getDisplaySku(item: InventoryItem) {
+  return item.sku || getPrimaryProductLink(item)?.variant_sku || null
+}
+
 function getStockBadge(item: InventoryItem, t: (key: string) => string) {
   const status = getStockStatus(item)
   switch (status) {
@@ -65,7 +82,7 @@ export function getInventoryColumns(
           href={`/inventory/${row.original.id}`}
           className="font-medium font-mono text-sm hover:underline"
         >
-          {row.original.sku || "—"}
+          {getDisplaySku(row.original) || "—"}
         </Link>
       ),
     },
@@ -82,10 +99,17 @@ export function getInventoryColumns(
         </Button>
       ),
       cell: ({ row }) => (
-        <div className="max-w-[200px]">
-          <p className="text-sm truncate">
-            {row.original.title || t("table.untitled")}
+        <div className="max-w-[240px]">
+          <p className="text-sm font-medium truncate">
+            {getInventoryDisplayTitle(row.original, t)}
           </p>
+          {row.original.title &&
+            !!row.original.product_links?.length &&
+            row.original.title !== getInventoryDisplayTitle(row.original, t) && (
+              <p className="text-xs text-muted-foreground truncate">
+                {row.original.title}
+              </p>
+            )}
         </div>
       ),
     },

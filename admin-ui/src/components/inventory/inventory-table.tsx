@@ -13,10 +13,14 @@ import {
 import {
   useInventoryItems,
   useInventoryItemsSummary,
+  useInventoryProductLinks,
   useStockLocations,
   useBulkEnableInventory,
   InventoryItem,
   getStockStatus,
+  buildInventoryProductLinkMap,
+  inventoryItemMatchesSearch,
+  withInventoryProductLinks,
 } from "@/hooks/use-inventory"
 import { getInventoryColumns } from "./inventory-columns"
 import { InventoryAdjustDialog } from "./inventory-adjust-dialog"
@@ -61,6 +65,7 @@ export function InventoryTable() {
   })
   const [itemToAdjust, setItemToAdjust] = React.useState<InventoryItem | null>(null)
   const { data: locationsData } = useStockLocations()
+  const { data: productLinksData } = useInventoryProductLinks()
   const bulkEnable = useBulkEnableInventory()
   const [bulkProgress, setBulkProgress] = React.useState<string | null>(null)
 
@@ -95,7 +100,6 @@ export function InventoryTable() {
     isError: isSummaryError,
     error: summaryError,
   } = useInventoryItemsSummary({
-    q: debouncedSearch || undefined,
     order: orderField,
   })
 
@@ -105,27 +109,77 @@ export function InventoryTable() {
   )
 
   // Client-side stock status filtering (since API doesn't support it natively).
-  // The summary query loads every item matching the search so filters and stats
-  // are not limited to the current server-paginated page.
-  const allItems = data?.inventory_items ?? []
-  const summaryItems = summaryData?.inventory_items ?? []
+  // The summary query loads every item so filters and product-linked search are
+  // not limited to the current server-paginated page.
+  const linksByInventoryItemId = React.useMemo(
+    () => buildInventoryProductLinkMap(productLinksData || []),
+    [productLinksData]
+  )
+  const allItems = React.useMemo(
+    () =>
+      withInventoryProductLinks(
+        data?.inventory_items ?? [],
+        linksByInventoryItemId
+      ),
+    [data?.inventory_items, linksByInventoryItemId]
+  )
+  const summaryItems = React.useMemo(
+    () =>
+      withInventoryProductLinks(
+        summaryData?.inventory_items ?? [],
+        linksByInventoryItemId
+      ),
+    [summaryData?.inventory_items, linksByInventoryItemId]
+  )
+  const searchFilteredSummaryItems = React.useMemo(() => {
+    if (!debouncedSearch) return summaryItems
+    return summaryItems.filter((item) =>
+      inventoryItemMatchesSearch(item, debouncedSearch)
+    )
+  }, [summaryItems, debouncedSearch])
   const statusFilteredItems = React.useMemo(() => {
-    if (stockFilter === "all") return summaryItems
-    return summaryItems.filter((item) => getStockStatus(item) === stockFilter)
-  }, [summaryItems, stockFilter])
+    if (stockFilter === "all") return searchFilteredSummaryItems
+    return searchFilteredSummaryItems.filter(
+      (item) => getStockStatus(item) === stockFilter
+    )
+  }, [searchFilteredSummaryItems, stockFilter])
+  const searchStats = React.useMemo(() => {
+    return searchFilteredSummaryItems.reduce(
+      (stats, item) => {
+        const status = getStockStatus(item)
+        stats.total += 1
+        if (status === "in_stock") stats.inStock += 1
+        if (status === "low_stock") stats.lowStock += 1
+        if (status === "out_of_stock") stats.outOfStock += 1
+        return stats
+      },
+      { total: 0, inStock: 0, lowStock: 0, outOfStock: 0 }
+    )
+  }, [searchFilteredSummaryItems])
   const filteredItems = React.useMemo(() => {
-    if (stockFilter === "all") return allItems
+    if (stockFilter === "all" && !debouncedSearch) return allItems
 
     const start = pagination.pageIndex * pagination.pageSize
     return statusFilteredItems.slice(start, start + pagination.pageSize)
-  }, [allItems, pagination.pageIndex, pagination.pageSize, statusFilteredItems, stockFilter])
+  }, [
+    allItems,
+    debouncedSearch,
+    pagination.pageIndex,
+    pagination.pageSize,
+    statusFilteredItems,
+    stockFilter,
+  ])
 
-  const stats = summaryData?.stats
-  const totalCount = stockFilter === "all" ? (data?.count ?? 0) : statusFilteredItems.length
+  const stats = debouncedSearch ? searchStats : summaryData?.stats
+  const totalCount =
+    stockFilter === "all" && !debouncedSearch
+      ? data?.count ?? 0
+      : statusFilteredItems.length
   const pageCount = Math.ceil(totalCount / pagination.pageSize)
-  const tableIsLoading = stockFilter === "all" ? isLoading : isSummaryLoading
-  const tableIsError = stockFilter === "all" ? isError : isSummaryError
-  const tableError = stockFilter === "all" ? error : summaryError
+  const usesSummaryTable = stockFilter !== "all" || !!debouncedSearch
+  const tableIsLoading = usesSummaryTable ? isSummaryLoading : isLoading
+  const tableIsError = usesSummaryTable ? isSummaryError : isError
+  const tableError = usesSummaryTable ? summaryError : error
   const statsAreLoading = isSummaryLoading && !summaryData
 
   const table = useReactTable({
@@ -156,7 +210,13 @@ export function InventoryTable() {
             <span className="text-sm text-muted-foreground">{t("stats.totalItems")}</span>
           </div>
           <p className="mt-2 text-2xl font-bold tabular-nums">
-            {isLoading ? "—" : data?.count ?? 0}
+            {debouncedSearch
+              ? isSummaryLoading
+                ? "—"
+                : searchStats.total
+              : isLoading
+              ? "—"
+              : data?.count ?? 0}
           </p>
         </button>
         <button

@@ -2,8 +2,15 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { adminFetch } from "@/lib/admin-api"
+import type { InventoryItem } from "@/hooks/use-inventory"
 
 // Types
+export interface ProductVariantInventoryItem {
+  inventory_item_id: string
+  required_quantity?: number
+  inventory?: InventoryItem | null
+}
+
 export interface ProductVariant {
   id: string
   title: string
@@ -20,6 +27,7 @@ export interface ProductVariant {
   }>
   inventory_quantity?: number
   manage_inventory?: boolean
+  inventory_items?: ProductVariantInventoryItem[]
   created_at?: string
   updated_at?: string
 }
@@ -126,7 +134,7 @@ export function useProducts(params: ProductsQueryParams = {}) {
   )
 
   return useQuery<ProductsResponse>({
-    queryKey: ["products", { offset, limit, q, status, order }],
+    queryKey: ["products", { offset, limit, q, status, order, fields }],
     queryFn: () =>
       adminFetch<ProductsResponse>(`/admin/products?${queryParams.toString()}`),
   })
@@ -137,7 +145,7 @@ export function useProduct(id: string) {
     queryKey: ["product", id],
     queryFn: () =>
       adminFetch<{ product: Product }>(
-        `/admin/products/${id}?fields=+variants,+variants.prices,+options,+options.values,+images,*categories,*brand,*custom_tags,+metadata`
+        `/admin/products/${id}?fields=+variants,+variants.prices,+variants.inventory_items,+variants.inventory_items.inventory,+variants.inventory_items.inventory.location_levels,+options,+options.values,+images,*categories,*brand,*custom_tags,+metadata`
       ),
     enabled: !!id,
   })
@@ -148,12 +156,17 @@ export function useCreateProduct() {
 
   return useMutation({
     mutationFn: (data: Record<string, any>) =>
-      adminFetch("/admin/products", {
-        method: "POST",
-        body: data,
-      }),
+      adminFetch<{ product: Product }>(
+        "/admin/products?fields=+variants,+variants.prices,+variants.inventory_items,+variants.inventory_items.inventory,+variants.inventory_items.inventory.location_levels,+options,+options.values,+images,*categories,*brand,*custom_tags,+metadata",
+        {
+          method: "POST",
+          body: data,
+        }
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] })
+      queryClient.invalidateQueries({ queryKey: ["inventory-items"] })
+      queryClient.invalidateQueries({ queryKey: ["inventory-product-links"] })
     },
   })
 }
@@ -170,6 +183,7 @@ export function useUpdateProduct(id: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] })
       queryClient.invalidateQueries({ queryKey: ["product", id] })
+      queryClient.invalidateQueries({ queryKey: ["inventory-product-links"] })
     },
   })
 }
@@ -207,6 +221,72 @@ export function useUpdateVariant(productId: string) {
       queryClient.invalidateQueries({ queryKey: ["products"] })
       queryClient.invalidateQueries({ queryKey: ["product", productId] })
       queryClient.invalidateQueries({ queryKey: ["inventory-items"] })
+      queryClient.invalidateQueries({ queryKey: ["inventory-product-links"] })
+    },
+  })
+}
+
+export function useCreateVariant(productId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: Record<string, any>) =>
+      adminFetch<{ product: Product }>(
+        `/admin/products/${productId}/variants?fields=+variants,+variants.prices,+variants.inventory_items,+variants.inventory_items.inventory,+variants.inventory_items.inventory.location_levels`,
+        {
+          method: "POST",
+          body: data,
+        }
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] })
+      queryClient.invalidateQueries({ queryKey: ["product", productId] })
+      queryClient.invalidateQueries({ queryKey: ["inventory-items"] })
+      queryClient.invalidateQueries({ queryKey: ["inventory-product-links"] })
+    },
+  })
+}
+
+export function useCreateProductOption(productId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: Record<string, any>) =>
+      adminFetch<{ product: Product }>(
+        `/admin/products/${productId}/options?fields=+options,+options.values,+variants,+variants.prices,+variants.inventory_items,+variants.inventory_items.inventory,+variants.inventory_items.inventory.location_levels`,
+        {
+          method: "POST",
+          body: data,
+        }
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] })
+      queryClient.invalidateQueries({ queryKey: ["product", productId] })
+    },
+  })
+}
+
+export function useUpdateProductOption(productId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      optionId,
+      data,
+    }: {
+      optionId: string
+      data: Record<string, any>
+    }) =>
+      adminFetch<{ product: Product }>(
+        `/admin/products/${productId}/options/${optionId}?fields=+options,+options.values,+variants,+variants.prices,+variants.inventory_items,+variants.inventory_items.inventory,+variants.inventory_items.inventory.location_levels`,
+        {
+          method: "POST",
+          body: data,
+        }
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] })
+      queryClient.invalidateQueries({ queryKey: ["product", productId] })
     },
   })
 }

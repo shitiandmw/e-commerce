@@ -28,7 +28,7 @@
     },
 
     "filters": {
-      "searchPlaceholder": "Search by SKU, title...",
+      "searchPlaceholder": "Search by product, variant, SKU...",
       "allStatus": "All Status",
       "inStock": "In Stock",
       "lowStock": "Low Stock",
@@ -95,6 +95,8 @@
         "title": "Item Details",
         "sku": "SKU",
         "itemTitle": "Title",
+        "product": "Product",
+        "variant": "Variant",
         "requiresShipping": "Requires Shipping",
         "yes": "Yes",
         "no": "No",

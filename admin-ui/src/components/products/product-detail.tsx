@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import {
   Product,
+  ProductVariant,
   useProduct,
   useDeleteProduct,
   useUpdateProduct,
@@ -29,12 +30,11 @@ import {
 import Link from "next/link"
 import { format } from "date-fns"
 import {
-  useInventoryItems,
   InventoryItem,
   getStockStatus,
   getTotalAvailable,
-  getTotalStocked,
   LOW_STOCK_THRESHOLD,
+  useInventoryItem,
 } from "@/hooks/use-inventory"
 
 /** brand field may be a single object or an array (due to isList link) */
@@ -96,27 +96,6 @@ function VariantInventoryBadge({ inventoryItem }: { inventoryItem?: InventoryIte
 
 function VariantsWithInventory({ product }: { product: Product }) {
   const t = useTranslations("products")
-  // Fetch inventory items matching variant SKUs
-  const variantSkus = product.variants
-    ?.map((v) => v.sku)
-    .filter((s): s is string => !!s) ?? []
-
-  const { data: inventoryData } = useInventoryItems({
-    limit: 100,
-  })
-
-  const inventoryItems = inventoryData?.inventory_items ?? []
-
-  // Build a map of SKU -> inventory item for quick lookup
-  const skuToInventory = React.useMemo(() => {
-    const map = new Map<string, InventoryItem>()
-    inventoryItems.forEach((item) => {
-      if (item.sku) {
-        map.set(item.sku, item)
-      }
-    })
-    return map
-  }, [inventoryItems])
 
   return (
     <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
@@ -142,93 +121,105 @@ function VariantsWithInventory({ product }: { product: Product }) {
         </p>
       ) : (
         <div className="space-y-3">
-          {product.variants.map((variant) => {
-            const inventoryItem = variant.sku
-              ? skuToInventory.get(variant.sku)
-              : undefined
-            const totalStocked = inventoryItem ? getTotalStocked(inventoryItem) : undefined
-            const totalAvailable = inventoryItem ? getTotalAvailable(inventoryItem) : undefined
+          {product.variants.map((variant) => (
+            <VariantInventoryCard key={variant.id} variant={variant} />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
-            return (
-              <div
-                key={variant.id}
-                className="rounded-md border p-4 space-y-3"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium">{variant.title}</p>
-                      <VariantInventoryBadge inventoryItem={inventoryItem} />
-                    </div>
-                    {variant.sku && (
-                      <p className="text-xs text-muted-foreground font-mono">
-                        SKU: {variant.sku}
-                      </p>
-                    )}
-                    {variant.options && variant.options.length > 0 && (
-                      <div className="flex gap-1.5 mt-1">
-                        {variant.options.map((opt, i) => (
-                          <Badge key={i} variant="outline" className="text-xs">
-                            {opt.value}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <div className="text-right space-y-1">
-                    {variant.prices?.map((price, i) => (
-                      <p key={i} className="font-semibold">
-                        {formatCurrency(price.amount, price.currency_code)}
-                      </p>
-                    ))}
+function VariantInventoryCard({ variant }: { variant: ProductVariant }) {
+  const t = useTranslations("products")
+  const inventoryLink = variant.inventory_items?.[0]
+  const linkedInventoryItem = inventoryLink?.inventory ?? undefined
+  const inventoryItemId =
+    linkedInventoryItem?.id || inventoryLink?.inventory_item_id || ""
+  const liveInventoryItemQuery = useInventoryItem(inventoryItemId)
+  const liveInventoryItem = liveInventoryItemQuery.data?.inventory_item
+  const inventoryItem = inventoryItemId ? liveInventoryItem : linkedInventoryItem
+
+  return (
+    <div className="rounded-md border p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <p className="font-medium">{variant.title}</p>
+            <VariantInventoryBadge inventoryItem={inventoryItem} />
+          </div>
+          {variant.sku && (
+            <p className="text-xs text-muted-foreground font-mono">
+              SKU: {variant.sku}
+            </p>
+          )}
+          {variant.options && variant.options.length > 0 && (
+            <div className="flex gap-1.5 mt-1">
+              {variant.options.map((opt, i) => (
+                <Badge key={i} variant="outline" className="text-xs">
+                  {opt.value}
+                </Badge>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="text-right space-y-1">
+          {variant.prices?.map((price, i) => (
+            <p key={i} className="font-semibold">
+              {formatCurrency(price.amount, price.currency_code)}
+            </p>
+          ))}
+          {inventoryItemId && (
+            <Link href={`/inventory/${inventoryItemId}`}>
+              <Button variant="outline" size="sm" className="mt-2">
+                <Warehouse className="mr-1.5 h-3.5 w-3.5" />
+                {t("detail.manageInventory")}
+              </Button>
+            </Link>
+          )}
+        </div>
+      </div>
+
+      {/* Inventory details for this variant */}
+      {inventoryItem && inventoryItem.location_levels && inventoryItem.location_levels.length > 0 && (
+        <div className="border-t pt-3 mt-2">
+          <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1.5">
+            <Warehouse className="h-3 w-3" />
+            {t("detail.stockByLocation")}
+          </p>
+          <div className="grid gap-2">
+            {inventoryItem.location_levels.map((level) => {
+              const isLow = level.available_quantity > 0 && level.available_quantity <= LOW_STOCK_THRESHOLD
+              const isOut = level.available_quantity <= 0
+              return (
+                <div key={level.id} className="flex items-center justify-between text-xs bg-muted/50 rounded px-3 py-1.5">
+                  <span className="text-muted-foreground">
+                    {level.location_id.substring(0, 12)}...
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-muted-foreground">
+                      {t("detail.stocked")}: <span className="font-medium text-foreground">{level.stocked_quantity}</span>
+                    </span>
+                    <span className="text-muted-foreground">
+                      {t("detail.availableLabel")}:{" "}
+                      <span className={`font-medium ${isOut ? "text-destructive" : isLow ? "text-yellow-600" : "text-green-600"}`}>
+                        {level.available_quantity}
+                      </span>
+                    </span>
                   </div>
                 </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
-                {/* Inventory details for this variant */}
-                {inventoryItem && inventoryItem.location_levels && inventoryItem.location_levels.length > 0 && (
-                  <div className="border-t pt-3 mt-2">
-                    <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1.5">
-                      <Warehouse className="h-3 w-3" />
-                      {t("detail.stockByLocation")}
-                    </p>
-                    <div className="grid gap-2">
-                      {inventoryItem.location_levels.map((level) => {
-                        const isLow = level.available_quantity > 0 && level.available_quantity <= LOW_STOCK_THRESHOLD
-                        const isOut = level.available_quantity <= 0
-                        return (
-                          <div key={level.id} className="flex items-center justify-between text-xs bg-muted/50 rounded px-3 py-1.5">
-                            <span className="text-muted-foreground">
-                              {level.location_id.substring(0, 12)}...
-                            </span>
-                            <div className="flex items-center gap-3">
-                              <span className="text-muted-foreground">
-                                {t("detail.stocked")}: <span className="font-medium text-foreground">{level.stocked_quantity}</span>
-                              </span>
-                              <span className="text-muted-foreground">
-                                {t("detail.availableLabel")}:{" "}
-                                <span className={`font-medium ${isOut ? "text-destructive" : isLow ? "text-yellow-600" : "text-green-600"}`}>
-                                  {level.available_quantity}
-                                </span>
-                              </span>
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* Fallback to basic inventory_quantity if no inventory item found */}
-                {!inventoryItem && variant.inventory_quantity !== undefined && (
-                  <div className="border-t pt-2 mt-2">
-                    <p className="text-xs text-muted-foreground">
-                      {t("detail.stock")}: {variant.inventory_quantity}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )
-          })}
+      {/* Fallback to basic inventory_quantity if no inventory item found */}
+      {!inventoryItem && !inventoryItemId && variant.inventory_quantity !== undefined && (
+        <div className="border-t pt-2 mt-2">
+          <p className="text-xs text-muted-foreground">
+            {t("detail.stock")}: {variant.inventory_quantity}
+          </p>
         </div>
       )}
     </div>

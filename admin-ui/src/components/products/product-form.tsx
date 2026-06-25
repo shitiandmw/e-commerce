@@ -11,6 +11,9 @@ import {
   useCreateProduct,
   useUpdateProduct,
   useUpdateVariant,
+  useCreateVariant,
+  useCreateProductOption,
+  useUpdateProductOption,
   useCategories,
   useLinkProductCategory,
   useUnlinkProductCategory,
@@ -22,6 +25,8 @@ import {
 } from "@/hooks/use-brands"
 import {
   useStockLocations,
+  fetchStockLocations,
+  fetchProductInventorySnapshot,
   ensureInventoryForVariant,
 } from "@/hooks/use-inventory"
 import {
@@ -32,7 +37,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { RichTextEditor } from "@/components/ui/rich-text-editor"
 import { Select } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
@@ -64,6 +68,7 @@ function resolveBrand(brand: Product["brand"]): { id: string; name: string } | n
 }
 
 const variantSchema = z.object({
+  id: z.string().optional(),
   title: z.string().min(1, "Variant title is required"),
   sku: z.string().optional(),
   price: z.coerce.number().min(0, "Price must be non-negative"),
@@ -97,6 +102,121 @@ const productSchema = z.object({
 })
 
 type ProductFormData = z.infer<typeof productSchema>
+type ProductFormVariant = ProductFormData["variants"][number]
+type OptionDefinition = { title: string; values: string[] }
+
+const DEFAULT_OPTION_TITLE = "Default option"
+const DEFAULT_OPTION_VALUE = "Default"
+
+function splitOptionValues(values: string) {
+  return values
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean)
+}
+
+function dedupeValues(values: string[]) {
+  return Array.from(new Set(values.filter(Boolean)))
+}
+
+function getProductOptionValues(option: NonNullable<Product["options"]>[number]) {
+  return option.values?.map((value) => value.value).filter(Boolean) || []
+}
+
+function splitVariantTitle(title: string) {
+  return title
+    .split("/")
+    .map((value) => value.trim())
+    .filter(Boolean)
+}
+
+function getVariantOptionAssignments(
+  variant: ProductFormVariant,
+  variantIndex: number,
+  options: Array<{ title: string; values: string[] }>
+) {
+  if (options.length === 0) {
+    return { [DEFAULT_OPTION_TITLE]: DEFAULT_OPTION_VALUE }
+  }
+
+  const titleParts = splitVariantTitle(variant.title)
+
+  return options.reduce<Record<string, string>>((assignments, option, optionIndex) => {
+    const optionValues = option.values
+    let value = titleParts[optionIndex]
+
+    if (options.length === 1) {
+      const titleValue = variant.title.trim()
+      value =
+        optionValues.find((optionValue) => optionValue === titleValue) ||
+        optionValues[variantIndex] ||
+        titleValue ||
+        optionValues[0]
+    }
+
+    value =
+      value ||
+      optionValues[variantIndex] ||
+      optionValues[0] ||
+      (optionIndex === 0 ? variant.title.trim() : option.title)
+
+    assignments[option.title] = value
+    return assignments
+  }, {})
+}
+
+function buildVariantCreatePayload(
+  variant: ProductFormVariant,
+  options: Record<string, string>
+) {
+  return {
+    title: variant.title,
+    sku: variant.sku?.trim() || undefined,
+    prices: [
+      {
+        amount: Math.round(variant.price * 100),
+        currency_code: variant.currency_code,
+      },
+    ],
+    manage_inventory: variant.manage_inventory,
+    options,
+  }
+}
+
+function findCreatedVariant<T extends { id: string; title: string; sku?: string | null }>(
+  variants: T[],
+  variant: ProductFormVariant,
+  usedVariantIds: Set<string>
+) {
+  const sku = variant.sku?.trim()
+
+  if (sku) {
+    const bySku = variants.find((item) => item.sku === sku && !usedVariantIds.has(item.id))
+    if (bySku) return bySku
+  }
+
+  const byTitle = variants.find(
+    (item) => item.title === variant.title && !usedVariantIds.has(item.id)
+  )
+  if (byTitle) return byTitle
+
+  return variants.find((item) => !usedVariantIds.has(item.id))
+}
+
+function expandOptionDefinitions(
+  options: OptionDefinition[],
+  assignments: Record<string, string>[]
+) {
+  return options.map((option) => ({
+    ...option,
+    values: dedupeValues([
+      ...option.values,
+      ...assignments
+        .map((assignment) => assignment[option.title])
+        .filter(Boolean),
+    ]),
+  }))
+}
 
 interface ProductFormProps {
   product?: Product
@@ -109,6 +229,9 @@ export function ProductForm({ product, mode }: ProductFormProps) {
   const createProduct = useCreateProduct()
   const updateProduct = useUpdateProduct(product?.id || "")
   const updateVariant = useUpdateVariant(product?.id || "")
+  const createVariant = useCreateVariant(product?.id || "")
+  const createProductOption = useCreateProductOption(product?.id || "")
+  const updateProductOption = useUpdateProductOption(product?.id || "")
   const { data: categoriesData } = useCategories()
   const { data: brandsData } = useBrands({ limit: 100 })
   const linkProductBrand = useLinkProductBrand()
@@ -144,6 +267,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
           })) || [],
         variants:
           product.variants?.map((v) => ({
+            id: v.id,
             title: v.title,
             sku: v.sku || "",
             price: v.prices?.[0]?.amount
@@ -172,6 +296,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
         options: [],
         variants: [
           {
+            id: undefined,
             title: "Default",
             sku: "",
             price: 0,
@@ -213,7 +338,9 @@ export function ProductForm({ product, mode }: ProductFormProps) {
     fields: variantFields,
     append: appendVariant,
     remove: removeVariant,
-  } = useFieldArray({ control, name: "variants" })
+  } = useFieldArray({ control, name: "variants", keyName: "fieldId" })
+
+  const [submitError, setSubmitError] = React.useState<Error | null>(null)
 
   // Media Picker state
   const [thumbnailPickerOpen, setThumbnailPickerOpen] = React.useState(false)
@@ -240,14 +367,94 @@ export function ProductForm({ product, mode }: ProductFormProps) {
     }
   )
 
+  const buildFormOptionDefinitions = (data: ProductFormData): OptionDefinition[] => {
+    if (data.options.length > 0) {
+      return data.options.map((option) => {
+        const values = splitOptionValues(option.values)
+        return {
+          title: option.title,
+          values: values.length > 0 ? values : [option.title],
+        }
+      })
+    }
+
+    if (product?.options && product.options.length > 0) {
+      return product.options.map((option) => {
+        const values = getProductOptionValues(option)
+        return {
+          title: option.title,
+          values: values.length > 0 ? values : [DEFAULT_OPTION_VALUE],
+        }
+      })
+    }
+
+    return [{ title: DEFAULT_OPTION_TITLE, values: [DEFAULT_OPTION_VALUE] }]
+  }
+
+  const ensureProductOptionValues = async (optionDefinitions: OptionDefinition[]) => {
+    if (!product?.id) return
+
+    const currentOptions = new Map(
+      (product.options || []).map((option) => [
+        option.title,
+        {
+          id: option.id,
+          title: option.title,
+          values: getProductOptionValues(option),
+        },
+      ])
+    )
+
+    for (const optionDefinition of optionDefinitions) {
+      const values =
+        optionDefinition.values.length > 0
+          ? optionDefinition.values
+          : [DEFAULT_OPTION_VALUE]
+      const existingOption = currentOptions.get(optionDefinition.title)
+
+      if (!existingOption) {
+        await createProductOption.mutateAsync({
+          title: optionDefinition.title,
+          values,
+        })
+        currentOptions.set(optionDefinition.title, {
+          id: "",
+          title: optionDefinition.title,
+          values,
+        })
+        continue
+      }
+
+      const nextValues = dedupeValues([...existingOption.values, ...values])
+      if (nextValues.length === existingOption.values.length) continue
+
+      await updateProductOption.mutateAsync({
+        optionId: existingOption.id,
+        data: {
+          title: existingOption.title,
+          values: nextValues,
+        },
+      })
+      currentOptions.set(optionDefinition.title, {
+        ...existingOption,
+        values: nextValues,
+      })
+    }
+  }
+
   const onSubmit = async (data: ProductFormData) => {
     try {
+      setSubmitError(null)
       // Build the API payload
       // Auto-generate a URL-safe handle if the user left it blank or it
       // contains non-URL-safe characters (e.g. Chinese, special symbols).
       const rawHandle = data.handle?.trim() || ""
       const isUrlSafe = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(rawHandle)
       const handle = rawHandle && isUrlSafe ? rawHandle : toSlug(data.title) || `product-${Date.now()}`
+      const defaultLocation =
+        stockLocationsData?.stock_locations?.[0] ||
+        (await fetchStockLocations().catch(() => undefined))
+          ?.stock_locations?.[0]
 
       const payload: Record<string, any> = {
         title: data.title,
@@ -269,42 +476,63 @@ export function ProductForm({ product, mode }: ProductFormProps) {
       }
 
       if (mode === "create") {
+        const baseOptionDefinitions = buildFormOptionDefinitions(data)
+        const variantOptionAssignments = data.variants.map((variant, index) =>
+          getVariantOptionAssignments(variant, index, baseOptionDefinitions)
+        )
+        const optionDefinitions = expandOptionDefinitions(
+          baseOptionDefinitions,
+          variantOptionAssignments
+        )
+
         // Include categories in create payload (Medusa supports it on create)
         if (data.category_ids.length > 0) {
           payload.categories = data.category_ids.map((id) => ({ id }))
         }
 
         // Medusa v2 requires every variant to reference valid option values.
-        // When the user hasn't defined custom options we create a default one
-        // so that the API call succeeds.
-        const hasCustomOptions = data.options.length > 0
-
-        if (hasCustomOptions) {
-          payload.options = data.options.map((opt) => ({
-            title: opt.title,
-            values: opt.values.split(",").map((v) => v.trim()),
-          }))
-        } else {
-          payload.options = [
-            { title: "Default option", values: ["Default"] },
-          ]
-        }
-
-        payload.variants = data.variants.map((v) => ({
-          title: v.title,
-          sku: v.sku || undefined,
-          prices: [
-            {
-              amount: Math.round(v.price * 100),
-              currency_code: v.currency_code,
-            },
-          ],
-          manage_inventory: v.manage_inventory,
-          options: hasCustomOptions ? {} : { "Default option": "Default" },
+        payload.options = optionDefinitions.map((option) => ({
+          title: option.title,
+          values: option.values,
         }))
+        payload.variants = data.variants.map((variant, index) =>
+          buildVariantCreatePayload(variant, variantOptionAssignments[index])
+        )
 
-        const result = await createProduct.mutateAsync(payload) as any
+        const result = await createProduct.mutateAsync(payload)
         const newProductId = result?.product?.id
+        const createdVariants =
+          result?.product?.variants ||
+          (newProductId
+            ? (await fetchProductInventorySnapshot(newProductId)).product
+                .variants || []
+            : [])
+        const usedVariantIds = new Set<string>()
+
+        if (newProductId) {
+          for (const formVariant of data.variants) {
+            if (!formVariant.manage_inventory) continue
+
+            const createdVariant = findCreatedVariant(
+              createdVariants,
+              formVariant,
+              usedVariantIds
+            )
+            if (!createdVariant) continue
+
+            usedVariantIds.add(createdVariant.id)
+            await ensureInventoryForVariant({
+              variantId: createdVariant.id,
+              productId: newProductId,
+              sku: formVariant.sku || createdVariant.sku,
+              title: formVariant.title,
+              productTitle: data.title,
+              locationId: defaultLocation?.id,
+              stockedQuantity: formVariant.inventory_quantity,
+              syncStockedQuantity: true,
+            })
+          }
+        }
 
         // Link brand to product if selected
         if (data.brand_id && newProductId) {
@@ -326,13 +554,82 @@ export function ProductForm({ product, mode }: ProductFormProps) {
       } else {
         await updateProduct.mutateAsync(payload)
 
-        // Update existing variants (price, SKU, inventory_quantity)
-        if (product?.variants && data.variants) {
-          for (let i = 0; i < data.variants.length; i++) {
-            const existingVariant = product.variants[i]
-            if (!existingVariant) continue
+        if (product?.id && data.variants) {
+          const baseOptionDefinitions = buildFormOptionDefinitions(data)
+          const existingVariantsById = new Map(
+            (product.variants || []).map((variant) => [variant.id, variant])
+          )
+          const variantsToCreate = data.variants
+            .map((formVariant, index) => ({
+              formVariant,
+              index,
+              existingVariant: formVariant.id
+                ? existingVariantsById.get(formVariant.id)
+                : undefined,
+            }))
+            .filter(({ formVariant, existingVariant }) => {
+              return !formVariant.id || !existingVariant
+            })
+          const newVariantAssignments = variantsToCreate.map(({ formVariant, index }) =>
+            getVariantOptionAssignments(formVariant, index, baseOptionDefinitions)
+          )
 
+          if (variantsToCreate.length > 0) {
+            await ensureProductOptionValues(
+              expandOptionDefinitions(baseOptionDefinitions, newVariantAssignments)
+            )
+          }
+
+          const usedVariantIds = new Set(
+            (product.variants || []).map((variant) => variant.id)
+          )
+
+          for (let i = 0; i < data.variants.length; i++) {
             const formVariant = data.variants[i]
+            const existingVariant =
+              (formVariant.id && existingVariantsById.get(formVariant.id)) ||
+              undefined
+
+            if (!existingVariant) {
+              const options = getVariantOptionAssignments(
+                formVariant,
+                i,
+                baseOptionDefinitions
+              )
+              const result = await createVariant.mutateAsync(
+                buildVariantCreatePayload(formVariant, options)
+              )
+              const createdVariants =
+                result.product?.variants ||
+                (await fetchProductInventorySnapshot(product.id)).product
+                  .variants ||
+                []
+              const createdVariant = findCreatedVariant(
+                createdVariants,
+                formVariant,
+                usedVariantIds
+              )
+
+              if (!createdVariant) {
+                throw new Error(`Created variant ${formVariant.title} was not returned by the API`)
+              }
+
+              usedVariantIds.add(createdVariant.id)
+              if (formVariant.manage_inventory) {
+                await ensureInventoryForVariant({
+                  variantId: createdVariant.id,
+                  productId: product.id,
+                  sku: formVariant.sku || createdVariant.sku,
+                  title: formVariant.title,
+                  productTitle: data.title,
+                  locationId: defaultLocation?.id,
+                  stockedQuantity: formVariant.inventory_quantity,
+                  syncStockedQuantity: true,
+                })
+              }
+              continue
+            }
+
             const variantPayload: Record<string, any> = {}
 
             if (formVariant.title !== existingVariant.title) {
@@ -370,25 +667,17 @@ export function ProductForm({ product, mode }: ProductFormProps) {
               })
             }
 
-            const wasDisabled = existingVariant.manage_inventory === false
-            const isNowEnabled = formVariant.manage_inventory === true
-            if (wasDisabled && isNowEnabled) {
-              const defaultLocation = stockLocationsData?.stock_locations?.[0]
-              if (defaultLocation && product?.id) {
-                try {
-                  await ensureInventoryForVariant({
-                    variantId: existingVariant.id,
-                    productId: product.id,
-                    sku: formVariant.sku || existingVariant.sku,
-                    title: product?.title ?? data.title,
-                    locationId: defaultLocation.id,
-                  })
-                } catch {
-                  console.warn(
-                    `Failed to create inventory for variant ${existingVariant.id}, can be retried from inventory page`
-                  )
-                }
-              }
+            if (formVariant.manage_inventory) {
+              await ensureInventoryForVariant({
+                variantId: existingVariant.id,
+                productId: product.id,
+                sku: formVariant.sku || existingVariant.sku,
+                title: formVariant.title,
+                productTitle: data.title,
+                locationId: defaultLocation?.id,
+                stockedQuantity: formVariant.inventory_quantity,
+                syncStockedQuantity: false,
+              })
             }
           }
         }
@@ -465,12 +754,19 @@ export function ProductForm({ product, mode }: ProductFormProps) {
 
       router.push("/products")
     } catch (err) {
-      // Error is handled by mutation state
+      setSubmitError(
+        err instanceof Error ? err : new Error(t("errorOccurred"))
+      )
     }
   }
 
   const mutationError =
-    mode === "create" ? createProduct.error : updateProduct.error
+    submitError ||
+    (mode === "create" ? createProduct.error : updateProduct.error) ||
+    updateVariant.error ||
+    createVariant.error ||
+    createProductOption.error ||
+    updateProductOption.error
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
@@ -784,9 +1080,10 @@ export function ProductForm({ product, mode }: ProductFormProps) {
 
             {variantFields.map((field, index) => (
               <div
-                key={field.id}
+                key={field.fieldId}
                 className="rounded-md border p-4 space-y-3"
               >
+                <input type="hidden" {...register(`variants.${index}.id`)} />
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-medium">
                     {t("form.variantNumber", { number: index + 1 })}
@@ -858,11 +1155,16 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                   </div>
                   <div className="space-y-2">
                     <Label>{t("form.variantInventory")}</Label>
-                    {mode === "edit" ? (
+                    {mode === "edit" && watch(`variants.${index}.id`) ? (
                       <div>
                         <Input
                           type="number"
-                          value={product?.variants?.[index]?.inventory_quantity ?? 0}
+                          value={
+                            product?.variants?.find(
+                              (variant) =>
+                                variant.id === watch(`variants.${index}.id`)
+                            )?.inventory_quantity ?? 0
+                          }
                           disabled
                           className="bg-muted"
                         />
