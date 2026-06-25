@@ -8,13 +8,11 @@ import {
   ProductVariant,
   useProduct,
   useDeleteProduct,
-  useUpdateProduct,
 } from "@/hooks/use-products"
 import { DeleteProductDialog } from "./delete-product-dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Select } from "@/components/ui/select"
 import {
   ArrowLeft,
   Pencil,
@@ -22,10 +20,10 @@ import {
   Package,
   DollarSign,
   BarChart3,
-  Calendar,
   Tag,
   Warehouse,
   AlertTriangle,
+  Loader2,
 } from "lucide-react"
 import Link from "next/link"
 import { format } from "date-fns"
@@ -34,7 +32,9 @@ import {
   getStockStatus,
   getTotalAvailable,
   LOW_STOCK_THRESHOLD,
+  useEnsureInventoryForVariant,
   useInventoryItem,
+  useStockLocations,
 } from "@/hooks/use-inventory"
 
 /** brand field may be a single object or an array (due to isList link) */
@@ -122,7 +122,11 @@ function VariantsWithInventory({ product }: { product: Product }) {
       ) : (
         <div className="space-y-3">
           {product.variants.map((variant) => (
-            <VariantInventoryCard key={variant.id} variant={variant} />
+            <VariantInventoryCard
+              key={variant.id}
+              product={product}
+              variant={variant}
+            />
           ))}
         </div>
       )}
@@ -130,7 +134,13 @@ function VariantsWithInventory({ product }: { product: Product }) {
   )
 }
 
-function VariantInventoryCard({ variant }: { variant: ProductVariant }) {
+function VariantInventoryCard({
+  product,
+  variant,
+}: {
+  product: Product
+  variant: ProductVariant
+}) {
   const t = useTranslations("products")
   const inventoryLink = variant.inventory_items?.[0]
   const linkedInventoryItem = inventoryLink?.inventory ?? undefined
@@ -139,6 +149,29 @@ function VariantInventoryCard({ variant }: { variant: ProductVariant }) {
   const liveInventoryItemQuery = useInventoryItem(inventoryItemId)
   const liveInventoryItem = liveInventoryItemQuery.data?.inventory_item
   const inventoryItem = inventoryItemId ? liveInventoryItem : linkedInventoryItem
+  const ensureInventory = useEnsureInventoryForVariant()
+  const { data: locationsData } = useStockLocations()
+  const defaultLocationId = locationsData?.stock_locations?.[0]?.id
+  const isInitializing =
+    ensureInventory.isPending &&
+    ensureInventory.variables?.variantId === variant.id
+
+  const handleInitializeInventory = async () => {
+    try {
+      await ensureInventory.mutateAsync({
+        productId: product.id,
+        productTitle: product.title,
+        variantId: variant.id,
+        title: variant.title,
+        sku: variant.sku,
+        locationId: defaultLocationId,
+        stockedQuantity: variant.inventory_quantity ?? 0,
+        syncStockedQuantity: true,
+      })
+    } catch {
+      // The mutation state renders the error inline.
+    }
+  }
 
   return (
     <div className="rounded-md border p-4 space-y-3">
@@ -177,8 +210,32 @@ function VariantInventoryCard({ variant }: { variant: ProductVariant }) {
               </Button>
             </Link>
           )}
+          {!inventoryItemId && (variant.manage_inventory ?? true) && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-2"
+              onClick={handleInitializeInventory}
+              disabled={isInitializing}
+            >
+              {isInitializing ? (
+                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Warehouse className="mr-1.5 h-3.5 w-3.5" />
+              )}
+              {t("detail.initializeInventory")}
+            </Button>
+          )}
         </div>
       </div>
+
+      {ensureInventory.isError && (
+        <p className="text-xs text-destructive">
+          {ensureInventory.error instanceof Error
+            ? ensureInventory.error.message
+            : t("detail.initializeInventoryFailed")}
+        </p>
+      )}
 
       {/* Inventory details for this variant */}
       {inventoryItem && inventoryItem.location_levels && inventoryItem.location_levels.length > 0 && (

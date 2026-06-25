@@ -39,6 +39,8 @@ const languages = [
   { code: "en", label: "English", short: "EN" },
 ]
 
+const MOBILE_MENU_CONTENT_ID = "site-mobile-menu"
+
 /* ─── mega menu: columns panel (links grouped by children) ─── */
 function ColumnsPanel({ item, onNavigate }: { item: MenuItem; onNavigate?: () => void }) {
   return (
@@ -381,10 +383,18 @@ export function SiteHeader({ navItems }: { navItems: MenuItem[] }) {
           <div className="mx-auto flex h-14 max-w-[1400px] items-center px-4 lg:px-6">
             {/* mobile trigger */}
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-              <SheetTrigger className="lg:hidden p-2 -ml-2 text-foreground/70 hover:text-foreground transition-colors" aria-label="打開選單">
+              <SheetTrigger
+                className="lg:hidden p-2 -ml-2 text-foreground/70 hover:text-foreground transition-colors"
+                aria-controls={MOBILE_MENU_CONTENT_ID}
+                aria-label="打開選單"
+              >
                 <Menu className="size-5" />
               </SheetTrigger>
-              <SheetContent side="left" className="w-[320px] bg-background border-border overflow-y-auto">
+              <SheetContent
+                id={MOBILE_MENU_CONTENT_ID}
+                side="left"
+                className="w-[320px] bg-background border-border overflow-y-auto"
+              >
                 <SheetHeader>
                   <SheetTitle className="text-gold font-serif text-lg tracking-wider">SHANGJIA</SheetTitle>
                 </SheetHeader>

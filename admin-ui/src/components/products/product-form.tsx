@@ -107,6 +107,60 @@ type OptionDefinition = { title: string; values: string[] }
 
 const DEFAULT_OPTION_TITLE = "Default option"
 const DEFAULT_OPTION_VALUE = "Default"
+const SKU_FALLBACK_PREFIX = "SKU"
+
+function getSkuPart(value?: string | null) {
+  return toSlug(value || "")
+    .toUpperCase()
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 12)
+    .replace(/-$/g, "")
+}
+
+function generateVariantSku(
+  productTitle: string | undefined,
+  variantTitle: string | undefined,
+  variantIndex: number,
+  usedSkus: Set<string>
+) {
+  const productPart = getSkuPart(productTitle)
+  const variantPart = getSkuPart(variantTitle)
+  const baseParts = [
+    productPart || SKU_FALLBACK_PREFIX,
+    variantPart || `VAR${variantIndex + 1}`,
+  ]
+  const base = baseParts.join("-").slice(0, 28)
+  let candidate = base
+  let suffix = 2
+
+  while (usedSkus.has(candidate)) {
+    const suffixText = `-${suffix}`
+    candidate = `${base.slice(0, 32 - suffixText.length)}${suffixText}`
+    suffix += 1
+  }
+
+  usedSkus.add(candidate)
+  return candidate
+}
+
+function generateVariantSkus(
+  productTitle: string | undefined,
+  variants: ProductFormVariant[]
+) {
+  const usedSkus = new Set<string>()
+  return variants.map((variant, index) =>
+    generateVariantSku(productTitle, variant.title, index, usedSkus)
+  )
+}
+
+function getExistingSkuSet(variants: ProductFormVariant[]) {
+  return new Set(
+    variants
+      .map((variant) => variant.sku?.trim())
+      .filter((sku): sku is string => !!sku)
+  )
+}
 
 function splitOptionValues(values: string) {
   return values
@@ -317,6 +371,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
     formState: { errors, isSubmitting },
     watch,
     setValue,
+    getValues,
   } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues,
@@ -341,6 +396,10 @@ export function ProductForm({ product, mode }: ProductFormProps) {
   } = useFieldArray({ control, name: "variants", keyName: "fieldId" })
 
   const [submitError, setSubmitError] = React.useState<Error | null>(null)
+  const manuallyEditedSkuFieldIds = React.useRef<Set<string>>(new Set())
+  const lastAutoSkusByFieldId = React.useRef<Map<string, string>>(new Map())
+  const watchedTitle = watch("title")
+  const watchedVariants = watch("variants")
 
   // Media Picker state
   const [thumbnailPickerOpen, setThumbnailPickerOpen] = React.useState(false)
@@ -366,6 +425,46 @@ export function ProductForm({ product, mode }: ProductFormProps) {
       return Array.isArray(attrs) ? attrs : []
     }
   )
+
+  React.useEffect(() => {
+    const currentVariants = getValues("variants") || []
+    const autoSkus = generateVariantSkus(watchedTitle, currentVariants)
+    const activeFieldIds = new Set(variantFields.map((field) => field.fieldId))
+
+    for (const fieldId of Array.from(manuallyEditedSkuFieldIds.current)) {
+      if (!activeFieldIds.has(fieldId)) {
+        manuallyEditedSkuFieldIds.current.delete(fieldId)
+      }
+    }
+
+    for (const fieldId of Array.from(lastAutoSkusByFieldId.current.keys())) {
+      if (!activeFieldIds.has(fieldId)) {
+        lastAutoSkusByFieldId.current.delete(fieldId)
+      }
+    }
+
+    variantFields.forEach((field, index) => {
+      const formVariant = currentVariants[index]
+      if (!formVariant) return
+      if (mode === "edit" && formVariant.id) return
+      if (manuallyEditedSkuFieldIds.current.has(field.fieldId)) return
+
+      const nextSku = autoSkus[index]
+      const currentSku = formVariant.sku?.trim() || ""
+      const previousAutoSku =
+        lastAutoSkusByFieldId.current.get(field.fieldId) || ""
+
+      if (!currentSku || currentSku === previousAutoSku) {
+        if (currentSku !== nextSku) {
+          setValue(`variants.${index}.sku`, nextSku, {
+            shouldDirty: false,
+            shouldValidate: true,
+          })
+        }
+        lastAutoSkusByFieldId.current.set(field.fieldId, nextSku)
+      }
+    })
+  }, [getValues, mode, setValue, variantFields, watchedTitle, watchedVariants])
 
   const buildFormOptionDefinitions = (data: ProductFormData): OptionDefinition[] => {
     if (data.options.length > 0) {
@@ -442,6 +541,29 @@ export function ProductForm({ product, mode }: ProductFormProps) {
     }
   }
 
+  const getSubmitVariants = (variants: ProductFormVariant[]) => {
+    const autoSkus = generateVariantSkus(watchedTitle, variants)
+
+    return variants.map((variant, index) => {
+      const fieldId = variantFields[index]?.fieldId
+      if (mode === "edit" && variant.id) return variant
+      if (fieldId && manuallyEditedSkuFieldIds.current.has(fieldId)) {
+        return { ...variant, sku: variant.sku?.trim() || "" }
+      }
+
+      const currentSku = variant.sku?.trim() || ""
+      const previousAutoSku = fieldId
+        ? lastAutoSkusByFieldId.current.get(fieldId) || ""
+        : ""
+      const nextSku =
+        !currentSku || currentSku === previousAutoSku
+          ? autoSkus[index]
+          : currentSku
+
+      return { ...variant, sku: nextSku }
+    })
+  }
+
   const onSubmit = async (data: ProductFormData) => {
     try {
       setSubmitError(null)
@@ -455,6 +577,10 @@ export function ProductForm({ product, mode }: ProductFormProps) {
         stockLocationsData?.stock_locations?.[0] ||
         (await fetchStockLocations().catch(() => undefined))
           ?.stock_locations?.[0]
+      const submitData = {
+        ...data,
+        variants: getSubmitVariants(data.variants),
+      }
 
       const payload: Record<string, any> = {
         title: data.title,
@@ -477,7 +603,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
 
       if (mode === "create") {
         const baseOptionDefinitions = buildFormOptionDefinitions(data)
-        const variantOptionAssignments = data.variants.map((variant, index) =>
+        const variantOptionAssignments = submitData.variants.map((variant, index) =>
           getVariantOptionAssignments(variant, index, baseOptionDefinitions)
         )
         const optionDefinitions = expandOptionDefinitions(
@@ -495,22 +621,20 @@ export function ProductForm({ product, mode }: ProductFormProps) {
           title: option.title,
           values: option.values,
         }))
-        payload.variants = data.variants.map((variant, index) =>
+        payload.variants = submitData.variants.map((variant, index) =>
           buildVariantCreatePayload(variant, variantOptionAssignments[index])
         )
 
         const result = await createProduct.mutateAsync(payload)
         const newProductId = result?.product?.id
-        const createdVariants =
-          result?.product?.variants ||
-          (newProductId
-            ? (await fetchProductInventorySnapshot(newProductId)).product
-                .variants || []
-            : [])
+        const createdVariants = newProductId
+          ? (await fetchProductInventorySnapshot(newProductId)).product
+              .variants || []
+          : result?.product?.variants || []
         const usedVariantIds = new Set<string>()
 
         if (newProductId) {
-          for (const formVariant of data.variants) {
+          for (const formVariant of submitData.variants) {
             if (!formVariant.manage_inventory) continue
 
             const createdVariant = findCreatedVariant(
@@ -554,12 +678,12 @@ export function ProductForm({ product, mode }: ProductFormProps) {
       } else {
         await updateProduct.mutateAsync(payload)
 
-        if (product?.id && data.variants) {
+        if (product?.id && submitData.variants) {
           const baseOptionDefinitions = buildFormOptionDefinitions(data)
           const existingVariantsById = new Map(
             (product.variants || []).map((variant) => [variant.id, variant])
           )
-          const variantsToCreate = data.variants
+          const variantsToCreate = submitData.variants
             .map((formVariant, index) => ({
               formVariant,
               index,
@@ -584,8 +708,8 @@ export function ProductForm({ product, mode }: ProductFormProps) {
             (product.variants || []).map((variant) => variant.id)
           )
 
-          for (let i = 0; i < data.variants.length; i++) {
-            const formVariant = data.variants[i]
+          for (let i = 0; i < submitData.variants.length; i++) {
+            const formVariant = submitData.variants[i]
             const existingVariant =
               (formVariant.id && existingVariantsById.get(formVariant.id)) ||
               undefined
@@ -1062,16 +1186,24 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() =>
+                onClick={() => {
+                  const currentVariants = getValues("variants") || []
+                  const nextIndex = currentVariants.length
+                  const nextSku = generateVariantSku(
+                    getValues("title"),
+                    "",
+                    nextIndex,
+                    getExistingSkuSet(currentVariants)
+                  )
                   appendVariant({
                     title: "",
-                    sku: "",
+                    sku: nextSku,
                     price: 0,
                     currency_code: "usd",
                     inventory_quantity: 0,
                     manage_inventory: true,
                   })
-                }
+                }}
               >
                 <Plus className="mr-2 h-4 w-4" />
                 {t("form.addVariant")}
@@ -1116,7 +1248,20 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                   <div className="space-y-2">
                     <Label>{t("form.variantSku")}</Label>
                     <Input
-                      {...register(`variants.${index}.sku`)}
+                      {...register(`variants.${index}.sku`, {
+                        onChange: (event) => {
+                          const fieldId = variantFields[index]?.fieldId
+                          if (!fieldId) return
+                          const value = event.target.value.trim()
+                          const lastAuto =
+                            lastAutoSkusByFieldId.current.get(fieldId) || ""
+                          if (value && value !== lastAuto) {
+                            manuallyEditedSkuFieldIds.current.add(fieldId)
+                          } else {
+                            manuallyEditedSkuFieldIds.current.delete(fieldId)
+                          }
+                        },
+                      })}
                       placeholder={t("form.variantSkuPlaceholder")}
                     />
                   </div>

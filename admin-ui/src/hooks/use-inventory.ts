@@ -128,10 +128,26 @@ export interface InventoryQueryParams {
 // ---- Hooks ----
 
 const INVENTORY_ITEMS_FIELDS = "*location_levels"
-const PRODUCT_INVENTORY_FIELDS =
-  "id,title,+variants,+variants.inventory_items,+variants.inventory_items.inventory,+variants.inventory_items.inventory.location_levels"
+const PRODUCT_INVENTORY_VARIANT_FIELDS = [
+  "id",
+  "title",
+  "variants.id",
+  "variants.title",
+  "variants.sku",
+  "variants.manage_inventory",
+  "variants.inventory_items",
+  "variants.inventory_items.*",
+  "variants.inventory_items.inventory",
+  "variants.inventory_items.inventory.id",
+  "variants.inventory_items.inventory.title",
+  "variants.inventory_items.inventory.sku",
+]
+const PRODUCT_INVENTORY_FIELDS = [
+  ...PRODUCT_INVENTORY_VARIANT_FIELDS,
+  "*variants.inventory_items.inventory.location_levels",
+].join(",")
 const PRODUCT_INVENTORY_LINK_FIELDS =
-  "id,title,+variants,+variants.inventory_items"
+  PRODUCT_INVENTORY_VARIANT_FIELDS.join(",")
 
 function buildInventoryItemsPath(params: InventoryQueryParams = {}) {
   const {
@@ -168,7 +184,8 @@ export function fetchStockLocations() {
 
 export function fetchProductInventorySnapshot(productId: string) {
   return adminFetch<{ product: ProductInventorySnapshot }>(
-    `/admin/products/${productId}?fields=${PRODUCT_INVENTORY_FIELDS}`
+    `/admin/products/${productId}`,
+    { params: { fields: PRODUCT_INVENTORY_FIELDS } }
   )
 }
 
@@ -181,9 +198,13 @@ export async function fetchInventoryProductLinks(): Promise<InventoryProductLink
     const data = await adminFetch<{
       products: ProductInventorySnapshot[]
       count: number
-    }>(
-      `/admin/products?offset=${offset}&limit=${limit}&fields=${PRODUCT_INVENTORY_LINK_FIELDS}`
-    )
+    }>("/admin/products", {
+      params: {
+        offset: String(offset),
+        limit: String(limit),
+        fields: PRODUCT_INVENTORY_LINK_FIELDS,
+      },
+    })
 
     for (const product of data.products || []) {
       for (const variant of product.variants || []) {
@@ -360,7 +381,7 @@ export function useUpdateInventoryItem(id: string) {
  * with manage_inventory=true. Toggling the flag on an existing variant does
  * NOT back-fill the item, so we do it here.
  */
-export async function ensureInventoryForVariant(opts: {
+export interface EnsureInventoryForVariantOptions {
   variantId: string
   productId: string
   sku?: string | null
@@ -369,19 +390,31 @@ export async function ensureInventoryForVariant(opts: {
   locationId?: string
   stockedQuantity?: number
   syncStockedQuantity?: boolean
-}) {
+}
+
+export async function ensureInventoryForVariant(
+  opts: EnsureInventoryForVariantOptions
+) {
   const snapshot = await fetchProductInventorySnapshot(opts.productId)
   const variant = snapshot.product.variants?.find((v) => v.id === opts.variantId)
   const existingLink = variant?.inventory_items?.[0]
+  const resolvedSku =
+    normalizeOptionalString(opts.sku) || normalizeOptionalString(variant?.sku)
+  const resolvedProductTitle =
+    normalizeOptionalString(opts.productTitle) ||
+    normalizeOptionalString(snapshot.product.title)
+  const resolvedVariantTitle =
+    normalizeOptionalString(opts.title) || normalizeOptionalString(variant?.title)
   const desiredTitle = buildInventoryItemTitle(
-    opts.productTitle || snapshot.product.title,
-    opts.title || variant?.title
+    resolvedProductTitle,
+    resolvedVariantTitle
   )
   const desiredMetadata = {
     product_id: opts.productId,
-    product_title: opts.productTitle || snapshot.product.title,
+    product_title: resolvedProductTitle || null,
     variant_id: opts.variantId,
-    variant_title: opts.title || variant?.title || null,
+    variant_title: resolvedVariantTitle || null,
+    variant_sku: resolvedSku || null,
   }
 
   if (existingLink) {
@@ -391,34 +424,36 @@ export async function ensureInventoryForVariant(opts: {
       throw new Error("Variant inventory link is missing inventory_item_id")
     }
 
-    const item = await fetchInventoryItem(inventoryItemId)
+    let item = await fetchInventoryItem(inventoryItemId)
     await syncInventoryItemMetadata(item, {
-      sku: opts.sku ?? variant?.sku,
+      sku: resolvedSku,
       title: desiredTitle,
       metadata: desiredMetadata,
-      variantTitle: variant?.title,
+      variantTitle: resolvedVariantTitle,
     })
+    item = await fetchInventoryItem(inventoryItemId)
     await ensureInventoryLevel(item, {
       locationId: opts.locationId,
       stockedQuantity: opts.stockedQuantity,
       syncStockedQuantity: opts.syncStockedQuantity,
     })
 
-    return item
+    return fetchInventoryItem(inventoryItemId)
   }
 
-  const reusableItem = opts.sku
-    ? await findInventoryItemBySku(opts.sku)
+  const reusableItem = resolvedSku
+    ? await findInventoryItemBySku(resolvedSku)
     : undefined
 
   if (reusableItem) {
     await syncInventoryItemMetadata(reusableItem, {
-      sku: opts.sku ?? variant?.sku,
+      sku: resolvedSku,
       title: desiredTitle,
       metadata: desiredMetadata,
-      variantTitle: variant?.title,
+      variantTitle: resolvedVariantTitle,
     })
-    await ensureInventoryLevel(reusableItem, {
+    let item = await fetchInventoryItem(reusableItem.id)
+    await ensureInventoryLevel(item, {
       locationId: opts.locationId,
       stockedQuantity: opts.stockedQuantity,
       syncStockedQuantity: opts.syncStockedQuantity,
@@ -429,7 +464,7 @@ export async function ensureInventoryForVariant(opts: {
       inventoryItemId: reusableItem.id,
     })
 
-    return reusableItem
+    return fetchInventoryItem(reusableItem.id)
   }
 
   const item = await adminFetch<{ inventory_item: InventoryItem }>(
@@ -437,7 +472,7 @@ export async function ensureInventoryForVariant(opts: {
     {
       method: "POST",
       body: {
-        sku: opts.sku ?? undefined,
+        sku: resolvedSku,
         title: desiredTitle,
         metadata: desiredMetadata,
         location_levels: opts.locationId
@@ -453,6 +488,21 @@ export async function ensureInventoryForVariant(opts: {
   )
 
   const inventoryItemId = item.inventory_item.id
+  let createdItem = await fetchInventoryItem(inventoryItemId)
+
+  await syncInventoryItemMetadata(createdItem, {
+    sku: resolvedSku,
+    title: desiredTitle,
+    metadata: desiredMetadata,
+    variantTitle: resolvedVariantTitle,
+  })
+
+  createdItem = await fetchInventoryItem(inventoryItemId)
+  await ensureInventoryLevel(createdItem, {
+    locationId: opts.locationId,
+    stockedQuantity: opts.stockedQuantity,
+    syncStockedQuantity: opts.syncStockedQuantity,
+  })
 
   await linkInventoryItemToVariant({
     productId: opts.productId,
@@ -460,7 +510,22 @@ export async function ensureInventoryForVariant(opts: {
     inventoryItemId,
   })
 
-  return item.inventory_item
+  return fetchInventoryItem(inventoryItemId)
+}
+
+export function useEnsureInventoryForVariant() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ensureInventoryForVariant,
+    onSuccess: (item, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["inventory-items"] })
+      queryClient.invalidateQueries({ queryKey: ["inventory-product-links"] })
+      queryClient.invalidateQueries({ queryKey: ["inventory-item", item.id] })
+      queryClient.invalidateQueries({ queryKey: ["products"] })
+      queryClient.invalidateQueries({ queryKey: ["product", variables.productId] })
+    },
+  })
 }
 
 export function useBulkEnableInventory() {
@@ -614,6 +679,9 @@ export function inventoryItemMatchesSearch(
     item.sku,
     item.title,
     item.description,
+    item.metadata?.product_title,
+    item.metadata?.variant_title,
+    item.metadata?.variant_sku,
     ...(item.product_links || []).flatMap((link) => [
       link.product_title,
       link.variant_title,
@@ -621,7 +689,14 @@ export function inventoryItemMatchesSearch(
     ]),
   ]
 
-  return values.some((value) => value?.toLowerCase().includes(query))
+  return values.some(
+    (value) => typeof value === "string" && value.toLowerCase().includes(query)
+  )
+}
+
+function normalizeOptionalString(value?: string | null) {
+  const trimmed = value?.trim()
+  return trimmed || undefined
 }
 
 function buildInventoryItemTitle(

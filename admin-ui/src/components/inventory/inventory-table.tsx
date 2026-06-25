@@ -65,7 +65,10 @@ export function InventoryTable() {
   })
   const [itemToAdjust, setItemToAdjust] = React.useState<InventoryItem | null>(null)
   const { data: locationsData } = useStockLocations()
-  const { data: productLinksData } = useInventoryProductLinks()
+  const {
+    data: productLinksData,
+    isLoading: isProductLinksLoading,
+  } = useInventoryProductLinks()
   const bulkEnable = useBulkEnableInventory()
   const [bulkProgress, setBulkProgress] = React.useState<string | null>(null)
 
@@ -91,7 +94,6 @@ export function InventoryTable() {
   const { data, isLoading, isError, error } = useInventoryItems({
     offset: pagination.pageIndex * pagination.pageSize,
     limit: pagination.pageSize,
-    q: debouncedSearch || undefined,
     order: orderField,
   })
   const {
@@ -177,10 +179,13 @@ export function InventoryTable() {
       : statusFilteredItems.length
   const pageCount = Math.ceil(totalCount / pagination.pageSize)
   const usesSummaryTable = stockFilter !== "all" || !!debouncedSearch
-  const tableIsLoading = usesSummaryTable ? isSummaryLoading : isLoading
+  const tableIsLoading = usesSummaryTable
+    ? isSummaryLoading || (!!debouncedSearch && isProductLinksLoading)
+    : isLoading
   const tableIsError = usesSummaryTable ? isSummaryError : isError
   const tableError = usesSummaryTable ? summaryError : error
-  const statsAreLoading = isSummaryLoading && !summaryData
+  const statsAreLoading =
+    isSummaryLoading || (!!debouncedSearch && isProductLinksLoading)
 
   const table = useReactTable({
     data: filteredItems,
@@ -211,7 +216,7 @@ export function InventoryTable() {
           </div>
           <p className="mt-2 text-2xl font-bold tabular-nums">
             {debouncedSearch
-              ? isSummaryLoading
+              ? isSummaryLoading || isProductLinksLoading
                 ? "—"
                 : searchStats.total
               : isLoading

@@ -124,6 +124,8 @@
       "thumbnail": "缩略图",
       "variantsInventory": "规格与库存",
       "manageInventory": "管理库存",
+      "initializeInventory": "初始化库存",
+      "initializeInventoryFailed": "初始化库存失败。",
       "noVariants": "未定义规格。",
       "available": "可用 {count} 件",
       "outOfStock": "缺货",

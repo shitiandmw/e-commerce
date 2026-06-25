@@ -30,17 +30,35 @@ function getPrimaryProductLink(item: InventoryItem) {
   return item.product_links?.[0]
 }
 
-function getInventoryDisplayTitle(item: InventoryItem, t: (key: string) => string) {
+function getMetadataString(item: InventoryItem, key: string) {
+  const value = item.metadata?.[key]
+  return typeof value === "string" && value.trim() ? value.trim() : null
+}
+
+function getInventoryProductDisplay(item: InventoryItem) {
   const link = getPrimaryProductLink(item)
-  if (!link) return item.title || t("table.untitled")
-  if (!link.variant_title || link.variant_title.toLowerCase() === "default") {
-    return link.product_title
+
+  return {
+    productTitle:
+      link?.product_title || getMetadataString(item, "product_title"),
+    variantTitle:
+      link?.variant_title || getMetadataString(item, "variant_title"),
+    variantSku:
+      link?.variant_sku || getMetadataString(item, "variant_sku"),
   }
-  return `${link.product_title} - ${link.variant_title}`
+}
+
+function isDefaultVariantTitle(title?: string | null) {
+  return !title || title.toLowerCase() === "default"
+}
+
+function getInventoryDisplayTitle(item: InventoryItem, t: (key: string) => string) {
+  const display = getInventoryProductDisplay(item)
+  return display.productTitle || item.title || t("table.untitled")
 }
 
 function getDisplaySku(item: InventoryItem) {
-  return item.sku || getPrimaryProductLink(item)?.variant_sku || null
+  return item.sku || getInventoryProductDisplay(item).variantSku || null
 }
 
 function getStockBadge(item: InventoryItem, t: (key: string) => string) {
@@ -98,20 +116,35 @@ export function getInventoryColumns(
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      cell: ({ row }) => (
-        <div className="max-w-[240px]">
-          <p className="text-sm font-medium truncate">
-            {getInventoryDisplayTitle(row.original, t)}
-          </p>
-          {row.original.title &&
-            !!row.original.product_links?.length &&
-            row.original.title !== getInventoryDisplayTitle(row.original, t) && (
+      cell: ({ row }) => {
+        const item = row.original
+        const display = getInventoryProductDisplay(item)
+        const title = getInventoryDisplayTitle(item, t)
+        const variantDetails = [
+          !isDefaultVariantTitle(display.variantTitle)
+            ? display.variantTitle
+            : null,
+          display.variantSku ? `SKU: ${display.variantSku}` : null,
+        ].filter(Boolean)
+        const shouldShowItemTitle =
+          !!item.title && item.title !== title && item.title !== display.variantTitle
+
+        return (
+          <div className="max-w-[280px]">
+            <p className="text-sm font-medium truncate">{title}</p>
+            {variantDetails.length > 0 && (
               <p className="text-xs text-muted-foreground truncate">
-                {row.original.title}
+                {variantDetails.join(" / ")}
               </p>
             )}
-        </div>
-      ),
+            {shouldShowItemTitle && (
+              <p className="text-xs text-muted-foreground truncate">
+                {item.title}
+              </p>
+            )}
+          </div>
+        )
+      },
     },
     {
       id: "status",

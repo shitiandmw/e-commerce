@@ -124,6 +124,8 @@
       "thumbnail": "Thumbnail",
       "variantsInventory": "Variants & Inventory",
       "manageInventory": "Manage Inventory",
+      "initializeInventory": "Initialize Inventory",
+      "initializeInventoryFailed": "Failed to initialize inventory.",
       "noVariants": "No variants defined.",
       "available": "{count} available",
       "outOfStock": "Out of stock",
