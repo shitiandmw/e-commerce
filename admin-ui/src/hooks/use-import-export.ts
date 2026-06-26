@@ -12,6 +12,7 @@ import { ImportResult } from "@/components/import-export/import-dialog"
 import type { Product, ProductsResponse } from "@/hooks/use-products"
 import type { OrdersResponse } from "@/hooks/use-orders"
 import type { CustomerListResponse, Customer } from "@/hooks/use-customers"
+import { withDefaultShippingProfile } from "@/lib/shipping-profiles"
 
 // ============================================================
 // PRODUCT IMPORT / EXPORT
@@ -27,6 +28,7 @@ export const PRODUCT_CSV_HEADERS = [
   "length",
   "height",
   "width",
+  "shipping_profile_id",
 ]
 
 /**
@@ -141,10 +143,13 @@ export function useProductImportExport() {
           if (row.length) productData.length = Number(row.length)
           if (row.height) productData.height = Number(row.height)
           if (row.width) productData.width = Number(row.width)
+          if (row.shipping_profile_id) {
+            productData.shipping_profile_id = row.shipping_profile_id.trim()
+          }
 
           await adminFetch("/admin/products", {
             method: "POST",
-            body: productData,
+            body: await withDefaultShippingProfile(productData),
           })
 
           result.success++

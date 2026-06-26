@@ -88,6 +88,12 @@ export interface Product {
     color?: string | null
     type: "badge" | "attribute"
   }>
+  shipping_profile?: {
+    id: string
+    name?: string | null
+    type?: string | null
+  } | null
+  shipping_profile_id?: string | null
   collection_id?: string | null
   type_id?: string | null
   weight?: number | null
@@ -145,7 +151,7 @@ export function useProduct(id: string) {
     queryKey: ["product", id],
     queryFn: () =>
       adminFetch<{ product: Product }>(
-        `/admin/products/${id}?fields=+variants,+variants.prices,+variants.inventory_items,+variants.inventory_items.inventory,+variants.inventory_items.inventory.location_levels,+options,+options.values,+images,*categories,*brand,*custom_tags,+metadata`
+        `/admin/products/${id}?fields=+variants,+variants.prices,+variants.inventory_items,+variants.inventory_items.inventory,+variants.inventory_items.inventory.location_levels,+options,+options.values,+images,*categories,*brand,*custom_tags,*shipping_profile,+metadata`
       ),
     enabled: !!id,
   })

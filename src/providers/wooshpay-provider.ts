@@ -288,7 +288,7 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
 
   private getReturnUrl(input: InitiatePaymentInput): string {
     const data = input.data ?? {}
-    const configured = data.success_url ?? data.return_url ?? data.cancel_url
+    const configured = data.return_url ?? data.success_url ?? data.cancel_url
     if (typeof configured === "string" && configured.length > 0) return configured
 
     const storeCors = process.env.STORE_CORS?.split(",").map((url) => url.trim()).find(Boolean)
@@ -305,11 +305,22 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
     return "http://localhost:8000/checkout"
   }
 
+  private getCheckoutUrl(
+    input: InitiatePaymentInput,
+    key: "success_url" | "return_url" | "cancel_url",
+    fallback: string
+  ): string {
+    const value = input.data?.[key]
+    return typeof value === "string" && value.length > 0 ? value : fallback
+  }
+
   private buildCheckoutPayload(input: InitiatePaymentInput): Record<string, unknown> {
     const amount = this.toMinorUnits(input.amount)
     const currency = input.currency_code.toUpperCase()
     const sessionId = this.extractSessionId(input)
     const returnUrl = this.getReturnUrl(input)
+    const successUrl = this.getCheckoutUrl(input, "success_url", returnUrl)
+    const cancelUrl = this.getCheckoutUrl(input, "cancel_url", returnUrl)
     const customerEmail = input.context?.customer?.email
 
     const metadata: Record<string, string> = {}
@@ -320,8 +331,9 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
 
     return {
       mode: "payment",
-      success_url: returnUrl,
-      cancel_url: returnUrl,
+      success_url: successUrl,
+      return_url: returnUrl,
+      cancel_url: cancelUrl,
       client_reference_id: sessionId,
       customer_email: customerEmail,
       metadata,

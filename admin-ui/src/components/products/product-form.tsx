@@ -59,6 +59,7 @@ import {
   type AttributeItem,
 } from "@/components/products/product-attributes-editor"
 import { toSlug } from "@/lib/slug"
+import { withDefaultShippingProfile } from "@/lib/shipping-profiles"
 
 /** brand field may be a single object or an array (due to isList link) */
 function resolveBrand(brand: Product["brand"]): { id: string; name: string } | null {
@@ -625,7 +626,9 @@ export function ProductForm({ product, mode }: ProductFormProps) {
           buildVariantCreatePayload(variant, variantOptionAssignments[index])
         )
 
-        const result = await createProduct.mutateAsync(payload)
+        const result = await createProduct.mutateAsync(
+          await withDefaultShippingProfile(payload)
+        )
         const newProductId = result?.product?.id
         const createdVariants = newProductId
           ? (await fetchProductInventorySnapshot(newProductId)).product
@@ -676,7 +679,14 @@ export function ProductForm({ product, mode }: ProductFormProps) {
           }
         }
       } else {
-        await updateProduct.mutateAsync(payload)
+        const hasShippingProfile = Boolean(
+          product?.shipping_profile?.id ?? product?.shipping_profile_id
+        )
+        const payloadWithShippingProfile = hasShippingProfile
+          ? payload
+          : await withDefaultShippingProfile(payload)
+
+        await updateProduct.mutateAsync(payloadWithShippingProfile)
 
         if (product?.id && submitData.variants) {
           const baseOptionDefinitions = buildFormOptionDefinitions(data)
