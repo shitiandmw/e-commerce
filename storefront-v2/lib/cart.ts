@@ -82,6 +82,17 @@ export interface Cart {
   promotions?: { code: string }[]
 }
 
+export interface RegionCountry {
+  iso_2?: string | null
+  display_name?: string | null
+  name?: string | null
+}
+
+export interface Region {
+  id: string
+  countries?: RegionCountry[]
+}
+
 export interface PaymentSession {
   id: string
   provider_id: string
@@ -107,6 +118,12 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   }
   return res.json()
 }
+
+export async function getRegions(): Promise<Region[]> {
+  const { regions } = await apiFetch<{ regions: Region[] }>("/api/regions")
+  return regions || []
+}
+
 export async function getOrCreateCart(): Promise<Cart> {
   const cartId = getCartId()
   if (cartId) {

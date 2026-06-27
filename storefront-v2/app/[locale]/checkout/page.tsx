@@ -304,13 +304,11 @@ export default function CheckoutPage() {
                             onChange={(e) => updateField("countryCode", e.target.value)}
                             className="w-full h-10 bg-background border border-border/50 rounded-sm px-3 text-sm text-foreground focus:outline-none focus:border-gold/50 transition-colors appearance-none"
                           >
-                            <option value="gb">{t("checkout_country_uk")}</option>
-                            <option value="de">Germany</option>
-                            <option value="dk">Denmark</option>
-                            <option value="se">Sweden</option>
-                            <option value="fr">France</option>
-                            <option value="es">Spain</option>
-                            <option value="it">Italy</option>
+                            {checkout.countryOptions.map((country) => (
+                              <option key={country.code} value={country.code}>
+                                {country.label}
+                              </option>
+                            ))}
                           </select>
                         </div>
                       </div>

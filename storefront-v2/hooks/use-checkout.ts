@@ -4,8 +4,10 @@ import { useState, useCallback, useEffect } from "react"
 import { useLocale } from "next-intl"
 import {
   type CartAddress,
+  type RegionCountry,
   type ShippingOption,
   type PaymentMethod,
+  getRegions,
   updateCartAddress,
   getShippingOptions,
   transferCartToCustomer,
@@ -31,11 +33,17 @@ export interface CheckoutForm {
   countryCode: string
 }
 
+export interface CountryOption {
+  code: string
+  label: string
+}
+
 interface UseCheckoutReturn {
   step: Step
   form: CheckoutForm
   setForm: React.Dispatch<React.SetStateAction<CheckoutForm>>
   updateField: (field: keyof CheckoutForm, value: string) => void
+  countryOptions: CountryOption[]
   shippingOptions: ShippingOption[]
   selectedShippingId: string | null
   selectShippingOption: (optionId: string) => void
@@ -68,6 +76,19 @@ export interface SavedAddress {
   country_code: string
 }
 
+const PREFERRED_COUNTRY_CODE = "cn"
+
+const FALLBACK_COUNTRIES: RegionCountry[] = [
+  { iso_2: "cn", display_name: "China" },
+  { iso_2: "gb", display_name: "United Kingdom" },
+  { iso_2: "de", display_name: "Germany" },
+  { iso_2: "dk", display_name: "Denmark" },
+  { iso_2: "se", display_name: "Sweden" },
+  { iso_2: "fr", display_name: "France" },
+  { iso_2: "es", display_name: "Spain" },
+  { iso_2: "it", display_name: "Italy" },
+]
+
 const initialForm: CheckoutForm = {
   email: "",
   phone: "",
@@ -77,7 +98,7 @@ const initialForm: CheckoutForm = {
   address2: "",
   city: "",
   postalCode: "",
-  countryCode: "gb",
+  countryCode: PREFERRED_COUNTRY_CODE,
 }
 
 const WOOSHPAY_PROVIDER_ID = "pp_wooshpay_wooshpay"
@@ -90,11 +111,47 @@ function isPickupOption(option: ShippingOption): boolean {
   return name.includes("自提") || name.includes("pickup") || name.includes("pick-up") || name.includes("self-pick")
 }
 
+function getCountryLabel(country: RegionCountry, code: string, locale: string): string {
+  try {
+    const displayName = new Intl.DisplayNames([locale], { type: "region" }).of(code.toUpperCase())
+    if (displayName) return displayName
+  } catch {
+    // Fall back to backend-provided labels below.
+  }
+
+  return country.display_name || country.name || code.toUpperCase()
+}
+
+function buildCountryOptions(countries: RegionCountry[], locale: string): CountryOption[] {
+  const seen = new Set<string>()
+  return countries.reduce<CountryOption[]>((options, country) => {
+    const code = country.iso_2?.toLowerCase()
+    if (!code || seen.has(code)) return options
+    seen.add(code)
+    options.push({
+      code,
+      label: getCountryLabel(country, code, locale),
+    })
+    return options
+  }, [])
+}
+
+function getNextCountryCode(options: CountryOption[], current: string): string {
+  const normalizedCurrent = current.toLowerCase()
+  if (options.some((option) => option.code === normalizedCurrent)) return normalizedCurrent
+  return options.find((option) => option.code === PREFERRED_COUNTRY_CODE)?.code
+    ?? options[0]?.code
+    ?? PREFERRED_COUNTRY_CODE
+}
+
 export function useCheckout(): UseCheckoutReturn {
   const { cart, initCart } = useCart()
   const locale = useLocale()
   const [step, setStep] = useState<Step>("shipping")
   const [form, setForm] = useState<CheckoutForm>(initialForm)
+  const [countryOptions, setCountryOptions] = useState<CountryOption[]>(() => (
+    buildCountryOptions(FALLBACK_COUNTRIES, locale)
+  ))
   const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([])
   const [selectedShippingId, setSelectedShippingId] = useState<string | null>(null)
   const [clientSecret, setClientSecret] = useState<string | null>(null)
@@ -106,10 +163,50 @@ export function useCheckout(): UseCheckoutReturn {
 
   useEffect(() => {
     let cancelled = false
+
+    async function loadCountryOptions() {
+      const fallbackOptions = buildCountryOptions(FALLBACK_COUNTRIES, locale)
+      try {
+        const regions = await getRegions()
+        if (cancelled) return
+
+        const currentRegion = regions.find((region) => region.id === cart?.region_id)
+        const regionWithCountries = currentRegion?.countries?.length
+          ? currentRegion
+          : regions.find((region) => region.countries?.length)
+        const options = buildCountryOptions(regionWithCountries?.countries ?? [], locale)
+        const nextOptions = options.length > 0 ? options : fallbackOptions
+
+        setCountryOptions(nextOptions)
+        setForm((prev) => ({
+          ...prev,
+          countryCode: getNextCountryCode(nextOptions, prev.countryCode),
+        }))
+      } catch {
+        if (!cancelled) {
+          setCountryOptions(fallbackOptions)
+          setForm((prev) => ({
+            ...prev,
+            countryCode: getNextCountryCode(fallbackOptions, prev.countryCode),
+          }))
+        }
+      }
+    }
+
+    loadCountryOptions()
+    return () => { cancelled = true }
+  }, [cart?.region_id, locale])
+
+  useEffect(() => {
+    let cancelled = false
     async function loadShippingOptions() {
       setLoading(true)
       try {
-        await transferCartToCustomer()
+        try {
+          await transferCartToCustomer()
+        } catch {
+          // A cart can still proceed as a guest when customer attachment fails.
+        }
         if (cancelled) return
         await initCart()
         if (cancelled) return
@@ -142,6 +239,7 @@ export function useCheckout(): UseCheckoutReturn {
   }, [])
 
   const fillFromSavedAddress = useCallback((addr: SavedAddress) => {
+    const countryCode = addr.country_code?.toLowerCase()
     setForm((prev) => ({
       ...prev,
       firstName: addr.first_name,
@@ -151,9 +249,11 @@ export function useCheckout(): UseCheckoutReturn {
       address2: addr.address_2 || "",
       city: addr.city,
       postalCode: addr.postal_code,
-      countryCode: addr.country_code?.toLowerCase() || prev.countryCode,
+      countryCode: countryCode && countryOptions.some((option) => option.code === countryCode)
+        ? countryCode
+        : prev.countryCode,
     }))
-  }, [])
+  }, [countryOptions])
 
   const selectShippingOption = useCallback((optionId: string) => {
     setError(null)
@@ -180,7 +280,7 @@ export function useCheckout(): UseCheckoutReturn {
             address_2: selectedOption.name,
             city: "Pickup",
             postal_code: "000000",
-            country_code: form.countryCode || initialForm.countryCode,
+            country_code: form.countryCode || PREFERRED_COUNTRY_CODE,
           }
         : {
             first_name: form.firstName,
@@ -279,6 +379,7 @@ export function useCheckout(): UseCheckoutReturn {
 
   return {
     step, form, setForm, updateField,
+    countryOptions,
     shippingOptions, selectedShippingId, selectShippingOption, isPickupOption, isPickup, clientSecret,
     loading, error,
     submitInfo, submitShipping, submitOrder, goBack, fillFromSavedAddress,
