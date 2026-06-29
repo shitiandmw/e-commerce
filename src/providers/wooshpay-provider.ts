@@ -1,4 +1,4 @@
-import { AbstractPaymentProvider, PaymentSessionStatus } from "@medusajs/framework/utils"
+import { AbstractPaymentProvider, MedusaError, PaymentSessionStatus } from "@medusajs/framework/utils"
 import {
   InitiatePaymentInput,
   InitiatePaymentOutput,
@@ -50,6 +50,32 @@ type WooShPaySessionData = {
 
 type WooShPayRequestOptions = {
   idempotencyKey?: string
+}
+
+type SafeWooShPayErrorDetails = {
+  status?: number
+  businessStatus?: string
+  paymentStatus?: string
+  code?: string
+  errorType?: string
+}
+
+class WooShPayProviderError extends Error {
+  status?: number
+  businessStatus?: string
+  paymentStatus?: string
+  code?: string
+  errorType?: string
+
+  constructor(message: string, details: SafeWooShPayErrorDetails = {}) {
+    super(message)
+    this.name = "WooShPayProviderError"
+    this.status = details.status
+    this.businessStatus = details.businessStatus
+    this.paymentStatus = details.paymentStatus
+    this.code = details.code
+    this.errorType = details.errorType
+  }
 }
 
 const BASE_URL_TEST = "https://apitest.wooshpay.com"
@@ -178,7 +204,9 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
   ): Promise<WooShPayObject> {
     const config = await this.getConfig()
     if (!config.api_key) {
-      throw new Error("WooShPay API key is not configured for provider pp_wooshpay_wooshpay")
+      throw new WooShPayProviderError("WooShPay API key is not configured for provider pp_wooshpay_wooshpay", {
+        code: "missing_api_key",
+      })
     }
 
     const baseUrl = this.getBaseUrl(config.sandbox_mode ?? true)
@@ -203,8 +231,17 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
     const parsed = text ? this.safeJsonParse(text) : {}
 
     if (!res.ok) {
-      const details = typeof parsed === "string" ? parsed : JSON.stringify(parsed)
-      throw new Error(`WooShPay API error ${res.status}: ${details}`)
+      const details = this.getSafeApiErrorDetails(parsed)
+      throw new WooShPayProviderError(
+        `WooShPay API error ${res.status}: ${details.summary}`,
+        {
+          status: res.status,
+          businessStatus: details.businessStatus,
+          paymentStatus: details.paymentStatus,
+          code: details.code,
+          errorType: details.errorType,
+        }
+      )
     }
 
     return typeof parsed === "object" && parsed !== null ? parsed as WooShPayObject : {}
@@ -216,6 +253,82 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
     } catch {
       return value
     }
+  }
+
+  private getSafeApiErrorDetails(parsed: unknown): {
+    summary: string
+    businessStatus?: string
+    paymentStatus?: string
+    code?: string
+    errorType?: string
+  } {
+    if (typeof parsed === "string") {
+      return {
+        summary: this.sanitizeDiagnostic(parsed) || "no safe error details returned",
+      }
+    }
+
+    const body = this.asObject(parsed)
+    const error = this.asObject(body?.error)
+    const source = error ?? body
+    const stringError = typeof body?.error === "string" ? body.error : undefined
+    const code = this.sanitizeDiagnostic(this.firstString(
+      source?.code,
+      source?.decline_code,
+      body?.code
+    ) ?? "")
+    const errorType = this.sanitizeDiagnostic(this.firstString(
+      source?.type,
+      source?.error_type,
+      body?.type
+    ) ?? "")
+    const businessStatus = this.sanitizeDiagnostic(this.firstString(
+      source?.status,
+      body?.status
+    ) ?? "")
+    const paymentStatus = this.sanitizeDiagnostic(this.firstString(
+      source?.payment_status,
+      source?.paymentStatus,
+      body?.payment_status,
+      body?.paymentStatus
+    ) ?? "")
+    const message = this.sanitizeDiagnostic(this.firstString(
+      source?.message,
+      source?.error_description,
+      source?.description,
+      source?.detail,
+      body?.message,
+      stringError
+    ) ?? "")
+    const parts = [
+      code ? `code=${code}` : undefined,
+      errorType ? `type=${errorType}` : undefined,
+      businessStatus ? `status=${businessStatus}` : undefined,
+      paymentStatus ? `payment_status=${paymentStatus}` : undefined,
+      message ? `message=${message}` : undefined,
+    ].filter((part): part is string => Boolean(part))
+
+    return {
+      summary: parts.join(", ") || "no safe error details returned",
+      businessStatus: businessStatus || undefined,
+      paymentStatus: paymentStatus || undefined,
+      code: code || undefined,
+      errorType: errorType || undefined,
+    }
+  }
+
+  private sanitizeDiagnostic(value: unknown, maxLength = 300): string {
+    const normalized = String(value ?? "").replace(/\s+/g, " ").trim()
+    if (!normalized) return ""
+
+    const redacted = normalized
+      .replace(/\b(sk|pk)_(test|live)_[A-Za-z0-9_:-]+\b/g, "$1_$2_[redacted]")
+      .replace(/("(?=[^"]*(?:token|secret|api[-_]?key|authorization|password))[^"]*"\s*:\s*)"[^"]*"/gi, "$1\"[redacted]\"")
+      .replace(/("(?=[^"]*(?:token|secret|api[-_]?key|authorization|password))[^"]*"\s*:\s*)([^,}\]\s]+)/gi, "$1\"[redacted]\"")
+      .replace(/((?=[A-Za-z0-9_.-]*(?:token|secret|api[-_]?key|authorization|password))[A-Za-z0-9_.-]+\s*[:=]\s*)(?:"[^"]*"|'[^']*'|(?:Basic|Bearer)\s+[^\s,;}\]]+|[^\s,;}\]]+)/gi, "$1[redacted]")
+      .replace(/\b(Basic|Bearer)\s+[A-Za-z0-9._~+/=-]+/gi, "$1 [redacted]")
+
+    return redacted.length > maxLength ? `${redacted.slice(0, maxLength - 3)}...` : redacted
   }
 
   private toMinorUnits(amount: unknown): number {
@@ -357,11 +470,7 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
 
   private toSessionData(checkout: WooShPayObject, fallbackAmount: number, fallbackCurrency: string): WooShPaySessionData {
     const url = this.firstString(checkout.url, checkout.redirect_url)
-    const paymentIntentId = this.firstPaymentIntentId(
-      checkout.payment_intent,
-      checkout.payment_intent_id,
-      checkout.payment_intent?.id
-    )
+    const paymentIntentId = this.getPaymentIntentId(checkout)
     const amount = this.toMinorUnits(checkout.amount_total ?? checkout.amount ?? fallbackAmount)
     const currency = this.firstString(checkout.currency, fallbackCurrency)?.toLowerCase() ?? fallbackCurrency.toLowerCase()
 
@@ -381,47 +490,120 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
     return values.find((value): value is string => typeof value === "string" && value.length > 0)
   }
 
+  private asObject(value: unknown): WooShPayObject | undefined {
+    return value && typeof value === "object" && !Array.isArray(value)
+      ? value as WooShPayObject
+      : undefined
+  }
+
   private firstPaymentIntentId(...values: unknown[]): string | undefined {
     return this.firstString(...values.filter((value) => {
       return typeof value === "string" && !value.startsWith("cs_")
     }))
   }
 
-  private getPaymentIntentId(data?: Record<string, unknown>): string {
+  private getPaymentIntentFromValue(value: unknown, allowObjectId = false): string | undefined {
+    if (typeof value === "string") return this.firstPaymentIntentId(value)
+
+    const object = this.asObject(value)
+    if (!object) return undefined
+    const objectId = this.firstString(object.id)
+    const isPaymentIntentObject = ["payment_intent", "payment.intent"].includes(String(object.object ?? ""))
+
     return this.firstPaymentIntentId(
-      data?.payment_intent_id,
-      data?.payment_intent,
-      (data?.raw as WooShPayObject | undefined)?.payment_intent,
-      (data?.raw as WooShPayObject | undefined)?.payment_intent?.id,
-      (data?.raw as WooShPayObject | undefined)?.payment_intent_id
+      allowObjectId || isPaymentIntentObject || objectId?.startsWith("pi_") ? objectId : undefined,
+      object.payment_intent_id,
+      object.paymentIntentId,
+      this.getPaymentIntentFromValue(object.payment_intent, true),
+      this.getPaymentIntentFromValue(object.paymentIntent, true),
+      this.getPaymentIntentFromValue(object.intent, true),
+      this.getPaymentIntentFromValue(object.intent_id, true)
+    )
+  }
+
+  private getPaymentIntentFromObject(object?: WooShPayObject): string | undefined {
+    if (!object) return undefined
+
+    const payment = this.asObject(object.payment)
+    const latestCharge = this.asObject(object.latest_charge)
+    const directCharge = this.asObject(object.charge)
+    const chargesValue = this.asObject(object.charges)?.data ?? object.charges
+    const charges = Array.isArray(chargesValue)
+      ? chargesValue.map((charge) => this.asObject(charge)).filter((charge): charge is WooShPayObject => Boolean(charge))
+      : []
+
+    return this.firstPaymentIntentId(
+      typeof object.id === "string" && object.id.startsWith("pi_") ? object.id : undefined,
+      object.object === "payment_intent" ? object.id : undefined,
+      object.object === "payment.intent" ? object.id : undefined,
+      this.getPaymentIntentFromValue(object.payment_intent_id),
+      this.getPaymentIntentFromValue(object.paymentIntentId),
+      this.getPaymentIntentFromValue(object.payment_intent, true),
+      this.getPaymentIntentFromValue(object.paymentIntent, true),
+      this.getPaymentIntentFromValue(object.payment_intent_data, true),
+      this.getPaymentIntentFromValue(object.paymentIntentData, true),
+      this.getPaymentIntentFromValue(object.intent, true),
+      this.getPaymentIntentFromValue(object.intent_id, true),
+      this.getPaymentIntentFromValue(payment?.payment_intent_id),
+      this.getPaymentIntentFromValue(payment?.payment_intent, true),
+      this.getPaymentIntentFromValue(payment?.paymentIntentId),
+      this.getPaymentIntentFromValue(payment?.paymentIntent, true),
+      this.getPaymentIntentFromValue(payment),
+      this.getPaymentIntentFromValue(latestCharge?.payment_intent_id),
+      this.getPaymentIntentFromValue(latestCharge?.payment_intent, true),
+      this.getPaymentIntentFromValue(latestCharge?.paymentIntentId),
+      this.getPaymentIntentFromValue(latestCharge?.paymentIntent, true),
+      this.getPaymentIntentFromValue(directCharge?.payment_intent_id),
+      this.getPaymentIntentFromValue(directCharge?.payment_intent, true),
+      this.getPaymentIntentFromValue(directCharge?.paymentIntentId),
+      this.getPaymentIntentFromValue(directCharge?.paymentIntent, true),
+      ...charges.flatMap((charge) => [
+        this.getPaymentIntentFromValue(charge.payment_intent_id),
+        this.getPaymentIntentFromValue(charge.payment_intent, true),
+        this.getPaymentIntentFromValue(charge.paymentIntentId),
+        this.getPaymentIntentFromValue(charge.paymentIntent, true),
+      ])
+    )
+  }
+
+  private getPaymentIntentId(data?: Record<string, unknown>): string {
+    const raw = this.asObject(data?.raw)
+
+    return this.firstPaymentIntentId(
+      this.getPaymentIntentFromObject(data),
+      this.getPaymentIntentFromObject(raw)
     ) ?? ""
   }
 
   private getRefundPaymentIntentId(data?: Record<string, unknown>): string {
-    const id = this.getPaymentIntentId(data)
-    if (id) return id
-
-    const raw = data?.raw as WooShPayObject | undefined
-    const charges = Array.isArray(raw?.charges?.data) ? raw?.charges?.data : []
-    return this.firstPaymentIntentId(
-      raw?.payment_intent,
-      raw?.payment_intent?.id,
-      ...charges.map((charge) => charge?.payment_intent),
-      ...charges.map((charge) => charge?.payment_intent?.id)
-    ) ?? ""
+    return this.getPaymentIntentId(data)
   }
 
   private getCheckoutSessionId(data?: Record<string, unknown>): string {
-    const raw = data?.raw as WooShPayObject | undefined
+    const raw = this.asObject(data?.raw)
+    const dataCheckoutSession = this.asObject(data?.checkout_session) ?? this.asObject(data?.checkoutSession)
+    const rawCheckoutSession = this.asObject(raw?.checkout_session) ?? this.asObject(raw?.checkoutSession)
     const dataId = this.firstString(data?.id)
     const rawId = this.firstString(raw?.id)
+    const dataSessionId = this.firstString(data?.session_id)
+    const rawSessionId = this.firstString(raw?.session_id)
 
     return this.firstString(
       data?.checkout_session_id,
+      data?.checkoutSessionId,
+      data?.checkout_session,
+      data?.checkoutSession,
+      dataCheckoutSession?.id,
       raw?.checkout_session_id,
+      raw?.checkoutSessionId,
+      raw?.checkout_session,
+      raw?.checkoutSession,
+      rawCheckoutSession?.id,
       raw?.object === "checkout.session" ? rawId : undefined,
       dataId?.startsWith("cs_") ? dataId : undefined,
-      rawId?.startsWith("cs_") ? rawId : undefined
+      rawId?.startsWith("cs_") ? rawId : undefined,
+      dataSessionId?.startsWith("cs_") ? dataSessionId : undefined,
+      rawSessionId?.startsWith("cs_") ? rawSessionId : undefined
     ) ?? ""
   }
 
@@ -467,13 +649,34 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
       "already cancelled",
       "already expired",
       "\"status\":\"succeeded\"",
+      "status=succeeded",
       "\"status\":\"paid\"",
+      "status=paid",
       "\"status\":\"complete\"",
+      "status=complete",
       "\"status\":\"captured\"",
+      "status=captured",
       "\"status\":\"canceled\"",
+      "status=canceled",
       "\"status\":\"cancelled\"",
+      "status=cancelled",
       "\"status\":\"expired\"",
+      "status=expired",
     ].some((token) => message.includes(token))
+  }
+
+  private toRefundError(error: unknown): MedusaError {
+    if (error instanceof MedusaError) return error
+
+    const message = error instanceof Error
+      ? this.sanitizeDiagnostic(error.message)
+      : "Unknown WooShPay refund error"
+    const fallback = "WooShPay refund failed"
+
+    return new MedusaError(
+      MedusaError.Types.INVALID_DATA,
+      message ? `${fallback}: ${message}` : fallback
+    )
   }
 
   private appendRefundData(data: Record<string, unknown> | undefined, refund: WooShPayObject): Record<string, unknown> {
@@ -533,37 +736,44 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
   }
 
   async refundPayment(input: RefundPaymentInput): Promise<RefundPaymentOutput> {
-    let paymentIntentId = this.getRefundPaymentIntentId(input.data)
-    let resolvedSession: WooShPayObject | undefined
-    const checkoutSessionId = this.getCheckoutSessionId(input.data)
+    try {
+      let paymentIntentId = this.getRefundPaymentIntentId(input.data)
+      let resolvedSession: WooShPayObject | undefined
+      const checkoutSessionId = this.getCheckoutSessionId(input.data)
 
-    if (!paymentIntentId && checkoutSessionId) {
-      resolvedSession = await this.request(`/v1/checkout/sessions/${checkoutSessionId}`, "GET")
-      paymentIntentId = this.getRefundPaymentIntentId({ raw: resolvedSession })
-    }
+      if (!paymentIntentId && checkoutSessionId) {
+        resolvedSession = await this.request(`/v1/checkout/sessions/${checkoutSessionId}`, "GET")
+        paymentIntentId = this.getRefundPaymentIntentId({ raw: resolvedSession })
+      }
 
-    const amount = this.toMinorUnits(input.amount)
+      const amount = this.toMinorUnits(input.amount)
 
-    if (!paymentIntentId) {
-      throw new Error("WooShPay refund requires a payment_intent_id in provider data or retrievable checkout session")
-    }
+      if (!paymentIntentId) {
+        throw new WooShPayProviderError(
+          "WooShPay refund requires a payment_intent_id in provider data or retrievable checkout session",
+          { code: "missing_payment_intent" }
+        )
+      }
 
-    const result = await this.request(
-      "/v1/refunds",
-      "POST",
-      {
-        payment_intent: paymentIntentId,
-        amount,
-      },
-      { idempotencyKey: this.getRefundIdempotencyKey(input) }
-    )
+      const result = await this.request(
+        "/v1/refunds",
+        "POST",
+        {
+          payment_intent: paymentIntentId,
+          amount,
+        },
+        { idempotencyKey: this.getRefundIdempotencyKey(input) }
+      )
 
-    return {
-      data: this.appendRefundData({
-        ...input.data,
-        payment_intent_id: input.data?.payment_intent_id ?? paymentIntentId,
-        raw: input.data?.raw ?? resolvedSession,
-      }, result),
+      return {
+        data: this.appendRefundData({
+          ...input.data,
+          payment_intent_id: input.data?.payment_intent_id ?? paymentIntentId,
+          raw: input.data?.raw ?? resolvedSession,
+        }, result),
+      }
+    } catch (error) {
+      throw this.toRefundError(error)
     }
   }
 
