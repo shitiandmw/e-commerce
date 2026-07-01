@@ -325,8 +325,8 @@ export function useCheckout(): UseCheckoutReturn {
 
             return {
               success_url: returnUrl.toString(),
-              return_url: returnUrl.toString(),
               cancel_url: cancelUrl.toString(),
+              payment_method_types: ["unionpay"],
             }
           })()
         : undefined

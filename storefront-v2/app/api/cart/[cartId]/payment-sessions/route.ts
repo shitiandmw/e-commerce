@@ -52,8 +52,8 @@ function withWooShPayReturnUrls(
     data: {
       ...data,
       success_url: typeof data.success_url === "string" ? data.success_url : returnUrl.toString(),
-      return_url: typeof data.return_url === "string" ? data.return_url : returnUrl.toString(),
       cancel_url: typeof data.cancel_url === "string" ? data.cancel_url : cancelUrl.toString(),
+      payment_method_types: Array.isArray(data.payment_method_types) ? data.payment_method_types : ["unionpay"],
     },
   }
 }

@@ -4,13 +4,17 @@ const MEDUSA_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localho
 
 export async function POST(req: NextRequest) {
   const body = await req.text()
-  const signature = req.headers.get("wooshpay-signature") || req.headers.get("Wooshpay-Signature")
+  const signature = req.headers.get("wooshpay-signature") ||
+    req.headers.get("Wooshpay-Signature") ||
+    req.headers.get("signature") ||
+    req.headers.get("Signature")
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   }
   if (signature) {
     headers["wooshpay-signature"] = signature
+    headers["signature"] = signature
   }
 
   const res = await fetch(`${MEDUSA_URL}/hooks/payment/wooshpay_wooshpay`, {

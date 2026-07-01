@@ -420,11 +420,22 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
 
   private getCheckoutUrl(
     input: InitiatePaymentInput,
-    key: "success_url" | "return_url" | "cancel_url",
+    key: "success_url" | "cancel_url",
     fallback: string
   ): string {
     const value = input.data?.[key]
     return typeof value === "string" && value.length > 0 ? value : fallback
+  }
+
+  private getPaymentMethodTypes(input: InitiatePaymentInput): string[] | undefined {
+    const value = input.data?.payment_method_types
+    if (!Array.isArray(value)) return undefined
+
+    const types = value.filter((item): item is string => {
+      return typeof item === "string" && item.length > 0
+    })
+
+    return types.length > 0 ? types : undefined
   }
 
   private buildCheckoutPayload(input: InitiatePaymentInput): Record<string, unknown> {
@@ -434,6 +445,7 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
     const returnUrl = this.getReturnUrl(input)
     const successUrl = this.getCheckoutUrl(input, "success_url", returnUrl)
     const cancelUrl = this.getCheckoutUrl(input, "cancel_url", returnUrl)
+    const paymentMethodTypes = this.getPaymentMethodTypes(input)
     const customerEmail = input.context?.customer?.email
 
     const metadata: Record<string, string> = {}
@@ -445,8 +457,8 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
     return {
       mode: "payment",
       success_url: successUrl,
-      return_url: returnUrl,
       cancel_url: cancelUrl,
+      ...(paymentMethodTypes ? { payment_method_types: paymentMethodTypes } : {}),
       client_reference_id: sessionId,
       customer_email: customerEmail,
       metadata,
@@ -908,7 +920,8 @@ class WooShPayPaymentProvider extends AbstractPaymentProvider {
     rawData: string | Buffer,
     secret: string
   ): boolean {
-    const signatureHeader = this.getHeader(headers, "wooshpay-signature")
+    const signatureHeader = this.getHeader(headers, "wooshpay-signature") ??
+      this.getHeader(headers, "signature")
     if (!signatureHeader) return false
 
     const signatureParts = new Map(

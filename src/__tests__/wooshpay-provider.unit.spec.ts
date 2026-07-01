@@ -39,6 +39,8 @@ jest.mock("pg", () => ({
   Pool: jest.fn(),
 }))
 
+import crypto from "crypto"
+
 describe("WooShPayPaymentProvider", () => {
   const ProviderService = require("../providers/wooshpay-provider")
   const Provider = (ProviderService.default ?? ProviderService).services[0]
@@ -64,7 +66,7 @@ describe("WooShPayPaymentProvider", () => {
     jest.restoreAllMocks()
   })
 
-  it("includes return_url when creating a checkout session", async () => {
+  it("creates UnionPay checkout session payload without top-level return_url", async () => {
     const fetchMock = jest.spyOn(global, "fetch").mockResolvedValue(
       mockFetchResponse({
         id: "cs_test",
@@ -74,7 +76,6 @@ describe("WooShPayPaymentProvider", () => {
     )
     const provider = makeProvider()
     const successUrl = "https://store.test/zh-TW/checkout/return?cart_id=cart_test"
-    const returnUrl = "https://store.test/zh-TW/checkout/return?cart_id=cart_test&source=return"
     const cancelUrl = "https://store.test/zh-TW/checkout/return?cart_id=cart_test&status=cancelled"
 
     await provider.initiatePayment({
@@ -82,8 +83,8 @@ describe("WooShPayPaymentProvider", () => {
       currency_code: "gbp",
       data: {
         success_url: successUrl,
-        return_url: returnUrl,
         cancel_url: cancelUrl,
+        payment_method_types: ["unionpay"],
       },
       context: {
         payment_session_id: "payses_test",
@@ -96,8 +97,67 @@ describe("WooShPayPaymentProvider", () => {
 
     expect(body).toMatchObject({
       success_url: successUrl,
-      return_url: returnUrl,
       cancel_url: cancelUrl,
+      payment_method_types: ["unionpay"],
+      client_reference_id: "payses_test",
+      metadata: {
+        session_id: "payses_test",
+        medusa_payment_session_id: "payses_test",
+      },
+      payment_intent_data: {
+        metadata: {
+          session_id: "payses_test",
+          medusa_payment_session_id: "payses_test",
+        },
+      },
+    })
+    expect(body).not.toHaveProperty("return_url")
+  })
+
+  it("accepts WooshPay webhook signatures from the Signature header", async () => {
+    const webhookSecret = "whsec_test"
+    const rawBody = JSON.stringify({
+      type: "payment_intent.succeeded",
+      data: {
+        object: {
+          amount_received: 1234,
+          metadata: {
+            session_id: "payses_test",
+          },
+        },
+      },
+    })
+    const timestamp = "1710000000"
+    const signature = crypto
+      .createHmac("sha256", webhookSecret)
+      .update(`${timestamp}.${rawBody}`)
+      .digest("hex")
+    const provider = new Provider({
+      payment_settings: {
+        listPaymentProviderSettings: jest.fn().mockResolvedValue([
+          {
+            api_key: "sk_test",
+            webhook_secret: webhookSecret,
+            sandbox_mode: true,
+          },
+        ]),
+      },
+    })
+
+    const result = await provider.getWebhookActionAndData({
+      data: rawBody,
+      rawData: rawBody,
+      headers: {
+        Signature: `t=${timestamp},v1=${signature}`,
+      },
+    })
+
+    expect(result).toEqual({
+      action: "captured",
+      data: {
+        session_id: "payses_test",
+        amount: 1234,
+      },
     })
   })
 
