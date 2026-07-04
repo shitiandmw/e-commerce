@@ -605,6 +605,7 @@
   "checkout_payment_return_pending_desc": "付款仍在確認中，您可以重試確認或返回結帳頁。",
   "checkout_payment_return_failed": "付款未完成",
   "checkout_payment_return_failed_desc": "付款未完成，因此尚未建立訂單。",
+  "checkout_payment_return_auth_expired": "登入狀態已失效，請重新登入後完成訂單。",
   "checkout_payment_return_retry": "重試確認",
   "checkout_payment_return_back_to_checkout": "返回結帳頁",
   "checkout_payment_return_cancelled": "付款已取消",

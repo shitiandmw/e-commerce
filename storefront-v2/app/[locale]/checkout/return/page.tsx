@@ -5,7 +5,8 @@ import { useSearchParams } from "next/navigation"
 import { Link, useRouter } from "@/i18n/navigation"
 import { AlertCircle, ArrowLeft, Loader2, RefreshCw } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { completeCart, getCartId, removeCartId, setCartId } from "@/lib/cart"
+import { CartApiError, completeCart, getCartId, removeCartId, setCartId } from "@/lib/cart"
+import { getToken, isAuthFailureStatus } from "@/lib/auth"
 
 type ReturnState = "processing" | "pending" | "failed" | "cancelled"
 
@@ -24,6 +25,10 @@ function isFailureStatus(value: string | null): boolean {
 function isCancelledStatus(value: string | null): boolean {
   if (!value) return false
   return ["cancel", "canceled", "cancelled"].includes(value.toLowerCase())
+}
+
+function isAuthFailure(error: unknown): boolean {
+  return error instanceof CartApiError && isAuthFailureStatus(error.status)
 }
 
 export default function WooShPayReturnPage() {
@@ -51,6 +56,7 @@ export default function WooShPayReturnPage() {
     const storedCartId = getCartId()
     const queryCartId = searchParams.get("cart_id")
     const cartId = storedCartId || queryCartId
+    const startedWithCustomerToken = Boolean(getToken())
 
     if (!cartId) {
       setState("failed")
@@ -61,6 +67,13 @@ export default function WooShPayReturnPage() {
 
     if (!storedCartId && queryCartId) {
       setCartId(queryCartId)
+    }
+
+    if (!startedWithCustomerToken) {
+      setState("failed")
+      setLastError(t("checkout_payment_return_auth_expired"))
+      inFlightRef.current = false
+      return
     }
 
     setState("processing")
@@ -77,6 +90,12 @@ export default function WooShPayReturnPage() {
         }
         setLastError(result.error || null)
       } catch (error) {
+        if (startedWithCustomerToken && isAuthFailure(error)) {
+          setLastError(t("checkout_payment_return_auth_expired"))
+          setState("failed")
+          inFlightRef.current = false
+          return
+        }
         setLastError(error instanceof Error ? error.message : null)
       }
 

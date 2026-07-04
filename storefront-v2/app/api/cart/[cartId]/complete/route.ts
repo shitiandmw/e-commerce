@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { medusaProxy } from "@/lib/medusa-proxy"
+import { getStoreHeaders, validateCustomerAuth } from "@/lib/store-auth"
 
 const MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
-const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
 
 type PaymentSession = {
   provider_id?: string | null
@@ -16,18 +16,6 @@ type CartWithPaymentCollection = {
 
 type PaymentCollection = {
   payment_sessions?: PaymentSession[]
-}
-
-function getStoreHeaders(req: NextRequest): Record<string, string> {
-  const headers: Record<string, string> = {
-    "content-type": "application/json",
-    "x-publishable-api-key": PUBLISHABLE_KEY,
-  }
-
-  const authHeader = req.headers.get("authorization")
-  if (authHeader) headers.authorization = authHeader
-
-  return headers
 }
 
 function getCurrentProviderId(cart: CartWithPaymentCollection | null): string | null {
@@ -149,6 +137,9 @@ async function transferCartToCustomer(req: NextRequest, cartId: string): Promise
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ cartId: string }> }) {
   const { cartId } = await params
+  const authError = await validateCustomerAuth(req)
+  if (authError) return authError
+
   const transferError = await transferCartToCustomer(req, cartId)
   if (transferError) return transferError
 

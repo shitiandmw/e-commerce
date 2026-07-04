@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
+import { getStoreHeaders, validateCustomerAuth } from "@/lib/store-auth"
 
 const MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
-const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
 const WOOSHPAY_PROVIDER_ID = "pp_wooshpay_wooshpay"
 const SUPPORTED_LOCALES = new Set(["zh-TW", "zh-CN", "en"])
 
@@ -60,10 +60,10 @@ function withWooShPayReturnUrls(
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ cartId: string }> }) {
   const { cartId } = await params
-  const headers: Record<string, string> = {
-    "content-type": "application/json",
-    "x-publishable-api-key": PUBLISHABLE_KEY,
-  }
+  const authError = await validateCustomerAuth(req)
+  if (authError) return authError
+
+  const headers = getStoreHeaders(req)
 
   try {
     // Step 1: Get cart to find payment_collection id

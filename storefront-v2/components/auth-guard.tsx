@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter, usePathname } from "@/i18n/navigation"
-import { isLoggedIn } from "@/lib/auth"
+import { getCustomer, getToken } from "@/lib/auth"
 
 const PROTECTED_PATHS = ["/checkout", "/account", "/orders"]
 const PUBLIC_PATHS = ["/checkout/return", "/checkout/success"]
@@ -13,12 +13,50 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [checked, setChecked] = useState(false)
 
   useEffect(() => {
+    let cancelled = false
     const isPublicPath = PUBLIC_PATHS.some((p) => pathname.startsWith(p))
     const needsAuth = !isPublicPath && PROTECTED_PATHS.some((p) => pathname.startsWith(p))
-    if (needsAuth && !isLoggedIn()) {
-      router.replace(`/login?redirect=${encodeURIComponent(pathname)}`)
-    } else {
+
+    async function syncAuth() {
+      if (!needsAuth) {
+        if (!cancelled) setChecked(true)
+        return
+      }
+
+      if (!getToken()) {
+        router.replace(`/login?redirect=${encodeURIComponent(pathname)}`)
+        return
+      }
+
+      const customer = await getCustomer()
+      if (cancelled) return
+      if (!customer) {
+        if (!getToken()) {
+          router.replace(`/login?redirect=${encodeURIComponent(pathname)}`)
+          return
+        }
+
+        setChecked(true)
+        return
+      }
+
       setChecked(true)
+    }
+
+    setChecked(false)
+    void syncAuth()
+
+    const handleAuthChange = () => {
+      if (needsAuth && !getToken()) {
+        setChecked(false)
+        router.replace(`/login?redirect=${encodeURIComponent(pathname)}`)
+      }
+    }
+
+    window.addEventListener("auth-change", handleAuthChange)
+    return () => {
+      cancelled = true
+      window.removeEventListener("auth-change", handleAuthChange)
     }
   }, [pathname, router])
 

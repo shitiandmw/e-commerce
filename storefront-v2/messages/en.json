@@ -605,6 +605,7 @@
   "checkout_payment_return_pending_desc": "The payment is still being confirmed. You can retry or return to checkout.",
   "checkout_payment_return_failed": "Payment Not Completed",
   "checkout_payment_return_failed_desc": "The payment was not completed, so no order was created.",
+  "checkout_payment_return_auth_expired": "Your login session has expired. Please sign in again before completing the order.",
   "checkout_payment_return_retry": "Retry Confirmation",
   "checkout_payment_return_back_to_checkout": "Back to Checkout",
   "checkout_payment_return_cancelled": "Payment Cancelled",

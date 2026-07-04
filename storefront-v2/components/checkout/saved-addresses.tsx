@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { getToken } from "@/lib/auth"
+import { authFetch, getToken } from "@/lib/auth"
 import { useTranslations } from "next-intl"
 import { MapPin, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -20,9 +20,7 @@ export function SavedAddresses({ onSelect }: SavedAddressesProps) {
   useEffect(() => {
     const token = getToken()
     if (!token) return
-    fetch("/api/account/addresses", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    authFetch("/api/account/addresses")
       .then((r) => r.json())
       .then((data) => {
         const list = data.addresses || []

@@ -5,7 +5,7 @@ import { Link } from "@/i18n/navigation"
 import { useSearchParams } from "next/navigation"
 import { CheckCircle2, ArrowRight, Package, Loader2 } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { getToken } from "@/lib/auth"
+import { authFetch, getToken } from "@/lib/auth"
 
 interface Order {
   id: string
@@ -28,11 +28,8 @@ export default function CheckoutSuccessPage() {
     if (!token) return
 
     setLoading(true)
-    fetch(
+    authFetch(
       `/api/account/orders/${orderId}?fields=${encodeURIComponent("id,display_id,status,total,currency_code")}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
     )
       .then((r) => {
         if (!r.ok) return null

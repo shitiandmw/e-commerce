@@ -1,6 +1,7 @@
 "use client"
 
 const TOKEN_KEY = "medusa_customer_token"
+const AUTH_FAILURE_STATUSES = new Set([401])
 
 export function getToken(): string | null {
   if (typeof window === "undefined") return null
@@ -21,6 +22,37 @@ export function removeToken() {
 
 export function isLoggedIn(): boolean {
   return !!getToken()
+}
+
+export function isAuthFailureStatus(status: number): boolean {
+  return AUTH_FAILURE_STATUSES.has(status)
+}
+
+export function syncAuthFromResponse(res: Response): boolean {
+  if (isAuthFailureStatus(res.status)) {
+    removeToken()
+    return true
+  }
+
+  return false
+}
+
+export async function authFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  const token = getToken()
+  const headers = new Headers(init?.headers)
+  if (init?.body && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json")
+  }
+  if (token && !headers.has("Authorization")) {
+    headers.set("Authorization", `Bearer ${token}`)
+  }
+
+  const res = await fetch(input, {
+    ...init,
+    headers,
+  })
+  syncAuthFromResponse(res)
+  return res
 }
 
 export async function login(email: string, password: string): Promise<string> {
@@ -93,14 +125,11 @@ export async function getCustomer() {
   const token = getToken()
   if (!token) return null
   try {
-    const res = await fetch("/api/auth?action=me", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    if (!res.ok) { removeToken(); return null }
+    const res = await authFetch("/api/auth?action=me")
+    if (!res.ok) return null
     const data = await res.json()
     return data.customer
   } catch {
-    removeToken()
     return null
   }
 }

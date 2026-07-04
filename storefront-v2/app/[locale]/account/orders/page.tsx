@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
-import { getToken } from "@/lib/auth"
+import { authFetch } from "@/lib/auth"
 import { formatPrice } from "@/lib/format"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -162,11 +162,7 @@ export default function OrdersPage() {
   const loadOrders = useCallback(async () => {
     setLoading(true)
     try {
-      const token = getToken()
-      const res = await fetch(
-        `/api/account/orders?limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`,
-        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-      )
+      const res = await authFetch(`/api/account/orders?limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`)
       if (res.ok) {
         const data = await res.json()
         setOrders(data.orders || [])
@@ -181,10 +177,7 @@ export default function OrdersPage() {
   const openDetail = useCallback(async (order: Order) => {
     setDetail(order)
     try {
-      const token = getToken()
-      const res = await fetch(`/api/account/orders/${order.id}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      })
+      const res = await authFetch(`/api/account/orders/${order.id}`)
       if (res.ok) {
         const data = await res.json() as { order?: Order }
         if (data.order) setDetail(data.order)
@@ -201,10 +194,7 @@ export default function OrdersPage() {
   const loadTracking = useCallback(async (orderId: string) => {
     setTrackingLoading(true)
     try {
-      const token = getToken()
-      const res = await fetch(`/api/account/orders/${orderId}/tracking`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      })
+      const res = await authFetch(`/api/account/orders/${orderId}/tracking`)
       if (res.ok) {
         const data = await res.json()
         setTrackingInfo(data.tracking || [])

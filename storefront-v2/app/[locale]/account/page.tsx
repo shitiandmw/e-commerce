@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { Link } from "@/i18n/navigation"
-import { getCustomer, getToken } from "@/lib/auth"
+import { authFetch, getCustomer, getToken } from "@/lib/auth"
 import { formatPrice } from "@/lib/format"
 import { useTranslations } from "next-intl"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -40,9 +40,7 @@ export default function AccountPage() {
     const token = getToken()
     if (token) {
       try {
-        const res = await fetch("/api/account/orders?limit=3&offset=0", {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        const res = await authFetch("/api/account/orders?limit=3&offset=0")
         if (res.ok) {
           const data = await res.json()
           setOrders(data.orders || [])

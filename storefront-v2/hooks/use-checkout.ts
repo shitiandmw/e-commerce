@@ -18,6 +18,7 @@ import {
   getPaymentMethods,
 } from "@/lib/cart"
 import { useCart } from "@/lib/cart-store"
+import { getToken, isAuthFailureStatus } from "@/lib/auth"
 
 export type Step = "shipping" | "info" | "payment-method" | "payment"
 
@@ -144,6 +145,10 @@ function getNextCountryCode(options: CountryOption[], current: string): string {
     ?? PREFERRED_COUNTRY_CODE
 }
 
+function isAuthError(error: unknown): boolean {
+  return error instanceof Error && /\b(401|Unauthorized)\b/i.test(error.message)
+}
+
 export function useCheckout(): UseCheckoutReturn {
   const { cart, initCart } = useCart()
   const locale = useLocale()
@@ -202,10 +207,13 @@ export function useCheckout(): UseCheckoutReturn {
     async function loadShippingOptions() {
       setLoading(true)
       try {
-        try {
-          await transferCartToCustomer()
-        } catch {
-          // A cart can still proceed as a guest when customer attachment fails.
+        if (getToken()) {
+          try {
+            await transferCartToCustomer()
+          } catch (error) {
+            if (isAuthError(error)) throw error
+            // Non-auth attachment failures should not block guest-compatible checkout.
+          }
         }
         if (cancelled) return
         await initCart()
@@ -363,7 +371,11 @@ export function useCheckout(): UseCheckoutReturn {
       }
       throw new Error(result.error || "Failed to complete order")
     } catch (e: any) {
-      setError(e.message || "Failed to complete order")
+      if (isAuthFailureStatus((e as { status?: number }).status ?? 0) || isAuthError(e)) {
+        setError("Your login session has expired. Please sign in again before placing the order.")
+      } else {
+        setError(e.message || "Failed to complete order")
+      }
       throw e
     } finally {
       setLoading(false)

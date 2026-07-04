@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
-import { getCustomer, getToken } from "@/lib/auth"
+import { authFetch, getCustomer } from "@/lib/auth"
 import { useTranslations } from "next-intl"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -38,10 +38,8 @@ export default function ProfilePage() {
     }
     setSaving(true)
     try {
-      const token = getToken()
-      const res = await fetch("/api/account/customer", {
+      const res = await authFetch("/api/account/customer", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ first_name: firstName.trim(), last_name: lastName.trim(), phone: phone.trim() || undefined }),
       })
       if (!res.ok) throw new Error()

@@ -1,6 +1,6 @@
 "use client"
 
-import { getToken } from "./auth"
+import { authFetch, getToken } from "./auth"
 
 const CART_ID_KEY = "medusa_cart_id"
 
@@ -102,9 +102,19 @@ export interface PaymentSession {
 
 const FIELDS = "fields=*items,*items.variant,*items.variant.product"
 
+export class CartApiError extends Error {
+  status: number
+
+  constructor(message: string, status: number) {
+    super(message)
+    this.name = "CartApiError"
+    this.status = status
+  }
+}
+
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const token = getToken()
-  const res = await fetch(path, {
+  const res = await authFetch(path, {
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -114,7 +124,7 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
-    throw new Error(err.message || `API error: ${res.status}`)
+    throw new CartApiError(err.message || `API error: ${res.status}`, res.status)
   }
   return res.json()
 }
@@ -244,10 +254,16 @@ export async function transferCartToCustomer(): Promise<Cart | null> {
   const token = getToken()
   if (!cartId || !token) return null
 
-  const { cart } = await apiFetch<{ cart: Cart }>(
+  const res = await authFetch(
     `/api/cart/${cartId}/customer?${FIELDS}`,
     { method: "POST" }
   )
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new CartApiError(err.message || `API error: ${res.status}`, res.status)
+  }
+
+  const { cart } = await res.json() as { cart: Cart }
   setCartId(cart.id)
   return cart
 }

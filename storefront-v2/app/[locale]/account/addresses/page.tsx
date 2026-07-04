@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
-import { getToken } from "@/lib/auth"
+import { authFetch } from "@/lib/auth"
 import { useTranslations } from "next-intl"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -46,14 +46,9 @@ export default function AddressesPage() {
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
 
-  const getHeaders = () => {
-    const token = getToken()
-    return { "Content-Type": "application/json", Authorization: `Bearer ${token}` } as Record<string, string>
-  }
-
   const loadAddresses = useCallback(async () => {
     try {
-      const res = await fetch("/api/account/addresses", { headers: getHeaders() })
+      const res = await authFetch("/api/account/addresses")
       if (res.ok) {
         const data = await res.json()
         setAddresses(data.addresses || [])
@@ -99,7 +94,7 @@ export default function AddressesPage() {
         country_code: form.country_code || "cn",
       }
       const url = editingId ? `/api/account/addresses/${editingId}` : "/api/account/addresses"
-      const res = await fetch(url, { method: "POST", headers: getHeaders(), body: JSON.stringify(payload) })
+      const res = await authFetch(url, { method: "POST", body: JSON.stringify(payload) })
       if (!res.ok) throw new Error()
       await loadAddresses()
       setDialogOpen(false)
@@ -113,7 +108,7 @@ export default function AddressesPage() {
   const handleDelete = async () => {
     if (!deleteId) return
     try {
-      await fetch(`/api/account/addresses/${deleteId}`, { method: "DELETE", headers: getHeaders() })
+      await authFetch(`/api/account/addresses/${deleteId}`, { method: "DELETE" })
       await loadAddresses()
     } catch { /* empty */ }
     setDeleteId(null)
@@ -121,8 +116,8 @@ export default function AddressesPage() {
 
   const handleSetDefault = async (id: string) => {
     try {
-      await fetch(`/api/account/addresses/${id}`, {
-        method: "POST", headers: getHeaders(), body: JSON.stringify({ is_default_shipping: true }),
+      await authFetch(`/api/account/addresses/${id}`, {
+        method: "POST", body: JSON.stringify({ is_default_shipping: true }),
       })
       await loadAddresses()
     } catch { /* empty */ }
