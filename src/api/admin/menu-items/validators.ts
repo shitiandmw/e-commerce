@@ -7,7 +7,7 @@ export const PostAdminCreateMenuItem = z.object({
   sort_order: z.number().int().default(0),
   is_enabled: z.boolean().default(true),
   metadata: z.record(z.unknown()).optional(),
-  parent_id: z.string().optional(),
+  parent_id: z.string().nullable().optional(),
 })
 
 export const PostAdminUpdateMenuItem = z.object({
@@ -25,7 +25,7 @@ export const PostAdminReorderMenuItems = z.object({
     z.object({
       id: z.string().min(1),
       sort_order: z.number().int(),
-      parent_id: z.string().optional(),
+      parent_id: z.string().nullable().optional(),
     })
   ),
 })

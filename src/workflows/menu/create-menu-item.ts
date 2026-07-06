@@ -15,7 +15,7 @@ type CreateMenuItemInput = {
   sort_order?: number
   is_enabled?: boolean
   metadata?: Record<string, unknown>
-  parent_id?: string
+  parent_id?: string | null
   translations?: Record<string, any>
 }
 

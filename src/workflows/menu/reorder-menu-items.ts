@@ -10,7 +10,7 @@ import MenuModuleService from "../../modules/menu/service"
 type ReorderItem = {
   id: string
   sort_order: number
-  parent_id?: string
+  parent_id?: string | null
 }
 
 type ReorderMenuItemsInput = {
