@@ -6,8 +6,8 @@ ENV NODE_ENV=development
 # Install dependencies (cached if package.json unchanged)
 COPY package.json package-lock.json* ./
 COPY scripts/patch-watcher.js ./scripts/
-RUN --mount=type=cache,target=/root/.npm npm install && \
-    node -e "require('@swc/core')" 2>/dev/null || npm install @swc/core --force --no-save
+RUN --mount=type=cache,id=npm-medusa,target=/root/.npm \
+    npm ci --include=dev --prefer-offline --no-audit --no-fund
 
 # Build Medusa
 COPY tsconfig.json medusa-config.ts ./
@@ -31,7 +31,8 @@ ENV NODE_ENV=production
 COPY --from=builder /app/.medusa/server ./
 COPY --from=builder /app/src/chat-widget/dist ./src/chat-widget/dist
 RUN mkdir -p scripts && echo "" > scripts/patch-watcher.js
-RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev
+RUN --mount=type=cache,id=npm-medusa-prod,target=/root/.npm \
+    npm ci --omit=dev --prefer-offline --no-audit --no-fund
 
 EXPOSE 9000
 
