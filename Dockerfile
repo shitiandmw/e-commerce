@@ -7,7 +7,9 @@ ENV NODE_ENV=development
 COPY package.json package-lock.json* ./
 COPY scripts/patch-watcher.js ./scripts/
 RUN --mount=type=cache,id=npm-medusa,target=/root/.npm \
-    npm ci --include=dev --prefer-offline --no-audit --no-fund
+    npm ci --include=dev --include=optional --prefer-offline --no-audit --no-fund && \
+    (node -e "require('@swc/core')" 2>/dev/null || \
+      npm install @swc/core --force --no-save --prefer-offline --no-audit --no-fund)
 
 # Build Medusa
 COPY tsconfig.json medusa-config.ts ./
