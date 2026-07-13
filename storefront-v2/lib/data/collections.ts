@@ -1,4 +1,8 @@
 import { fetchContent } from "@/lib/medusa"
+import {
+  isProductOutOfStock,
+  prioritizeInStockItems,
+} from "@/lib/product-availability"
 
 const MEDUSA_BACKEND_URL =
   process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
@@ -53,6 +57,8 @@ interface ProductPrice {
 interface ProductVariant {
   id: string
   prices: ProductPrice[]
+  inventory_quantity?: number | null
+  manage_inventory?: boolean | null
 }
 
 interface StoreProduct {
@@ -76,6 +82,13 @@ export interface CollectionProductWithPrice {
   thumbnail: string | null
   price: number | null
   currency_code: string
+  isOutOfStock: boolean
+}
+
+interface CollectionProductData {
+  price: number | null
+  currency_code: string
+  isOutOfStock: boolean
 }
 
 /* ---------- Fetchers ---------- */
@@ -99,8 +112,8 @@ export async function fetchCollection(key: string, locale?: string): Promise<Cur
 export async function fetchProductPrices(
   productIds: string[],
   locale?: string,
-): Promise<Map<string, { price: number; currency_code: string }>> {
-  const priceMap = new Map<string, { price: number; currency_code: string }>()
+): Promise<Map<string, CollectionProductData>> {
+  const priceMap = new Map<string, CollectionProductData>()
   if (productIds.length === 0) return priceMap
 
   try {
@@ -108,7 +121,10 @@ export async function fetchProductPrices(
     for (const id of productIds) {
       url.searchParams.append("id[]", id)
     }
-    url.searchParams.set("fields", "id,variants.prices.*")
+    url.searchParams.set(
+      "fields",
+      "id,*variants.prices,*variants.inventory_quantity,*variants.manage_inventory",
+    )
 
     const headers: Record<string, string> = {}
     if (PUBLISHABLE_KEY) {
@@ -133,12 +149,11 @@ export async function fetchProductPrices(
         || product.variants
           ?.flatMap((v) => v.prices ?? [])
           .sort((a, b) => a.amount - b.amount)[0]
-      if (cheapest) {
-        priceMap.set(product.id, {
-          price: cheapest.amount,
-          currency_code: cheapest.currency_code,
-        })
-      }
+      priceMap.set(product.id, {
+        price: cheapest?.amount ?? null,
+        currency_code: cheapest?.currency_code ?? "usd",
+        isOutOfStock: isProductOutOfStock(product),
+      })
     }
   } catch {
     // Price fetch failed — components will show without price
@@ -164,7 +179,7 @@ export async function fetchCollectionWithPrices(
 
   const priceMap = await fetchProductPrices(productIds, locale)
 
-  return collection.items
+  const products = collection.items
     .filter((item) => item.product !== null)
     .map((item) => {
       const priceInfo = priceMap.get(item.product_id)
@@ -175,6 +190,9 @@ export async function fetchCollectionWithPrices(
         thumbnail: item.product!.thumbnail,
         price: priceInfo?.price ?? null,
         currency_code: priceInfo?.currency_code ?? "usd",
+        isOutOfStock: priceInfo?.isOutOfStock ?? false,
       }
     })
+
+  return prioritizeInStockItems(products, (product) => product.isOutOfStock)
 }

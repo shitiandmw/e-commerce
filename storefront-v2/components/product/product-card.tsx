@@ -10,6 +10,7 @@ import { useCart } from "@/lib/cart-store"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 import { getCustomTags, ProductTagChip } from "@/components/product/product-tag-chip"
+import { isProductOutOfStock } from "@/lib/product-availability"
 
 function isMedusaProduct(p: Product | MedusaProduct): p is MedusaProduct {
   return "handle" in p && "variants" in p
@@ -42,9 +43,7 @@ function MedusaProductCard({
   const firstVariant = product.variants?.[0]
   const hasSingleVariant = (product.variants?.length ?? 0) === 1
   const firstVariantId = firstVariant?.id
-  const manageInventory = firstVariant?.manage_inventory !== false
-  const inventoryQty = firstVariant?.inventory_quantity
-  const isOutOfStock = manageInventory && (inventoryQty === undefined || inventoryQty === null || inventoryQty <= 0)
+  const isOutOfStock = isProductOutOfStock(product)
   const canQuickAdd = hasSingleVariant && !!firstVariantId && !isOutOfStock
   const customTags = getCustomTags(product)
   const badgeTags = customTags.filter((tag) => tag.type === "badge")

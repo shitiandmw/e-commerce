@@ -10,6 +10,7 @@ import type { CartLineItem } from "@/lib/cart"
 import type { MedusaProduct } from "@/lib/data/products"
 import { getMedusaPrice, getMedusaImages } from "@/lib/data/products"
 import { formatPrice } from "@/lib/format"
+import { fetchCartRecommendedProducts } from "@/lib/data/cart-recommendations"
 
 function CartItemRow({ item, currencyCode }: { item: CartLineItem; currencyCode?: string }) {
   const { updateItem, removeItem, loading } = useCart()
@@ -115,9 +116,8 @@ function RecommendedProducts() {
   const [products, setProducts] = useState<MedusaProduct[]>([])
 
   useEffect(() => {
-    fetch(`/api/products?limit=4&order=-created_at&fields=id,title,handle,thumbnail,*variants,*variants.prices,*brand&locale=${locale}`)
-      .then((res) => res.json())
-      .then((data) => setProducts(data.products ?? []))
+    fetchCartRecommendedProducts(locale)
+      .then(setProducts)
       .catch(() => {})
   }, [locale])
 

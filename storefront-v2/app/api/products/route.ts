@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
 
   const locale = searchParams.get("locale")
   searchParams.forEach((v, k) => {
-    if (k !== "locale") url.searchParams.set(k, v)
+    if (k !== "locale") url.searchParams.append(k, v)
   })
 
   const headers: Record<string, string> = {

@@ -39,12 +39,17 @@ export default async function CategoryPage({
   const sort = String(sp.sort ?? "recommended")
   const offset = (page - 1) * PAGE_SIZE
 
-  // Map frontend sort values to Medusa order param (price sort handled client-side)
+  // Map frontend sort values to server-side candidate ordering.
   let order: string | undefined
   switch (sort) {
     case "name": order = "title"; break
     default: order = undefined
   }
+  const priceOrder = sort === "price-asc"
+    ? "asc"
+    : sort === "price-desc"
+      ? "desc"
+      : undefined
 
   // Fetch category and all categories in parallel with mock fallback
   const [medusaCategory, mockCategory, allCategories, region] = await Promise.all([
@@ -63,6 +68,7 @@ export default async function CategoryPage({
         order,
         locale,
         region_id: region.id,
+        price_order: priceOrder,
       })
     : { products: [], count: 0, offset: 0, limit: PAGE_SIZE }
 

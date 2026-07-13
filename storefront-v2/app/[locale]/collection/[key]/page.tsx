@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
 import { fetchCollection, fetchProductPrices } from "@/lib/data/collections"
+import { prioritizeInStockItems } from "@/lib/product-availability"
 import { CollectionPageContent } from "@/components/collection/collection-page-content"
 
 interface PageProps {
@@ -45,8 +46,14 @@ export default async function CollectionPage({ params }: PageProps) {
         thumbnail: item.product!.thumbnail,
         price: priceInfo?.price ?? null,
         currency_code: priceInfo?.currency_code ?? "usd",
+        isOutOfStock: priceInfo?.isOutOfStock ?? false,
       }
     })
 
-  return <CollectionPageContent collection={collection} products={products} />
+  const prioritizedProducts = prioritizeInStockItems(
+    products,
+    (product) => product.isOutOfStock,
+  )
+
+  return <CollectionPageContent collection={collection} products={prioritizedProducts} />
 }

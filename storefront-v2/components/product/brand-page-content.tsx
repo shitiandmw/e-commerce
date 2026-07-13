@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState } from "react"
 import Image from "next/image"
 import { Link } from "@/i18n/navigation"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Grid3X3, LayoutList, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react"
-import { type MedusaProduct, type MedusaBrand, getMedusaPrice } from "@/lib/data/products"
+import { type MedusaProduct, type MedusaBrand } from "@/lib/data/products"
 import { ProductCard } from "@/components/product/product-card"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
@@ -40,17 +40,6 @@ export function BrandPageContent({
   ]
 
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
-
-  const sortedProducts = useMemo(() => {
-    if (currentSort === "price-asc" || currentSort === "price-desc") {
-      return [...medusaProducts].sort((a, b) => {
-        const pa = getMedusaPrice(a)?.amount ?? 0
-        const pb = getMedusaPrice(b)?.amount ?? 0
-        return currentSort === "price-asc" ? pa - pb : pb - pa
-      })
-    }
-    return medusaProducts
-  }, [medusaProducts, currentSort])
 
   function buildUrl(updates: Record<string, string | null>) {
     const params = new URLSearchParams(searchParams.toString())
@@ -132,12 +121,12 @@ export function BrandPageContent({
             </div>
           </div>
           {/* Product Grid */}
-          {sortedProducts.length > 0 ? (
+          {medusaProducts.length > 0 ? (
             <div className={cn(
               "grid gap-4 lg:gap-6",
               gridCols === 3 ? "grid-cols-2 md:grid-cols-3" : "grid-cols-1 md:grid-cols-2"
             )}>
-              {sortedProducts.map((product) => (
+              {medusaProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>

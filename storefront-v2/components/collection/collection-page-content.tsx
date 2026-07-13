@@ -119,13 +119,16 @@ function CollectionProductCard({ product }: { product: CollectionProductWithPric
         <h3 className="text-sm font-medium text-foreground leading-snug line-clamp-2 group-hover:text-gold transition-colors">
           {product.title}
         </h3>
-        <div className="mt-3">
+        <div className="mt-3 flex items-center justify-between gap-2">
           {product.price !== null ? (
             <span className="text-gold font-bold">
               {formatPrice(product.price, product.currency_code)}
             </span>
           ) : (
             <span className="text-muted-foreground text-sm">{t("price_tbd")}</span>
+          )}
+          {product.isOutOfStock && (
+            <span className="text-[10px] text-destructive font-medium">{t("out_of_stock")}</span>
           )}
         </div>
       </div>

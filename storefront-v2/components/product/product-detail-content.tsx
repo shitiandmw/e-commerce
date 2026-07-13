@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
 import { getCustomTags, ProductTagChip } from "@/components/product/product-tag-chip"
+import { isVariantOutOfStock } from "@/lib/product-availability"
 
 export function ProductDetailContent({
   product,
@@ -101,9 +102,9 @@ export function ProductDetailContent({
 
   // Inventory
   const inventory = selectedVariant?.inventory_quantity
-  const manageInventory = selectedVariant?.manage_inventory !== false
+  const manageInventory = !!selectedVariant && selectedVariant.manage_inventory !== false
   const inventoryKnown = inventory !== undefined && inventory !== null
-  const isOutOfStock = manageInventory && (!inventoryKnown || inventory <= 0)
+  const isOutOfStock = isVariantOutOfStock(selectedVariant)
   const isLowStock = manageInventory && inventoryKnown && inventory > 0 && inventory <= 5
   const canAddToCart = !!selectedVariant && !isOutOfStock
 

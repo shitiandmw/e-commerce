@@ -16,9 +16,11 @@ type BrandPageDataDependencies<Brand extends BrandWithProducts, Product> = {
   fetchProducts: (params: {
     ids: string[]
     limit: number
+    offset?: number
     order?: string
     locale?: string
     region_id?: string
+    price_order?: "asc" | "desc"
   }) => Promise<ProductListResponse<Product>>
   getRegion: () => Promise<{ id: string }>
 }
@@ -50,6 +52,11 @@ export async function loadBrandPageData<Brand extends BrandWithProducts, Product
     default:
       order = undefined
   }
+  const priceOrder = sort === "price-asc"
+    ? "asc"
+    : sort === "price-desc"
+      ? "desc"
+      : undefined
 
   const brand = await fetchBrand(handle, locale)
   if (!brand) {
@@ -69,24 +76,16 @@ export async function loadBrandPageData<Brand extends BrandWithProducts, Product
   }
 
   if (productIds.length > 0) {
-    const pageIds = productIds.slice(offset, offset + BRAND_PAGE_SIZE)
-    if (pageIds.length > 0) {
-      const data = await fetchProducts({
-        ids: pageIds,
-        limit: BRAND_PAGE_SIZE,
-        order,
-        locale,
-        region_id: region.id,
-      })
-      productsData = { ...data, count: productIds.length }
-    } else {
-      productsData = {
-        products: [],
-        count: productIds.length,
-        offset,
-        limit: BRAND_PAGE_SIZE,
-      }
-    }
+    const data = await fetchProducts({
+      ids: productIds,
+      limit: BRAND_PAGE_SIZE,
+      offset,
+      order,
+      locale,
+      region_id: region.id,
+      price_order: priceOrder,
+    })
+    productsData = { ...data, count: productIds.length }
   }
 
   return {
