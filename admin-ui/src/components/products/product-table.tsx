@@ -1,15 +1,14 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import {
   useReactTable,
   getCoreRowModel,
   getSortedRowModel,
-  getFilteredRowModel,
   flexRender,
   SortingState,
-  ColumnFiltersState,
   PaginationState,
 } from "@tanstack/react-table"
 import { useProducts, Product, useDeleteProduct } from "@/hooks/use-products"
@@ -43,31 +42,43 @@ import {
   useProductImportExport,
   PRODUCT_CSV_HEADERS,
 } from "@/hooks/use-import-export"
+import {
+  buildProductListHref,
+  type ProductListState,
+} from "@/lib/product-navigation"
 
-export function ProductTable() {
+interface ProductTableProps {
+  initialState: ProductListState
+}
+
+export function ProductTable({ initialState }: ProductTableProps) {
   const t = useTranslations("products")
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [search, setSearch] = React.useState("")
-  const [debouncedSearch, setDebouncedSearch] = React.useState("")
-  const [statusFilter, setStatusFilter] = React.useState<string>("all")
+  const router = useRouter()
+  const [sorting, setSorting] = React.useState<SortingState>(
+    initialState.sorting
+  )
+  const [search, setSearch] = React.useState(initialState.search)
+  const [debouncedSearch, setDebouncedSearch] = React.useState(
+    initialState.search
+  )
+  const [statusFilter, setStatusFilter] = React.useState(
+    initialState.status
+  )
   const [pagination, setPagination] = React.useState<PaginationState>({
-    pageIndex: 0,
+    pageIndex: initialState.pageIndex,
     pageSize: 20,
   })
 
   // Debounce search
   React.useEffect(() => {
+    if (search === debouncedSearch) return
+
     const timer = setTimeout(() => {
       setDebouncedSearch(search)
       setPagination((p) => ({ ...p, pageIndex: 0 }))
     }, 300)
     return () => clearTimeout(timer)
-  }, [search])
-
-  // Reset page when filter changes
-  React.useEffect(() => {
-    setPagination((p) => ({ ...p, pageIndex: 0 }))
-  }, [statusFilter])
+  }, [debouncedSearch, search])
 
   const statusArray =
     statusFilter && statusFilter !== "all" ? [statusFilter] : undefined
@@ -101,9 +112,32 @@ export function ProductTable() {
     }
   }
 
+  const listHref = React.useMemo(
+    () =>
+      buildProductListHref({
+        pageIndex: pagination.pageIndex,
+        search: debouncedSearch,
+        status: statusFilter,
+        sorting,
+      }),
+    [debouncedSearch, pagination.pageIndex, sorting, statusFilter]
+  )
+  const lastSyncedHref = React.useRef(buildProductListHref(initialState))
+
+  React.useEffect(() => {
+    if (lastSyncedHref.current === listHref) return
+    lastSyncedHref.current = listHref
+    router.replace(listHref, { scroll: false })
+  }, [listHref, router])
+
   const columns = React.useMemo(
-    () => getProductColumns((product) => setProductToDelete(product), t),
-    [t]
+    () =>
+      getProductColumns(
+        (product) => setProductToDelete(product),
+        t,
+        listHref
+      ),
+    [listHref, t]
   )
 
   const products = data?.products ?? []
@@ -142,7 +176,10 @@ export function ProductTable() {
           </div>
           <Select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => {
+              setStatusFilter(e.target.value)
+              setPagination((p) => ({ ...p, pageIndex: 0 }))
+            }}
             className="w-[150px]"
           >
             <option value="all">{t("statusOptions.all")}</option>

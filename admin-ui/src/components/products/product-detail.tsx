@@ -36,6 +36,7 @@ import {
   useInventoryItem,
   useStockLocations,
 } from "@/hooks/use-inventory"
+import { withProductListReturnTo } from "@/lib/product-navigation"
 
 /** brand field may be a single object or an array (due to isList link) */
 function resolveBrand(brand: Product["brand"]): { id: string; name: string } | null {
@@ -285,9 +286,13 @@ function VariantInventoryCard({
 
 interface ProductDetailProps {
   productId: string
+  returnTo?: string
 }
 
-export function ProductDetail({ productId }: ProductDetailProps) {
+export function ProductDetail({
+  productId,
+  returnTo = "/products",
+}: ProductDetailProps) {
   const t = useTranslations("products")
   const router = useRouter()
   const { data, isLoading, isError, error } = useProduct(productId)
@@ -299,7 +304,7 @@ export function ProductDetail({ productId }: ProductDetailProps) {
   const handleDelete = async () => {
     try {
       await deleteProduct.mutateAsync(productId)
-      router.push("/products")
+      router.push(returnTo)
     } catch (err) {
       // Handled by mutation
     }
@@ -332,7 +337,7 @@ export function ProductDetail({ productId }: ProductDetailProps) {
   if (isError || !product) {
     return (
       <div className="space-y-6">
-        <Link href="/products">
+        <Link href={returnTo}>
           <Button variant="ghost" size="sm">
             <ArrowLeft className="mr-2 h-4 w-4" />
             {t("backToProducts")}
@@ -354,7 +359,7 @@ export function ProductDetail({ productId }: ProductDetailProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/products">
+          <Link href={returnTo}>
             <Button variant="ghost" size="icon">
               <ArrowLeft className="h-4 w-4" />
             </Button>
@@ -372,7 +377,12 @@ export function ProductDetail({ productId }: ProductDetailProps) {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Link href={`/products/${productId}/edit`}>
+          <Link
+            href={withProductListReturnTo(
+              `/products/${productId}/edit`,
+              returnTo
+            )}
+          >
             <Button variant="outline">
               <Pencil className="mr-2 h-4 w-4" />
               {t("actions.edit")}

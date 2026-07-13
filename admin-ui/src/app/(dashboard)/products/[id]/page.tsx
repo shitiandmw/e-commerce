@@ -1,11 +1,21 @@
 "use client"
 
-import { useParams } from "next/navigation"
 import { ProductDetail } from "@/components/products/product-detail"
+import {
+  getProductListReturnTo,
+  type ProductRouteSearchParams,
+} from "@/lib/product-navigation"
 
-export default function ProductDetailPage() {
-  const params = useParams()
-  const productId = params.id as string
+interface ProductDetailPageProps {
+  params: { id: string }
+  searchParams?: ProductRouteSearchParams
+}
 
-  return <ProductDetail productId={productId} />
+export default function ProductDetailPage({
+  params,
+  searchParams,
+}: ProductDetailPageProps) {
+  const returnTo = getProductListReturnTo(searchParams?.from)
+
+  return <ProductDetail productId={params.id} returnTo={returnTo} />
 }

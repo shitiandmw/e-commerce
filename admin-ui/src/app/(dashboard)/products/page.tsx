@@ -2,9 +2,19 @@
 
 import { useTranslations } from "next-intl"
 import { ProductTable } from "@/components/products/product-table"
+import {
+  parseProductListState,
+  type ProductRouteSearchParams,
+} from "@/lib/product-navigation"
 
-export default function ProductsPage() {
+interface ProductsPageProps {
+  searchParams?: ProductRouteSearchParams
+}
+
+export default function ProductsPage({ searchParams }: ProductsPageProps) {
   const t = useTranslations("products")
+  const initialState = parseProductListState(searchParams)
+
   return (
     <div className="space-y-6">
       <div>
@@ -14,7 +24,7 @@ export default function ProductsPage() {
         </p>
       </div>
 
-      <ProductTable />
+      <ProductTable initialState={initialState} />
     </div>
   )
 }

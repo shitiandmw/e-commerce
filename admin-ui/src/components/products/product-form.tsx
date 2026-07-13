@@ -276,9 +276,14 @@ function expandOptionDefinitions(
 interface ProductFormProps {
   product?: Product
   mode: "create" | "edit"
+  returnTo?: string
 }
 
-export function ProductForm({ product, mode }: ProductFormProps) {
+export function ProductForm({
+  product,
+  mode,
+  returnTo = "/products",
+}: ProductFormProps) {
   const t = useTranslations("products")
   const router = useRouter()
   const createProduct = useCreateProduct()
@@ -886,7 +891,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
         }
       }
 
-      router.push("/products")
+      router.push(returnTo)
     } catch (err) {
       setSubmitError(
         err instanceof Error ? err : new Error(t("errorOccurred"))
@@ -908,7 +913,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
       <div className="sticky top-0 z-20 -mx-8 -mt-8 px-8 pt-6 pb-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/products">
+            <Link href={returnTo}>
               <Button variant="ghost" size="icon" type="button">
                 <ArrowLeft className="h-4 w-4" />
               </Button>

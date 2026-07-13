@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
 import { format } from "date-fns"
+import { withProductListReturnTo } from "@/lib/product-navigation"
 
 function getStatusBadge(status: Product["status"], t: (key: string) => string) {
   switch (status) {
@@ -44,7 +45,8 @@ function formatPrice(variants: Product["variants"]) {
 
 export function getProductColumns(
   onDelete: (product: Product) => void,
-  t: (key: string) => string
+  t: (key: string) => string,
+  returnTo: string
 ): ColumnDef<Product>[] {
   return [
     {
@@ -84,7 +86,10 @@ export function getProductColumns(
       cell: ({ row }) => (
         <div>
           <Link
-            href={`/products/${row.original.id}`}
+            href={withProductListReturnTo(
+              `/products/${row.original.id}`,
+              returnTo
+            )}
             className="font-medium hover:underline"
           >
             {row.original.title}
@@ -152,13 +157,23 @@ export function getProductColumns(
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <Link href={`/products/${product.id}`}>
+              <Link
+                href={withProductListReturnTo(
+                  `/products/${product.id}`,
+                  returnTo
+                )}
+              >
                 <DropdownMenuItem>
                   <Eye className="mr-2 h-4 w-4" />
                   {t("actions.view")}
                 </DropdownMenuItem>
               </Link>
-              <Link href={`/products/${product.id}/edit`}>
+              <Link
+                href={withProductListReturnTo(
+                  `/products/${product.id}/edit`,
+                  returnTo
+                )}
+              >
                 <DropdownMenuItem>
                   <Pencil className="mr-2 h-4 w-4" />
                   {t("actions.edit")}

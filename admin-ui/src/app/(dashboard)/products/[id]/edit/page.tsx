@@ -1,6 +1,5 @@
 "use client"
 
-import { useParams } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { useProduct } from "@/hooks/use-products"
 import { ProductForm } from "@/components/products/product-form"
@@ -8,11 +7,23 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import {
+  getProductListReturnTo,
+  type ProductRouteSearchParams,
+} from "@/lib/product-navigation"
 
-export default function EditProductPage() {
+interface EditProductPageProps {
+  params: { id: string }
+  searchParams?: ProductRouteSearchParams
+}
+
+export default function EditProductPage({
+  params,
+  searchParams,
+}: EditProductPageProps) {
   const t = useTranslations("products")
-  const params = useParams()
-  const productId = params.id as string
+  const productId = params.id
+  const returnTo = getProductListReturnTo(searchParams?.from)
   const { data, isLoading, isError, error } = useProduct(productId)
 
   if (isLoading) {
@@ -41,7 +52,7 @@ export default function EditProductPage() {
   if (isError || !data?.product) {
     return (
       <div className="space-y-6">
-        <Link href="/products">
+        <Link href={returnTo}>
           <Button variant="ghost" size="sm">
             <ArrowLeft className="mr-2 h-4 w-4" />
             {t("backToProducts")}
@@ -58,5 +69,5 @@ export default function EditProductPage() {
     )
   }
 
-  return <ProductForm product={data.product} mode="edit" />
+  return <ProductForm product={data.product} mode="edit" returnTo={returnTo} />
 }

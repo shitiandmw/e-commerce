@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "allowJs": false,
+    "incremental": false,
+    "isolatedModules": false,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noEmit": false,
+    "outDir": ".next/test-navigation",
+    "rootDir": "src",
+    "target": "ES2020"
+  },
+  "include": [
+    "src/lib/product-navigation.ts",
+    "src/lib/product-navigation.test.ts"
+  ],
+  "exclude": ["node_modules"]
+}
