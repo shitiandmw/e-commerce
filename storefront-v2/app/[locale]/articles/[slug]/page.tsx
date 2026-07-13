@@ -128,7 +128,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
                     )}
                   </div>
                   <div className="mt-3">
-                    <p className="text-[11px] text-muted-foreground">{formatDate(related.published_at)}</p>
+                    <p className="text-[0.6875rem] text-muted-foreground">{formatDate(related.published_at)}</p>
                     <h3 className="mt-1 text-sm font-serif font-medium text-foreground group-hover:text-gold transition-colors line-clamp-2">
                       {related.title}
                     </h3>

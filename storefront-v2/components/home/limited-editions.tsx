@@ -56,7 +56,7 @@ export async function LimitedEditions({ products }: LimitedEditionsProps) {
                     </div>
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
-                  <div className="absolute top-3 left-3 bg-gold/90 text-primary-foreground text-[10px] font-bold px-2 py-1 tracking-wider">
+                  <div className="absolute top-3 left-3 bg-gold/90 text-primary-foreground text-[0.625rem] font-bold px-2 py-1 tracking-wider">
                     LIMITED
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 p-4">

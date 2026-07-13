@@ -571,7 +571,7 @@ export function ProductDetailContent({
                                   ? "bg-gold"
                                   : "bg-border/30"
                               }`} />
-                              <span className="text-[10px] text-muted-foreground">{t(labelKey)}</span>
+                              <span className="text-[0.625rem] text-muted-foreground">{t(labelKey)}</span>
                             </div>
                             )
                           })}

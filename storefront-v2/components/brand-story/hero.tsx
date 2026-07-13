@@ -6,7 +6,7 @@ import { getTranslations } from "next-intl/server"
 export async function BrandStoryHero() {
   const t = await getTranslations()
   return (
-    <section className="relative h-[70vh] min-h-[500px] lg:h-[80vh]">
+    <section className="relative h-[80vh] min-h-[650px] sm:h-[70vh] sm:min-h-[500px] lg:h-[80vh]">
       <Image
         src="/images/brand-story-hero.jpg"
         alt={t("bs_hero_title")}
@@ -46,8 +46,8 @@ export async function BrandStoryHero() {
           <p className="mt-4 text-muted-foreground leading-relaxed max-w-xl text-pretty">
             {t("bs_hero_desc")}
           </p>
-          <div className="mt-8 flex items-center gap-8">
-            <div className="flex items-center gap-3">
+          <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-5 sm:flex sm:items-center sm:gap-8">
+            <div className="flex min-w-0 items-center gap-3">
               <span className="text-gold font-serif text-3xl lg:text-4xl font-bold">
                 {t("bs_hero_stat1_value")}
               </span>
@@ -57,8 +57,8 @@ export async function BrandStoryHero() {
                 {t("bs_hero_stat1_line2")}
               </span>
             </div>
-            <div className="h-8 w-px bg-border/50" />
-            <div className="flex items-center gap-3">
+            <div className="hidden h-8 w-px bg-border/50 sm:block" />
+            <div className="flex min-w-0 items-center gap-3">
               <span className="text-gold font-serif text-3xl lg:text-4xl font-bold">
                 {t("bs_hero_stat2_value")}
               </span>
@@ -68,8 +68,8 @@ export async function BrandStoryHero() {
                 {t("bs_hero_stat2_line2")}
               </span>
             </div>
-            <div className="h-8 w-px bg-border/50" />
-            <div className="flex items-center gap-3">
+            <div className="hidden h-8 w-px bg-border/50 sm:block" />
+            <div className="col-span-2 flex min-w-0 items-center gap-3 sm:col-auto">
               <span className="text-gold font-serif text-3xl lg:text-4xl font-bold">
                 {t("bs_hero_stat3_value")}
               </span>

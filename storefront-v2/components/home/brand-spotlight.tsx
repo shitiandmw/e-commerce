@@ -9,7 +9,7 @@ export async function BrandSpotlight() {
     <section className="py-16 px-4 lg:px-6">
       <div className="mx-auto max-w-7xl">
         <div className="relative overflow-hidden">
-          <div className="relative h-[500px] lg:h-[600px]">
+          <div className="relative h-[650px] sm:h-[500px] lg:h-[600px]">
             <Image
               src="/images/brand-story.jpg"
               alt={t("brand_story_title")}

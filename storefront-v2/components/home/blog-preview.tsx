@@ -58,7 +58,7 @@ export async function BlogPreview({ articles = [] }: BlogPreviewProps) {
                 <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
                 {article.category?.name && (
                   <div className="absolute top-3 left-3">
-                    <span className="bg-gold/90 text-primary-foreground text-[10px] font-medium px-2 py-1 tracking-wider">
+                    <span className="bg-gold/90 text-primary-foreground text-[0.625rem] font-medium px-2 py-1 tracking-wider">
                       {article.category.name}
                     </span>
                   </div>
@@ -66,7 +66,7 @@ export async function BlogPreview({ articles = [] }: BlogPreviewProps) {
               </div>
               <div className="mt-4">
                 {article.published_at && (
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-[0.6875rem] text-muted-foreground">
                     {new Date(article.published_at).toLocaleDateString("zh-TW")}
                   </p>
                 )}

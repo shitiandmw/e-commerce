@@ -40,7 +40,7 @@ export async function BeginnerSection() {
             <ul className="mt-6 flex flex-col gap-3">
               {tips.map((item, i) => (
                 <li key={i} className="flex items-start gap-3 text-sm text-foreground/80">
-                  <span className="mt-1 flex size-5 shrink-0 items-center justify-center bg-gold/10 text-gold text-[10px]">
+                  <span className="mt-1 flex size-5 shrink-0 items-center justify-center bg-gold/10 text-gold text-[0.625rem]">
                     {i + 1}
                   </span>
                   {item}

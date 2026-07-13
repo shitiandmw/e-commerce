@@ -69,7 +69,7 @@ export function ProductTagChip({
     return (
       <span
         className={cn(
-          "inline-flex max-w-full items-center border bg-gold/90 px-2 py-1 text-[10px] font-bold uppercase text-primary-foreground shadow-sm",
+          "inline-flex max-w-full items-center border bg-gold/90 px-2 py-1 text-[0.625rem] font-bold uppercase text-primary-foreground shadow-sm",
           className
         )}
         style={tagStyle(tag, variant)}
@@ -82,7 +82,7 @@ export function ProductTagChip({
   return (
     <span
       className={cn(
-        "inline-flex max-w-full items-center gap-1.5 border border-border/50 bg-background/60 px-2 py-1 text-[10px] font-medium text-muted-foreground",
+        "inline-flex max-w-full items-center gap-1.5 border border-border/50 bg-background/60 px-2 py-1 text-[0.625rem] font-medium text-muted-foreground",
         className
       )}
       style={tagStyle(tag, variant)}

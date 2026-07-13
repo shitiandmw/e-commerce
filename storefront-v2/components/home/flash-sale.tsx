@@ -53,7 +53,7 @@ export function HotPicks({ products }: HotPicksProps) {
                     No Image
                   </div>
                 )}
-                <div className="absolute top-3 left-3 flex items-center gap-1 bg-gold/90 text-primary-foreground text-[10px] font-bold px-2 py-1 tracking-wider">
+                <div className="absolute top-3 left-3 flex items-center gap-1 bg-gold/90 text-primary-foreground text-[0.625rem] font-bold px-2 py-1 tracking-wider">
                   <Flame className="size-3" />
                   HOT
                 </div>

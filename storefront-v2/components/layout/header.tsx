@@ -23,7 +23,7 @@ function BrandLogo({ brand, size = "sm" }: { brand: MenuBrand; size?: "sm" | "md
       </span>
     )
   }
-  const text = size === "md" ? "text-[10px]" : "text-[8px]"
+  const text = size === "md" ? "text-[0.625rem]" : "text-[0.5rem]"
   const letter = brand.name.charAt(0).toUpperCase()
   return (
     <span className={cn(dim, "shrink-0 inline-flex items-center justify-center rounded bg-gold/10 border border-gold/20 text-gold font-bold uppercase", text)}>
@@ -103,7 +103,7 @@ function BrandGridPanel({ item, onNavigate }: { item: MenuItem; onNavigate?: () 
 /* ─── menu item icon ─── */
 function MenuIcon({ item, size = "sm" }: { item: MenuItem; size?: "sm" | "md" }) {
   const dim = size === "md" ? "size-9" : "size-7"
-  const text = size === "md" ? "text-[10px]" : "text-[8px]"
+  const text = size === "md" ? "text-[0.625rem]" : "text-[0.5rem]"
   if (item.icon_url) {
     return (
       <span className={cn(dim, "shrink-0 inline-flex items-center justify-center rounded overflow-hidden")}>
@@ -205,7 +205,7 @@ function MobileNavSection({ item, onNavigate }: { item: MenuItem; onNavigate: ()
               {item.children.map((child) =>
                 child.children.length > 0 ? (
                   <div key={child.id}>
-                    <p className="px-2 pt-2 pb-1 text-[10px] text-gold/50 uppercase tracking-widest">{child.label}</p>
+                    <p className="px-2 pt-2 pb-1 text-[0.625rem] text-gold/50 uppercase tracking-widest">{child.label}</p>
                     {child.children.map((link) => (
                       <Link key={link.id} href={link.url || "#"} onClick={onNavigate} className="block px-2 py-1.5 text-xs text-foreground/70 hover:text-gold transition-colors">{link.label}</Link>
                     ))}
@@ -288,7 +288,7 @@ function MobileLanguageSwitcher({ onNavigate }: { onNavigate: () => void }) {
 
   return (
     <div className="mt-4 pt-4 border-t border-border/30">
-      <p className="px-3 pb-2 text-[10px] text-gold/50 uppercase tracking-widest">語言</p>
+      <p className="px-3 pb-2 text-[0.625rem] text-gold/50 uppercase tracking-widest">語言</p>
       {languages.map((l) => (
         <button
           key={l.code}
@@ -317,7 +317,7 @@ function MobileThemeSwitcher() {
 
   return (
     <div className="mt-4 pt-4 border-t border-border/30">
-      <p className="px-3 pb-2 text-[10px] text-gold/50 uppercase tracking-widest">{t('theme')}</p>
+      <p className="px-3 pb-2 text-[0.625rem] text-gold/50 uppercase tracking-widest">{t('theme')}</p>
       <button
         onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         className="flex w-full items-center gap-3 px-3 py-2 text-sm text-foreground/70 hover:text-gold transition-colors"
@@ -411,9 +411,9 @@ export function SiteHeader({ navItems }: { navItems: MenuItem[] }) {
             </Sheet>
 
             {/* logo */}
-            <Link href="/" className="flex items-center gap-2.5 shrink-0 mr-4 lg:mr-6">
-              <span className="text-xl font-serif font-bold tracking-[0.2em] text-gold">SHANGJIA</span>
-              <span className="hidden sm:block text-[10px] text-muted-foreground tracking-widest leading-none">
+            <Link href="/" className="flex items-center gap-2.5 shrink-0 mr-2 sm:mr-4 lg:mr-6">
+              <span className="text-xl font-serif font-bold tracking-[0.05em] sm:tracking-[0.2em] text-gold">SHANGJIA</span>
+              <span className="hidden sm:block text-xl text-muted-foreground tracking-widest leading-none">
                 上茄
               </span>
             </Link>
@@ -430,7 +430,7 @@ export function SiteHeader({ navItems }: { navItems: MenuItem[] }) {
                         href={item.url || "#"}
                         onClick={() => setActiveMenu(null)}
                         className={cn(
-                          "flex items-center gap-0.5 whitespace-nowrap px-2.5 py-2 text-[13px] tracking-wide transition-colors xl:px-3",
+                          "flex items-center gap-0.5 whitespace-nowrap px-2.5 py-2 text-[0.8125rem] tracking-wide transition-colors xl:px-3",
                           isActive ? "text-gold" : "text-foreground/65 hover:text-gold"
                         )}
                       >
@@ -445,19 +445,21 @@ export function SiteHeader({ navItems }: { navItems: MenuItem[] }) {
 
             {/* right icons */}
             <div className="flex items-center gap-0.5 shrink-0 ml-auto">
-              <ThemeToggle />
+              <div className="hidden sm:block">
+                <ThemeToggle />
+              </div>
               <LanguageSwitcher />
-              <Link href="/search" className="p-2 text-foreground/60 hover:text-gold transition-colors" aria-label="搜尋">
+              <Link href="/search" className="p-1.5 sm:p-2 text-foreground/60 hover:text-gold transition-colors" aria-label="搜尋">
                 <Search className="size-[18px]" />
               </Link>
-              <Link href={loggedIn ? "/account" : "/login"} className="p-2 text-foreground/60 hover:text-gold transition-colors" aria-label={loggedIn ? "帳戶" : "登入"}>
+              <Link href={loggedIn ? "/account" : "/login"} className="p-1.5 sm:p-2 text-foreground/60 hover:text-gold transition-colors" aria-label={loggedIn ? "帳戶" : "登入"}>
                 {loggedIn ? <User className="size-[18px]" /> : <LogIn className="size-[18px]" />}
               </Link>
-              <Link href="/cart" className="relative p-2 text-foreground/60 hover:text-gold transition-colors" aria-label="購物車">
+              <Link href="/cart" className="relative p-1.5 sm:p-2 text-foreground/60 hover:text-gold transition-colors" aria-label="購物車">
                 <ShoppingBag className="size-[18px]" />
                 {cartCount > 0 && (
                   <span className={cn(
-                    "absolute top-0 right-0 flex size-3.5 items-center justify-center rounded-full bg-gold text-[9px] font-bold text-primary-foreground transition-transform",
+                    "absolute top-0 right-0 flex size-3.5 items-center justify-center rounded-full bg-gold text-[0.5625rem] font-bold text-primary-foreground transition-transform",
                     cartBounce && "animate-[cart-bounce_0.3s_ease-out]"
                   )}>
                     {cartCount > 99 ? "99+" : cartCount}

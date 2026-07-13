@@ -80,7 +80,7 @@ function MedusaProductCard({
         {(isLimited || visibleBadgeTags.length > 0) && (
           <div className="absolute top-3 left-3 right-12 flex flex-wrap items-start gap-1.5">
             {isLimited && (
-              <span className="bg-gold/90 text-primary-foreground text-[10px] font-bold px-2 py-1 tracking-wider">
+              <span className="bg-gold/90 text-primary-foreground text-[0.625rem] font-bold px-2 py-1 tracking-wider">
                 LIMITED
               </span>
             )}
@@ -111,7 +111,7 @@ function MedusaProductCard({
       </div>
       <div className="p-4">
         {brandNameEn && (
-          <p className="text-[10px] text-gold tracking-[0.15em] uppercase">{brandNameEn}</p>
+          <p className="text-[0.625rem] text-gold tracking-[0.15em] uppercase">{brandNameEn}</p>
         )}
         <h3 className="mt-1 text-sm font-medium text-foreground leading-snug line-clamp-2 group-hover:text-gold transition-colors">
           {product.title}
@@ -135,7 +135,7 @@ function MedusaProductCard({
             <span className="text-muted-foreground font-bold">{t("price_tbd")}</span>
           )}
           {isOutOfStock && (
-            <span className="text-[10px] text-destructive font-medium">{t("out_of_stock")}</span>
+            <span className="text-[0.625rem] text-destructive font-medium">{t("out_of_stock")}</span>
           )}
         </div>
       </div>
@@ -162,12 +162,12 @@ function MockProductCard({
         />
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           {product.isLimited && (
-            <span className="bg-gold/90 text-primary-foreground text-[10px] font-bold px-2 py-1 tracking-wider">
+            <span className="bg-gold/90 text-primary-foreground text-[0.625rem] font-bold px-2 py-1 tracking-wider">
               LIMITED
             </span>
           )}
           {product.isNew && (
-            <span className="bg-foreground/80 text-background text-[10px] font-bold px-2 py-1 tracking-wider">
+            <span className="bg-foreground/80 text-background text-[0.625rem] font-bold px-2 py-1 tracking-wider">
               NEW
             </span>
           )}
@@ -181,18 +181,18 @@ function MockProductCard({
         </button>
       </div>
       <div className="p-4">
-        <p className="text-[10px] text-gold tracking-[0.15em] uppercase">{product.brandEn}</p>
+        <p className="text-[0.625rem] text-gold tracking-[0.15em] uppercase">{product.brandEn}</p>
         <h3 className="mt-1 text-sm font-medium text-foreground leading-snug line-clamp-2 group-hover:text-gold transition-colors">
           {product.name}
         </h3>
         <p className="mt-0.5 text-xs text-muted-foreground">{product.nameEn}</p>
         <div className="mt-3 flex items-center justify-between">
           <span className="text-gold font-bold">${product.price.toLocaleString()}</span>
-          <span className="text-[10px] text-muted-foreground/60">{product.packSize}</span>
+          <span className="text-[0.625rem] text-muted-foreground/60">{product.packSize}</span>
         </div>
         <div className="mt-2 flex items-center gap-2">
           <span className={`size-1.5 rounded-full ${product.inStock ? "bg-green-500" : "bg-destructive"}`} />
-          <span className="text-[10px] text-muted-foreground">{product.inStock ? "✓" : "✗"}</span>
+          <span className="text-[0.625rem] text-muted-foreground">{product.inStock ? "✓" : "✗"}</span>
         </div>
       </div>
     </Link>

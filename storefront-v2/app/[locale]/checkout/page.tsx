@@ -70,7 +70,7 @@ function StepIndicator({ current, t }: { current: Step; t: (key: string) => stri
             <div className="flex items-center gap-2">
               <span
                 className={cn(
-                  "size-6 flex items-center justify-center rounded-full text-[10px] font-bold transition-colors",
+                  "size-6 flex items-center justify-center rounded-full text-[0.625rem] font-bold transition-colors",
                   isActive
                     ? "bg-gold text-primary-foreground"
                     : isDone
@@ -253,7 +253,7 @@ export default function CheckoutPage() {
                   <Truck className="size-4 text-gold/60 mt-0.5 shrink-0" />
                   <div>
                     <p className="text-xs text-foreground/70">{t("checkout_shipping_note_title")}</p>
-                    <p className="text-[11px] text-muted-foreground mt-1">{t("checkout_shipping_note_desc")}</p>
+                    <p className="text-[0.6875rem] text-muted-foreground mt-1">{t("checkout_shipping_note_desc")}</p>
                   </div>
                 </div>
               </div>
@@ -459,14 +459,14 @@ export default function CheckoutPage() {
                           fill
                           className="object-cover"
                         />
-                        <span className="absolute -top-1.5 -right-1.5 size-5 flex items-center justify-center bg-gold text-[9px] font-bold text-primary-foreground rounded-full">
+                        <span className="absolute -top-1.5 -right-1.5 size-5 flex items-center justify-center bg-gold text-[0.5625rem] font-bold text-primary-foreground rounded-full">
                           {item.quantity}
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-foreground line-clamp-1">{getCartProductName(item)}</p>
                         {item.variant_title && (
-                          <p className="text-[10px] text-muted-foreground mt-0.5">{item.variant_title}</p>
+                          <p className="text-[0.625rem] text-muted-foreground mt-0.5">{item.variant_title}</p>
                         )}
                         <p className="text-xs text-gold mt-1">{fmtPrice(item.total)}</p>
                       </div>

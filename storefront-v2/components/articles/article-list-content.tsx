@@ -121,7 +121,7 @@ export function ArticleListContent({
                       <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent" />
                       {article.category?.name && (
                         <div className="absolute top-3 left-3">
-                          <span className="bg-gold/90 text-primary-foreground text-[10px] font-medium px-2 py-1 tracking-wider">
+                          <span className="bg-gold/90 text-primary-foreground text-[0.625rem] font-medium px-2 py-1 tracking-wider">
                             {article.category.name}
                           </span>
                         </div>
@@ -131,7 +131,7 @@ export function ArticleListContent({
                       "flex flex-col justify-center",
                       isHero ? "py-4" : "mt-4"
                     )}>
-                      <div className="flex items-center gap-3 text-[11px] text-muted-foreground mb-2">
+                      <div className="flex items-center gap-3 text-[0.6875rem] text-muted-foreground mb-2">
                         <span>{formatDate(article.published_at)}</span>
                       </div>
                       <h2 className={cn(

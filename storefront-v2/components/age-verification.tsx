@@ -71,7 +71,7 @@ export function AgeVerification() {
             {t("deny")}
           </Button>
         </div>
-        <p className="text-[11px] text-muted-foreground/50 mt-2 leading-relaxed">
+        <p className="text-[0.6875rem] text-muted-foreground/50 mt-2 leading-relaxed">
           {t("smoking_warning")}
         </p>
 
@@ -83,7 +83,7 @@ export function AgeVerification() {
               key={l.code}
               onClick={() => switchLocale(l.code)}
               className={cn(
-                "px-2 py-0.5 text-[11px] rounded transition-colors",
+                "px-2 py-0.5 text-[0.6875rem] rounded transition-colors",
                 l.code === locale
                   ? "text-gold font-medium"
                   : "text-muted-foreground/50 hover:text-foreground/70"

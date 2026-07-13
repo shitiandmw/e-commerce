@@ -74,7 +74,7 @@ function CartItemRow({ item, currencyCode }: { item: CartLineItem; currencyCode?
 
           <div className="text-right">
             {item.quantity > 1 && (
-              <p className="text-[10px] text-muted-foreground">
+              <p className="text-[0.625rem] text-muted-foreground">
                 {formatPrice(item.unit_price, currencyCode)} x {item.quantity}
               </p>
             )}
@@ -137,7 +137,7 @@ function RecommendedProducts() {
                 <Image src={image} alt={product.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
               </div>
               {brand?.name && (
-                <p className="text-[10px] text-gold tracking-[0.15em] uppercase">{brand.name}</p>
+                <p className="text-[0.625rem] text-gold tracking-[0.15em] uppercase">{brand.name}</p>
               )}
               <p className="text-xs text-foreground mt-0.5 line-clamp-1 group-hover:text-gold transition-colors">{product.title}</p>
               {price && (
@@ -211,7 +211,7 @@ export default function CartPage() {
                   <Truck className="size-3.5 text-gold" />
                   <span>{t("free_shipping_remaining", { amount: formatPrice(shippingRemaining, currencyCode) })}</span>
                 </div>
-                <span className="text-[10px] text-muted-foreground">{Math.round(shippingProgress)}%</span>
+                <span className="text-[0.625rem] text-muted-foreground">{Math.round(shippingProgress)}%</span>
               </div>
               <div className="h-1 bg-border/50 rounded-full overflow-hidden">
                 <div className="h-full bg-gold rounded-full transition-all duration-500" style={{ width: `${shippingProgress}%` }} />
