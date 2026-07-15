@@ -30,6 +30,7 @@ import {
   ChevronDown,
   FolderTree,
   MessageCircle,
+  BellRing,
 } from "lucide-react"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { useChatSocketContext } from "@/providers/chat-socket-provider"
@@ -64,6 +65,7 @@ const navigation: NavEntry[] = [
       { key: "productCategories", href: "/product-categories", icon: FolderTree },
       { key: "collections", href: "/collections", icon: LayoutGrid },
       { key: "inventory", href: "/inventory", icon: Warehouse },
+      { key: "restockDemands", href: "/restock-demands", icon: BellRing },
     ],
   },
   {

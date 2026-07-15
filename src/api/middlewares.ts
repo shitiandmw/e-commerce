@@ -101,6 +101,12 @@ import {
   PostAdminResetAccountUserPassword,
   PostAdminUpdateAccountUser,
 } from "./admin/account-users/validators"
+import {
+  StoreAnonymousRestockRequestBody,
+  StoreAnonymousRestockRequestQuery,
+  StoreCustomerRestockRequestBody,
+  StoreCustomerRestockRequestQuery,
+} from "./store/restock-requests/validators"
 import { initSocketIO, setContainer } from "../lib/socket-io"
 
 export const GetBrandsSchema = createFindParams().merge(z.object({ q: z.string().optional() }))
@@ -133,6 +139,12 @@ export const GetConversationsSchema = createFindParams().merge(z.object({
   q: z.string().optional(),
   status: z.string().optional(),
 }))
+
+export const GetRestockDemandsSchema = z.object({
+  status: z.enum(["pending", "restocked", "all"]).optional(),
+  offset: z.coerce.number().int().min(0).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
+})
 
 export const GetStoreContentSchema = createFindParams().merge(z.object({
   locale: z.string().optional(),
@@ -768,6 +780,54 @@ export default defineMiddlewares({
       matcher: "/store/wishlist",
       middlewares: [
         authenticate("customer", ["session", "bearer"]),
+      ],
+    },
+    // Restock demand routes. Visitors use the public route with a stable
+    // browser ID; signed-in customers use the authenticated sub-route.
+    {
+      matcher: "/store/restock-requests/customer",
+      middlewares: [
+        authenticate("customer", ["session", "bearer"]),
+      ],
+    },
+    {
+      matcher: "/store/restock-requests",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(StoreAnonymousRestockRequestQuery, {
+          defaults: [],
+          isList: false,
+        }),
+      ],
+    },
+    {
+      matcher: "/store/restock-requests",
+      method: "POST",
+      middlewares: [validateAndTransformBody(StoreAnonymousRestockRequestBody)],
+    },
+    {
+      matcher: "/store/restock-requests/customer",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(StoreCustomerRestockRequestQuery, {
+          defaults: [],
+          isList: false,
+        }),
+      ],
+    },
+    {
+      matcher: "/store/restock-requests/customer",
+      method: "POST",
+      middlewares: [validateAndTransformBody(StoreCustomerRestockRequestBody)],
+    },
+    {
+      matcher: "/admin/restock-demands",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(GetRestockDemandsSchema, {
+          defaults: [],
+          isList: true,
+        }),
       ],
     },
     {

@@ -18,6 +18,7 @@ const namespaces = [
   "brands",
   "tags",
   "inventory",
+  "restock-demands",
   "settings",
   "media",
   "analytics",

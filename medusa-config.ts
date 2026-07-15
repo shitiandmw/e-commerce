@@ -38,6 +38,9 @@ module.exports = defineConfig({
       resolve: "./src/modules/wishlist",
     },
     {
+      resolve: "./src/modules/restock-demand",
+    },
+    {
       resolve: "./src/modules/chat",
     },
     {

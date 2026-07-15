@@ -9,6 +9,7 @@
     "productCategories": "Categories",
     "collections": "Collections",
     "inventory": "Inventory",
+    "restockDemands": "Restock demand",
     "sales": "Sales",
     "orders": "Orders",
     "customers": "Customers",

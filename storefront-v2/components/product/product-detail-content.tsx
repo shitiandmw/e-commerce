@@ -18,6 +18,7 @@ import { toast } from "sonner"
 import { useTranslations } from "next-intl"
 import { getCustomTags, ProductTagChip } from "@/components/product/product-tag-chip"
 import { isVariantOutOfStock } from "@/lib/product-availability"
+import { RestockRequestButton } from "@/components/product/restock-request-button"
 
 export function ProductDetailContent({
   product,
@@ -409,6 +410,10 @@ export function ProductDetailContent({
                 {buyingNow ? <Loader2 className="size-4 animate-spin" /> : null}
                 {buyingNow ? t("processing") : t("buy_now")}
               </button>
+
+              {selectedVariant && isOutOfStock && (
+                <RestockRequestButton variantId={selectedVariant.id} />
+              )}
             </div>
 
           </div>

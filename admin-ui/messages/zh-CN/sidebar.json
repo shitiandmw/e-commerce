@@ -9,6 +9,7 @@
     "productCategories": "商品分类",
     "collections": "商品集合",
     "inventory": "库存管理",
+    "restockDemands": "补货需求",
     "sales": "销售",
     "orders": "订单管理",
     "customers": "客户管理",

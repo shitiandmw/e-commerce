@@ -1,0 +1,33 @@
+{
+  "restockDemands": {
+    "title": "补货需求",
+    "description": "查看各 SKU 的用户补货需求与历史轮次。",
+    "filters": { "pending": "待补货", "restocked": "已补货历史" },
+    "columns": {
+      "product": "商品",
+      "sku": "SKU / 规格",
+      "requesters": "想要人数",
+      "lastRequested": "最近催补时间",
+      "status": "状态",
+      "restockedAt": "补货时间",
+      "actions": "操作"
+    },
+    "status": { "pending": "待补货", "restocked": "已补货" },
+    "viewUsers": "用户明细",
+    "notAvailable": "-",
+    "loadFailed": "加载补货需求失败：{error}",
+    "empty": { "pending": "暂无待补货需求", "restocked": "暂无已补货历史" },
+    "users": {
+      "title": "登录用户明细",
+      "summary": "登录用户 {logged} 人，未登录用户 {anonymous} 人",
+      "name": "姓名",
+      "email": "邮箱",
+      "requestedAt": "催补时间",
+      "empty": "本轮暂无登录用户明细"
+    },
+    "pagination": "第 {current} / {total} 页",
+    "previous": "上一页",
+    "next": "下一页"
+  }
+}
+

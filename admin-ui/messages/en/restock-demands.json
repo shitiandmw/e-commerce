@@ -1,0 +1,33 @@
+{
+  "restockDemands": {
+    "title": "Restock demand",
+    "description": "Review customer demand and restock history for each SKU.",
+    "filters": { "pending": "Pending", "restocked": "Restocked history" },
+    "columns": {
+      "product": "Product",
+      "sku": "SKU / Options",
+      "requesters": "Customers wanting it",
+      "lastRequested": "Last requested",
+      "status": "Status",
+      "restockedAt": "Restocked at",
+      "actions": "Actions"
+    },
+    "status": { "pending": "Pending", "restocked": "Restocked" },
+    "viewUsers": "User details",
+    "notAvailable": "-",
+    "loadFailed": "Failed to load restock demand: {error}",
+    "empty": { "pending": "No pending restock demand", "restocked": "No restocked history" },
+    "users": {
+      "title": "Signed-in user details",
+      "summary": "{logged} signed-in, {anonymous} anonymous",
+      "name": "Name",
+      "email": "Email",
+      "requestedAt": "Requested at",
+      "empty": "No signed-in users in this round"
+    },
+    "pagination": "Page {current} of {total}",
+    "previous": "Previous page",
+    "next": "Next page"
+  }
+}
+
