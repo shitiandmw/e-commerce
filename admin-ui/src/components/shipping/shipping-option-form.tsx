@@ -1,16 +1,20 @@
 "use client"
 
-import { useState, useEffect, useMemo, useRef } from "react"
+import { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import { useTranslations, useLocale } from "next-intl"
 import {
   useCreateShippingOption,
-  useUpdateShippingOption,
+  useUpdateShippingOptionConfiguration,
   useShippingProfiles,
   useShippingOptionTypes,
   useFulfillmentProviders,
   useStockLocationsWithZones,
+  useShippingOptionPickupLocation,
+  useSyncShippingOptionPickupLocation,
   type ShippingOption,
 } from "@/hooks/use-shipping"
+import { usePickupLocations } from "@/hooks/use-pickup-locations"
+import { adminFetch } from "@/lib/admin-api"
 import { toSlug } from "@/lib/slug"
 import { useRegions } from "@/hooks/use-settings"
 import { Button } from "@/components/ui/button"
@@ -24,6 +28,11 @@ import {
 } from "@/components/ui/dialog"
 import { Select } from "@/components/ui/select"
 import { getProviderLabel } from "@/components/shipping/fulfillment-providers"
+import {
+  getPickupLocationUnavailabilityReason,
+  type PickupLocationUnavailabilityReason,
+} from "@/lib/shipping-form-state"
+import { usePickupLocationSelectionGuard } from "@/hooks/use-shipping-form-state"
 
 interface ShippingOptionFormProps {
   open: boolean
@@ -40,11 +49,27 @@ export function ShippingOptionForm({
   const locale = useLocale()
   const isZh = locale.startsWith("zh")
   const createOption = useCreateShippingOption()
-  const updateOption = useUpdateShippingOption(editOption?.id || "")
+  const updateConfiguration = useUpdateShippingOptionConfiguration(
+    editOption?.id || ""
+  )
   const { data: profilesData } = useShippingProfiles()
   const { data: optionTypesData, isLoading: isLoadingOptionTypes } = useShippingOptionTypes()
   const { data: regionsData } = useRegions()
-  const { data: locationsData } = useStockLocationsWithZones()
+  const {
+    data: locationsData,
+    isLoading: isLoadingServiceZones,
+    isError: isServiceZonesError,
+  } = useStockLocationsWithZones()
+  const {
+    data: pickupLocationsData,
+    isLoading: isLoadingPickupLocations,
+    isError: isPickupLocationsError,
+    isFetching: isFetchingPickupLocations,
+    refetch: refetchPickupLocations,
+  } = usePickupLocations({ limit: 100 })
+  const { data: pickupBindingData, isLoading: isLoadingPickupBinding } =
+    useShippingOptionPickupLocation(open ? editOption?.id : undefined)
+  const syncPickupLocation = useSyncShippingOptionPickupLocation()
 
   const [name, setName] = useState("")
   const [serviceZoneId, setServiceZoneId] = useState("")
@@ -54,6 +79,10 @@ export function ShippingOptionForm({
   const [amount, setAmount] = useState("")
   const [currencyCode, setCurrencyCode] = useState("usd")
   const [metadataType, setMetadataType] = useState<"pickup" | "delivery" | "">("delivery")
+  const [pickupLocationId, setPickupLocationId] = useState("")
+  const [pickupSelectionWarningReason, setPickupSelectionWarningReason] =
+    useState<PickupLocationUnavailabilityReason | null>(null)
+  const [submitError, setSubmitError] = useState<Error | null>(null)
 
   const didDefaultServiceZone = useRef(false)
   const didDefaultShippingOptionType = useRef(false)
@@ -72,6 +101,7 @@ export function ShippingOptionForm({
           (fulfillmentSet.service_zones || []).map((zone) => ({
             id: zone.id,
             name: zone.name,
+            geoZones: zone.geo_zones || [],
             fulfillmentSetName: fulfillmentSet.name,
             locationName: location.name,
             stockLocationId: location.id,
@@ -94,7 +124,40 @@ export function ShippingOptionForm({
         (provider) => provider.is_enabled !== false
       )
     : []
-  const mutationError = editOption ? updateOption.error : createOption.error
+  const mutationError =
+    submitError ||
+    (editOption ? updateConfiguration.error : createOption.error) ||
+    (!editOption ? syncPickupLocation.error : null)
+  const pickupLocationOptions = useMemo(
+    () =>
+      (pickupLocationsData?.pickup_locations || []).map((location) => ({
+        location,
+        reason: getPickupLocationUnavailabilityReason(
+          location,
+          editOption?.id
+        ),
+      })),
+    [editOption?.id, pickupLocationsData?.pickup_locations]
+  )
+  const selectablePickupLocationCount = pickupLocationOptions.filter(
+    (option) => !option.reason
+  ).length
+  const pickupSelectionValidationReady =
+    !isLoadingPickupLocations &&
+    !isPickupLocationsError
+  const handlePickupLocationInvalidated = useCallback(
+    (reason: PickupLocationUnavailabilityReason) => {
+      setPickupLocationId("")
+      setPickupSelectionWarningReason(reason)
+    },
+    []
+  )
+  const selectedPickupLocationReason = usePickupLocationSelectionGuard({
+    pickupLocationId,
+    options: pickupLocationOptions,
+    validationReady: pickupSelectionValidationReady,
+    onInvalidate: handlePickupLocationInvalidated,
+  })
   const currentServiceZoneId = editOption?.service_zone_id || ""
   const shouldShowMissingCurrentZone =
     !!currentServiceZoneId &&
@@ -117,6 +180,19 @@ export function ShippingOptionForm({
       ? Array.from(new Set(regions.map((r) => r.currency_code)))
       : ["usd", "eur", "gbp"]
   const selectedCurrencyCode = currencyCode || currencyCodes[0] || "usd"
+
+  const getPickupLocationReason = (
+    reason: PickupLocationUnavailabilityReason
+  ) => {
+    switch (reason) {
+      case "disabled":
+        return t("options.form.pickupLocationDisabled")
+      case "already_assigned":
+        return t("options.form.pickupLocationAlreadyAssigned")
+      case "unavailable":
+        return t("options.form.pickupLocationUnavailable")
+    }
+  }
 
   useEffect(() => {
     if (!open) {
@@ -141,6 +217,8 @@ export function ShippingOptionForm({
       setShippingProfileId(editOption.shipping_profile_id || "")
       setProviderId(editOption.provider_id || "")
       setMetadataType((editOption.metadata?.type as "pickup" | "delivery") || "delivery")
+      setPickupLocationId("")
+      setPickupSelectionWarningReason(null)
       const price = editOption.prices?.[0]
       if (price) {
         setAmount(String(price.amount / 100))
@@ -156,10 +234,18 @@ export function ShippingOptionForm({
       setShippingProfileId("")
       setProviderId("")
       setMetadataType("delivery")
+      setPickupLocationId("")
+      setPickupSelectionWarningReason(null)
       setAmount("")
       setCurrencyCode("")
     }
   }, [editOption, open])
+
+  useEffect(() => {
+    if (!open || !editOption || !pickupBindingData) return
+    setPickupLocationId(pickupBindingData.pickup_location_id || "")
+    setPickupSelectionWarningReason(null)
+  }, [editOption, open, pickupBindingData])
 
   useEffect(() => {
     if (
@@ -259,22 +345,35 @@ export function ShippingOptionForm({
     setCurrencyCode(firstCurrencyCode)
   }, [currencyCode, firstCurrencyCode, isEditing, open])
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setSubmitError(null)
+    const isPickup = metadataType === "pickup"
+    if (
+      isPickup &&
+      (!pickupSelectionValidationReady || selectedPickupLocationReason)
+    ) {
+      if (selectedPickupLocationReason) {
+        setPickupSelectionWarningReason(selectedPickupLocationReason)
+      }
+      return
+    }
     if (
       !name.trim() ||
       (!editOption && !serviceZoneId) ||
       (!editOption && hasSelectedServiceZoneWithoutStockLocation) ||
-      (!!selectedStockLocationId && (!providerId || hasNoAvailableProviders))
+      (!!selectedStockLocationId && (!providerId || hasNoAvailableProviders)) ||
+      (metadataType === "pickup" && !pickupLocationId)
     ) {
       return
     }
 
-    const isPickup = metadataType === "pickup"
-
     const payload: Record<string, unknown> = {
       name: name.trim(),
       price_type: "flat",
-      metadata: { type: metadataType || "delivery" },
+      metadata: {
+        ...(editOption?.metadata || {}),
+        type: metadataType || "delivery",
+      },
     }
 
     if (!editOption) {
@@ -308,18 +407,41 @@ export function ShippingOptionForm({
       ]
     }
 
-    if (editOption) {
-      updateOption.mutate(payload, {
-        onSuccess: () => onOpenChange(false),
+    let createdOptionId: string | null = null
+    try {
+      if (editOption) {
+        await updateConfiguration.mutateAsync({
+          shippingOption: payload,
+          pickupLocationId: isPickup ? pickupLocationId : null,
+        })
+        onOpenChange(false)
+        return
+      }
+
+      const result = await createOption.mutateAsync(payload)
+      const optionId = result.shipping_option.id
+      createdOptionId = optionId
+      await syncPickupLocation.mutateAsync({
+        optionId,
+        pickupLocationId: isPickup ? pickupLocationId : null,
       })
-    } else {
-      createOption.mutate(payload, {
-        onSuccess: () => onOpenChange(false),
-      })
+      onOpenChange(false)
+    } catch (error) {
+      if (createdOptionId) {
+        await adminFetch(`/admin/shipping-options/${createdOptionId}/safe`, {
+          method: "DELETE",
+        }).catch(() => undefined)
+      }
+      setSubmitError(
+        error instanceof Error ? error : new Error(t("options.form.saveFailed"))
+      )
     }
   }
 
-  const isPending = createOption.isPending || updateOption.isPending
+  const isPending =
+    createOption.isPending ||
+    updateConfiguration.isPending ||
+    syncPickupLocation.isPending
   const isSubmitDisabled =
     !name.trim() ||
     (!editOption &&
@@ -328,6 +450,11 @@ export function ShippingOptionForm({
         hasSelectedServiceZoneWithoutStockLocation)) ||
     (!!selectedStockLocationId &&
       (!providerId || isFetchingProviders || hasNoAvailableProviders)) ||
+    (metadataType === "pickup" &&
+      (!pickupLocationId ||
+        !pickupSelectionValidationReady ||
+        !!selectedPickupLocationReason ||
+        (!!editOption && isLoadingPickupBinding))) ||
     isPending
 
   return (
@@ -408,12 +535,96 @@ export function ShippingOptionForm({
             <Select
               id="metadata-type"
               value={metadataType}
-              onChange={(e) => setMetadataType(e.target.value as "pickup" | "delivery")}
+              onChange={(e) => {
+                setMetadataType(e.target.value as "pickup" | "delivery")
+                setPickupSelectionWarningReason(null)
+              }}
             >
               <option value="delivery">{t("options.form.typeDelivery")}</option>
               <option value="pickup">{t("options.form.typePickup")}</option>
             </Select>
           </div>
+
+          {metadataType === "pickup" && (
+            <div className="space-y-2">
+              <Label htmlFor="pickup-location">
+                {t("options.form.pickupLocation")}
+              </Label>
+              <Select
+                id="pickup-location"
+                value={pickupLocationId}
+                onChange={(event) => {
+                  setPickupLocationId(event.target.value)
+                  setPickupSelectionWarningReason(null)
+                }}
+                disabled={
+                  isLoadingPickupLocations ||
+                  isPickupLocationsError ||
+                  pickupLocationOptions.length === 0
+                }
+              >
+                <option value="">
+                  {isLoadingPickupLocations
+                    ? t("options.form.loadingPickupLocations")
+                    : t("options.form.selectPickupLocation")}
+                </option>
+                {pickupLocationOptions.map(({ location, reason }) => {
+                  const label = `${location.name} - ${location.address}`
+                  return (
+                    <option
+                      key={location.id}
+                      value={location.id}
+                      disabled={!!reason}
+                    >
+                      {reason
+                        ? `${label} - ${getPickupLocationReason(reason)}`
+                        : label}
+                    </option>
+                  )
+                })}
+              </Select>
+              {isPickupLocationsError && (
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-xs text-destructive">
+                    {t("options.form.pickupLocationsLoadFailed")}
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={isFetchingPickupLocations}
+                    onClick={() => void refetchPickupLocations()}
+                  >
+                    {t("options.form.retryPickupLocations")}
+                  </Button>
+                </div>
+              )}
+              {pickupSelectionWarningReason && (
+                <p className="text-xs text-destructive">
+                  {t("options.form.pickupLocationSelectionInvalidated", {
+                    reason: getPickupLocationReason(
+                      pickupSelectionWarningReason
+                    ),
+                  })}
+                </p>
+              )}
+              {!isLoadingPickupLocations &&
+                !isPickupLocationsError &&
+                pickupLocationOptions.length === 0 && (
+                  <p className="text-xs text-destructive">
+                    {t("options.form.noPickupLocations")}
+                  </p>
+                )}
+              {!isLoadingPickupLocations &&
+                !isPickupLocationsError &&
+                pickupLocationOptions.length > 0 &&
+                selectablePickupLocationCount === 0 && (
+                  <p className="text-xs text-destructive">
+                    {t("options.form.noEligiblePickupLocations")}
+                  </p>
+                )}
+            </div>
+          )}
 
           {metadataType !== "pickup" && (
             <div className="grid grid-cols-2 gap-4">

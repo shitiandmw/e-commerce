@@ -6,6 +6,7 @@ import {
   validateAndTransformBody,
   validateAndTransformQuery,
   authenticate,
+  errorHandler,
 } from "@medusajs/framework/http"
 import { PolicyOperation } from "@medusajs/framework/utils"
 import { AdminGetOrdersParams } from "@medusajs/medusa/api/admin/orders/validators"
@@ -108,6 +109,18 @@ import {
   StoreCustomerRestockRequestQuery,
 } from "./store/restock-requests/validators"
 import { initSocketIO, setContainer } from "../lib/socket-io"
+import { PostAdminProductShippingOptions } from "./admin/products/[id]/shipping-options/validators"
+import { PostAdminShippingOptionPickupLocation } from "./admin/shipping-options/[id]/pickup-location/validators"
+import { PostAdminShippingOptionConfiguration } from "./admin/shipping-options/[id]/configuration/validators"
+import { PostStoreRemoveIncompatibleItems } from "./store/carts/[id]/shipping-availability/validators"
+import {
+  assertShippingOptionCanBeDeleted,
+  createShippingAvailabilityError,
+  getShippingOptionPickupLocation,
+  prepareCartShippingSnapshot,
+  sendShippingAvailabilityError,
+  SHIPPING_AVAILABILITY_ERROR_CODES,
+} from "../lib/shipping-availability"
 
 export const GetBrandsSchema = createFindParams().merge(z.object({ q: z.string().optional() }))
 export const GetTagsSchema = createFindParams()
@@ -179,8 +192,121 @@ const verifyStoreOrderOwnership = async (
   return next()
 }
 
+const preparePaymentCartShipping = async (
+  req: MedusaRequest,
+  _res: MedusaResponse,
+  next: MedusaNextFunction
+) => {
+  const cartId = (req.body as any)?.cart_id
+  if (!cartId) return next()
+  await prepareCartShippingSnapshot(req.scope, cartId)
+  return next()
+}
+
+export const preparePaymentSessionCartShipping = async (
+  req: MedusaRequest,
+  _res: MedusaResponse,
+  next: MedusaNextFunction
+) => {
+  const query = req.scope.resolve("query")
+  const { data } = await query.graph({
+    entity: "cart_payment_collection",
+    fields: ["cart_id"],
+    filters: { payment_collection_id: req.params.id },
+  })
+  const cartId = (data?.[0] as { cart_id?: string } | undefined)?.cart_id
+  if (!cartId) {
+    throw createShippingAvailabilityError(
+      SHIPPING_AVAILABILITY_ERROR_CODES.PAYMENT_COLLECTION_CART_NOT_FOUND,
+      "This payment collection is not linked to a cart.",
+      { payment_collection_id: req.params.id }
+    )
+  }
+
+  await prepareCartShippingSnapshot(req.scope, cartId)
+  return next()
+}
+
+export const prepareCompletedCartShipping = async (
+  req: MedusaRequest,
+  _res: MedusaResponse,
+  next: MedusaNextFunction
+) => {
+  await prepareCartShippingSnapshot(req.scope, req.params.id)
+  return next()
+}
+
+const protectNativeShippingOptionDelete = async (
+  req: MedusaRequest,
+  _res: MedusaResponse,
+  next: MedusaNextFunction
+) => {
+  await assertShippingOptionCanBeDeleted(req.scope, req.params.id)
+  const binding = await getShippingOptionPickupLocation(req.scope, req.params.id)
+  if (binding.pickup_location_id) {
+    throw createShippingAvailabilityError(
+      SHIPPING_AVAILABILITY_ERROR_CODES.SAFE_DELETE_REQUIRED,
+      "Delete pickup shipping options through the safe delete endpoint."
+    )
+  }
+  return next()
+}
+
+const coreErrorHandler = errorHandler()
+
 export default defineMiddlewares({
+  errorHandler: (err, req, res, next) => {
+    if (sendShippingAvailabilityError(res, err)) return
+    return coreErrorHandler(err, req, res, next)
+  },
   routes: [
+    {
+      matcher: "/admin/products/:id/shipping-options",
+      method: "POST",
+      middlewares: [validateAndTransformBody(PostAdminProductShippingOptions)],
+    },
+    {
+      matcher: "/admin/shipping-options/:id/configuration",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminShippingOptionConfiguration),
+      ],
+    },
+    {
+      matcher: "/admin/shipping-options/:id/pickup-location",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminShippingOptionPickupLocation),
+      ],
+    },
+    {
+      matcher: "/admin/shipping-options/:id",
+      method: "DELETE",
+      middlewares: [protectNativeShippingOptionDelete],
+    },
+    {
+      matcher:
+        "/store/carts/:id/shipping-availability/remove-incompatible-items",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostStoreRemoveIncompatibleItems),
+      ],
+    },
+    {
+      matcher: "/store/payment-collections",
+      method: "POST",
+      middlewares: [preparePaymentCartShipping],
+    },
+    {
+      matcher: "/store/payment-collections/:id/payment-sessions",
+      method: "POST",
+      middlewares: [preparePaymentSessionCartShipping],
+    },
+    {
+      matcher: "/store/carts/:id/complete",
+      method: "POST",
+      middlewares: [prepareCompletedCartShipping],
+    },
     // Store content routes
     {
       matcher: "/store/content/articles",

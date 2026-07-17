@@ -7,6 +7,7 @@ const DEFAULT_FIELDS = [
   "+items.thumbnail",
   "+shipping_address",
   "+shipping_methods",
+  "+metadata",
 ].join(",")
 
 export async function GET(req: NextRequest) {

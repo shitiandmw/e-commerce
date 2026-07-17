@@ -2,6 +2,8 @@ import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { PICKUP_LOCATION_MODULE } from "../../../modules/pickup-location"
 import PickupLocationModuleService from "../../../modules/pickup-location/service"
 import { PostAdminCreatePickupLocationType } from "./validators"
+import { SHIPPING_AVAILABILITY_MODULE } from "../../../modules/shipping-availability"
+import type ShippingAvailabilityModuleService from "../../../modules/shipping-availability/service"
 
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const query = req.scope.resolve("query")
@@ -22,12 +24,31 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
       },
     },
   })
+  const availability = req.scope.resolve(
+    SHIPPING_AVAILABILITY_MODULE
+  ) as ShippingAvailabilityModuleService
+  const pickupLocationIds = pickupLocations.map((location: any) => location.id)
+  const bindings = pickupLocationIds.length
+    ? await availability.listShippingOptionPickupLocations({
+        pickup_location_id: pickupLocationIds,
+      } as any)
+    : []
+  const shippingOptionIdByLocation = new Map(
+    bindings.map((binding: any) => [
+      binding.pickup_location_id,
+      binding.shipping_option_id,
+    ])
+  )
+  const locationsWithBindings = pickupLocations.map((location: any) => ({
+    ...location,
+    shipping_option_id: shippingOptionIdByLocation.get(location.id) ?? null,
+  }))
 
   res.json({
-    pickup_locations: pickupLocations,
-    count: metadata?.count || pickupLocations.length,
+    pickup_locations: locationsWithBindings,
+    count: metadata?.count || locationsWithBindings.length,
     offset: metadata?.skip || 0,
-    limit: metadata?.take || pickupLocations.length,
+    limit: metadata?.take || locationsWithBindings.length,
   })
 }
 

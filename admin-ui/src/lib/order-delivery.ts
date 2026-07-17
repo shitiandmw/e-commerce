@@ -13,6 +13,37 @@ export type ShippingOptionDeliveryInfo = {
 
 const PICKUP_ADDRESS_SENTINELS = ["pickup order"]
 const PICKUP_NAME_MARKERS = ["pickup", "pick-up", "self-pick", "自提", "自取"]
+const SHIPPING_DELIVERY_SNAPSHOT_KEY = "shipping_delivery_snapshot"
+
+export type OrderDeliverySnapshot = {
+  version: 1
+  captured_at: string
+  shipping_option: {
+    id: string
+    name: string
+    type: OrderDeliveryType
+  }
+  pickup_location: {
+    id: string
+    name: string
+    address: string
+    phone: string | null
+    hours: string | null
+    note: string | null
+  } | null
+}
+
+export function getOrderDeliverySnapshot(
+  order: AdminOrder
+): OrderDeliverySnapshot | null {
+  const value =
+    order.metadata?.[SHIPPING_DELIVERY_SNAPSHOT_KEY] ??
+    order.shipping_methods?.[0]?.metadata?.[SHIPPING_DELIVERY_SNAPSHOT_KEY]
+  if (!value || typeof value !== "object") return null
+
+  const snapshot = value as Partial<OrderDeliverySnapshot>
+  return snapshot.shipping_option?.id ? (snapshot as OrderDeliverySnapshot) : null
+}
 
 function normalize(value: unknown) {
   return typeof value === "string" ? value.trim().toLowerCase() : ""
@@ -40,6 +71,8 @@ export function getRawShippingMethodName(
   order: AdminOrder,
   shippingOptions?: ShippingOptionDeliveryInfo[]
 ) {
+  const snapshot = getOrderDeliverySnapshot(order)
+  if (snapshot) return snapshot.shipping_option.name
   const method = getPrimaryShippingMethod(order)
   const option = getShippingOptionById(shippingOptions, method?.shipping_option_id)
   const pickupName =
@@ -61,6 +94,9 @@ export function getOrderDeliveryType(
   order: AdminOrder,
   shippingOptions?: ShippingOptionDeliveryInfo[]
 ): OrderDeliveryType {
+  const snapshot = getOrderDeliverySnapshot(order)
+  if (snapshot) return snapshot.shipping_option.type
+
   for (const method of order.shipping_methods ?? []) {
     const metadataType = normalizeDeliveryType(method.metadata?.type)
     if (metadataType) return metadataType

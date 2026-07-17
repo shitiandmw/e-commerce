@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button"
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table"
-import { PickupLocationsCard } from "@/components/checkout/pickup-locations-card"
 import { useTranslations } from "next-intl"
+import { getOrderDeliverySnapshot } from "@/lib/order-delivery-snapshot"
 
 interface TrackingEvent {
   status: string
@@ -74,6 +74,7 @@ interface Order {
   shipping_methods?: ShippingMethod[]
   payment_status?: string
   fulfillment_status?: string
+  metadata?: Record<string, unknown> | null
 }
 
 const PAGE_SIZE = 10
@@ -112,6 +113,8 @@ export default function OrdersPage() {
   }
   const getPrimaryShippingMethod = (order: Order) => order.shipping_methods?.[0] ?? null
   const getRawShippingMethodName = (order: Order) => {
+    const snapshot = getOrderDeliverySnapshot(order)
+    if (snapshot) return snapshot.shipping_option.name
     const method = getPrimaryShippingMethod(order)
     const pickupName = order.shipping_address?.address_1 === "Pickup Order"
       ? order.shipping_address?.address_2
@@ -120,6 +123,8 @@ export default function OrdersPage() {
   }
   const getShippingMethodName = (order: Order) => getRawShippingMethodName(order) || t("no_shipping_method")
   const isPickupOrder = (order: Order) => {
+    const snapshot = getOrderDeliverySnapshot(order)
+    if (snapshot) return snapshot.shipping_option.type === "pickup"
     const method = getPrimaryShippingMethod(order)
     const metadataType = method?.metadata?.type ?? method?.shipping_option?.metadata?.type
     const methodName = getRawShippingMethodName(order).toLowerCase()
@@ -225,6 +230,7 @@ export default function OrdersPage() {
     const detailAddressLines = formatAddressLines(detail.shipping_address)
     const detailShippingMethodName = getShippingMethodName(detail)
     const detailHasSpecificShippingMethod = hasSpecificShippingMethod(detail)
+    const deliverySnapshot = getOrderDeliverySnapshot(detail)
 
     return (
       <div className="space-y-6">
@@ -278,11 +284,21 @@ export default function OrdersPage() {
                 <div className="space-y-3">
                   <div className="rounded-md border border-gold/20 bg-gold/5 p-3 text-sm text-foreground">
                     <p>{t("pickup_order_notice")}</p>
-                    {detailHasSpecificShippingMethod && detail.shipping_address?.address_2 && (
-                      <p className="mt-1 text-muted-foreground">{detail.shipping_address.address_2}</p>
+                    {deliverySnapshot?.pickup_location && (
+                      <div className="mt-2 space-y-1 text-muted-foreground">
+                        <p className="font-medium text-foreground">
+                          {deliverySnapshot.pickup_location.name}
+                        </p>
+                        <p>{deliverySnapshot.pickup_location.address}</p>
+                        {deliverySnapshot.pickup_location.hours && (
+                          <p>{deliverySnapshot.pickup_location.hours}</p>
+                        )}
+                        {deliverySnapshot.pickup_location.phone && (
+                          <p>{deliverySnapshot.pickup_location.phone}</p>
+                        )}
+                      </div>
                     )}
                   </div>
-                  <PickupLocationsCard descriptionKey="order_pickup_locations_desc" />
                 </div>
               ) : detail.shipping_address ? (
                 <div>

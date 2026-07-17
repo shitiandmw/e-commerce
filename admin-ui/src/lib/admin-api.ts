@@ -188,6 +188,7 @@ export interface AdminOrder {
     id: string
     name?: string
   } | null
+  metadata?: Record<string, unknown> | null
   summary?: Record<string, unknown>
 }
 

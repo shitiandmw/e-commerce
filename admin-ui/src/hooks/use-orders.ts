@@ -26,10 +26,10 @@ export interface OrderListParams {
 }
 
 const ORDER_LIST_FIELDS =
-  "+items,*customer,+email,+shipping_address,*shipping_methods,+fulfillments,+payment_collections"
+  "+items,*customer,+email,+shipping_address,*shipping_methods,+metadata,+fulfillments,+payment_collections"
 
 const ORDER_DETAIL_FIELDS =
-  "+email,+customer_id,+items,+items.variant,*customer,+shipping_address,+billing_address,*shipping_methods,+fulfillments,+fulfillments.items,+fulfillments.labels,+payment_collections,+payment_collections.payments,+region,+sales_channel"
+  "+email,+customer_id,+items,+items.variant,*customer,+shipping_address,+billing_address,*shipping_methods,+metadata,+fulfillments,+fulfillments.items,+fulfillments.labels,+payment_collections,+payment_collections.payments,+region,+sales_channel"
 
 export function useOrders(params: OrderListParams = {}) {
   return useQuery({

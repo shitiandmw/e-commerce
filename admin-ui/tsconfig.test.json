@@ -6,6 +6,7 @@
     "isolatedModules": false,
     "module": "commonjs",
     "moduleResolution": "node",
+    "jsx": "react-jsx",
     "noEmit": false,
     "outDir": ".next/test-navigation",
     "rootDir": "src",
@@ -13,7 +14,11 @@
   },
   "include": [
     "src/lib/product-navigation.ts",
-    "src/lib/product-navigation.test.ts"
+    "src/lib/product-navigation.test.ts",
+    "src/lib/shipping-form-state.ts",
+    "src/lib/shipping-form-state.test.ts",
+    "src/hooks/use-shipping-form-state.ts",
+    "src/hooks/use-shipping-form-state.test.tsx"
   ],
   "exclude": ["node_modules"]
 }

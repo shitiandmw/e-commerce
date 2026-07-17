@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback, useEffect } from "react"
-import { useLocale } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import {
   type CartAddress,
   type RegionCountry,
@@ -9,16 +9,28 @@ import {
   type PaymentMethod,
   getRegions,
   updateCartAddress,
-  getShippingOptions,
+  updateCartPickupContact,
+  getShippingAvailability,
   transferCartToCustomer,
   setShippingMethod as setShippingMethodApi,
   initPaymentSessions,
   completeCart,
   removeCartId,
   getPaymentMethods,
+  CartApiError,
+  removeCheckoutIncompatibleItems,
 } from "@/lib/cart"
 import { useCart } from "@/lib/cart-store"
 import { getToken, isAuthFailureStatus } from "@/lib/auth"
+import {
+  buildPickupCartContact,
+  getCheckoutCartErrorTranslationKey,
+  validatePickupContact,
+} from "@/lib/checkout-contact"
+import {
+  CHECKOUT_REMOVAL_ERROR_CODES,
+  getCheckoutRemovalError,
+} from "@/lib/checkout-incompatible-removal"
 
 export type Step = "shipping" | "info" | "payment-method" | "payment"
 
@@ -62,6 +74,10 @@ interface UseCheckoutReturn {
   selectedPaymentMethod: string | null
   selectPaymentMethod: (providerId: string) => Promise<void>
   setSelectedPaymentMethod: (id: string | null) => void
+  selectedOption: ShippingOption | null
+  incompatibleRemovalBlocked: boolean
+  removeIncompatibleItem: (lineItemId: string) => Promise<void>
+  removeAllIncompatibleItems: () => Promise<void>
 }
 
 export interface SavedAddress {
@@ -105,11 +121,7 @@ const initialForm: CheckoutForm = {
 const WOOSHPAY_PROVIDER_ID = "pp_wooshpay_wooshpay"
 
 function isPickupOption(option: ShippingOption): boolean {
-  if (option.metadata?.type) {
-    return option.metadata.type.toLowerCase() === "pickup"
-  }
-  const name = option.name?.toLowerCase() ?? ""
-  return name.includes("自提") || name.includes("pickup") || name.includes("pick-up") || name.includes("self-pick")
+  return option.is_pickup
 }
 
 function getCountryLabel(country: RegionCountry, code: string, locale: string): string {
@@ -152,6 +164,7 @@ function isAuthError(error: unknown): boolean {
 export function useCheckout(): UseCheckoutReturn {
   const { cart, initCart } = useCart()
   const locale = useLocale()
+  const t = useTranslations()
   const [step, setStep] = useState<Step>("shipping")
   const [form, setForm] = useState<CheckoutForm>(initialForm)
   const [countryOptions, setCountryOptions] = useState<CountryOption[]>(() => (
@@ -218,7 +231,8 @@ export function useCheckout(): UseCheckoutReturn {
         if (cancelled) return
         await initCart()
         if (cancelled) return
-        const options = await getShippingOptions()
+        const availability = await getShippingAvailability()
+        const options = availability.shipping_options
         if (cancelled) return
         setShippingOptions(options)
         setSelectedShippingId((prev) => (
@@ -270,6 +284,79 @@ export function useCheckout(): UseCheckoutReturn {
 
   const selectedOption = shippingOptions.find((option) => option.id === selectedShippingId) ?? null
   const isPickup = selectedOption ? isPickupOption(selectedOption) : false
+  const incompatibleRemovalBlocked = getCheckoutRemovalError(
+    (cart?.items ?? []).map((item) => item.id),
+    selectedOption?.incompatible_items.map((item) => item.line_item_id) ?? [],
+    selectedOption?.incompatible_items.map((item) => item.line_item_id) ?? []
+  ) === CHECKOUT_REMOVAL_ERROR_CODES.KEEP_ONE
+
+  const refreshShippingAvailability = useCallback(async () => {
+    const availability = await getShippingAvailability()
+    setShippingOptions(availability.shipping_options)
+    setSelectedShippingId((current) =>
+      current && availability.shipping_options.some((option) => option.id === current)
+        ? current
+        : null
+    )
+  }, [])
+
+  const removeSelectedIncompatibleItems = useCallback(async (
+    lineItemIds: string[]
+  ) => {
+    setLoading(true)
+    setError(null)
+    try {
+      if (!selectedOption) {
+        throw new Error(t("checkout_incompatible_items_changed"))
+      }
+      const validationError = getCheckoutRemovalError(
+        (cart?.items ?? []).map((item) => item.id),
+        selectedOption.incompatible_items.map((item) => item.line_item_id),
+        lineItemIds
+      )
+      if (validationError === CHECKOUT_REMOVAL_ERROR_CODES.KEEP_ONE) {
+        throw new Error(t("checkout_keep_one_item"))
+      }
+      if (validationError === CHECKOUT_REMOVAL_ERROR_CODES.ITEMS_CHANGED) {
+        throw new Error(t("checkout_incompatible_items_changed"))
+      }
+
+      await removeCheckoutIncompatibleItems(selectedOption.id, lineItemIds)
+      await initCart()
+      await refreshShippingAvailability()
+      setPaymentMethods([])
+      setSelectedPaymentMethod(null)
+      setClientSecret(null)
+    } catch (error) {
+      if (
+        error instanceof CartApiError &&
+        error.code === CHECKOUT_REMOVAL_ERROR_CODES.KEEP_ONE
+      ) {
+        setError(t("checkout_keep_one_item"))
+      } else if (
+        error instanceof CartApiError &&
+        error.code === CHECKOUT_REMOVAL_ERROR_CODES.ITEMS_CHANGED
+      ) {
+        setError(t("checkout_incompatible_items_changed"))
+      } else {
+        setError(error instanceof Error ? error.message : "Failed to remove items")
+      }
+    } finally {
+      setLoading(false)
+    }
+  }, [cart?.items, initCart, refreshShippingAvailability, selectedOption, t])
+
+  const removeIncompatibleItem = useCallback(async (lineItemId: string) => {
+    await removeSelectedIncompatibleItems([lineItemId])
+  }, [removeSelectedIncompatibleItems])
+
+  const removeAllIncompatibleItems = useCallback(async () => {
+    const lineItemIds = selectedOption?.incompatible_items.map(
+      (item) => item.line_item_id
+    ) ?? []
+    if (!lineItemIds.length) return
+    await removeSelectedIncompatibleItems(lineItemIds)
+  }, [removeSelectedIncompatibleItems, selectedOption])
 
   const submitInfo = useCallback(async () => {
     setLoading(true)
@@ -278,19 +365,36 @@ export function useCheckout(): UseCheckoutReturn {
       if (!selectedShippingId || !selectedOption) {
         throw new Error("Please select a shipping method")
       }
+      if (!selectedOption.is_compatible) {
+        throw new Error("Remove incompatible items before continuing")
+      }
 
-      const address: CartAddress = isPickupOption(selectedOption)
-        ? {
-            first_name: form.firstName.trim() || "Pickup",
-            last_name: form.lastName.trim() || "Customer",
-            phone: form.phone,
-            address_1: "Pickup Order",
-            address_2: selectedOption.name,
-            city: "Pickup",
-            postal_code: "000000",
-            country_code: form.countryCode || PREFERRED_COUNTRY_CODE,
-          }
-        : {
+      if (isPickupOption(selectedOption)) {
+        const contactError = validatePickupContact(form)
+        if (contactError === "first_name_required") {
+          throw new Error(t("validation_first_name_required"))
+        }
+        if (contactError === "last_name_required") {
+          throw new Error(t("validation_last_name_required"))
+        }
+        if (contactError === "phone_required") {
+          throw new Error(t("validation_phone_required"))
+        }
+        if (contactError === "email_required") {
+          throw new Error(t("validation_email_required"))
+        }
+        if (contactError === "email_invalid") {
+          throw new Error(t("validation_email_invalid"))
+        }
+      }
+
+      if (isPickupOption(selectedOption)) {
+        await updateCartPickupContact(
+          buildPickupCartContact(form),
+          form.email.trim()
+        )
+      } else {
+        const address: CartAddress = {
             first_name: form.firstName,
             last_name: form.lastName,
             phone: form.phone,
@@ -299,9 +403,9 @@ export function useCheckout(): UseCheckoutReturn {
             city: form.city,
             postal_code: form.postalCode,
             country_code: form.countryCode,
-          }
-
-      await updateCartAddress(address, form.email)
+        }
+        await updateCartAddress(address, form.email)
+      }
       await setShippingMethodApi(selectedShippingId)
       await initCart()
 
@@ -310,11 +414,18 @@ export function useCheckout(): UseCheckoutReturn {
       setPaymentMethods(methods)
       setStep("payment-method")
     } catch (e: any) {
-      setError(e.message || "Failed to continue")
+      const translationKey = e instanceof CartApiError
+        ? getCheckoutCartErrorTranslationKey(e.code)
+        : null
+      setError(
+        translationKey
+          ? t(translationKey)
+          : e.message || "Failed to continue"
+      )
     } finally {
       setLoading(false)
     }
-  }, [form, initCart, selectedOption, selectedShippingId])
+  }, [form, initCart, selectedOption, selectedShippingId, t])
 
   const selectPaymentMethod = useCallback(async (providerId: string) => {
     setLoading(true)
@@ -355,9 +466,14 @@ export function useCheckout(): UseCheckoutReturn {
 
   const submitShipping = useCallback((optionId: string) => {
     setError(null)
-    setSelectedShippingId(optionId)
+    const option = shippingOptions.find((candidate) => candidate.id === optionId)
+    if (!option?.is_compatible) {
+      setError("Remove incompatible items before continuing")
+      return
+    }
+    setSelectedShippingId(option.id)
     setStep("info")
-  }, [])
+  }, [shippingOptions])
 
   const submitOrder = useCallback(async (): Promise<string> => {
     setLoading(true)
@@ -393,6 +509,8 @@ export function useCheckout(): UseCheckoutReturn {
     step, form, setForm, updateField,
     countryOptions,
     shippingOptions, selectedShippingId, selectShippingOption, isPickupOption, isPickup, clientSecret,
+    selectedOption, incompatibleRemovalBlocked,
+    removeIncompatibleItem, removeAllIncompatibleItems,
     loading, error,
     submitInfo, submitShipping, submitOrder, goBack, fillFromSavedAddress,
     paymentMethods, selectedPaymentMethod, selectPaymentMethod, setSelectedPaymentMethod,

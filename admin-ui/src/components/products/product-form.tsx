@@ -9,6 +9,7 @@ import { z } from "zod"
 import {
   Product,
   useCreateProduct,
+  useDeleteProduct,
   useUpdateProduct,
   useUpdateVariant,
   useCreateVariant,
@@ -60,6 +61,16 @@ import {
 } from "@/components/products/product-attributes-editor"
 import { toSlug } from "@/lib/slug"
 import { withDefaultShippingProfile } from "@/lib/shipping-profiles"
+import {
+  useProductShippingOptions,
+  useShippingOptions,
+  useSyncProductShippingOptions,
+} from "@/hooks/use-shipping"
+import {
+  productShippingOptionIdsSchema,
+  toggleShippingOptionId,
+} from "@/lib/shipping-form-state"
+import { useProductShippingOptionsInitialization } from "@/hooks/use-shipping-form-state"
 
 /** brand field may be a single object or an array (due to isList link) */
 function resolveBrand(brand: Product["brand"]): { id: string; name: string } | null {
@@ -100,6 +111,7 @@ const productSchema = z.object({
   category_ids: z.array(z.string()),
   brand_id: z.string().optional(),
   tag_ids: z.array(z.string()),
+  shipping_option_ids: productShippingOptionIdsSchema,
 })
 
 type ProductFormData = z.infer<typeof productSchema>
@@ -287,6 +299,7 @@ export function ProductForm({
   const t = useTranslations("products")
   const router = useRouter()
   const createProduct = useCreateProduct()
+  const deleteProduct = useDeleteProduct()
   const updateProduct = useUpdateProduct(product?.id || "")
   const updateVariant = useUpdateVariant(product?.id || "")
   const createVariant = useCreateVariant(product?.id || "")
@@ -302,10 +315,26 @@ export function ProductForm({
   const linkProductCategory = useLinkProductCategory()
   const unlinkProductCategory = useUnlinkProductCategory()
   const { data: stockLocationsData } = useStockLocations()
+  const {
+    data: shippingOptionsData,
+    isLoading: isLoadingShippingOptions,
+    isFetching: isFetchingShippingOptions,
+    isError: isShippingOptionsError,
+    refetch: refetchShippingOptions,
+  } = useShippingOptions({ limit: 100 })
+  const {
+    data: productShippingOptionsData,
+    isLoading: isLoadingProductShippingOptions,
+    isFetching: isFetchingProductShippingOptions,
+    isError: isProductShippingOptionsError,
+    refetch: refetchProductShippingOptions,
+  } = useProductShippingOptions(product?.id)
+  const syncProductShippingOptions = useSyncProductShippingOptions()
 
   const categories = categoriesData?.product_categories ?? []
   const brands = brandsData?.brands ?? []
   const allTags = tagsData?.tags ?? []
+  const shippingOptions = shippingOptionsData?.shipping_options ?? []
 
   const defaultValues: ProductFormData = product
     ? {
@@ -340,6 +369,7 @@ export function ProductForm({
         category_ids: product.categories?.map((c) => c.id) || [],
         brand_id: resolveBrand(product.brand)?.id || "",
         tag_ids: product.custom_tags?.map((t) => t.id) || [],
+        shipping_option_ids: [],
       }
     : {
         title: "",
@@ -368,13 +398,14 @@ export function ProductForm({
         category_ids: [],
         brand_id: "",
         tag_ids: [],
+        shipping_option_ids: [],
       }
 
   const {
     register,
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, dirtyFields },
     watch,
     setValue,
     getValues,
@@ -406,6 +437,63 @@ export function ProductForm({
   const lastAutoSkusByFieldId = React.useRef<Map<string, string>>(new Map())
   const watchedTitle = watch("title")
   const watchedVariants = watch("variants")
+
+  const initializeProductShippingOptions = React.useCallback(
+    (ids: string[]) => {
+      setValue("shipping_option_ids", ids, {
+        shouldDirty: false,
+        shouldValidate: true,
+      })
+    },
+    [setValue]
+  )
+  const productShippingOptionsInitialized =
+    useProductShippingOptionsInitialization({
+      productId: product?.id,
+      associationIds: productShippingOptionsData?.shipping_option_ids,
+      isFieldDirty: Boolean(dirtyFields.shipping_option_ids),
+      onInitialize: initializeProductShippingOptions,
+    })
+  const hasShippingOptionsResponse = shippingOptionsData !== undefined
+  const hasProductShippingOptionsResponse =
+    productShippingOptionsData !== undefined
+  const shippingOptionsRequestFailed =
+    isShippingOptionsError &&
+    !isFetchingShippingOptions &&
+    !hasShippingOptionsResponse
+  const productShippingOptionsRequestFailed =
+    mode === "edit" &&
+    isProductShippingOptionsError &&
+    !isFetchingProductShippingOptions &&
+    !hasProductShippingOptionsResponse &&
+    !productShippingOptionsInitialized
+  const shippingOptionFieldError =
+    shippingOptionsRequestFailed || productShippingOptionsRequestFailed
+  const shippingOptionFieldLoading =
+    (!hasShippingOptionsResponse &&
+      (isLoadingShippingOptions ||
+        isFetchingShippingOptions ||
+        !isShippingOptionsError)) ||
+    (mode === "edit" &&
+      !productShippingOptionsInitialized &&
+      (isLoadingProductShippingOptions ||
+        isFetchingProductShippingOptions ||
+        !isProductShippingOptionsError))
+  const shippingOptionFieldBlocked =
+    shippingOptionFieldLoading || shippingOptionFieldError
+  const retryShippingOptionField = React.useCallback(() => {
+    if (shippingOptionsRequestFailed) {
+      void refetchShippingOptions()
+    }
+    if (productShippingOptionsRequestFailed) {
+      void refetchProductShippingOptions()
+    }
+  }, [
+    productShippingOptionsRequestFailed,
+    refetchProductShippingOptions,
+    refetchShippingOptions,
+    shippingOptionsRequestFailed,
+  ])
 
   // Media Picker state
   const [thumbnailPickerOpen, setThumbnailPickerOpen] = React.useState(false)
@@ -573,6 +661,9 @@ export function ProductForm({
   const onSubmit = async (data: ProductFormData) => {
     try {
       setSubmitError(null)
+      if (shippingOptionFieldBlocked) {
+        throw new Error(t("form.shippingOptionsUnavailable"))
+      }
       // Build the API payload
       // Auto-generate a URL-safe handle if the user left it blank or it
       // contains non-URL-safe characters (e.g. Chinese, special symbols).
@@ -635,6 +726,18 @@ export function ProductForm({
           await withDefaultShippingProfile(payload)
         )
         const newProductId = result?.product?.id
+        if (!newProductId) {
+          throw new Error("Created product ID was not returned by the API")
+        }
+        try {
+          await syncProductShippingOptions.mutateAsync({
+            productId: newProductId,
+            shippingOptionIds: data.shipping_option_ids,
+          })
+        } catch (error) {
+          await deleteProduct.mutateAsync(newProductId).catch(() => undefined)
+          throw error
+        }
         const createdVariants = newProductId
           ? (await fetchProductInventorySnapshot(newProductId)).product
               .variants || []
@@ -692,6 +795,12 @@ export function ProductForm({
           : await withDefaultShippingProfile(payload)
 
         await updateProduct.mutateAsync(payloadWithShippingProfile)
+        if (product?.id) {
+          await syncProductShippingOptions.mutateAsync({
+            productId: product.id,
+            shippingOptionIds: data.shipping_option_ids,
+          })
+        }
 
         if (product?.id && submitData.variants) {
           const baseOptionDefinitions = buildFormOptionDefinitions(data)
@@ -929,7 +1038,10 @@ export function ProductForm({
               </p>
             </div>
           </div>
-          <Button type="submit" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            disabled={isSubmitting || shippingOptionFieldBlocked}
+          >
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -1395,6 +1507,101 @@ export function ProductForm({
                 </Select>
               )}
             />
+          </div>
+
+          {/* Shipping options */}
+          <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
+            <div>
+              <h2 className="text-lg font-semibold">
+                {t("form.shippingOptions")}
+              </h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {t("form.shippingOptionsHint")}
+              </p>
+            </div>
+            {shippingOptionFieldLoading && (
+              <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                {t("form.loadingShippingOptions")}
+              </p>
+            )}
+            {shippingOptionFieldError && (
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm text-destructive">
+                  {t("form.shippingOptionsLoadFailed")}
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={
+                    isFetchingShippingOptions ||
+                    isFetchingProductShippingOptions
+                  }
+                  onClick={retryShippingOptionField}
+                >
+                  {t("form.retryShippingOptions")}
+                </Button>
+              </div>
+            )}
+            {!shippingOptionFieldLoading &&
+            !shippingOptionFieldError &&
+            shippingOptions.length === 0 ? (
+              <p className="text-sm text-destructive">
+                {t("form.noShippingOptions")}
+              </p>
+            ) : shippingOptions.length > 0 ? (
+              <Controller
+                name="shipping_option_ids"
+                control={control}
+                render={({ field }) => (
+                  <div className="space-y-2">
+                    {shippingOptions.map((option) => (
+                      <label
+                        key={option.id}
+                        className="flex items-start gap-3 rounded-md border p-3 text-sm"
+                      >
+                        <input
+                          type="checkbox"
+                          className="mt-0.5 h-4 w-4"
+                          checked={(field.value || []).includes(option.id)}
+                          disabled={shippingOptionFieldBlocked}
+                          onBlur={field.onBlur}
+                          onChange={(event) => {
+                            setValue(
+                              "shipping_option_ids",
+                              toggleShippingOptionId(
+                                field.value || [],
+                                option.id,
+                                event.target.checked
+                              ),
+                              {
+                                shouldDirty: true,
+                                shouldTouch: true,
+                                shouldValidate: true,
+                              }
+                            )
+                          }}
+                        />
+                        <span>
+                          <span className="block font-medium">{option.name}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {option.metadata?.type === "pickup"
+                              ? t("form.pickupOption")
+                              : t("form.deliveryOption")}
+                          </span>
+                        </span>
+                      </label>
+                    ))}
+                    {errors.shipping_option_ids && (
+                      <p className="text-xs text-destructive">
+                        {t("form.shippingOptionsRequired")}
+                      </p>
+                    )}
+                  </div>
+                )}
+              />
+            ) : null}
           </div>
 
           {/* Brand */}

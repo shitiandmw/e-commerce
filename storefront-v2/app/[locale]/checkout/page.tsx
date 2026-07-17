@@ -11,6 +11,8 @@ import {
   MapPin,
   CheckCircle2,
   Loader2,
+  AlertTriangle,
+  Trash2,
 } from "lucide-react"
 import { useCart, getCartProductName, getCartProductImage } from "@/lib/cart-store"
 import { formatPrice } from "@/lib/format"
@@ -22,7 +24,6 @@ import { StripePayment } from "@/components/checkout/stripe-payment"
 import { PaymentMethodSelector } from "@/components/checkout/payment-method-selector"
 import { DirectOrderPayment } from "@/components/checkout/direct-order-payment"
 import { WooShPayPayment } from "@/components/checkout/wooshpay-payment"
-import { PickupLocationsCard } from "@/components/checkout/pickup-locations-card"
 
 /* step definitions */
 const steps: { key: Step; labelKey: string; num: number }[] = [
@@ -127,6 +128,9 @@ export default function CheckoutPage() {
   const total = baseTotal + (shippingCost ?? 0)
   const itemCount = items.reduce((s, i) => s + i.quantity, 0)
   const currencyCode = cart?.currency_code || "usd"
+  const selectedOptionReady = Boolean(
+    selectedShippingOption?.is_compatible && items.length > 0
+  )
 
   const fmtPrice = (amount: number) => formatPrice(amount, currencyCode)
 
@@ -242,7 +246,104 @@ export default function CheckoutPage() {
                               {opt.amount === 0 ? t("checkout_free_label") : fmtPrice(opt.amount)}
                             </span>
                           </button>
-                          {isSelected && isPickup && <PickupLocationsCard />}
+                          {isSelected && isPickup && opt.pickup_location && (
+                            <div className="border border-gold/20 bg-gold/5 p-4 text-sm">
+                              <div className="flex items-start gap-3">
+                                <MapPin className="mt-0.5 size-4 shrink-0 text-gold" />
+                                <div className="space-y-1">
+                                  <p className="font-medium text-foreground">
+                                    {opt.pickup_location.name}
+                                  </p>
+                                  <p className="text-muted-foreground">
+                                    {opt.pickup_location.address}
+                                  </p>
+                                  {opt.pickup_location.hours && (
+                                    <p className="text-xs text-muted-foreground">
+                                      {opt.pickup_location.hours}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          {isSelected && !opt.pickup_location_valid && (
+                            <div className="flex items-start gap-3 border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+                              <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+                              <p>{t("checkout_pickup_location_invalid")}</p>
+                            </div>
+                          )}
+                          {isSelected && opt.incompatible_items.length > 0 && (
+                            <div className="space-y-3 border border-destructive/30 bg-destructive/5 p-4">
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex items-start gap-2">
+                                  <AlertTriangle className="mt-0.5 size-4 shrink-0 text-destructive" />
+                                  <div>
+                                    <p className="text-sm font-medium text-foreground">
+                                      {t("checkout_incompatible_items_title")}
+                                    </p>
+                                    <p className="mt-1 text-xs text-muted-foreground">
+                                      {t("checkout_incompatible_items_desc")}
+                                    </p>
+                                    {checkout.incompatibleRemovalBlocked && (
+                                      <p className="mt-2 text-xs font-medium text-destructive">
+                                        {t("checkout_keep_one_item")}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                                <button
+                                  type="button"
+                                  disabled={loading || checkout.incompatibleRemovalBlocked}
+                                  onClick={() => {
+                                    if (window.confirm(t("checkout_remove_all_confirm"))) {
+                                      void checkout.removeAllIncompatibleItems()
+                                    }
+                                  }}
+                                  className="shrink-0 text-xs font-medium text-destructive hover:underline disabled:opacity-50"
+                                >
+                                  {t("checkout_remove_all")}
+                                </button>
+                              </div>
+                              <div className="divide-y divide-border/40 border-y border-border/40">
+                                {opt.incompatible_items.map((item) => (
+                                  <div
+                                    key={item.line_item_id}
+                                    className="flex items-center justify-between gap-3 py-3"
+                                  >
+                                    <div className="min-w-0">
+                                      <p className="truncate text-sm text-foreground">
+                                        {item.title}
+                                      </p>
+                                      <p className="text-xs text-muted-foreground">
+                                        {t("checkout_item_quantity", { quantity: item.quantity })}
+                                      </p>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      disabled={loading || items.length <= 1}
+                                      aria-label={t("checkout_remove_item")}
+                                      onClick={() => {
+                                        if (
+                                          window.confirm(
+                                            t("checkout_remove_item_confirm", {
+                                              title: item.title,
+                                            })
+                                          )
+                                        ) {
+                                          void checkout.removeIncompatibleItem(
+                                            item.line_item_id
+                                          )
+                                        }
+                                      }}
+                                      className="inline-flex size-8 shrink-0 items-center justify-center text-destructive hover:bg-destructive/10 disabled:opacity-50"
+                                    >
+                                      <Trash2 className="size-4" />
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )
                     })}
@@ -279,7 +380,19 @@ export default function CheckoutPage() {
                 {checkout.isPickup ? (
                   <div className="rounded-md border border-gold/20 bg-gold/5 p-4 flex items-start gap-3">
                     <MapPin className="size-4 text-gold mt-0.5 shrink-0" />
-                    <p className="text-sm text-foreground/80">{t("checkout_pickup_notice")}</p>
+                    <div className="text-sm text-foreground/80">
+                      <p>{t("checkout_pickup_notice")}</p>
+                      {checkout.selectedOption?.pickup_location && (
+                        <div className="mt-2">
+                          <p className="font-medium text-foreground">
+                            {checkout.selectedOption.pickup_location.name}
+                          </p>
+                          <p className="text-muted-foreground">
+                            {checkout.selectedOption.pickup_location.address}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <div>
@@ -372,7 +485,7 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={() => checkout.selectedShippingId && checkout.submitShipping(checkout.selectedShippingId)}
-                  disabled={loading || !checkout.selectedShippingId}
+                  disabled={loading || !checkout.selectedShippingId || !selectedOptionReady}
                   className="flex items-center gap-2 bg-gold text-primary-foreground px-8 py-3 text-sm font-medium tracking-wide hover:bg-gold-light transition-colors disabled:opacity-50"
                 >
                   {loading ? <Loader2 className="size-4 animate-spin" /> : null}

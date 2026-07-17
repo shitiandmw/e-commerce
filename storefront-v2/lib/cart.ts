@@ -52,6 +52,11 @@ export interface CartAddress {
   postal_code: string
   country_code: string
 }
+
+export type PickupCartContact = Pick<
+  CartAddress,
+  "first_name" | "last_name" | "phone"
+>
 export interface ShippingOption {
   id: string
   name: string
@@ -62,6 +67,37 @@ export interface ShippingOption {
     type?: string
     [key: string]: unknown
   } | null
+  is_pickup: boolean
+  core_available: boolean
+  is_compatible: boolean
+  pickup_location_valid: boolean
+  pickup_location: PickupLocationSnapshot | null
+  incompatible_items: IncompatibleCartItem[]
+  unavailable_reason: string | null
+}
+
+export interface PickupLocationSnapshot {
+  id: string
+  name: string
+  address: string
+  phone: string | null
+  hours: string | null
+  note: string | null
+}
+
+export interface IncompatibleCartItem {
+  line_item_id: string
+  product_id: string
+  title: string
+  thumbnail: string | null
+  quantity: number
+}
+
+export interface CartShippingAvailability {
+  cart_id: string
+  item_count: number
+  shipping_options: ShippingOption[]
+  selected_shipping_option_id: string | null
 }
 
 export interface Cart {
@@ -104,11 +140,20 @@ const FIELDS = "fields=*items,*items.variant,*items.variant.product"
 
 export class CartApiError extends Error {
   status: number
+  code?: string
+  details?: Record<string, unknown>
 
-  constructor(message: string, status: number) {
+  constructor(
+    message: string,
+    status: number,
+    code?: string,
+    details?: Record<string, unknown>
+  ) {
     super(message)
     this.name = "CartApiError"
     this.status = status
+    this.code = code
+    this.details = details
   }
 }
 
@@ -124,7 +169,12 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
-    throw new CartApiError(err.message || `API error: ${res.status}`, res.status)
+    throw new CartApiError(
+      err.message || `API error: ${res.status}`,
+      res.status,
+      err.code,
+      err.details
+    )
   }
   return res.json()
 }
@@ -190,6 +240,24 @@ export async function removeLineItem(lineItemId: string): Promise<Cart> {
   )
   return cart
 }
+
+export async function removeCheckoutIncompatibleItems(
+  shippingOptionId: string,
+  lineItemIds: string[]
+): Promise<{ cart_id: string; removed_line_item_ids: string[] }> {
+  const cartId = getCartId()
+  if (!cartId) throw new Error("No cart found")
+  return apiFetch(
+    `/api/cart/${cartId}/shipping-availability/remove-incompatible-items`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        shipping_option_id: shippingOptionId,
+        line_item_ids: lineItemIds,
+      }),
+    }
+  )
+}
 export async function updateCartAddress(shippingAddress: CartAddress, email: string): Promise<Cart> {
   const cartId = getCartId()
   if (!cartId) throw new Error("No cart found")
@@ -200,11 +268,28 @@ export async function updateCartAddress(shippingAddress: CartAddress, email: str
   return cart
 }
 
-export async function getShippingOptions(): Promise<ShippingOption[]> {
+export async function updateCartPickupContact(
+  contact: PickupCartContact,
+  email: string
+): Promise<Cart> {
   const cartId = getCartId()
   if (!cartId) throw new Error("No cart found")
-  const data = await apiFetch<{ shipping_options: ShippingOption[] }>(`/api/cart/${cartId}/shipping-options`)
-  return data.shipping_options || []
+  const { cart } = await apiFetch<{ cart: Cart }>(
+    `/api/cart/${cartId}?${FIELDS}`,
+    {
+      method: "POST",
+      body: JSON.stringify({ shipping_address: contact, email }),
+    }
+  )
+  return cart
+}
+
+export async function getShippingAvailability(): Promise<CartShippingAvailability> {
+  const cartId = getCartId()
+  if (!cartId) throw new Error("No cart found")
+  return apiFetch<CartShippingAvailability>(
+    `/api/cart/${cartId}/shipping-availability`
+  )
 }
 
 export async function setShippingMethod(optionId: string): Promise<Cart> {

@@ -122,14 +122,134 @@ export function useUpdateShippingOption(id: string) {
   })
 }
 
+export function useUpdateShippingOptionConfiguration(id: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      shippingOption,
+      pickupLocationId,
+    }: {
+      shippingOption: Record<string, unknown>
+      pickupLocationId: string | null
+    }) =>
+      adminFetch<
+        { shipping_option: ShippingOption } & ShippingOptionPickupLocationResponse
+      >(`/admin/shipping-options/${id}/configuration`, {
+        method: "POST",
+        body: {
+          shipping_option: shippingOption,
+          pickup_location_id: pickupLocationId,
+        },
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["shipping-options"] })
+      queryClient.invalidateQueries({ queryKey: ["shipping-option", id] })
+      queryClient.invalidateQueries({
+        queryKey: ["shipping-option-pickup-location", id],
+      })
+      queryClient.invalidateQueries({ queryKey: ["pickup-locations"] })
+    },
+  })
+}
+
 export function useDeleteShippingOption() {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (id: string) =>
-      adminFetch(`/admin/shipping-options/${id}`, { method: "DELETE" }),
+      adminFetch(`/admin/shipping-options/${id}/safe`, { method: "DELETE" }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["shipping-options"] })
+      queryClient.invalidateQueries({ queryKey: ["pickup-locations"] })
+    },
+  })
+}
+
+export interface ProductShippingOptionsResponse {
+  shipping_option_ids: string[]
+  shipping_options: ShippingOption[]
+}
+
+export function useProductShippingOptions(productId?: string) {
+  return useQuery<ProductShippingOptionsResponse>({
+    queryKey: ["product-shipping-options", productId],
+    queryFn: () =>
+      adminFetch<ProductShippingOptionsResponse>(
+        `/admin/products/${productId}/shipping-options`
+      ),
+    enabled: !!productId,
+  })
+}
+
+export function useSyncProductShippingOptions() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      productId,
+      shippingOptionIds,
+    }: {
+      productId: string
+      shippingOptionIds: string[]
+    }) =>
+      adminFetch<ProductShippingOptionsResponse>(
+        `/admin/products/${productId}/shipping-options`,
+        {
+          method: "POST",
+          body: { shipping_option_ids: shippingOptionIds },
+        }
+      ),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["product-shipping-options", variables.productId],
+      })
+    },
+  })
+}
+
+export interface ShippingOptionPickupLocationResponse {
+  pickup_location_id: string | null
+  pickup_location: {
+    id: string
+    name: string
+    address: string
+    is_enabled: boolean
+  } | null
+}
+
+export function useShippingOptionPickupLocation(optionId?: string) {
+  return useQuery<ShippingOptionPickupLocationResponse>({
+    queryKey: ["shipping-option-pickup-location", optionId],
+    queryFn: () =>
+      adminFetch<ShippingOptionPickupLocationResponse>(
+        `/admin/shipping-options/${optionId}/pickup-location`
+      ),
+    enabled: !!optionId,
+  })
+}
+
+export function useSyncShippingOptionPickupLocation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      optionId,
+      pickupLocationId,
+    }: {
+      optionId: string
+      pickupLocationId: string | null
+    }) =>
+      adminFetch<ShippingOptionPickupLocationResponse>(
+        `/admin/shipping-options/${optionId}/pickup-location`,
+        {
+          method: "POST",
+          body: { pickup_location_id: pickupLocationId },
+        }
+      ),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["shipping-option-pickup-location", variables.optionId],
+      })
+      queryClient.invalidateQueries({ queryKey: ["pickup-locations"] })
     },
   })
 }

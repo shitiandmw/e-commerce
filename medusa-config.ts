@@ -50,6 +50,9 @@ module.exports = defineConfig({
       resolve: "./src/modules/pickup-location",
     },
     {
+      resolve: "./src/modules/shipping-availability",
+    },
+    {
       resolve: "./src/modules/tracking",
     },
     {

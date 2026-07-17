@@ -24,6 +24,7 @@ import {
 } from "./order-columns"
 import {
   getOrderDeliveryType,
+  getOrderDeliverySnapshot,
   getShippingMethodName,
   isPickupOrder,
 } from "@/lib/order-delivery"
@@ -197,6 +198,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
   const deliveryType = getOrderDeliveryType(order, shippingOptions)
   const pickupOrder = isPickupOrder(order, shippingOptions)
   const shippingMethodName = getShippingMethodName(order, shippingOptions)
+  const deliverySnapshot = getOrderDeliverySnapshot(order)
   const canFulfill = !pickupOrder &&
     order.status !== "canceled" &&
     order.fulfillment_status !== "fulfilled" &&
@@ -831,6 +833,20 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                         <p>{t("detail.address.pickupSelected")}</p>
                         {shippingMethodName && (
                           <p className="mt-0.5 text-amber-700">{shippingMethodName}</p>
+                        )}
+                        {deliverySnapshot?.pickup_location && (
+                          <div className="mt-2 space-y-0.5 text-amber-700">
+                            <p className="font-medium">
+                              {deliverySnapshot.pickup_location.name}
+                            </p>
+                            <p>{deliverySnapshot.pickup_location.address}</p>
+                            {deliverySnapshot.pickup_location.hours && (
+                              <p>{deliverySnapshot.pickup_location.hours}</p>
+                            )}
+                            {deliverySnapshot.pickup_location.phone && (
+                              <p>{deliverySnapshot.pickup_location.phone}</p>
+                            )}
+                          </div>
                         )}
                       </div>
                     </div>

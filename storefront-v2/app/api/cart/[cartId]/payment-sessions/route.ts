@@ -66,6 +66,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ car
   const headers = getStoreHeaders(req)
 
   try {
+    const prepareRes = await fetch(
+      `${MEDUSA_BACKEND_URL}/store/carts/${cartId}/shipping-availability/prepare`,
+      { method: "POST", headers, cache: "no-store" }
+    )
+    if (!prepareRes.ok) {
+      const prepareData = await prepareRes.json().catch(() => ({}))
+      return NextResponse.json(prepareData, { status: prepareRes.status })
+    }
+
     // Step 1: Get cart to find payment_collection id
     const cartRes = await fetch(
       `${MEDUSA_BACKEND_URL}/store/carts/${cartId}?fields=+payment_collection.id`,

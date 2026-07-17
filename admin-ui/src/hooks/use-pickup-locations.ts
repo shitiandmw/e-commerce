@@ -10,6 +10,7 @@ export interface PickupLocation {
   phone?: string | null
   hours?: string | null
   note?: string | null
+  shipping_option_id?: string | null
   sort_order: number
   is_enabled: boolean
   created_at: string

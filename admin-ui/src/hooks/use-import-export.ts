@@ -29,6 +29,7 @@ export const PRODUCT_CSV_HEADERS = [
   "height",
   "width",
   "shipping_profile_id",
+  "shipping_option_ids",
 ]
 
 /**
@@ -59,6 +60,14 @@ export function useProductImportExport() {
 
       if (allProducts.length >= data.count) break
       offset += limit
+    }
+
+    const shippingOptionIdsByProduct = new Map<string, string[]>()
+    for (const product of allProducts) {
+      const data = await adminFetch<{ shipping_option_ids: string[] }>(
+        `/admin/products/${product.id}/shipping-options`
+      )
+      shippingOptionIdsByProduct.set(product.id, data.shipping_option_ids)
     }
 
     const csv = generateCSV(allProducts, [
@@ -103,6 +112,11 @@ export function useProductImportExport() {
       { header: "length", accessor: (p) => p.length || "" },
       { header: "height", accessor: (p) => p.height || "" },
       { header: "width", accessor: (p) => p.width || "" },
+      {
+        header: "shipping_option_ids",
+        accessor: (p) =>
+          (shippingOptionIdsByProduct.get(p.id) || []).join(";"),
+      },
       { header: "created_at", accessor: (p) => p.created_at },
       { header: "updated_at", accessor: (p) => p.updated_at },
     ])
@@ -129,6 +143,13 @@ export function useProductImportExport() {
           if (!row.title || !row.title.trim()) {
             throw new Error("Title is required")
           }
+          const shippingOptionIds = row.shipping_option_ids
+            ?.split(/[;,]/)
+            .map((id) => id.trim())
+            .filter(Boolean) ?? []
+          if (shippingOptionIds.length === 0) {
+            throw new Error("At least one shipping_option_id is required")
+          }
 
           const productData: Record<string, unknown> = {
             title: row.title.trim(),
@@ -147,10 +168,24 @@ export function useProductImportExport() {
             productData.shipping_profile_id = row.shipping_profile_id.trim()
           }
 
-          await adminFetch("/admin/products", {
+          const created = await adminFetch<{ product: { id: string } }>("/admin/products", {
             method: "POST",
             body: await withDefaultShippingProfile(productData),
           })
+          try {
+            await adminFetch(
+              `/admin/products/${created.product.id}/shipping-options`,
+              {
+                method: "POST",
+                body: { shipping_option_ids: shippingOptionIds },
+              }
+            )
+          } catch (error) {
+            await adminFetch(`/admin/products/${created.product.id}`, {
+              method: "DELETE",
+            }).catch(() => undefined)
+            throw error
+          }
 
           result.success++
         } catch (err) {
@@ -196,7 +231,7 @@ export function useOrderExport() {
       queryParams.set("order", "-created_at")
       queryParams.set(
         "fields",
-        "+items,+customer,+shipping_address,*shipping_methods,+fulfillments,+payment_collections"
+        "+items,+customer,+shipping_address,*shipping_methods,+metadata,+fulfillments,+payment_collections"
       )
 
       const data = await adminFetch<OrdersResponse>(

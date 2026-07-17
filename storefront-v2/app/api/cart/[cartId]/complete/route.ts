@@ -135,6 +135,20 @@ async function transferCartToCustomer(req: NextRequest, cartId: string): Promise
   return null
 }
 
+async function prepareShippingSnapshot(
+  req: NextRequest,
+  cartId: string
+): Promise<NextResponse | null> {
+  const res = await fetch(
+    `${MEDUSA_BACKEND_URL}/store/carts/${cartId}/shipping-availability/prepare`,
+    { method: "POST", headers: getStoreHeaders(req), cache: "no-store" }
+  )
+  if (res.ok) return null
+
+  const data = await res.json().catch(() => ({}))
+  return NextResponse.json(data, { status: res.status })
+}
+
 export async function POST(req: NextRequest, { params }: { params: Promise<{ cartId: string }> }) {
   const { cartId } = await params
   const authError = await validateCustomerAuth(req)
@@ -142,6 +156,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ car
 
   const transferError = await transferCartToCustomer(req, cartId)
   if (transferError) return transferError
+
+  const shippingError = await prepareShippingSnapshot(req, cartId)
+  if (shippingError) return shippingError
 
   const providerError = await assertPaymentProviderEnabled(req, cartId)
   if (providerError) return providerError
