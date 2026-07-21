@@ -262,6 +262,23 @@ export default function CheckoutPage() {
                                       {opt.pickup_location.hours}
                                     </p>
                                   )}
+                                  {opt.pickup_location.phone && (
+                                    <p className="text-xs text-muted-foreground">
+                                      {opt.pickup_location.phone}
+                                    </p>
+                                  )}
+                                  {opt.pickup_location.note && (
+                                    <div className="text-xs leading-relaxed text-muted-foreground [&_img]:my-2 [&_img]:h-auto [&_img]:max-w-full [&_p]:mb-1">
+                                      <span className="font-medium text-foreground/80">
+                                        {t("checkout_pickup_note")}:
+                                      </span>{" "}
+                                      <div
+                                        dangerouslySetInnerHTML={{
+                                          __html: opt.pickup_location.note,
+                                        }}
+                                      />
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -390,6 +407,28 @@ export default function CheckoutPage() {
                           <p className="text-muted-foreground">
                             {checkout.selectedOption.pickup_location.address}
                           </p>
+                          {checkout.selectedOption.pickup_location.hours && (
+                            <p className="text-muted-foreground">
+                              {checkout.selectedOption.pickup_location.hours}
+                            </p>
+                          )}
+                          {checkout.selectedOption.pickup_location.phone && (
+                            <p className="text-muted-foreground">
+                              {checkout.selectedOption.pickup_location.phone}
+                            </p>
+                          )}
+                          {checkout.selectedOption.pickup_location.note && (
+                            <div className="leading-relaxed text-muted-foreground [&_img]:my-2 [&_img]:h-auto [&_img]:max-w-full [&_p]:mb-1">
+                              <span className="font-medium text-foreground/80">
+                                {t("checkout_pickup_note")}:
+                              </span>{" "}
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html: checkout.selectedOption.pickup_location.note,
+                                }}
+                              />
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>

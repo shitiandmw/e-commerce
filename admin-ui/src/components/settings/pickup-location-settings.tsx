@@ -36,6 +36,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Textarea } from "@/components/ui/textarea"
+import { RichTextEditor } from "@/components/ui/rich-text-editor"
 import {
   AlertTriangle,
   ArrowDown,
@@ -108,6 +109,18 @@ function toFormValues(
 function truncate(value: string, maxLength = 80) {
   if (value.length <= maxLength) return value
   return `${value.slice(0, maxLength)}...`
+}
+
+function getNotePreview(value: string) {
+  if (typeof window !== "undefined") {
+    const parsedDocument = new DOMParser().parseFromString(value, "text/html")
+    return parsedDocument.body.textContent?.replace(/\s+/g, " ").trim() || ""
+  }
+
+  return value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
 }
 
 export function PickupLocationSettings() {
@@ -367,8 +380,8 @@ function PickupLocationRow({
         <div className="space-y-1">
           <p className="text-sm font-medium">{location.name}</p>
           {location.note && (
-            <p className="text-xs text-muted-foreground" title={location.note}>
-              {truncate(location.note, 50)}
+            <p className="text-xs text-muted-foreground" title={getNotePreview(location.note)}>
+              {truncate(getNotePreview(location.note), 50)}
             </p>
           )}
         </div>
@@ -473,7 +486,12 @@ function PickupLocationForm({
       address: data.address.trim(),
       phone: data.phone?.trim() || null,
       hours: data.hours?.trim() || null,
-      note: data.note?.trim() || null,
+      note: (() => {
+        const note = data.note?.trim() || ""
+        const hasText = getNotePreview(note).length > 0
+        const hasImage = /<img\b/i.test(note)
+        return note && (hasText || hasImage) ? note : null
+      })(),
       is_enabled: data.is_enabled,
     }
 
@@ -561,12 +579,17 @@ function PickupLocationForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="pickup-note">{t("pickupLocations.form.note")}</Label>
-            <Textarea
-              id="pickup-note"
-              {...register("note")}
-              placeholder={t("pickupLocations.form.notePlaceholder")}
-              rows={2}
+            <Label>{t("pickupLocations.form.note")}</Label>
+            <Controller
+              name="note"
+              control={control}
+              render={({ field }) => (
+                <RichTextEditor
+                  content={field.value || ""}
+                  onChange={field.onChange}
+                  placeholder={t("pickupLocations.form.notePlaceholder")}
+                />
+              )}
             />
           </div>
 

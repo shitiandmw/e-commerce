@@ -165,7 +165,7 @@
         "hours": "Business Hours",
         "hoursPlaceholder": "e.g. Mon-Sat 11:00-20:00",
         "note": "Note",
-        "notePlaceholder": "Optional pickup instructions",
+        "notePlaceholder": "Optional pickup instructions; images are supported",
         "sortOrder": "Sort Order",
         "enabled": "Enabled"
       }

@@ -296,6 +296,18 @@ export default function OrdersPage() {
                         {deliverySnapshot.pickup_location.phone && (
                           <p>{deliverySnapshot.pickup_location.phone}</p>
                         )}
+                        {deliverySnapshot.pickup_location.note && (
+                          <div className="leading-relaxed [&_img]:my-2 [&_img]:h-auto [&_img]:max-w-full [&_p]:mb-1">
+                            <span className="font-medium text-foreground/80">
+                              {t("pickup_location_note")}:
+                            </span>{" "}
+                            <div
+                              dangerouslySetInnerHTML={{
+                                __html: deliverySnapshot.pickup_location.note,
+                              }}
+                            />
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

@@ -165,7 +165,7 @@
         "hours": "营业时间",
         "hoursPlaceholder": "例如：周一至周六 11:00-20:00",
         "note": "备注",
-        "notePlaceholder": "可选的取货说明",
+        "notePlaceholder": "可选的取货说明，支持插入图片",
         "sortOrder": "排序",
         "enabled": "启用"
       }

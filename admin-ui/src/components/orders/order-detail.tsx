@@ -846,6 +846,18 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                             {deliverySnapshot.pickup_location.phone && (
                               <p>{deliverySnapshot.pickup_location.phone}</p>
                             )}
+                            {deliverySnapshot.pickup_location.note && (
+                              <div className="[&_img]:my-2 [&_img]:h-auto [&_img]:max-w-full [&_p]:mb-1">
+                                <span className="font-medium">
+                                  {t("detail.address.pickupNote")}:
+                                </span>{" "}
+                                <div
+                                  dangerouslySetInnerHTML={{
+                                    __html: deliverySnapshot.pickup_location.note,
+                                  }}
+                                />
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>

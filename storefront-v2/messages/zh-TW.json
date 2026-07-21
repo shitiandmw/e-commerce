@@ -399,6 +399,8 @@
   "checkout_pickup_locations_loading": "正在載入自提點...",
   "checkout_pickup_locations_empty": "暫未配置自提點資訊。訂單確認後我們會與您聯絡。",
   "checkout_pickup_locations_unavailable": "自提點資訊暫時無法載入，不影響繼續下單。",
+  "checkout_pickup_note": "備註",
+  "pickup_location_note": "自提點備註",
   "checkout_shipping_note_title": "所有訂單均以專業雪茄包裝發貨",
   "checkout_shipping_note_desc": "我們使用專業恆溫恆濕包裝，確保雪茄在運輸過程中保持最佳狀態。",
   "checkout_payment_method": "付款方式",

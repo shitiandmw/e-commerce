@@ -145,7 +145,8 @@
         "noShippingAddress": "未提供收货地址。",
         "sameAsShipping": "与收货地址相同。",
         "pickupSelected": "客户已选择门店自提，无需发货，请联系客户安排取货时间。",
-        "shippingMethod": "配送方式"
+        "shippingMethod": "配送方式",
+        "pickupNote": "自提点备注"
       },
 
       "orderMeta": {

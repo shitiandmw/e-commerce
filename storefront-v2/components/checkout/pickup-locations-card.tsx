@@ -114,9 +114,12 @@ export function PickupLocationsCard({
                 )}
               </div>
               {location.note && (
-                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                  {location.note}
-                </p>
+                <div className="mt-2 text-xs leading-relaxed text-muted-foreground [&_img]:my-2 [&_img]:h-auto [&_img]:max-w-full [&_p]:mb-1">
+                  <span className="font-medium text-foreground/80">
+                    {t("checkout_pickup_note")}:
+                  </span>{" "}
+                  <div dangerouslySetInnerHTML={{ __html: location.note }} />
+                </div>
               )}
             </div>
           ))}

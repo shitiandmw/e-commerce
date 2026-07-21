@@ -399,6 +399,8 @@
   "checkout_pickup_locations_loading": "Loading pickup locations...",
   "checkout_pickup_locations_empty": "Pickup location details are not available right now. We will contact you after the order is confirmed.",
   "checkout_pickup_locations_unavailable": "Pickup location details could not be loaded. This will not affect checkout.",
+  "checkout_pickup_note": "Note",
+  "pickup_location_note": "Pickup note",
   "checkout_shipping_note_title": "All orders are shipped with professional cigar packaging",
   "checkout_shipping_note_desc": "We use professional temperature and humidity controlled packaging to ensure cigars remain in optimal condition during transit.",
   "checkout_payment_method": "Payment Method",
