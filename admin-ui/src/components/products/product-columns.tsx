@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
 import { format } from "date-fns"
-import { withProductListReturnTo } from "@/lib/product-navigation"
+import { withProductReturnTo } from "@/lib/product-navigation"
 
 function getStatusBadge(status: Product["status"], t: (key: string) => string) {
   switch (status) {
@@ -86,7 +86,7 @@ export function getProductColumns(
       cell: ({ row }) => (
         <div>
           <Link
-            href={withProductListReturnTo(
+            href={withProductReturnTo(
               `/products/${row.original.id}`,
               returnTo
             )}
@@ -158,7 +158,7 @@ export function getProductColumns(
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <Link
-                href={withProductListReturnTo(
+                href={withProductReturnTo(
                   `/products/${product.id}`,
                   returnTo
                 )}
@@ -169,7 +169,7 @@ export function getProductColumns(
                 </DropdownMenuItem>
               </Link>
               <Link
-                href={withProductListReturnTo(
+                href={withProductReturnTo(
                   `/products/${product.id}/edit`,
                   returnTo
                 )}

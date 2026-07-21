@@ -189,6 +189,11 @@ export function useUpdateProduct(id: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] })
       queryClient.invalidateQueries({ queryKey: ["product", id] })
+      queryClient.invalidateQueries({ queryKey: ["brands"] })
+      queryClient.invalidateQueries({ queryKey: ["brand"] })
+      queryClient.invalidateQueries({ queryKey: ["curated-collections"] })
+      queryClient.invalidateQueries({ queryKey: ["curated-collection"] })
+      queryClient.invalidateQueries({ queryKey: ["curated-collection-items"] })
       queryClient.invalidateQueries({ queryKey: ["inventory-product-links"] })
     },
   })
@@ -204,6 +209,11 @@ export function useDeleteProduct() {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] })
+      queryClient.invalidateQueries({ queryKey: ["brands"] })
+      queryClient.invalidateQueries({ queryKey: ["brand"] })
+      queryClient.invalidateQueries({ queryKey: ["curated-collections"] })
+      queryClient.invalidateQueries({ queryKey: ["curated-collection"] })
+      queryClient.invalidateQueries({ queryKey: ["curated-collection-items"] })
     },
   })
 }

@@ -18,6 +18,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { format } from "date-fns"
+import { withProductReturnTo } from "@/lib/product-navigation"
 
 interface BrandDetailProps {
   brandId: string
@@ -198,7 +199,10 @@ export function BrandDetail({ brandId }: BrandDetailProps) {
                       )}
                       <div>
                         <Link
-                          href={`/products/${product.id}`}
+                          href={withProductReturnTo(
+                            `/products/${product.id}`,
+                            `/brands/${brandId}`
+                          )}
                           className="font-medium hover:underline text-sm"
                         >
                           {product.title}

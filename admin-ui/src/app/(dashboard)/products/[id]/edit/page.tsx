@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import {
-  getProductListReturnTo,
+  getProductReturnTo,
   type ProductRouteSearchParams,
 } from "@/lib/product-navigation"
 
@@ -23,7 +23,7 @@ export default function EditProductPage({
 }: EditProductPageProps) {
   const t = useTranslations("products")
   const productId = params.id
-  const returnTo = getProductListReturnTo(searchParams?.from)
+  const returnTo = getProductReturnTo(searchParams?.from)
   const { data, isLoading, isError, error } = useProduct(productId)
 
   if (isLoading) {
@@ -55,7 +55,7 @@ export default function EditProductPage({
         <Link href={returnTo}>
           <Button variant="ghost" size="sm">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("backToProducts")}
+            {t("back")}
           </Button>
         </Link>
         <div className="rounded-lg border bg-card p-8 text-center">

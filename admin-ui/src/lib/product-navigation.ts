@@ -11,6 +11,8 @@ export interface ProductListState {
 }
 
 const PRODUCT_LIST_PATH = "/products"
+const ADMIN_ORIGIN = "https://admin.local"
+const PRODUCT_RETURN_DETAIL_RESOURCES = new Set(["brands", "collections"])
 const PRODUCT_STATUSES = new Set([
   "all",
   "published",
@@ -69,30 +71,56 @@ export function buildProductListHref(state: ProductListState) {
   return query ? `${PRODUCT_LIST_PATH}?${query}` : PRODUCT_LIST_PATH
 }
 
-export function getProductListReturnTo(value?: string | string[]): string {
+function getResourceDetailPath(pathname: string) {
+  const match = pathname.match(/^\/([^/]+)\/([^/]+)$/)
+  if (!match) return null
+
+  try {
+    const resource = match[1]
+    const resourceId = decodeURIComponent(match[2])
+    if (
+      !PRODUCT_RETURN_DETAIL_RESOURCES.has(resource) ||
+      !resourceId ||
+      resourceId.includes("/") ||
+      resourceId === "." ||
+      resourceId === ".."
+    ) {
+      return null
+    }
+
+    return `/${resource}/${encodeURIComponent(resourceId)}`
+  } catch {
+    return null
+  }
+}
+
+export function getProductReturnTo(value?: string | string[]): string {
   const candidate = firstParam(value)
   if (!candidate || !candidate.startsWith("/")) {
     return PRODUCT_LIST_PATH
   }
 
   try {
-    const baseUrl = "https://admin.local"
-    const url = new URL(candidate, baseUrl)
-    if (url.origin !== baseUrl || url.pathname !== PRODUCT_LIST_PATH) {
+    const url = new URL(candidate, ADMIN_ORIGIN)
+    if (url.origin !== ADMIN_ORIGIN) {
       return PRODUCT_LIST_PATH
     }
 
-    return buildProductListHref(
-      readProductListState((key) => url.searchParams.get(key))
-    )
+    if (url.pathname === PRODUCT_LIST_PATH) {
+      return buildProductListHref(
+        readProductListState((key) => url.searchParams.get(key))
+      )
+    }
+
+    return getResourceDetailPath(url.pathname) ?? PRODUCT_LIST_PATH
   } catch {
     return PRODUCT_LIST_PATH
   }
 }
 
-export function withProductListReturnTo(path: string, returnTo: string) {
+export function withProductReturnTo(path: string, returnTo: string) {
   const searchParams = new URLSearchParams({
-    from: getProductListReturnTo(returnTo),
+    from: getProductReturnTo(returnTo),
   })
   return `${path}?${searchParams.toString()}`
 }

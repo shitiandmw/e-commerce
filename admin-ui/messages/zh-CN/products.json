@@ -10,6 +10,7 @@
     "saveChanges": "保存更改",
     "saving": "保存中...",
     "errorOccurred": "发生错误",
+    "back": "返回",
     "backToProducts": "返回商品列表",
     "productNotFound": "未找到商品或加载失败。",
     "search": "搜索商品...",

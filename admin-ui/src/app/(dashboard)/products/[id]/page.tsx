@@ -2,7 +2,7 @@
 
 import { ProductDetail } from "@/components/products/product-detail"
 import {
-  getProductListReturnTo,
+  getProductReturnTo,
   type ProductRouteSearchParams,
 } from "@/lib/product-navigation"
 
@@ -15,7 +15,7 @@ export default function ProductDetailPage({
   params,
   searchParams,
 }: ProductDetailPageProps) {
-  const returnTo = getProductListReturnTo(searchParams?.from)
+  const returnTo = getProductReturnTo(searchParams?.from)
 
   return <ProductDetail productId={params.id} returnTo={returnTo} />
 }

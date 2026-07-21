@@ -36,7 +36,7 @@ import {
   useInventoryItem,
   useStockLocations,
 } from "@/hooks/use-inventory"
-import { withProductListReturnTo } from "@/lib/product-navigation"
+import { withProductReturnTo } from "@/lib/product-navigation"
 
 /** brand field may be a single object or an array (due to isList link) */
 function resolveBrand(brand: Product["brand"]): { id: string; name: string } | null {
@@ -340,7 +340,7 @@ export function ProductDetail({
         <Link href={returnTo}>
           <Button variant="ghost" size="sm">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("backToProducts")}
+            {t("back")}
           </Button>
         </Link>
         <div className="rounded-lg border bg-card p-8 text-center">
@@ -360,7 +360,7 @@ export function ProductDetail({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href={returnTo}>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" aria-label={t("back")}>
               <ArrowLeft className="h-4 w-4" />
             </Button>
           </Link>
@@ -378,7 +378,7 @@ export function ProductDetail({
         </div>
         <div className="flex items-center gap-2">
           <Link
-            href={withProductListReturnTo(
+            href={withProductReturnTo(
               `/products/${productId}/edit`,
               returnTo
             )}

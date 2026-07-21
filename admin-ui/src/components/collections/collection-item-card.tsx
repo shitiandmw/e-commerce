@@ -5,6 +5,7 @@ import { CollectionItem } from "@/hooks/use-curated-collections"
 import { Button } from "@/components/ui/button"
 import { ChevronUp, ChevronDown, X } from "lucide-react"
 import Link from "next/link"
+import { withProductReturnTo } from "@/lib/product-navigation"
 
 interface CollectionItemCardProps {
   item: CollectionItem
@@ -72,7 +73,10 @@ export function CollectionItemCard({
         {/* Product info */}
         <div className="min-w-0">
           <Link
-            href={`/products/${item.product_id}`}
+            href={withProductReturnTo(
+              `/products/${item.product_id}`,
+              `/collections/${item.collection_id}`
+            )}
             className="font-medium hover:underline text-sm truncate block"
           >
             {item.product?.title || item.product_id}
