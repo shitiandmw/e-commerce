@@ -1,5 +1,6 @@
 import type { MedusaProduct } from "./products"
 import {
+  getSellableVariants,
   loadPrioritizedProductSelection,
   type InventoryProductCandidate,
   type ProductBatch,
@@ -7,9 +8,9 @@ import {
 
 const CART_RECOMMENDATION_LIMIT = 4
 const CART_RECOMMENDATION_FIELDS =
-  "id,title,handle,thumbnail,*variants,*variants.prices,*variants.inventory_quantity,*variants.manage_inventory,*brand"
+  "id,title,handle,thumbnail,*variants,*variants.prices,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata,*brand"
 const PRODUCT_INVENTORY_CANDIDATE_FIELDS =
-  "id,*variants.inventory_quantity,*variants.manage_inventory"
+  "id,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata"
 
 async function requestProducts<T>(
   params: URLSearchParams,
@@ -46,6 +47,10 @@ export async function fetchCartRecommendedProducts(
         .then((data) => data.products ?? [])
     },
     limit: CART_RECOMMENDATION_LIMIT,
+    filterCandidates: (candidate) => (
+      !Array.isArray(candidate.variants)
+      || getSellableVariants(candidate.variants).length > 0
+    ),
   })
 
   return selection.products

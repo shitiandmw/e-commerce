@@ -110,6 +110,7 @@ import {
 } from "./store/restock-requests/validators"
 import { initSocketIO, setContainer } from "../lib/socket-io"
 import { PostAdminProductShippingOptions } from "./admin/products/[id]/shipping-options/validators"
+import { PostAdminProductVariantConfiguration } from "./admin/products/[id]/variant-configuration/validators"
 import { PostAdminShippingOptionPickupLocation } from "./admin/shipping-options/[id]/pickup-location/validators"
 import { PostAdminShippingOptionConfiguration } from "./admin/shipping-options/[id]/configuration/validators"
 import { PostStoreRemoveIncompatibleItems } from "./store/carts/[id]/shipping-availability/validators"
@@ -121,6 +122,11 @@ import {
   sendShippingAvailabilityError,
   SHIPPING_AVAILABILITY_ERROR_CODES,
 } from "../lib/shipping-availability"
+import {
+  assertCartVariantsAreSellable,
+  assertVariantIsSellable,
+  sendProductVariantConfigurationError,
+} from "../lib/product-variant-configuration"
 
 export const GetBrandsSchema = createFindParams().merge(z.object({ q: z.string().optional() }))
 export const GetTagsSchema = createFindParams()
@@ -232,7 +238,18 @@ export const prepareCompletedCartShipping = async (
   _res: MedusaResponse,
   next: MedusaNextFunction
 ) => {
+  await assertCartVariantsAreSellable(req.scope, req.params.id)
   await prepareCartShippingSnapshot(req.scope, req.params.id)
+  return next()
+}
+
+const rejectStoppedVariantLineItem = async (
+  req: MedusaRequest,
+  _res: MedusaResponse,
+  next: MedusaNextFunction
+) => {
+  const variantId = (req.body as { variant_id?: string } | undefined)?.variant_id
+  if (variantId) await assertVariantIsSellable(req.scope, variantId)
   return next()
 }
 
@@ -257,6 +274,7 @@ const coreErrorHandler = errorHandler()
 export default defineMiddlewares({
   errorHandler: (err, req, res, next) => {
     if (sendShippingAvailabilityError(res, err)) return
+    if (sendProductVariantConfigurationError(res, err)) return
     return coreErrorHandler(err, req, res, next)
   },
   routes: [
@@ -264,6 +282,14 @@ export default defineMiddlewares({
       matcher: "/admin/products/:id/shipping-options",
       method: "POST",
       middlewares: [validateAndTransformBody(PostAdminProductShippingOptions)],
+    },
+    {
+      matcher: "/admin/products/:id/variant-configuration",
+      method: "POST",
+      middlewares: [
+        authenticate("user", ["bearer", "session"]),
+        validateAndTransformBody(PostAdminProductVariantConfiguration),
+      ],
     },
     {
       matcher: "/admin/shipping-options/:id/configuration",
@@ -306,6 +332,11 @@ export default defineMiddlewares({
       matcher: "/store/carts/:id/complete",
       method: "POST",
       middlewares: [prepareCompletedCartShipping],
+    },
+    {
+      matcher: "/store/carts/:id/line-items",
+      method: "POST",
+      middlewares: [rejectStoppedVariantLineItem],
     },
     // Store content routes
     {

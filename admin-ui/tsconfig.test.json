@@ -17,6 +17,9 @@
     "src/lib/product-navigation.test.ts",
     "src/lib/shipping-form-state.ts",
     "src/lib/shipping-form-state.test.ts",
+    "src/lib/slug.ts",
+    "src/lib/product-variant-config.ts",
+    "src/lib/product-variant-config.test.ts",
     "src/hooks/use-shipping-form-state.ts",
     "src/hooks/use-shipping-form-state.test.tsx"
   ],

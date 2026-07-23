@@ -6,6 +6,73 @@ import { getToken } from "./auth"
 const BASE_URL =
   process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
 
+export type AdminApiErrorPayload = {
+  message?: unknown
+  code?: unknown
+  type?: unknown
+  errors?: unknown
+  error?: unknown
+  variant_id?: unknown
+  sku?: unknown
+}
+
+/** Preserve the server error code for callers handling business-rule failures. */
+export class AdminApiError extends Error {
+  readonly code?: string
+  readonly type?: string
+  readonly status: number
+  readonly variantId?: string
+  readonly sku?: string
+
+  constructor(
+    message: string,
+    options: {
+      status: number
+      code?: string
+      type?: string
+      variantId?: string
+      sku?: string
+    }
+  ) {
+    super(message)
+    this.name = "AdminApiError"
+    this.status = options.status
+    this.code = options.code
+    this.type = options.type
+    this.variantId = options.variantId
+    this.sku = options.sku
+  }
+}
+
+function getErrorMessage(payload: AdminApiErrorPayload, fallback: string) {
+  if (typeof payload.message === "string" && payload.message.trim()) {
+    return payload.message
+  }
+
+  if (Array.isArray(payload.errors)) {
+    const messages = payload.errors
+      .map((error) => {
+        if (typeof error === "string") return error
+        if (error && typeof error === "object" && "message" in error) {
+          const message = (error as { message?: unknown }).message
+          return typeof message === "string" ? message : undefined
+        }
+        return undefined
+      })
+      .filter((message): message is string => Boolean(message?.trim()))
+    if (messages.length > 0) return messages.join("；")
+  }
+
+  if (payload.error && typeof payload.error === "object") {
+    const nestedMessage = (payload.error as { message?: unknown }).message
+    if (typeof nestedMessage === "string" && nestedMessage.trim()) {
+      return nestedMessage
+    }
+  }
+
+  return fallback
+}
+
 /**
  * Unified fetch wrapper for Admin API.
  * Supports GET (with query params) and mutation methods (POST/PUT/DELETE with body).
@@ -48,9 +115,25 @@ export async function adminFetch<T>(
       throw new Error("Unauthorized")
     }
     
-    const errorData = await res.json().catch(() => ({}))
-    throw new Error(
-      errorData.message || `Admin API error: ${res.status} ${res.statusText}`
+    const parsedError = await res.json().catch(() => ({}))
+    const errorData = (
+      parsedError && typeof parsedError === "object" ? parsedError : {}
+    ) as AdminApiErrorPayload
+    throw new AdminApiError(
+      getErrorMessage(
+        errorData,
+        `Admin API error: ${res.status} ${res.statusText}`
+      ),
+      {
+        status: res.status,
+        code: typeof errorData.code === "string" ? errorData.code : undefined,
+        type: typeof errorData.type === "string" ? errorData.type : undefined,
+        variantId:
+          typeof errorData.variant_id === "string"
+            ? errorData.variant_id
+            : undefined,
+        sku: typeof errorData.sku === "string" ? errorData.sku : undefined,
+      }
     )
   }
 

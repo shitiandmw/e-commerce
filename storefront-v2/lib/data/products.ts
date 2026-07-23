@@ -1,5 +1,6 @@
 import {
   collectAllProductCandidates,
+  getSellableVariants,
   loadPrioritizedProductSelection,
   PRODUCT_CANDIDATE_BATCH_SIZE,
   selectPrioritizedProductSelection,
@@ -373,6 +374,7 @@ interface MedusaCalculatedPrice {
 export interface DisplayPriceVariant {
   prices?: MedusaPrice[]
   calculated_price?: MedusaCalculatedPrice
+  metadata?: Record<string, unknown> | null
 }
 
 export interface DisplayPriceProduct {
@@ -388,7 +390,7 @@ interface ProductListCandidate extends InventoryProductCandidate {
   price_data_unavailable?: boolean
 }
 
-interface MedusaVariant {
+export interface MedusaVariant {
   id: string
   title: string
   sku: string | null
@@ -397,6 +399,7 @@ interface MedusaVariant {
   options?: MedusaOptionValue[]
   inventory_quantity?: number
   manage_inventory?: boolean
+  metadata?: Record<string, unknown> | null
 }
 
 interface MedusaProductOption {
@@ -466,19 +469,19 @@ export interface MedusaProductListResponse {
 }
 
 const PRODUCT_LIST_FIELDS_WITH_CUSTOM_TAGS =
-  "id,title,handle,subtitle,description,thumbnail,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*images,*categories,*brand,*custom_tags"
+  "id,title,handle,subtitle,description,thumbnail,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata,*images,*categories,*brand,*custom_tags"
 const PRODUCT_LIST_FIELDS =
-  "id,title,handle,subtitle,description,thumbnail,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*images,*categories,*brand"
+  "id,title,handle,subtitle,description,thumbnail,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata,*images,*categories,*brand"
 const PRODUCT_DETAIL_FIELDS_WITH_CUSTOM_TAGS =
-  "id,title,handle,subtitle,description,thumbnail,collection_id,metadata,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*variants.options,*options,*options.values,*images,*categories,*tags,*brand,*custom_tags"
+  "id,title,handle,subtitle,description,thumbnail,collection_id,metadata,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata,*variants.options,*options,*options.values,*images,*categories,*tags,*brand,*custom_tags"
 const PRODUCT_DETAIL_FIELDS =
-  "id,title,handle,subtitle,description,thumbnail,collection_id,metadata,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*variants.options,*options,*options.values,*images,*categories,*tags,*brand"
+  "id,title,handle,subtitle,description,thumbnail,collection_id,metadata,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata,*variants.options,*options,*options.values,*images,*categories,*tags,*brand"
 const RELATED_PRODUCT_FIELDS_WITH_CUSTOM_TAGS =
-  "id,title,handle,subtitle,thumbnail,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*custom_tags"
+  "id,title,handle,subtitle,thumbnail,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata,*custom_tags"
 const RELATED_PRODUCT_FIELDS =
-  "id,title,handle,subtitle,thumbnail,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory"
+  "id,title,handle,subtitle,thumbnail,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata"
 const PRODUCT_INVENTORY_CANDIDATE_FIELDS =
-  "id,*variants.inventory_quantity,*variants.manage_inventory"
+  "id,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata"
 const PRODUCT_PRICE_INVENTORY_CANDIDATE_FIELDS =
   `${PRODUCT_INVENTORY_CANDIDATE_FIELDS},*variants.calculated_price,*variants.prices`
 const PRODUCT_ID_FIELDS = "id"
@@ -499,7 +502,8 @@ export function getProductDisplayPrice(
   product: DisplayPriceProduct,
   preferredCurrency = "usd",
 ): { amount: number; currency_code: string } | null {
-  const calculatedPrices = product.variants
+  const sellableVariants = getSellableVariants(product.variants)
+  const calculatedPrices = sellableVariants
     ?.map((variant) => variant.calculated_price)
     .filter((price): price is MedusaCalculatedPrice => (
       !!price && Number.isFinite(price.calculated_amount)
@@ -511,8 +515,8 @@ export function getProductDisplayPrice(
     return { amount: cheapest.calculated_amount, currency_code: cheapest.currency_code }
   }
 
-  const rawPrices = product.variants
-    ?.flatMap((variant) => variant.prices ?? [])
+  const rawPrices = sellableVariants
+    .flatMap((variant) => variant.prices ?? [])
     .filter((price) => Number.isFinite(price.amount)) ?? []
   const preferredPrices = rawPrices.filter((price) => price.currency_code === preferredCurrency)
   const candidates = preferredPrices.length > 0 ? preferredPrices : rawPrices
@@ -648,6 +652,7 @@ async function loadPrioritizedProducts(
     detailFieldsWithCustomTags: string
     detailFields: string
     priceOrder?: ProductPriceOrder
+    excludeUnsellable?: boolean
   },
 ): Promise<MedusaProductListResponse> {
   const priceOrder = options.priceOrder
@@ -662,6 +667,12 @@ async function loadPrioritizedProducts(
       )
     : undefined
   const categoryFiltered = "category_id" in candidateParams || "category_id[]" in candidateParams
+  const filterCandidates = options.excludeUnsellable
+    ? (candidate: ProductListCandidate) => (
+        !Array.isArray(candidate.variants)
+        || getSellableVariants(candidate.variants).length > 0
+      )
+    : undefined
   if (categoryFiltered) {
     const candidates = await collectCategoryInventoryCandidates(
       candidateParams,
@@ -681,6 +692,7 @@ async function loadPrioritizedProducts(
       offset: options.offset,
       excludeIds: options.excludeIds,
       sortCandidates,
+      filterCandidates,
     })
   }
 
@@ -725,6 +737,7 @@ async function loadPrioritizedProducts(
     offset: options.offset,
     excludeIds: options.excludeIds,
     sortCandidates,
+    filterCandidates,
   })
 }
 
@@ -895,6 +908,7 @@ export async function fetchRelatedProducts(
         excludeIds: [product.id],
         detailFieldsWithCustomTags: RELATED_PRODUCT_FIELDS_WITH_CUSTOM_TAGS,
         detailFields: RELATED_PRODUCT_FIELDS,
+        excludeUnsellable: true,
       })).products
       if (results.length > 0) return results
     }
@@ -911,6 +925,7 @@ export async function fetchRelatedProducts(
       excludeIds: [product.id],
       detailFieldsWithCustomTags: RELATED_PRODUCT_FIELDS_WITH_CUSTOM_TAGS,
       detailFields: RELATED_PRODUCT_FIELDS,
+      excludeUnsellable: true,
     })).products
   } catch {
     return []

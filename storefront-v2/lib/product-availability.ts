@@ -1,10 +1,20 @@
 export interface InventoryVariant {
   inventory_quantity?: number | null
   manage_inventory?: boolean | null
+  metadata?: Record<string, unknown> | null
 }
 
 export interface InventoryAwareProduct {
   variants?: readonly InventoryVariant[] | null
+}
+
+export interface VariantOptionValue {
+  id: string
+  option_id: string
+}
+
+export interface OptionLinkedVariant extends InventoryVariant {
+  options?: readonly VariantOptionValue[] | null
 }
 
 export interface InventoryProductCandidate extends InventoryAwareProduct {
@@ -32,6 +42,7 @@ interface LoadProductSelectionOptions<Candidate extends InventoryProductCandidat
   batchSize?: number
   maxBatches?: number
   sortCandidates?: (candidates: readonly Candidate[]) => Candidate[]
+  filterCandidates?: (candidate: Candidate) => boolean
 }
 
 interface SelectProductOptions<Candidate extends InventoryProductCandidate, Product extends { id: string }> {
@@ -41,23 +52,72 @@ interface SelectProductOptions<Candidate extends InventoryProductCandidate, Prod
   offset?: number
   excludeIds?: readonly string[]
   sortCandidates?: (candidates: readonly Candidate[]) => Candidate[]
+  filterCandidates?: (candidate: Candidate) => boolean
 }
 
 export const PRODUCT_CANDIDATE_BATCH_SIZE = 100
 export const MAX_PRODUCT_CANDIDATE_BATCHES = 1000
+export const VARIANT_SALES_DISABLED_KEY = "sales_disabled"
+
+export function isVariantSalesDisabled(
+  variant: Pick<InventoryVariant, "metadata"> | null | undefined,
+): boolean {
+  const value = variant?.metadata?.[VARIANT_SALES_DISABLED_KEY]
+  return value === true || value === "true"
+}
+
+export function getSellableVariants<T extends Pick<InventoryVariant, "metadata">>(
+  variants: readonly T[] | null | undefined,
+): T[] {
+  return variants?.filter((variant) => !isVariantSalesDisabled(variant)) ?? []
+}
+
+export function findSellableVariantByOptionValueIds<T extends OptionLinkedVariant>(
+  variants: readonly T[] | null | undefined,
+  optionIds: readonly string[],
+  selectedOptionValueIds: Readonly<Record<string, string>>,
+): T | undefined {
+  if (!optionIds.every((optionId) => selectedOptionValueIds[optionId])) {
+    return undefined
+  }
+
+  return getSellableVariants(variants).find((variant) =>
+    variant.options?.length === optionIds.length
+    && optionIds.every((optionId) =>
+      variant.options?.some(
+        (value) => value.option_id === optionId
+          && value.id === selectedOptionValueIds[optionId],
+      ),
+    ),
+  )
+}
+
+export function isOptionValueCombinationAvailable<T extends OptionLinkedVariant>(
+  variants: readonly T[] | null | undefined,
+  selectedOptionValueIds: Readonly<Record<string, string>>,
+): boolean {
+  return getSellableVariants(variants).some((variant) =>
+    Object.entries(selectedOptionValueIds).every(([optionId, optionValueId]) =>
+      variant.options?.some(
+        (value) => value.option_id === optionId && value.id === optionValueId,
+      ),
+    ),
+  )
+}
 
 /**
  * A product is only known to be out of stock when every variant uses inventory
  * management and has a known, non-positive inventory quantity.
  */
 export function isProductOutOfStock(product: InventoryAwareProduct): boolean {
-  const variants = product.variants
-  if (!variants?.length) return false
+  if (!product.variants?.length) return false
 
-  return variants.every(isVariantOutOfStock)
+  const variants = getSellableVariants(product.variants)
+  return variants.length === 0 || variants.every(isVariantOutOfStock)
 }
 
 export function isVariantOutOfStock(variant: InventoryVariant | null | undefined): boolean {
+  if (isVariantSalesDisabled(variant)) return true
   if (!variant || variant.manage_inventory === false) return false
 
   const quantity = variant.inventory_quantity
@@ -86,7 +146,7 @@ export function prioritizeInStockItems<T>(
 export function prioritizeInStockProducts<T extends InventoryAwareProduct>(
   products: readonly T[],
 ): T[] {
-  return prioritizeInStockItems(products, isProductOutOfStock)
+  return prioritizeInStockItems(products, (product) => isProductOutOfStock(product))
 }
 
 /**
@@ -144,6 +204,7 @@ export async function loadPrioritizedProductSelection<
   batchSize,
   maxBatches,
   sortCandidates,
+  filterCandidates,
 }: LoadProductSelectionOptions<Candidate, Product>): Promise<ProductSelection<Product>> {
   const candidates = await collectAllProductCandidates(fetchCandidateBatch, {
     batchSize,
@@ -157,6 +218,7 @@ export async function loadPrioritizedProductSelection<
     offset,
     excludeIds,
     sortCandidates,
+    filterCandidates,
   })
 }
 
@@ -170,11 +232,14 @@ export async function selectPrioritizedProductSelection<
   offset = 0,
   excludeIds = [],
   sortCandidates,
+  filterCandidates,
 }: SelectProductOptions<Candidate, Product>): Promise<ProductSelection<Product>> {
   const safeLimit = Math.max(0, Math.floor(limit))
   const safeOffset = Math.max(0, Math.floor(offset))
   const excluded = new Set(excludeIds)
-  const filteredCandidates = candidates.filter((product) => !excluded.has(product.id))
+  const filteredCandidates = candidates.filter((product) =>
+    !excluded.has(product.id) && (!filterCandidates || filterCandidates(product))
+  )
 
   const sortedCandidates = sortCandidates
     ? sortCandidates(filteredCandidates)

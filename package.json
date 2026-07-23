@@ -17,6 +17,7 @@
     "postinstall": "node scripts/patch-watcher.js",
     "build": "NODE_ENV=development medusa build",
     "seed": "NODE_ENV=development medusa exec ./src/scripts/seed.ts",
+    "audit:product-variants": "NODE_ENV=development medusa exec ./src/scripts/audit-product-variant-configurations.ts dry-run",
     "convert:data:zh-cn": "node ./scripts/convert-csv-trad-to-simplified.mjs",
     "start": "medusa start",
     "dev": "NODE_ENV=development medusa develop",

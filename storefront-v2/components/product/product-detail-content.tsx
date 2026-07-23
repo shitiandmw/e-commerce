@@ -17,7 +17,13 @@ import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
 import { getCustomTags, ProductTagChip } from "@/components/product/product-tag-chip"
-import { isVariantOutOfStock } from "@/lib/product-availability"
+import {
+  findSellableVariantByOptionValueIds,
+  getSellableVariants,
+  isOptionValueCombinationAvailable,
+  isProductOutOfStock,
+  isVariantOutOfStock,
+} from "@/lib/product-availability"
 import { RestockRequestButton } from "@/components/product/restock-request-button"
 
 export function ProductDetailContent({
@@ -27,14 +33,17 @@ export function ProductDetailContent({
   product: MedusaProduct
   relatedProducts: MedusaProduct[]
 }) {
+  const sellableVariants = useMemo(
+    () => getSellableVariants(product.variants),
+    [product.variants],
+  )
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() => {
-    // Auto-select if only one variant
-    if (product.variants?.length === 1 && product.options) {
+    if (sellableVariants.length === 1) {
       const init: Record<string, string> = {}
-      for (const opt of product.options) {
-        if (opt.values?.length === 1) init[opt.id] = opt.values[0].value
+      for (const optionValue of sellableVariants[0].options ?? []) {
+        init[optionValue.option_id] = optionValue.id
       }
       return init
     }
@@ -54,22 +63,23 @@ export function ProductDetailContent({
   const categoryName = product.categories?.[0]?.name ?? ""
   const categoryHandle = product.categories?.[0]?.handle ?? ""
 
-  const hasMultipleVariants = (product.variants?.length ?? 0) > 1
+  const hasMultipleVariants = sellableVariants.length > 1
   const hasOptions = (product.options?.length ?? 0) > 0 && hasMultipleVariants
 
-  // Find selected variant based on option selections (Medusa official pattern)
   const selectedVariant = useMemo(() => {
-    if (!product.variants?.length) return undefined
-    // Single variant → always selected
-    if (product.variants.length === 1) return product.variants[0]
-    // Need all options selected
-    if (!product.options || Object.keys(selectedOptions).length !== product.options.length) return undefined
-    return product.variants.find((variant) =>
-      variant.options?.every(
-        (optionValue) => selectedOptions[optionValue.option_id] === optionValue.value
-      )
+    if (sellableVariants.length === 0) return undefined
+    if (sellableVariants.length === 1) return sellableVariants[0]
+    return findSellableVariantByOptionValueIds(
+      sellableVariants,
+      product.options?.map((option) => option.id) ?? [],
+      selectedOptions,
     )
-  }, [selectedOptions, product])
+  }, [product.options, selectedOptions, sellableVariants])
+
+  const isOptionValueAvailable = (optionId: string, optionValueId: string) => {
+    const candidateSelections = { ...selectedOptions, [optionId]: optionValueId }
+    return isOptionValueCombinationAvailable(sellableVariants, candidateSelections)
+  }
 
   // Price from selected variant (prefer calculated_price), or cheapest variant as fallback
   const variantPrice = useMemo(() => {
@@ -86,26 +96,28 @@ export function ProductDetailContent({
       }
     }
     // Fallback: cheapest calculated_price across all variants
-    const calcPrices = product.variants
-      ?.map((vr) => vr.calculated_price)
+    const calcPrices = sellableVariants
+      .map((vr) => vr.calculated_price)
       .filter((cp): cp is NonNullable<typeof cp> => !!cp && cp.calculated_amount != null)
     if (calcPrices?.length) {
       const cheapest = calcPrices.sort((a, b) => a.calculated_amount - b.calculated_amount)[0]
       return { amount: cheapest.calculated_amount, currency_code: cheapest.currency_code }
     }
     // Fallback: cheapest raw price in USD
-    const allPrices = product.variants?.flatMap((vr) => vr.prices ?? []) ?? []
+    const allPrices = sellableVariants.flatMap((vr) => vr.prices ?? [])
     const usd = allPrices.filter((p) => p.currency_code === "usd").sort((a, b) => a.amount - b.amount)[0]
     if (usd) return { amount: usd.amount, currency_code: usd.currency_code }
     const cheapest = allPrices.sort((a, b) => a.amount - b.amount)[0]
     return cheapest ? { amount: cheapest.amount, currency_code: cheapest.currency_code } : null
-  }, [selectedVariant, product])
+  }, [selectedVariant, sellableVariants])
 
   // Inventory
   const inventory = selectedVariant?.inventory_quantity
   const manageInventory = !!selectedVariant && selectedVariant.manage_inventory !== false
   const inventoryKnown = inventory !== undefined && inventory !== null
-  const isOutOfStock = isVariantOutOfStock(selectedVariant)
+  const isOutOfStock = selectedVariant
+    ? isVariantOutOfStock(selectedVariant)
+    : isProductOutOfStock(product)
   const isLowStock = manageInventory && inventoryKnown && inventory > 0 && inventory <= 5
   const canAddToCart = !!selectedVariant && !isOutOfStock
 
@@ -270,21 +282,35 @@ export function ProductDetailContent({
                     <p className="text-sm font-medium text-foreground mb-2.5">
                       {option.title}
                       {selectedOptions[option.id] && (
-                        <span className="ml-2 font-normal text-muted-foreground">: {selectedOptions[option.id]}</span>
+                        <span className="ml-2 font-normal text-muted-foreground">
+                          : {option.values?.find((value) => value.id === selectedOptions[option.id])?.value}
+                        </span>
                       )}
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {option.values?.map((optionValue) => {
-                        const isSelected = selectedOptions[option.id] === optionValue.value
+                        const isSelected = selectedOptions[option.id] === optionValue.id
+                        const isAvailable = isSelected || isOptionValueAvailable(option.id, optionValue.id)
                         return (
                           <button
                             key={optionValue.id}
-                            onClick={() => setSelectedOptions((prev) => ({ ...prev, [option.id]: optionValue.value }))}
+                            type="button"
+                            disabled={!isAvailable}
+                            onClick={() => setSelectedOptions((previous) => {
+                              if (previous[option.id] !== optionValue.id) {
+                                return { ...previous, [option.id]: optionValue.id }
+                              }
+                              const next = { ...previous }
+                              delete next[option.id]
+                              return next
+                            })}
                             className={cn(
                               "px-4 py-2 text-sm border transition-colors min-w-[48px]",
                               isSelected
                                 ? "border-gold text-gold bg-gold/5"
-                                : "border-border/50 text-muted-foreground hover:border-gold/50 hover:text-foreground"
+                                : isAvailable
+                                  ? "border-border/50 text-muted-foreground hover:border-gold/50 hover:text-foreground"
+                                  : "border-border/30 text-muted-foreground/40 cursor-not-allowed line-through"
                             )}
                           >
                             {optionValue.value}
@@ -343,7 +369,15 @@ export function ProductDetailContent({
                   )}
                 >
                   {adding ? <Loader2 className="size-4 animate-spin" /> : <ShoppingBag className="size-4" />}
-                  {isOutOfStock ? t("out_of_stock_label") : !selectedVariant && hasOptions ? t("select_option") : adding ? t("adding_to_cart") : t("add_to_cart")}
+                  {isOutOfStock && sellableVariants.length === 0
+                    ? t("out_of_stock_label")
+                    : !selectedVariant && hasOptions
+                      ? t("select_option")
+                      : isOutOfStock
+                        ? t("out_of_stock_label")
+                        : adding
+                          ? t("adding_to_cart")
+                          : t("add_to_cart")}
                 </button>
                 <button
                   className={cn(

@@ -1,4 +1,5 @@
 import {
+  getSellableVariants,
   isProductOutOfStock,
   isVariantOutOfStock,
   prioritizeInStockProducts,
@@ -9,6 +10,7 @@ type TestProduct = {
   variants?: Array<{
     inventory_quantity?: number | null
     manage_inventory?: boolean | null
+    metadata?: Record<string, unknown> | null
   }> | null
 }
 
@@ -90,5 +92,18 @@ describe("product availability ordering", () => {
     expect(isVariantOutOfStock(undefined)).toBe(false)
     expect(isVariantOutOfStock({ manage_inventory: true })).toBe(false)
     expect(isVariantOutOfStock({ manage_inventory: true, inventory_quantity: 0 })).toBe(true)
+  })
+
+  it("excludes stopped variants from availability", () => {
+    const variants = [
+      { inventory_quantity: 8, metadata: { sales_disabled: true } },
+      { inventory_quantity: 2 },
+    ]
+
+    expect(getSellableVariants(variants)).toEqual([variants[1]])
+    expect(isProductOutOfStock({ variants })).toBe(false)
+    expect(isProductOutOfStock({
+      variants: [{ inventory_quantity: 8, metadata: { sales_disabled: true } }],
+    })).toBe(true)
   })
 })

@@ -5,12 +5,18 @@ import {
   type MedusaProduct,
 } from "../../storefront-v2/lib/data/products"
 
-function candidate(id: string, inventoryQuantity: number, amount?: number) {
+function candidate(
+  id: string,
+  inventoryQuantity: number,
+  amount?: number,
+  salesDisabled = false,
+) {
   return {
     id,
     variants: [{
       inventory_quantity: inventoryQuantity,
       prices: amount === undefined ? [] : [{ amount, currency_code: "usd" }],
+      metadata: salesDisabled ? { sales_disabled: true } : undefined,
     }],
   }
 }
@@ -66,7 +72,7 @@ describe("product recommendation candidate truncation", () => {
         const products = offset === 0 ? firstBatch : [candidate("available-101", 2)]
         return response({ products, count: 101, offset, limit: 100 })
       }
-      if (fields === "id,*variants.inventory_quantity,*variants.manage_inventory") {
+      if (fields === "id,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata") {
         const ids = url.searchParams.getAll("id[]")
         const products = ids.map((id) => (
           id === "available-101" ? candidate(id, 2) : candidate(id, 0)
@@ -102,7 +108,7 @@ describe("product recommendation candidate truncation", () => {
       expect(secondBatchUrl.searchParams.get("category_id[]")).toBe("category_1")
       const inventoryUrl = new URL(String(request.mock.calls[2][0]))
       expect(inventoryUrl.searchParams.get("fields")).toBe(
-        "id,*variants.inventory_quantity,*variants.manage_inventory",
+        "id,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata",
       )
       expect(inventoryUrl.searchParams.has("category_id[]")).toBe(false)
     } finally {
@@ -121,6 +127,7 @@ describe("product recommendation candidate truncation", () => {
       "id",
       "*variants.inventory_quantity",
       "*variants.manage_inventory",
+      "*variants.metadata",
       "*variants.calculated_price",
       "*variants.prices",
     ].join(",")
@@ -184,6 +191,7 @@ describe("product recommendation candidate truncation", () => {
       "id",
       "*variants.inventory_quantity",
       "*variants.manage_inventory",
+      "*variants.metadata",
       "*variants.calculated_price",
       "*variants.prices",
     ].join(",")
@@ -195,7 +203,7 @@ describe("product recommendation candidate truncation", () => {
         if (offset === 100) return errorResponse()
         return response({ products: firstBatch, count: 101, offset: 0, limit: 100 })
       }
-      if (fields === "id,*variants.inventory_quantity,*variants.manage_inventory") {
+      if (fields === "id,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata") {
         return response({ products: [candidate("product-101", 5)], count: 101, offset: 100, limit: 100 })
       }
 
@@ -237,7 +245,7 @@ describe("product recommendation candidate truncation", () => {
       if (fields === "id") {
         return response({ products: candidates, count: candidates.length, offset: 0, limit: 100 })
       }
-      if (fields === "id,*variants.inventory_quantity,*variants.manage_inventory") {
+      if (fields === "id,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata") {
         const ids = url.searchParams.getAll("id[]")
         const products = ids
           .map((id) => candidates.find((item) => item.id === id))
@@ -281,7 +289,7 @@ describe("product recommendation candidate truncation", () => {
     const request = jest.fn(async (input: string | URL | Request) => {
       const url = new URL(String(input), "http://localhost")
       const fields = url.searchParams.get("fields")
-      if (fields === "id,*variants.inventory_quantity,*variants.manage_inventory") {
+      if (fields === "id,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata") {
         return response({ products: candidates, count: candidates.length, offset: 0, limit: 100 })
       }
 
@@ -305,5 +313,28 @@ describe("product recommendation candidate truncation", () => {
       "sold-2",
       "sold-3",
     ])
+  })
+
+  it("excludes products whose variants are all stopped from cart recommendations", async () => {
+    const candidates = [
+      candidate("stopped", 8, undefined, true),
+      candidate("available", 3),
+    ]
+    const request = jest.fn(async (input: string | URL | Request) => {
+      const url = new URL(String(input), "http://localhost")
+      const fields = url.searchParams.get("fields")
+      if (fields === "id,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata") {
+        return response({ products: candidates, count: candidates.length, offset: 0, limit: 100 })
+      }
+
+      const ids = url.searchParams.getAll("id[]")
+      return response({ products: ids.map((id) => product(id, 3)) })
+    })
+
+    const result = await fetchCartRecommendedProducts("zh-TW", request as typeof fetch)
+
+    expect(result.map((item) => item.id)).toEqual(["available"])
+    const detailUrl = new URL(String(request.mock.calls[1][0]), "http://localhost")
+    expect(detailUrl.searchParams.getAll("id[]")).toEqual(["available"])
   })
 })

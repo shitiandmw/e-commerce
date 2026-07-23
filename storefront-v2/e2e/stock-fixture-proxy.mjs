@@ -115,7 +115,7 @@ async function upstreamFetch(req, target, body) {
 async function loadFixtureBase(req) {
   const target = new URL("/store/products", upstream)
   target.searchParams.set("limit", "100")
-  target.searchParams.set("fields", "id,title,handle,thumbnail,*variants,*variants.prices,*categories,*brand")
+  target.searchParams.set("fields", "id,title,handle,thumbnail,*variants,*variants.prices,*variants.metadata,*categories,*brand")
   const response = await upstreamFetch(req, target, Buffer.alloc(0))
   if (!response.ok) return []
   const data = await response.json()
@@ -231,11 +231,11 @@ function requestKind(target) {
   if (target.pathname !== "/store/products") return "other"
   const fields = target.searchParams.get("fields") || ""
   if (fields === "id") return "ids"
-  if (fields === "id,*variants.inventory_quantity,*variants.manage_inventory") {
+  if (fields === "id,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata") {
     return "stock-candidates"
   }
   if (
-    fields === "id,*variants.inventory_quantity,*variants.manage_inventory,*variants.calculated_price,*variants.prices"
+    fields === "id,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata,*variants.calculated_price,*variants.prices"
   ) {
     return "price-candidates"
   }

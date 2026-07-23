@@ -7,6 +7,7 @@ import {
   getVariantAvailability,
 } from "@medusajs/utils"
 import { RESTOCK_DEMAND_MODULE } from "../modules/restock-demand"
+import { isVariantSalesDisabled } from "./product-variant-configuration"
 
 export type RestockVariantSnapshot = {
   id: string
@@ -17,6 +18,7 @@ export type RestockVariantSnapshot = {
   specification: Array<{ name: string; value: string }>
   manage_inventory: boolean
   available_quantity: number | null
+  sales_disabled: boolean
 }
 
 export function buildRestockIdentity(customerId?: string | null, visitorId?: string | null) {
@@ -49,6 +51,7 @@ export async function getRestockVariantSnapshot(
       "sku",
       "product_id",
       "manage_inventory",
+      "metadata",
       "product.id",
       "product.title",
       "options.value",
@@ -81,6 +84,7 @@ export async function getRestockVariantSnapshot(
     })).filter((option: { name: string; value: string }) => option.name || option.value),
     manage_inventory: variant.manage_inventory !== false,
     available_quantity: availability[variantId]?.availability ?? null,
+    sales_disabled: isVariantSalesDisabled(variant.metadata),
   }
 }
 

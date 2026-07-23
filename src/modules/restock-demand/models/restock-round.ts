@@ -9,7 +9,7 @@ export const RestockRound = model.define("restock_round", {
   variant_title: model.text().nullable(),
   sku: model.text().nullable(),
   specification: model.json().nullable(),
-  status: model.enum(["pending", "restocked"]).default("pending"),
+  status: model.enum(["pending", "restocked", "discontinued"]).default("pending"),
   restocked_at: model.dateTime().nullable(),
   requests: model.hasMany(() => RestockRequester, {
     mappedBy: "round",

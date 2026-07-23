@@ -21,12 +21,13 @@ export interface ProductVariant {
     currency_code: string
   }>
   options?: Array<{
-    id?: string
+    id: string
     value: string
-    option_id?: string
+    option_id: string
   }>
   inventory_quantity?: number
   manage_inventory?: boolean
+  metadata?: Record<string, unknown> | null
   inventory_items?: ProductVariantInventoryItem[]
   created_at?: string
   updated_at?: string
@@ -112,6 +113,26 @@ export interface ProductsResponse {
   limit: number
 }
 
+export interface ProductVariantConfigurationPayload {
+  expected_updated_at?: string
+  options: Array<{
+    key: string
+    id?: string
+    title: string
+    values: Array<{ key: string; id?: string; value: string }>
+  }>
+  variants: Array<{
+    key: string
+    id?: string
+    title: string
+    sku: string
+    prices: Array<{ amount: number; currency_code: string }>
+    manage_inventory: boolean
+    option_values: Record<string, string>
+    status: "active" | "stopped" | "delete"
+  }>
+}
+
 export interface ProductsQueryParams {
   offset?: number
   limit?: number
@@ -136,7 +157,7 @@ export function useProducts(params: ProductsQueryParams = {}) {
   queryParams.set(
     "fields",
     fields ||
-      "+variants,+variants.prices,+options,+options.values,+images,*categories,*brand,*custom_tags"
+      "+variants,+variants.prices,+variants.metadata,+options,+options.values,+images,*categories,*brand,*custom_tags"
   )
 
   return useQuery<ProductsResponse>({
@@ -151,7 +172,7 @@ export function useProduct(id: string) {
     queryKey: ["product", id],
     queryFn: () =>
       adminFetch<{ product: Product }>(
-        `/admin/products/${id}?fields=+variants,+variants.prices,+variants.inventory_items,+variants.inventory_items.inventory,+variants.inventory_items.inventory.location_levels,+options,+options.values,+images,*categories,*brand,*custom_tags,*shipping_profile,+metadata`
+        `/admin/products/${id}?fields=+variants,+variants.prices,+variants.options,+variants.metadata,+variants.inventory_items,+variants.inventory_items.inventory,+variants.inventory_items.inventory.location_levels,+options,+options.values,+images,*categories,*brand,*custom_tags,*shipping_profile,+metadata`
       ),
     enabled: !!id,
   })
@@ -163,7 +184,7 @@ export function useCreateProduct() {
   return useMutation({
     mutationFn: (data: Record<string, any>) =>
       adminFetch<{ product: Product }>(
-        "/admin/products?fields=+variants,+variants.prices,+variants.inventory_items,+variants.inventory_items.inventory,+variants.inventory_items.inventory.location_levels,+options,+options.values,+images,*categories,*brand,*custom_tags,+metadata",
+        "/admin/products?fields=+variants,+variants.prices,+variants.metadata,+variants.inventory_items,+variants.inventory_items.inventory,+variants.inventory_items.inventory.location_levels,+options,+options.values,+images,*categories,*brand,*custom_tags,+metadata",
         {
           method: "POST",
           body: data,
@@ -194,6 +215,23 @@ export function useUpdateProduct(id: string) {
       queryClient.invalidateQueries({ queryKey: ["curated-collections"] })
       queryClient.invalidateQueries({ queryKey: ["curated-collection"] })
       queryClient.invalidateQueries({ queryKey: ["curated-collection-items"] })
+      queryClient.invalidateQueries({ queryKey: ["inventory-product-links"] })
+    },
+  })
+}
+
+export function useSyncProductVariantConfiguration(productId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: ProductVariantConfigurationPayload) =>
+      adminFetch(`/admin/products/${productId}/variant-configuration`, {
+        method: "POST",
+        body: data,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] })
+      queryClient.invalidateQueries({ queryKey: ["product", productId] })
+      queryClient.invalidateQueries({ queryKey: ["inventory-items"] })
       queryClient.invalidateQueries({ queryKey: ["inventory-product-links"] })
     },
   })

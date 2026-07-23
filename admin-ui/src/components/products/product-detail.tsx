@@ -37,6 +37,7 @@ import {
   useStockLocations,
 } from "@/hooks/use-inventory"
 import { withProductReturnTo } from "@/lib/product-navigation"
+import { isStoppedVariantMetadata } from "@/lib/product-variant-config"
 
 /** brand field may be a single object or an array (due to isList link) */
 function resolveBrand(brand: Product["brand"]): { id: string; name: string } | null {
@@ -156,6 +157,7 @@ function VariantInventoryCard({
   const isInitializing =
     ensureInventory.isPending &&
     ensureInventory.variables?.variantId === variant.id
+  const isStopped = isStoppedVariantMetadata(variant.metadata)
 
   const handleInitializeInventory = async () => {
     try {
@@ -180,6 +182,11 @@ function VariantInventoryCard({
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <p className="font-medium">{variant.title}</p>
+            {isStopped && (
+              <Badge variant="secondary" className="text-xs">
+                {t("variantEditor.stopped")}
+              </Badge>
+            )}
             <VariantInventoryBadge inventoryItem={inventoryItem} />
           </div>
           {variant.sku && (

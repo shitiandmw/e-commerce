@@ -1,5 +1,6 @@
 import { fetchContent } from "@/lib/medusa"
 import {
+  getSellableVariants,
   isProductOutOfStock,
   prioritizeInStockItems,
 } from "@/lib/product-availability"
@@ -59,6 +60,7 @@ interface ProductVariant {
   prices: ProductPrice[]
   inventory_quantity?: number | null
   manage_inventory?: boolean | null
+  metadata?: Record<string, unknown> | null
 }
 
 interface StoreProduct {
@@ -123,7 +125,7 @@ export async function fetchProductPrices(
     }
     url.searchParams.set(
       "fields",
-      "id,*variants.prices,*variants.inventory_quantity,*variants.manage_inventory",
+      "id,*variants.prices,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata",
     )
 
     const headers: Record<string, string> = {}
@@ -142,12 +144,13 @@ export async function fetchProductPrices(
 
     const data: StoreProductsResponse = await res.json()
     for (const product of data?.products ?? []) {
-      const cheapest = product.variants
-        ?.flatMap((v) => v.prices ?? [])
+      const sellableVariants = getSellableVariants(product.variants)
+      const cheapest = sellableVariants
+        .flatMap((v) => v.prices ?? [])
         .filter((p) => p.currency_code === "usd")
         .sort((a, b) => a.amount - b.amount)[0]
-        || product.variants
-          ?.flatMap((v) => v.prices ?? [])
+        || sellableVariants
+          .flatMap((v) => v.prices ?? [])
           .sort((a, b) => a.amount - b.amount)[0]
       priceMap.set(product.id, {
         price: cheapest?.amount ?? null,

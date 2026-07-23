@@ -44,6 +44,12 @@ async function ensurePendingRound(
   if (!variant) {
     throw new MedusaError(MedusaError.Types.NOT_FOUND, "Product variant not found")
   }
+  if (variant.sales_disabled) {
+    throw new MedusaError(
+      MedusaError.Types.NOT_ALLOWED,
+      "This product variant has been discontinued"
+    )
+  }
   if (!isVariantOutOfStock(variant.manage_inventory, variant.available_quantity)) {
     if (round) {
       await service.updateRestockRounds({
@@ -92,6 +98,9 @@ export async function getRestockRequestStatus(
   const variant = await getRestockVariantSnapshot(container, input.variant_id, {
     salesChannelId: input.sales_channel_id,
   })
+  if (variant?.sales_disabled) {
+    return { requested: false, round_id: null, requester_count: 0 }
+  }
   if (variant && !isVariantOutOfStock(variant.manage_inventory, variant.available_quantity)) {
     await service.updateRestockRounds({
       id: round.id,
