@@ -7,6 +7,7 @@ const ACTION_MAP: Record<string, { path: string; isStore?: boolean }> = {
   login: { path: "/auth/customer/emailpass" },
   register: { path: "/auth/customer/emailpass/register" },
   reset: { path: "/auth/customer/emailpass/reset-password" },
+  update: { path: "/auth/customer/emailpass/update" },
   "create-customer": { path: "/store/customers", isStore: true },
 }
 

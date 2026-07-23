@@ -110,15 +110,31 @@ export async function logout() {
 }
 
 export async function requestPasswordReset(email: string): Promise<void> {
-  try {
-    await fetch("/api/auth?action=reset", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ identifier: email }),
-    })
-  } catch {
-    // Don't leak whether user exists
-  }
+  const res = await fetch("/api/auth?action=reset", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ identifier: email.trim().toLowerCase() }),
+  })
+  if (!res.ok) throw new Error("RESET_REQUEST_FAILED")
+}
+
+export async function resetPassword(
+  email: string,
+  password: string,
+  token: string
+): Promise<void> {
+  const res = await fetch("/api/auth?action=update", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      email: email.trim().toLowerCase(),
+      password,
+    }),
+  })
+  if (!res.ok) throw new Error("PASSWORD_RESET_FAILED")
 }
 
 export async function getCustomer() {

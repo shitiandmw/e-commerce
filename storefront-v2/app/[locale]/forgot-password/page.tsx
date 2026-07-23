@@ -14,14 +14,21 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("")
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [serverError, setServerError] = useState("")
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!email) return
+    setServerError("")
     setLoading(true)
-    await requestPasswordReset(email)
-    setSubmitted(true)
-    setLoading(false)
+    try {
+      await requestPasswordReset(email)
+      setSubmitted(true)
+    } catch {
+      setServerError(t("reset_request_failed"))
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -45,6 +52,11 @@ export default function ForgotPasswordPage() {
               <p className="mb-4 text-sm text-muted-foreground">
                 {t("forgot_password_desc")}
               </p>
+              {serverError && (
+                <div className="mb-4 rounded-md bg-destructive/10 px-4 py-2 text-sm text-destructive">
+                  {serverError}
+                </div>
+              )}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">{t("email")}</Label>
