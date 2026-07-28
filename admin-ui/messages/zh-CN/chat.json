@@ -21,6 +21,13 @@
     "save": "保存",
     "connected": "已连接",
     "disconnected": "未连接",
-    "search": "搜索会话..."
+    "search": "搜索会话...",
+    "uploadImage": "发送图片",
+    "imageMessage": "客服图片",
+    "invalidImageType": "仅支持 JPG、PNG 和 WebP 图片",
+    "imageTooLarge": "图片不能超过 10MB",
+    "uploadFailed": "图片上传失败，请重试",
+    "sendFailed": "消息发送失败，请重试",
+    "imageLoadFailed": "图片加载失败"
   }
 }

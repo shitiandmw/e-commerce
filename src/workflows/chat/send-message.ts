@@ -6,6 +6,7 @@ import {
 } from "@medusajs/framework/workflows-sdk"
 import { CHAT_MODULE } from "../../modules/chat"
 import ChatModuleService from "../../modules/chat/service"
+import { buildChatMessagePreview } from "../../lib/chat-message"
 
 type SendMessageInput = {
   conversation_id: string
@@ -40,7 +41,7 @@ const sendMessageStep = createStep(
 
 const updateConversationLastMessageStep = createStep(
   "update-conversation-last-message-step",
-  async (input: { conversation_id: string; content: string; sender_type: string }, { container }) => {
+  async (input: SendMessageInput, { container }) => {
     const chatService: ChatModuleService = container.resolve(CHAT_MODULE)
 
     const existing = await chatService.retrieveConversation(input.conversation_id)
@@ -51,7 +52,7 @@ const updateConversationLastMessageStep = createStep(
     }
 
     const updateData: Record<string, any> = {
-      last_message_preview: input.content.substring(0, 100),
+      last_message_preview: buildChatMessagePreview(input),
       last_message_at: new Date(),
     }
 

@@ -1,10 +1,7 @@
 "use client"
 
-import { useEffect, useRef, useCallback, useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { adminFetch } from "@/lib/admin-api"
-import { getToken } from "@/lib/auth"
-import { io, Socket } from "socket.io-client"
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -14,7 +11,7 @@ export interface ChatMessage {
   sender_type: "customer" | "visitor" | "agent" | "system"
   sender_id: string
   content: string
-  message_type: string
+  message_type: "text" | "image" | "system"
   metadata?: Record<string, unknown> | null
   created_at: string
 }
@@ -46,6 +43,22 @@ interface MessagesResponse {
   offset: number
   limit: number
 }
+
+export type SendChatMessageInput =
+  | {
+      message_type?: "text"
+      content: string
+    }
+  | {
+      message_type: "image"
+      content: string
+      metadata: {
+        file_id: string
+        file_name: string
+        mime_type: "image/jpeg" | "image/png" | "image/webp"
+        size: number
+      }
+    }
 
 // ─── Data Hooks ──────────────────────────────────────────
 
@@ -98,6 +111,32 @@ export function useUpdateConversation(id: string) {
   })
 }
 
+export function useSendChatMessage(id: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: SendChatMessageInput) =>
+      adminFetch<{ message: ChatMessage }>(`/admin/chat/conversations/${id}/messages`, {
+        method: "POST",
+        body: data,
+      }),
+    onSuccess: ({ message }) => {
+      queryClient.setQueriesData<MessagesResponse>(
+        { queryKey: ["conversation-messages", id] },
+        (old) => {
+          if (!old || old.chat_messages.some((item) => item.id === message.id)) return old
+          return {
+            ...old,
+            chat_messages: [...old.chat_messages, message],
+            count: old.count + 1,
+          }
+        }
+      )
+      queryClient.invalidateQueries({ queryKey: ["conversations"] })
+    },
+  })
+}
+
 export function useChatSettings() {
   return useQuery<{
     chat_settings: Array<{
@@ -139,70 +178,4 @@ export function useUpdateChatSettings() {
       queryClient.invalidateQueries({ queryKey: ["chat-settings"] })
     },
   })
-}
-
-// ─── Socket.io Hook ──────────────────────────────────────
-
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:9001"
-
-export function useChatSocket() {
-  const socketRef = useRef<Socket | null>(null)
-  const [connected, setConnected] = useState(false)
-  const queryClient = useQueryClient()
-
-  useEffect(() => {
-    const token = getToken()
-    if (!token) return
-
-    const socket = io(SOCKET_URL, {
-      auth: { role: "agent", token },
-      transports: ["websocket", "polling"],
-    })
-
-    socketRef.current = socket
-
-    socket.on("connect", () => setConnected(true))
-    socket.on("disconnect", () => setConnected(false))
-
-    socket.on("chat:message", (msg: ChatMessage) => {
-      queryClient.setQueryData<MessagesResponse>(
-        ["conversation-messages", msg.conversation_id, { offset: 0, limit: 50 }],
-        (old) => {
-          if (!old) return old
-          if (old.chat_messages.some((m) => m.id === msg.id)) return old
-          return { ...old, chat_messages: [...old.chat_messages, msg], count: old.count + 1 }
-        }
-      )
-      queryClient.invalidateQueries({ queryKey: ["conversations"] })
-    })
-
-    socket.on("chat:conversation:new", () => {
-      queryClient.invalidateQueries({ queryKey: ["conversations"] })
-    })
-
-    socket.on("chat:conversation:updated", () => {
-      queryClient.invalidateQueries({ queryKey: ["conversations"] })
-    })
-
-    return () => {
-      socket.disconnect()
-      socketRef.current = null
-      setConnected(false)
-    }
-  }, [queryClient])
-
-  const joinConversation = useCallback((conversationId: string) => {
-    socketRef.current?.emit("chat:join", { conversation_id: conversationId })
-  }, [])
-
-  const sendMessage = useCallback((conversationId: string, content: string) => {
-    if (!socketRef.current?.connected) return
-    socketRef.current.emit("chat:message", { conversation_id: conversationId, content })
-  }, [])
-
-  const sendTyping = useCallback((conversationId: string) => {
-    socketRef.current?.emit("chat:typing", { conversation_id: conversationId })
-  }, [])
-
-  return { socket: socketRef, connected, joinConversation, sendMessage, sendTyping }
 }

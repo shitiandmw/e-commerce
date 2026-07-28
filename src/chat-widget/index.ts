@@ -1,6 +1,6 @@
 import { getStyles } from "./styles"
 import { createUI } from "./ui"
-import { getState, setState } from "./store"
+import { getState, setConversationToken, setState } from "./store"
 import { createConversation, loadMessages } from "./api"
 import { connectSocket, disconnectSocket } from "./socket"
 
@@ -28,13 +28,14 @@ function init() {
     if (!state.conversationId) {
       setState({ loading: true })
       try {
-        const conversationId = await createConversation()
-        setState({ conversationId })
+        const credentials = await createConversation()
+        setConversationToken(credentials.conversationToken)
+        setState({ conversationId: credentials.id })
 
-        const messages = await loadMessages(conversationId)
+        const messages = await loadMessages(credentials.id)
         setState({ messages })
 
-        connectSocket(conversationId)
+        connectSocket(credentials.id)
       } catch (err) {
         console.error("[TimeCigarChat] Failed to initialize:", err)
       } finally {
@@ -57,12 +58,23 @@ function init() {
       document.dispatchEvent(new CustomEvent("timecigar-chat:close"))
     },
     setCustomerToken(token: string) {
-      setState({ customerToken: token })
-      // Reconnect with new auth if already connected
       const state = getState()
-      if (state.conversationId) {
-        disconnectSocket()
-        connectSocket(state.conversationId)
+      if (state.customerToken === token) return
+
+      disconnectSocket()
+      setConversationToken(null)
+      setState({ customerToken: token, conversationId: null, messages: [] })
+      if (state.isOpen) {
+        queueMicrotask(() => document.dispatchEvent(new CustomEvent("timecigar-chat:open")))
+      }
+    },
+    clearCustomerToken() {
+      const state = getState()
+      disconnectSocket()
+      setConversationToken(null)
+      setState({ customerToken: null, conversationId: null, messages: [] })
+      if (state.isOpen) {
+        queueMicrotask(() => document.dispatchEvent(new CustomEvent("timecigar-chat:open")))
       }
     },
   }

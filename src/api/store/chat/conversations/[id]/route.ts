@@ -2,6 +2,10 @@ import {
   MedusaRequest,
   MedusaResponse,
 } from "@medusajs/framework/http"
+import {
+  canAccessConversation,
+  resolveStoreChatIdentity,
+} from "../../../../../lib/chat-auth"
 
 export const GET = async (
   req: MedusaRequest,
@@ -19,6 +23,14 @@ export const GET = async (
   if (!conversation) {
     res.status(404).json({ message: "Conversation not found" })
     return
+  }
+
+  const identity = resolveStoreChatIdentity({
+    authorization: req.headers.authorization,
+    conversationToken: req.headers["x-chat-conversation-token"],
+  })
+  if (!identity || !canAccessConversation(identity, conversation as any)) {
+    return res.status(404).json({ message: "Conversation not found" })
   }
 
   res.json({ conversation })

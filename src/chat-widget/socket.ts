@@ -23,11 +23,11 @@ export function connectSocket(conversationId: string) {
   const auth: Record<string, string> = {}
 
   if (state.customerToken) {
-    auth.role = "customer"
     auth.token = state.customerToken
+  } else if (state.conversationToken) {
+    auth.conversation_token = state.conversationToken
   } else {
-    auth.role = "visitor"
-    auth.visitor_id = state.visitorId
+    return
   }
 
   socket = io(getSocketUrl(), {
@@ -41,6 +41,10 @@ export function connectSocket(conversationId: string) {
   })
 
   socket.on("disconnect", () => {
+    setState({ connected: false })
+  })
+
+  socket.on("connect_error", () => {
     setState({ connected: false })
   })
 

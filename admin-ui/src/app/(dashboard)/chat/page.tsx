@@ -18,7 +18,7 @@ export default function ChatPage() {
   const t = useTranslations("chat")
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
-  const { connected, resetUnread, joinConversation, sendMessage, sendTyping } = useChatSocketContext()
+  const { connected, resetUnread, joinConversation, sendTyping } = useChatSocketContext()
   const { data } = useChatSettings()
   const updateMutation = useUpdateChatSettings()
   const { toast, showToast, hideToast } = useToast()
@@ -59,8 +59,6 @@ export default function ChatPage() {
         <ConversationList selectedId={selectedId} onSelect={handleSelect} />
         <ChatPanel
           conversationId={selectedId}
-          connected={connected}
-          onSendMessage={sendMessage}
           onTyping={sendTyping}
         />
       </div>

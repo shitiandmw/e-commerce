@@ -4,7 +4,8 @@ export type ChatMessage = {
   sender_type: "customer" | "visitor" | "agent" | "system"
   sender_id: string
   content: string
-  message_type: string
+  message_type: "text" | "image" | "system"
+  metadata?: Record<string, unknown> | null
   created_at: string
 }
 
@@ -19,9 +20,12 @@ export interface ChatState {
   unreadCount: number
   visitorId: string
   customerToken: string | null
+  conversationToken: string | null
 }
 
 const VISITOR_ID_KEY = "timecigar_chat_visitor_id"
+const CONVERSATION_TOKEN_KEY = "timecigar_chat_conversation_token"
+const CUSTOMER_TOKEN_KEY = "medusa_customer_token"
 
 function getOrCreateVisitorId(): string {
   let id = localStorage.getItem(VISITOR_ID_KEY)
@@ -40,7 +44,8 @@ let state: ChatState = {
   loading: false,
   unreadCount: 0,
   visitorId: getOrCreateVisitorId(),
-  customerToken: null,
+  customerToken: localStorage.getItem(CUSTOMER_TOKEN_KEY),
+  conversationToken: localStorage.getItem(CONVERSATION_TOKEN_KEY),
 }
 
 const listeners: Set<Listener> = new Set()
@@ -52,6 +57,15 @@ export function getState(): ChatState {
 export function setState(partial: Partial<ChatState>) {
   state = { ...state, ...partial }
   listeners.forEach((fn) => fn())
+}
+
+export function setConversationToken(token: string | null) {
+  if (token) {
+    localStorage.setItem(CONVERSATION_TOKEN_KEY, token)
+  } else {
+    localStorage.removeItem(CONVERSATION_TOKEN_KEY)
+  }
+  setState({ conversationToken: token })
 }
 
 export function subscribe(fn: Listener): () => void {

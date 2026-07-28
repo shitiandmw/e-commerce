@@ -13,6 +13,7 @@ type AIConfig = {
 type ChatMessage = {
   sender_type: string
   content: string
+  message_type?: string
 }
 
 export async function generateAIResponse(
@@ -111,7 +112,7 @@ export async function generateAIResponse(
     system: config.ai_system_prompt || defaultPrompt,
     messages: messages.map((m) => ({
       role: m.sender_type === "agent" ? "assistant" : "user",
-      content: m.content,
+      content: m.message_type === "image" ? "[客服发送了一张图片]" : m.content,
     })),
     maxRetries: 5,
   })

@@ -9,6 +9,7 @@ let messagesEl: HTMLElement
 let inputEl: HTMLTextAreaElement
 let badgeEl: HTMLElement
 let windowEl: HTMLElement
+let lastRenderedMessageId: string | null = null
 
 export function createUI(shadowRoot: ShadowRoot) {
   root = shadowRoot
@@ -124,6 +125,9 @@ function render() {
 
 function renderMessages(messages: ChatMessage[]) {
   const wasAtBottom = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight < 50
+  const newestMessageId = messages[messages.length - 1]?.id || null
+  const shouldScroll = wasAtBottom || newestMessageId !== lastRenderedMessageId
+  lastRenderedMessageId = newestMessageId
 
   messagesEl.innerHTML = ""
 
@@ -146,14 +150,49 @@ function renderMessages(messages: ChatMessage[]) {
       el.appendChild(label)
     }
 
-    const text = document.createElement("div")
-    text.textContent = msg.content
-    el.appendChild(text)
+    if (msg.message_type === "image") {
+      el.classList.add("tc-msg-image")
+      const link = document.createElement("a")
+      link.href = msg.content
+      link.target = "_blank"
+      link.rel = "noopener noreferrer"
+      link.className = "tc-image-link"
+
+      const image = document.createElement("img")
+      image.alt = typeof msg.metadata?.file_name === "string"
+        ? msg.metadata.file_name
+        : "客服图片"
+      image.loading = "lazy"
+      image.referrerPolicy = "no-referrer"
+      image.className = "tc-message-image"
+      image.addEventListener("load", () => {
+        if (shouldScroll) {
+          messagesEl.scrollTop = messagesEl.scrollHeight
+        }
+      }, { once: true })
+      image.addEventListener("error", () => {
+        link.remove()
+        const fallback = document.createElement("div")
+        fallback.className = "tc-image-error"
+        fallback.textContent = "图片加载失败"
+        el.appendChild(fallback)
+      }, { once: true })
+      image.src = msg.content
+
+      link.appendChild(image)
+      el.appendChild(link)
+    } else {
+      const text = document.createElement("div")
+      text.textContent = msg.content
+      el.appendChild(text)
+    }
 
     messagesEl.appendChild(el)
   }
 
-  if (wasAtBottom) {
-    messagesEl.scrollTop = messagesEl.scrollHeight
+  if (shouldScroll) {
+    requestAnimationFrame(() => {
+      messagesEl.scrollTop = messagesEl.scrollHeight
+    })
   }
 }

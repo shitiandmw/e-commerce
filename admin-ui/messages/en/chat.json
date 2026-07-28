@@ -21,6 +21,13 @@
     "save": "Save",
     "connected": "Connected",
     "disconnected": "Disconnected",
-    "search": "Search conversations..."
+    "search": "Search conversations...",
+    "uploadImage": "Send image",
+    "imageMessage": "Support image",
+    "invalidImageType": "Only JPG, PNG, and WebP images are supported",
+    "imageTooLarge": "Images must be 10MB or smaller",
+    "uploadFailed": "Image upload failed. Please try again",
+    "sendFailed": "Message failed to send. Please try again",
+    "imageLoadFailed": "Image failed to load"
   }
 }

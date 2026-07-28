@@ -18,6 +18,7 @@ export function setToken(token: string) {
 export function removeToken() {
   localStorage.removeItem(TOKEN_KEY)
   window.dispatchEvent(new Event("auth-change"))
+  ;(window as any).TimeCigarChat?.clearCustomerToken()
 }
 
 export function isLoggedIn(): boolean {

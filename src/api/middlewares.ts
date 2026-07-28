@@ -80,8 +80,10 @@ import {
 } from "./store/wishlist/validators"
 import {
   PostStoreCreateConversation,
+  PostStoreSendChatMessage,
 } from "./store/chat/validators"
 import {
+  PostAdminSendChatMessage,
   PostAdminUpdateConversation,
   PostAdminUpdateChatSettings,
 } from "./admin/chat/validators"
@@ -1004,6 +1006,7 @@ export default defineMiddlewares({
     {
       matcher: "/admin/chat/**",
       middlewares: [
+        authenticate("user", ["session", "bearer"]),
         (req, _res, next) => {
           initSocketIO()
           setContainer(req.scope)
@@ -1039,6 +1042,13 @@ export default defineMiddlewares({
         validateAndTransformBody(PostStoreCreateConversation),
       ],
     },
+    {
+      matcher: "/store/chat/conversations/:id/messages",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostStoreSendChatMessage),
+      ],
+    },
     // Chat admin routes
     {
       matcher: "/admin/chat/conversations",
@@ -1062,6 +1072,13 @@ export default defineMiddlewares({
       method: "POST",
       middlewares: [
         validateAndTransformBody(PostAdminUpdateConversation),
+      ],
+    },
+    {
+      matcher: "/admin/chat/conversations/:id/messages",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(PostAdminSendChatMessage),
       ],
     },
     {

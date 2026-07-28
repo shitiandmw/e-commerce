@@ -153,6 +153,37 @@ export function getStyles(): string {
       margin-bottom: 2px;
     }
 
+    .tc-msg-image {
+      padding: 8px;
+    }
+
+    .tc-image-link {
+      display: block;
+      line-height: 0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .tc-message-image {
+      display: block;
+      width: auto;
+      max-width: min(260px, 100%);
+      max-height: 240px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .tc-image-error {
+      display: flex;
+      min-width: 160px;
+      min-height: 80px;
+      align-items: center;
+      justify-content: center;
+      color: inherit;
+      opacity: 0.65;
+      font-size: 13px;
+    }
+
     .tc-chat-input-area {
       padding: 12px 16px;
       border-top: 1px solid #e5e5e5;

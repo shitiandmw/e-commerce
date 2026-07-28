@@ -3,7 +3,13 @@ import {
   MedusaResponse,
 } from "@medusajs/framework/http"
 import { sendMessageWorkflow } from "../../../../../../workflows/chat/send-message"
-import { triggerAIResponse } from "../../../../../../lib/socket-io"
+import {
+  broadcastChatMessage,
+} from "../../../../../../lib/socket-io"
+import { isAllowedChatImageUrl } from "../../../../../../lib/chat-message"
+import { CHAT_MODULE } from "../../../../../../modules/chat"
+import ChatModuleService from "../../../../../../modules/chat/service"
+import { PostAdminSendChatMessageType } from "../../../validators"
 
 export const GET = async (
   req: MedusaRequest,
@@ -36,28 +42,48 @@ export const GET = async (
 }
 
 export const POST = async (
-  req: MedusaRequest,
+  req: MedusaRequest<PostAdminSendChatMessageType>,
   res: MedusaResponse
 ) => {
   const { id } = req.params
-  const { content, sender_type } = req.body as { content: string; sender_type?: string }
-  const agentId = (req as any).auth_context?.actor_id || "admin"
+  const body = req.validatedBody
+  const agentId = (req as any).auth_context?.actor_id as string | undefined
+  const chatService: ChatModuleService = req.scope.resolve(CHAT_MODULE)
+
+  if (!agentId) {
+    return res.status(401).json({ message: "Unauthorized" })
+  }
+
+  let conversation: any
+  try {
+    conversation = await chatService.retrieveConversation(id)
+  } catch {
+    return res.status(404).json({ message: "Conversation not found" })
+  }
+
+  if (conversation.status === "closed") {
+    return res.status(409).json({ message: "Conversation is closed" })
+  }
+
+  if (body.message_type === "image") {
+    const requestOrigin = `${req.protocol}://${req.get("host")}`
+    if (!isAllowedChatImageUrl(body.content, requestOrigin)) {
+      return res.status(400).json({ message: "Image URL is not from an allowed upload origin" })
+    }
+  }
 
   const { result } = await sendMessageWorkflow(req.scope).run({
     input: {
       conversation_id: id,
-      sender_type: (sender_type || "agent") as any,
-      sender_id: sender_type === "customer" ? "test_customer" : agentId,
-      content,
-      message_type: "text",
+      sender_type: "agent",
+      sender_id: agentId,
+      content: body.content,
+      message_type: body.message_type || "text",
+      metadata: body.message_type === "image" ? body.metadata : undefined,
     },
   })
 
-  // 触发AI自动回复(如果是客户消息)
-  if (sender_type === "customer") {
-    console.log('[API] Triggering AI response for conversation:', id)
-    triggerAIResponse(id, req.scope)
-  }
+  broadcastChatMessage(id, result as any)
 
-  res.json({ message: result })
+  res.status(201).json({ message: result })
 }

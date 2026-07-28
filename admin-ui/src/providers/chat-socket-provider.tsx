@@ -11,7 +11,6 @@ interface ChatSocketContextValue {
   totalUnread: number
   resetUnread: () => void
   joinConversation: (id: string) => void
-  sendMessage: (conversationId: string, content: string) => void
   sendTyping: (conversationId: string) => void
 }
 
@@ -20,7 +19,6 @@ const ChatSocketContext = createContext<ChatSocketContextValue>({
   totalUnread: 0,
   resetUnread: () => {},
   joinConversation: () => {},
-  sendMessage: () => {},
   sendTyping: () => {},
 })
 
@@ -40,7 +38,7 @@ export function ChatSocketProvider({ children }: { children: ReactNode }) {
     if (!token) return
 
     const socket = io(SOCKET_URL, {
-      auth: { role: "agent", token },
+      auth: { token },
       transports: ["websocket", "polling"],
     })
     socketRef.current = socket
@@ -101,17 +99,12 @@ export function ChatSocketProvider({ children }: { children: ReactNode }) {
     socketRef.current?.emit("chat:join", { conversation_id: id })
   }, [])
 
-  const sendMessage = useCallback((conversationId: string, content: string) => {
-    if (!socketRef.current?.connected) return
-    socketRef.current.emit("chat:message", { conversation_id: conversationId, content })
-  }, [])
-
   const sendTyping = useCallback((conversationId: string) => {
     socketRef.current?.emit("chat:typing", { conversation_id: conversationId })
   }, [])
 
   return (
-    <ChatSocketContext.Provider value={{ connected, totalUnread, resetUnread, joinConversation, sendMessage, sendTyping }}>
+    <ChatSocketContext.Provider value={{ connected, totalUnread, resetUnread, joinConversation, sendTyping }}>
       {children}
     </ChatSocketContext.Provider>
   )
