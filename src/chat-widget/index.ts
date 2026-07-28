@@ -1,6 +1,11 @@
 import { getStyles } from "./styles"
 import { createUI } from "./ui"
-import { getState, setConversationToken, setState } from "./store"
+import {
+  getState,
+  setConversationToken,
+  setCustomerToken,
+  setState,
+} from "./store"
 import { createConversation, loadMessages } from "./api"
 import { connectSocket, disconnectSocket } from "./socket"
 
@@ -26,7 +31,7 @@ function init() {
 
     const state = getState()
     if (!state.conversationId) {
-      setState({ loading: true })
+      setState({ loading: true, connectionFailed: false })
       try {
         const credentials = await createConversation()
         setConversationToken(credentials.conversationToken)
@@ -37,6 +42,7 @@ function init() {
 
         connectSocket(credentials.id)
       } catch (err) {
+        setState({ connectionFailed: true })
         console.error("[TimeCigarChat] Failed to initialize:", err)
       } finally {
         setState({ loading: false })
@@ -63,7 +69,12 @@ function init() {
 
       disconnectSocket()
       setConversationToken(null)
-      setState({ customerToken: token, conversationId: null, messages: [] })
+      setCustomerToken(token)
+      setState({
+        conversationId: null,
+        messages: [],
+        connectionFailed: false,
+      })
       if (state.isOpen) {
         queueMicrotask(() => document.dispatchEvent(new CustomEvent("timecigar-chat:open")))
       }
@@ -72,7 +83,12 @@ function init() {
       const state = getState()
       disconnectSocket()
       setConversationToken(null)
-      setState({ customerToken: null, conversationId: null, messages: [] })
+      setCustomerToken(null)
+      setState({
+        conversationId: null,
+        messages: [],
+        connectionFailed: false,
+      })
       if (state.isOpen) {
         queueMicrotask(() => document.dispatchEvent(new CustomEvent("timecigar-chat:open")))
       }

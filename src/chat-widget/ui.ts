@@ -110,14 +110,24 @@ function render() {
 
   // Connection status
   const statusEl = windowEl.querySelector(".tc-chat-header-status")!
-  statusEl.textContent = state.connected ? "在线客服" : "未连接"
+  statusEl.textContent = state.connected
+    ? "在线客服"
+    : state.connectionFailed
+      ? "连接失败"
+      : state.loading
+        ? "连接中"
+        : "未连接"
   ;(statusEl as HTMLElement).style.color = state.connected ? "" : "#ef4444"
 
   // Disable input when disconnected
   const sendBtn = windowEl.querySelector(".tc-chat-send") as HTMLButtonElement
   inputEl.disabled = !state.connected
   sendBtn.disabled = !state.connected
-  inputEl.placeholder = state.connected ? "输入消息..." : "未连接，请稍候..."
+  inputEl.placeholder = state.connected
+    ? "输入消息..."
+    : state.connectionFailed
+      ? "连接失败，请稍后重试"
+      : "未连接，请稍候..."
 
   // Messages
   renderMessages(state.messages)

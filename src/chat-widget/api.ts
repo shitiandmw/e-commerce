@@ -1,4 +1,9 @@
-import { getState, setConversationToken, ChatMessage } from "./store"
+import {
+  getState,
+  setConversationToken,
+  setCustomerToken,
+  ChatMessage,
+} from "./store"
 
 const BASE_URL = getBaseUrl()
 const PUBLISHABLE_KEY = getPublishableKey()
@@ -40,20 +45,37 @@ type ConversationCredentials = {
   conversationToken: string | null
 }
 
-export async function createConversation(retryWithoutToken = true): Promise<ConversationCredentials> {
+export async function createConversation(
+  retryWithoutCredentials = true
+): Promise<ConversationCredentials> {
   const state = getState()
   const res = await fetch(`${BASE_URL}/store/chat/conversations`, {
     method: "POST",
     headers: storeHeaders(),
     body: JSON.stringify({
       visitor_id: state.visitorId,
-      conversation_token: state.customerToken ? undefined : state.conversationToken || undefined,
+      conversation_token: state.customerToken
+        ? undefined
+        : state.conversationToken || undefined,
     }),
   })
 
-  if (res.status === 401 && state.conversationToken && retryWithoutToken) {
-    setConversationToken(null)
-    return createConversation(false)
+  if (res.status === 401 && retryWithoutCredentials) {
+    const hasInvalidCredentials = Boolean(
+      state.customerToken || state.conversationToken
+    )
+
+    if (state.customerToken) {
+      setCustomerToken(null)
+      window.dispatchEvent(new Event("auth-change"))
+    }
+    if (state.conversationToken) {
+      setConversationToken(null)
+    }
+
+    if (hasInvalidCredentials) {
+      return createConversation(false)
+    }
   }
   if (!res.ok) throw new Error(`Create conversation failed: ${res.status}`)
   const data = await res.json()

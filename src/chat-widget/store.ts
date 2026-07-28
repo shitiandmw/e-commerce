@@ -16,6 +16,7 @@ export interface ChatState {
   conversationId: string | null
   messages: ChatMessage[]
   connected: boolean
+  connectionFailed: boolean
   loading: boolean
   unreadCount: number
   visitorId: string
@@ -41,6 +42,7 @@ let state: ChatState = {
   conversationId: null,
   messages: [],
   connected: false,
+  connectionFailed: false,
   loading: false,
   unreadCount: 0,
   visitorId: getOrCreateVisitorId(),
@@ -66,6 +68,15 @@ export function setConversationToken(token: string | null) {
     localStorage.removeItem(CONVERSATION_TOKEN_KEY)
   }
   setState({ conversationToken: token })
+}
+
+export function setCustomerToken(token: string | null) {
+  if (token) {
+    localStorage.setItem(CUSTOMER_TOKEN_KEY, token)
+  } else {
+    localStorage.removeItem(CUSTOMER_TOKEN_KEY)
+  }
+  setState({ customerToken: token })
 }
 
 export function subscribe(fn: Listener): () => void {

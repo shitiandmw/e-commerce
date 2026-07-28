@@ -36,7 +36,7 @@ export function connectSocket(conversationId: string) {
   })
 
   socket.on("connect", () => {
-    setState({ connected: true })
+    setState({ connected: true, connectionFailed: false })
     socket!.emit("chat:join", { conversation_id: conversationId })
   })
 
@@ -45,7 +45,7 @@ export function connectSocket(conversationId: string) {
   })
 
   socket.on("connect_error", () => {
-    setState({ connected: false })
+    setState({ connected: false, connectionFailed: true })
   })
 
   socket.on("chat:message", (msg) => {
@@ -94,5 +94,5 @@ export function emitTyping() {
 export function disconnectSocket() {
   socket?.disconnect()
   socket = null
-  setState({ connected: false })
+  setState({ connected: false, connectionFailed: false })
 }
