@@ -35,6 +35,7 @@ PROD_STORE_CORS=https://your-store.com
 PROD_ADMIN_CORS=https://admin.your-store.com
 NEXT_PUBLIC_MEDUSA_BACKEND_URL_ADMIN=https://api.your-store.com
 NEXT_PUBLIC_MEDUSA_BACKEND_URL_STORE=https://api.your-store.com
+FILE_BACKEND_URL=https://api.your-store.com/static
 NEXT_PUBLIC_SOCKET_URL=https://api.your-store.com:49001
 
 # Stripe 支付（可选）
@@ -49,6 +50,8 @@ NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_xxx
 ```
 
 WooshPay 的 API key 和 webhook secret 通过 Admin UI 的 Payment Configuration 写入 runtime payment settings；当前 provider 不读取 `WOOSHPAY_API_KEY` 环境变量。
+
+`FILE_BACKEND_URL` 是上传文件的公网访问前缀，必须能被管理后台和店铺访客的浏览器访问，并保留 `/static` 路径。
 
 ### 2. 启动服务
 

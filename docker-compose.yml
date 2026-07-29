@@ -52,6 +52,7 @@ services:
       STORE_CORS: ${STORE_CORS:-http://localhost:43000}
       ADMIN_CORS: ${ADMIN_CORS:-http://localhost:43002}
       AUTH_CORS: ${AUTH_CORS:-http://localhost:43002,http://localhost:43000}
+      FILE_BACKEND_URL: "${FILE_BACKEND_URL:-${NEXT_PUBLIC_MEDUSA_BACKEND_URL_ADMIN:-http://localhost:49000}/static}"
       STRIPE_API_KEY: ${STRIPE_API_KEY:-}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
       STOREFRONT_URL: ${STOREFRONT_URL:-http://localhost:43000}

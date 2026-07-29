@@ -12,6 +12,8 @@ const smtpSecure = process.env.SMTP_SECURE?.trim() || "false"
 const smtpUser = process.env.SMTP_USER?.trim()
 const smtpPass = process.env.SMTP_PASS?.trim()
 const smtpFrom = process.env.SMTP_FROM?.trim() || smtpUser
+const fileBackendUrl =
+  process.env.FILE_BACKEND_URL?.trim() || "http://localhost:9000/static"
 const sendgridSettings = [
   sendgridApiKey,
   sendgridFrom,
@@ -127,6 +129,20 @@ module.exports = defineConfig({
     },
     {
       resolve: "./src/modules/tracking",
+    },
+    {
+      resolve: "@medusajs/medusa/file",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/medusa/file-local",
+            id: "local",
+            options: {
+              backend_url: fileBackendUrl,
+            },
+          },
+        ],
+      },
     },
     {
       resolve: "@medusajs/medusa/notification",
