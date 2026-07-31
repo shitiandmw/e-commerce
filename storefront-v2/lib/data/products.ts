@@ -371,6 +371,15 @@ interface MedusaCalculatedPrice {
   original_amount: number
 }
 
+export interface MedusaProductSalePrice {
+  variant_id: string
+  amount: number
+  currency_code: string
+  starts_at: string | null
+  ends_at: string | null
+  status: "active" | "scheduled"
+}
+
 export interface DisplayPriceVariant {
   prices?: MedusaPrice[]
   calculated_price?: MedusaCalculatedPrice
@@ -445,6 +454,8 @@ export interface MedusaProduct {
   metadata: Record<string, unknown> | null
   tags?: { id: string; value: string }[]
   custom_tags?: ProductCustomTag[]
+  sale_prices?: MedusaProductSalePrice[]
+  sale_price_server_time?: string
 }
 
 interface StoreProductResponse {
@@ -459,6 +470,11 @@ interface StoreProductCandidateResponse extends ProductBatch<ProductListCandidat
 
 interface StoreProductTagsResponse {
   product_tags: Record<string, ProductCustomTag[]>
+}
+
+interface StoreProductSalePricesResponse {
+  sale_prices: MedusaProductSalePrice[]
+  server_time: string
 }
 
 export interface MedusaProductListResponse {
@@ -501,7 +517,7 @@ export interface FetchProductsParams {
 export function getProductDisplayPrice(
   product: DisplayPriceProduct,
   preferredCurrency = "usd",
-): { amount: number; currency_code: string } | null {
+): { amount: number; currency_code: string; original_amount?: number } | null {
   const sellableVariants = getSellableVariants(product.variants)
   const calculatedPrices = sellableVariants
     ?.map((variant) => variant.calculated_price)
@@ -512,7 +528,14 @@ export function getProductDisplayPrice(
     const cheapest = calculatedPrices.reduce((current, price) => (
       price.calculated_amount < current.calculated_amount ? price : current
     ))
-    return { amount: cheapest.calculated_amount, currency_code: cheapest.currency_code }
+    return {
+      amount: cheapest.calculated_amount,
+      currency_code: cheapest.currency_code,
+      original_amount:
+        cheapest.original_amount > cheapest.calculated_amount
+          ? cheapest.original_amount
+          : undefined,
+    }
   }
 
   const rawPrices = sellableVariants
@@ -564,7 +587,7 @@ async function medusaFetch<T>(path: string, params?: Record<string, string | str
   }
   const res = await fetch(url.toString(), {
     headers,
-    next: { revalidate: 30 },
+    cache: "no-store",
   })
   if (!res.ok) {
     throw new Error(`Medusa API error: ${res.status}`)
@@ -613,6 +636,23 @@ async function hydrateProductsWithCustomTags<T extends MedusaProduct>(
       custom_tags: customTags,
     }
   })
+}
+
+async function hydrateProductWithSalePrices<T extends MedusaProduct>(
+  product: T
+): Promise<T> {
+  try {
+    const data = await medusaFetch<StoreProductSalePricesResponse>(
+      `/store/products/${product.id}/sale-prices`
+    )
+    return {
+      ...product,
+      sale_prices: data.sale_prices ?? [],
+      sale_price_server_time: data.server_time,
+    }
+  } catch {
+    return product
+  }
 }
 
 async function fetchProductDetailsByIds(
@@ -867,7 +907,9 @@ export async function fetchProduct(handle: string, locale?: string, regionId?: s
     try {
       const data = await medusaFetch<StoreProductResponse>("/store/products", params, locale)
       const products = await hydrateProductsWithCustomTags(data?.products ?? [], locale)
-      return products?.[0] ?? null
+      return products?.[0]
+        ? await hydrateProductWithSalePrices(products[0])
+        : null
     } catch {
       const data = await medusaFetch<StoreProductResponse>(
         "/store/products",
@@ -875,7 +917,9 @@ export async function fetchProduct(handle: string, locale?: string, regionId?: s
         locale
       )
       const products = await hydrateProductsWithCustomTags(data?.products ?? [], locale)
-      return products?.[0] ?? null
+      return products?.[0]
+        ? await hydrateProductWithSalePrices(products[0])
+        : null
     }
   } catch {
     return null
@@ -938,7 +982,7 @@ export async function fetchRelatedProducts(
  * Get price from calculated_price (region-aware, preferred) or fallback to raw prices.
  * When region_id is passed to the API, Medusa populates calculated_price on each variant.
  */
-export function getMedusaPrice(product: MedusaProduct, preferredCurrency = "usd"): { amount: number; currency_code: string } | null {
+export function getMedusaPrice(product: MedusaProduct, preferredCurrency = "usd"): { amount: number; currency_code: string; original_amount?: number } | null {
   return getProductDisplayPrice(product, preferredCurrency)
 }
 

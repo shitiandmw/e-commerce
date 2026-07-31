@@ -56,7 +56,13 @@ function ChevronRight() {
   )
 }
 
-function ProductCarousel({ items }: { items: CollectionItem[] }) {
+function ProductCarousel({
+  items,
+  locale,
+}: {
+  items: CollectionItem[]
+  locale?: string
+}) {
   const scrollRef = useRef<HTMLDivElement>(null)
 
   const scroll = (dir: "left" | "right") => {
@@ -172,7 +178,7 @@ export default function PromotionTabs({ collections, locale }: { collections: Cu
         ))}
       </div>
       {/* Product carousel */}
-      <ProductCarousel items={activeItems} />
+      <ProductCarousel items={activeItems} locale={locale} />
     </section>
   )
 }

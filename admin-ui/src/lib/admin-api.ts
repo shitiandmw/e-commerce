@@ -171,6 +171,21 @@ export interface AdminOrderItem {
   tax_total?: number
   discount_total?: number
   original_total?: number
+  adjustments?: AdminOrderAdjustment[]
+}
+
+export interface AdminOrderAdjustment {
+  id?: string
+  code?: string | null
+  amount?: number
+  promotion_id?: string | null
+  description?: string | null
+}
+
+export interface AdminOrderPromotion {
+  id: string
+  code?: string | null
+  is_automatic?: boolean
 }
 
 export interface AdminOrderFulfillment {
@@ -225,6 +240,7 @@ export interface AdminOrderShippingMethod {
       [key: string]: unknown
     } | null
   } | null
+  adjustments?: AdminOrderAdjustment[]
 }
 
 export interface AdminOrder {
@@ -263,6 +279,7 @@ export interface AdminOrder {
   shipping_methods?: AdminOrderShippingMethod[]
   fulfillments?: AdminOrderFulfillment[]
   payment_collections?: AdminPaymentCollection[]
+  promotions?: AdminOrderPromotion[]
   region?: {
     id: string
     name?: string

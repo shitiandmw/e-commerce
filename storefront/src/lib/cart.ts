@@ -74,7 +74,7 @@ export interface Cart {
   shipping_address?: CartAddress | null
   billing_address?: CartAddress | null
   shipping_methods?: { shipping_option_id: string; amount: number; name?: string }[]
-  promotions?: { code: string }[]
+  promotions?: { code: string; is_automatic?: boolean }[]
 }
 
 const FIELDS = "fields=*items,*items.variant,*items.variant.product"
@@ -180,7 +180,7 @@ export async function applyPromoCode(code: string): Promise<Cart> {
   if (!cartId) throw new Error("No cart found")
   const { cart } = await apiFetch<{ cart: Cart }>(
     `/api/cart/${cartId}/promotions?${FIELDS}`,
-    { method: "POST", body: JSON.stringify({ promo_codes: [code] }) }
+    { method: "POST", body: JSON.stringify({ promo_codes: [code.trim().toUpperCase()] }) }
   )
   return cart
 }
@@ -190,7 +190,7 @@ export async function removePromoCode(code: string): Promise<Cart> {
   if (!cartId) throw new Error("No cart found")
   const { cart } = await apiFetch<{ cart: Cart }>(
     `/api/cart/${cartId}/promotions?${FIELDS}`,
-    { method: "DELETE", body: JSON.stringify({ promo_codes: [code] }) }
+    { method: "DELETE", body: JSON.stringify({ promo_codes: [code.trim().toUpperCase()] }) }
   )
   return cart
 }

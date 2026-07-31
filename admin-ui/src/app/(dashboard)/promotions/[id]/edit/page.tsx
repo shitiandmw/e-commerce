@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { isEditableCoupon } from "@/lib/promotion-config"
 
 export default function EditPromotionPage() {
   const t = useTranslations("promotions")
@@ -52,6 +53,25 @@ export default function EditPromotionPage() {
             {error instanceof Error
               ? error.message
               : t("promotionNotFound")}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isEditableCoupon(data.promotion)) {
+    return (
+      <div className="space-y-6">
+        <Link href={`/promotions/${promotionId}`}>
+          <Button variant="ghost" size="sm">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            {t("backToPromotions")}
+          </Button>
+        </Link>
+        <div className="max-w-2xl rounded-md border p-6">
+          <h1 className="text-xl font-semibold">{t("legacy.readOnlyTitle")}</h1>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            {t("legacy.readOnlyDescription")}
           </p>
         </div>
       </div>

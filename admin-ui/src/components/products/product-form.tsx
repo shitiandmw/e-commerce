@@ -8,10 +8,12 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import {
   Product,
+  ProductSalePrice,
   useCreateProduct,
   useDeleteProduct,
   useUpdateProduct,
   useSyncProductVariantConfiguration,
+  useSyncProductSalePrices,
   useCategories,
   useLinkProductCategory,
   useUnlinkProductCategory,
@@ -87,6 +89,8 @@ import {
 } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { AdminApiError } from "@/lib/admin-api"
+import { majorToMinorAmount } from "@/lib/promotion-config"
+import { storeDatetimeLocalToIso } from "@/lib/store-time"
 
 /** brand field may be a single object or an array (due to isList link) */
 function resolveBrand(brand: Product["brand"]): { id: string; name: string } | null {
@@ -141,12 +145,14 @@ function getBlockedVariantDeleteError(error: Error) {
 
 interface ProductFormProps {
   product?: Product
+  salePrices?: ProductSalePrice[]
   mode: "create" | "edit"
   returnTo?: string
 }
 
 export function ProductForm({
   product,
+  salePrices = [],
   mode,
   returnTo = "/products",
 }: ProductFormProps) {
@@ -156,6 +162,7 @@ export function ProductForm({
   const deleteProduct = useDeleteProduct()
   const updateProduct = useUpdateProduct(product?.id || "")
   const syncVariantConfiguration = useSyncProductVariantConfiguration(product?.id || "")
+  const syncProductSalePrices = useSyncProductSalePrices()
   const { data: categoriesData } = useCategories()
   const { data: brandsData } = useBrands({ limit: 100 })
   const linkProductBrand = useLinkProductBrand()
@@ -247,9 +254,16 @@ export function ProductForm({
   const [variantConfiguration, setVariantConfiguration] =
     React.useState<ProductVariantConfiguration>(() =>
       product
-        ? initializeProductVariantConfiguration(product)
+        ? initializeProductVariantConfiguration(product, salePrices)
         : createDefaultProductVariantConfiguration("")
     )
+  const handleVariantConfigurationChange = React.useCallback(
+    (configuration: ProductVariantConfiguration) => {
+      setVariantConfiguration(configuration)
+      setSubmitError(null)
+    },
+    []
+  )
   const [pendingSubmit, setPendingSubmit] = React.useState<ProductFormData | null>(null)
   const [blockedVariantDelete, setBlockedVariantDelete] =
     React.useState<BlockedVariantDelete | null>(null)
@@ -379,6 +393,36 @@ export function ProductForm({
             optionValueByKey.get(`${option.key}:${optionValues[option.key]}`)!,
           ])
         )
+      const buildSalePricesPayload = (
+        persistedVariants: Array<{ id: string; sku?: string | null }>
+      ) => ({
+        configurations: retainedVariants.map((variant) => {
+          const persisted =
+            (variant.id && persistedVariants.find((item) => item.id === variant.id)) ||
+            persistedVariants.find((item) => item.sku === variant.sku.trim())
+          if (!persisted) {
+            throw new Error(`Unable to resolve saved SKU ${variant.sku}`)
+          }
+          return {
+            variant_id: persisted.id,
+            enabled: variant.sale_enabled,
+            mode: variant.sale_mode,
+            amount:
+              variant.sale_price === null
+                ? null
+                : majorToMinorAmount(variant.sale_price, variant.currency_code),
+            currency_code: variant.currency_code,
+            starts_at:
+              variant.sale_mode === "scheduled"
+                ? storeDatetimeLocalToIso(variant.sale_starts_at)
+                : null,
+            ends_at:
+              variant.sale_mode === "scheduled"
+                ? storeDatetimeLocalToIso(variant.sale_ends_at)
+                : null,
+          }
+        }),
+      })
 
       const payload: Record<string, any> = {
         title: data.title,
@@ -413,7 +457,7 @@ export function ProductForm({
           title: variant.title.trim(),
           sku: variant.sku.trim(),
           prices: [{
-            amount: Math.round(variant.price * 100),
+            amount: majorToMinorAmount(variant.price, variant.currency_code),
             currency_code: variant.currency_code,
           }],
           manage_inventory: variant.manage_inventory,
@@ -444,6 +488,15 @@ export function ProductForm({
           ? (await fetchProductInventorySnapshot(newProductId)).product
               .variants || []
           : result?.product?.variants || []
+        try {
+          await syncProductSalePrices.mutateAsync({
+            productId: newProductId,
+            payload: buildSalePricesPayload(createdVariants),
+          })
+        } catch (error) {
+          await deleteProduct.mutateAsync(newProductId).catch(() => undefined)
+          throw error
+        }
         if (newProductId) {
           for (const formVariant of retainedVariants) {
             if (!formVariant.manage_inventory) continue
@@ -509,7 +562,7 @@ export function ProductForm({
             title: variant.title.trim(),
             sku: variant.sku.trim(),
             prices: [{
-              amount: Math.round(variant.price * 100),
+              amount: majorToMinorAmount(variant.price, variant.currency_code),
               currency_code: variant.currency_code,
             }],
             manage_inventory: variant.manage_inventory,
@@ -526,6 +579,10 @@ export function ProductForm({
         const refreshedVariants = (
           await fetchProductInventorySnapshot(product.id)
         ).product.variants || []
+        await syncProductSalePrices.mutateAsync({
+          productId: product.id,
+          payload: buildSalePricesPayload(refreshedVariants),
+        })
         for (const formVariant of retainedVariants) {
           if (!formVariant.manage_inventory) continue
           const persisted = refreshedVariants.find(
@@ -704,7 +761,8 @@ export function ProductForm({
   const mutationError =
     submitError ||
     (mode === "create" ? createProduct.error : updateProduct.error) ||
-    syncVariantConfiguration.error
+    syncVariantConfiguration.error ||
+    syncProductSalePrices.error
 
   return (
     <form onSubmit={handleSubmit(requestSubmit)} className="space-y-8">
@@ -929,7 +987,7 @@ export function ProductForm({
 
           <ProductVariantEditor
             value={variantConfiguration}
-            onChange={setVariantConfiguration}
+            onChange={handleVariantConfigurationChange}
             productTitle={watchedTitle}
             mode={mode}
           />

@@ -4,8 +4,13 @@
  * @param currencyCode 货币代码，默认 usd
  */
 export function formatPrice(amount: number, currencyCode = "usd"): string {
+  const formatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currencyCode,
+  })
+  const fractionDigits = formatter.resolvedOptions().maximumFractionDigits ?? 2
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: currencyCode,
-  }).format(amount / 100)
+  }).format(amount / 10 ** fractionDigits)
 }

@@ -71,7 +71,16 @@ export function HotPicks({ products }: HotPicksProps) {
                 <h3 className="mt-1 text-sm font-medium text-foreground leading-snug line-clamp-2">{product.title}</h3>
                 <div className="mt-3">
                   {product.price !== null ? (
-                    <span className="text-gold font-bold text-base">{formatPrice(product.price, product.currency_code)}</span>
+                    <span className="flex flex-wrap items-baseline gap-2">
+                      <span className="text-gold font-bold text-base">
+                        {formatPrice(product.price, product.currency_code)}
+                      </span>
+                      {product.original_price !== null && (
+                        <span className="text-xs text-muted-foreground line-through">
+                          {formatPrice(product.original_price, product.currency_code)}
+                        </span>
+                      )}
+                    </span>
                   ) : (
                     <span className="text-muted-foreground text-sm">{t("price_tbd")}</span>
                   )}

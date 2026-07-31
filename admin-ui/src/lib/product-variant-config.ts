@@ -1,4 +1,10 @@
-import type { Product } from "@/hooks/use-products"
+import type {
+  Product,
+  ProductSalePrice,
+  ProductSaleStatus,
+} from "@/hooks/use-products"
+import { minorToMajorAmount } from "./promotion-config"
+import { isoToStoreDatetimeLocal } from "./store-time"
 import { toSlug } from "./slug"
 
 export type EditorOptionValue = {
@@ -28,6 +34,12 @@ export type EditorVariant = {
   option_values: Record<string, string>
   status: EditorVariantStatus
   initial_status: "active" | "stopped" | "new"
+  sale_enabled: boolean
+  sale_price: number | null
+  sale_mode: "ongoing" | "scheduled"
+  sale_starts_at: string
+  sale_ends_at: string
+  sale_status: ProductSaleStatus
 }
 
 export type ProductVariantConfiguration = {
@@ -73,7 +85,8 @@ export function isStoppedVariantMetadata(metadata?: Record<string, unknown> | nu
 }
 
 export function initializeProductVariantConfiguration(
-  product?: Product
+  product?: Product,
+  salePrices: ProductSalePrice[] = []
 ): ProductVariantConfiguration {
   if (!product) return { options: [], variants: [] }
 
@@ -88,6 +101,9 @@ export function initializeProductVariantConfiguration(
     })),
   }))
   const optionKeyById = new Map(options.map((option) => [option.id, option.key]))
+  const salePriceByVariant = new Map(
+    salePrices.map((salePrice) => [salePrice.variant_id, salePrice])
+  )
 
   const variants: EditorVariant[] = (product.variants || []).map((variant) => {
     const stopped = isStoppedVariantMetadata(variant.metadata)
@@ -96,18 +112,29 @@ export function initializeProductVariantConfiguration(
       const optionKey = optionKeyById.get(value.option_id)
       if (optionKey) optionValues[optionKey] = value.id
     }
+    const currencyCode = variant.prices?.[0]?.currency_code || "usd"
+    const salePrice = salePriceByVariant.get(variant.id)
     return {
       key: variant.id,
       id: variant.id,
       title: variant.title,
       sku: variant.sku || "",
-      price: (variant.prices?.[0]?.amount || 0) / 100,
-      currency_code: variant.prices?.[0]?.currency_code || "usd",
+      price: minorToMajorAmount(variant.prices?.[0]?.amount || 0, currencyCode),
+      currency_code: currencyCode,
       inventory_quantity: variant.inventory_quantity || 0,
       manage_inventory: variant.manage_inventory ?? true,
       option_values: optionValues,
       status: stopped ? "stopped" : "active",
       initial_status: stopped ? "stopped" : "active",
+      sale_enabled: salePrice?.enabled ?? false,
+      sale_price:
+        salePrice?.amount == null
+          ? null
+          : minorToMajorAmount(salePrice.amount, salePrice.currency_code),
+      sale_mode: salePrice?.mode ?? "ongoing",
+      sale_starts_at: isoToStoreDatetimeLocal(salePrice?.starts_at),
+      sale_ends_at: isoToStoreDatetimeLocal(salePrice?.ends_at),
+      sale_status: salePrice?.status ?? "not_configured",
     }
   })
 
@@ -137,6 +164,12 @@ export function createDefaultProductVariantConfiguration(
       option_values: { [optionKey]: valueKey },
       status: "active",
       initial_status: "new",
+      sale_enabled: false,
+      sale_price: null,
+      sale_mode: "ongoing",
+      sale_starts_at: "",
+      sale_ends_at: "",
+      sale_status: "not_configured",
     }],
   }
 }
@@ -215,6 +248,12 @@ export function reconcileVariantMatrix(
       option_values: optionValues,
       status: "active" as const,
       initial_status: "new" as const,
+      sale_enabled: false,
+      sale_price: null,
+      sale_mode: "ongoing" as const,
+      sale_starts_at: "",
+      sale_ends_at: "",
+      sale_status: "not_configured" as const,
     }
   })
 
@@ -247,6 +286,47 @@ export function getConfigurationErrors(configuration: ProductVariantConfiguratio
   if (new Set(signatures).size !== signatures.length) errors.push("规格选项组合不能重复")
   const skus = retained.map((variant) => variant.sku.trim().toLowerCase())
   if (new Set(skus).size !== skus.length) errors.push("SKU 不能重复")
+  if (retained.some((variant) => !Number.isFinite(variant.price) || variant.price <= 0)) {
+    errors.push("原价必须大于 0")
+  }
+  if (retained.some((variant) => variant.sale_enabled && variant.sale_price === null)) {
+    errors.push("开启优惠价后必须填写优惠价")
+  }
+  if (
+    retained.some((variant) =>
+      variant.sale_price !== null &&
+      (!Number.isFinite(variant.sale_price) || variant.sale_price <= 0)
+    )
+  ) {
+    errors.push("优惠价必须大于 0")
+  }
+  if (
+    retained.some((variant) =>
+      variant.sale_price !== null && variant.sale_price >= variant.price
+    )
+  ) {
+    errors.push("优惠价必须低于原价")
+  }
+  if (
+    retained.some((variant) =>
+      variant.sale_price !== null &&
+      variant.sale_mode === "scheduled" &&
+      (!variant.sale_starts_at || !variant.sale_ends_at)
+    )
+  ) {
+    errors.push("定时优惠必须填写开始和结束时间")
+  }
+  if (
+    retained.some((variant) =>
+      variant.sale_price !== null &&
+      variant.sale_mode === "scheduled" &&
+      variant.sale_starts_at &&
+      variant.sale_ends_at &&
+      variant.sale_ends_at <= variant.sale_starts_at
+    )
+  ) {
+    errors.push("优惠结束时间必须晚于开始时间")
+  }
   return errors
 }
 

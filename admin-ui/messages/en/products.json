@@ -133,6 +133,26 @@
       "existingValueRemovalBlocked": "This value is used by {count} existing variants. Permanently delete and save them first. Stopped variants must keep their option relationship.",
       "syncMatrix": "Sync combinations",
       "selectValue": "Select a value",
+      "originalPrice": "Original price *",
+      "salePrice": "Sale price",
+      "salePriceHint": "When enabled, the sale price applies during its active period and automatically returns to the original price afterward.",
+      "saleAmount": "Sale price",
+      "saleAmountPlaceholder": "Enter an amount below the original price",
+      "saleDuration": "Duration",
+      "saleStartsAt": "Starts at",
+      "saleEndsAt": "Ends at (exclusive)",
+      "saleTimezone": "Times use the store time zone {timeZone}. The start is inclusive and the end is exclusive.",
+      "saleMode": {
+        "ongoing": "Ongoing",
+        "scheduled": "Scheduled"
+      },
+      "saleStatus": {
+        "not_configured": "Needs price",
+        "disabled": "Disabled",
+        "scheduled": "Scheduled",
+        "active": "On sale",
+        "ended": "Ended"
+      },
       "active": "Active",
       "stopped": "Stopped",
       "pendingDelete": "Pending permanent deletion",

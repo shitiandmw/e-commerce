@@ -1,11 +1,11 @@
 {
   "promotions": {
-    "title": "Promotions",
-    "description": "Manage discount promotions and campaigns",
-    "addPromotion": "Add Promotion",
-    "createPromotion": "Create Promotion",
-    "editPromotion": "Edit Promotion",
-    "createSubtitle": "Set up a new discount promotion",
+    "title": "Discount Codes",
+    "description": "Create and manage product discount codes used at checkout",
+    "addPromotion": "Add Discount Code",
+    "createPromotion": "Create Discount Code",
+    "editPromotion": "Edit Discount Code",
+    "createSubtitle": "Set up a new checkout discount code",
     "editing": "Editing {code}",
     "saveChanges": "Save Changes",
     "saving": "Saving...",
@@ -36,6 +36,8 @@
 
     "status": {
       "active": "Active",
+      "draft": "Draft",
+      "inactive": "Inactive",
       "expired": "Expired",
       "scheduled": "Scheduled"
     },
@@ -49,14 +51,18 @@
 
     "form": {
       "basicInfo": "Basic Information",
-      "code": "Promotion Code *",
+      "code": "Discount Code *",
       "codePlaceholder": "e.g. SUMMER20",
       "codeRequired": "Code is required",
       "codeFormat": "Code must be alphanumeric (dashes/underscores allowed)",
       "promotionType": "Promotion Type",
       "applicationMode": "Application",
       "discountConfig": "Discount Configuration",
-      "discountType": "Discount Type",
+      "discountType": "Discount Method",
+      "rateDiscount": "Percentage discount",
+      "fixedDiscount": "Fixed amount off",
+      "discountRate": "Customer pays (x/10) *",
+      "fixedValue": "Amount off *",
       "percentage": "Percentage",
       "fixedAmount": "Fixed Amount",
       "discountValue": "Discount Value *",
@@ -65,15 +71,76 @@
       "appliesTo": "Applies To",
       "entireOrder": "Entire Order",
       "specificItems": "Specific Items",
+      "allItems": "All Items",
       "shippingMethods": "Shipping Methods",
       "allocation": "Allocation",
       "none": "None",
       "eachItem": "Each Item",
-      "acrossItems": "Across Items"
+      "acrossItems": "Across Items",
+      "maxQuantity": "Maximum Discounted Quantity Per Item",
+      "discountTarget": "Discount Target",
+      "orderTarget": "Order Amount",
+      "productsTarget": "Products",
+      "shippingTarget": "Shipping Fee",
+      "productScope": "Product Scope",
+      "allProducts": "All Products",
+      "selectedProducts": "Selected Products",
+      "calculationMode": "Discount Calculation",
+      "totalFixedDiscount": "Fixed amount across eligible products",
+      "fixedPerItem": "Fixed amount per eligible product",
+      "allEligibleItems": "Discount all eligible products",
+      "limitedItemDiscount": "Discount by item with a quantity limit",
+      "maxDiscountedQuantity": "Maximum Discounted Quantity Per Order"
+    },
+
+    "productPicker": {
+      "title": "Select Promotion Products",
+      "description": "Select products for this discount. All variants are included by default.",
+      "searchPlaceholder": "Search product names...",
+      "product": "Product",
+      "variants": "Applicable Variants",
+      "status": "Status",
+      "published": "Published",
+      "variantCount": "{count} variants",
+      "selectedCount": "{count} products selected",
+      "selectProduct": "Select product {title}",
+      "confirm": "Add Selected",
+      "noResults": "No matching published products",
+      "loadError": "Failed to load products. Please retry."
+    },
+
+    "selectedProducts": {
+      "count": "{count} products selected",
+      "allVariantsHint": "All current and future variants of each product are included.",
+      "add": "Add Products",
+      "remove": "Remove",
+      "empty": "No products selected",
+      "required": "Select at least one product",
+      "allVariants": "All variants ({count} currently)",
+      "unavailable": "Product was deleted or is unavailable",
+      "notPublished": "Not published"
+    },
+
+    "summary": {
+      "title": "Promotion Summary",
+      "sentence": "Code {code}: {discount} on products, {timing}.",
+      "codePlaceholder": "not set",
+      "order": "the order amount",
+      "shipping": "the shipping fee",
+      "allProducts": "all products",
+      "selectedProducts": "{count} selected products",
+      "rate": "customer pays {value}/10",
+      "percentage": "{value}% off",
+      "fixed": "{value} {currency} off",
+      "draft": "saved as draft",
+      "inactive": "kept inactive",
+      "scheduled": "active on the configured schedule",
+      "immediate": "active immediately"
     },
 
     "schedule": {
       "title": "Schedule",
+      "status": "Promotion Status",
       "startDate": "Start Date",
       "endDate": "End Date"
     },
@@ -81,9 +148,11 @@
     "detail": {
       "promotionDetails": "Promotion Details",
       "discountValue": "Discount Value",
-      "promotionType": "Promotion Type",
+      "promotionType": "Discount Type",
       "appliesTo": "Applies To",
-      "allocation": "Allocation",
+      "allocation": "Discount Calculation",
+      "shippingTotal": "Discount the total eligible shipping fee",
+      "shippingEach": "Discount each eligible shipping fee separately",
       "automatic": "Automatic",
       "yes": "Yes",
       "no": "No",
@@ -100,20 +169,27 @@
       "noRules": "No rules configured.",
       "targetRules": "Target Rules",
       "noTargetRules": "No target rules.",
+      "applicableProducts": "Applicable Products",
       "attribute": "Attribute",
       "operator": "Operator",
       "values": "Values"
     },
 
+    "legacy": {
+      "badge": "Legacy promotion",
+      "readOnlyTitle": "This promotion uses legacy rules",
+      "readOnlyDescription": "The new discount-code editor supports only manual order discounts. You can still view, deactivate, or delete this promotion, but it cannot be edited with the new form."
+    },
+
     "table": {
       "errorLoading": "Failed to load promotions",
-      "noPromotions": "No promotions yet. Create your first promotion to get started.",
-      "showing": "Showing {from} to {to} of {total} promotions",
+      "noPromotions": "No discount codes yet. Create your first code to get started.",
+      "showing": "Showing {from} to {to} of {total} discount codes",
       "page": "Page {current} of {total}",
       "search": "Search promotion codes...",
       "allTypes": "All Types",
       "filterByType": "Filter by type",
-      "noResults": "No promotions match your search criteria."
+      "noResults": "No discount codes match your search."
     },
 
     "actions": {

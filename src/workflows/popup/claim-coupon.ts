@@ -7,6 +7,10 @@ import {
 import { POPUP_MODULE } from "../../modules/popup"
 import PopupModuleService from "../../modules/popup/service"
 import { MedusaError } from "@medusajs/framework/utils"
+import {
+  getClaimablePromotionCodes,
+  normalizePromotionCode,
+} from "../../lib/promotion-availability"
 
 type ClaimCouponInput = {
   popup_id: string
@@ -33,11 +37,21 @@ const claimCouponStep = createStep(
       )
     }
 
+    const couponCode = normalizePromotionCode(popup.coupon_code)
+    const claimableCodes = await getClaimablePromotionCodes(container, [couponCode])
+
+    if (!claimableCodes.has(couponCode)) {
+      throw new MedusaError(
+        MedusaError.Types.NOT_ALLOWED,
+        "This coupon is no longer available"
+      )
+    }
+
     const logger = container.resolve("logger")
-    logger.info(`[coupon-claim] email=${input.email}, popup=${input.popup_id}, code=${popup.coupon_code}`)
+    logger.info(`[coupon-claim] email=${input.email}, popup=${input.popup_id}, code=${couponCode}`)
 
     return new StepResponse({
-      coupon_code: popup.coupon_code,
+      coupon_code: couponCode,
       email: input.email,
     })
   }

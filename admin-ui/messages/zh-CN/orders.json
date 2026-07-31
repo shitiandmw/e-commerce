@@ -103,6 +103,8 @@
         "subtotal": "小计",
         "shipping": "运费",
         "tax": "税费",
+        "promotionCode": "优惠码",
+        "automaticPromotion": "自动优惠",
         "discount": "折扣",
         "total": "合计"
       },

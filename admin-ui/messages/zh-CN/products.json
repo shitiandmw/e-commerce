@@ -133,6 +133,26 @@
       "existingValueRemovalBlocked": "该值被 {count} 个已有规格使用，请先永久删除对应规格并保存。停售规格仍需保留原选项关系。",
       "syncMatrix": "同步规格组合",
       "selectValue": "选择选项值",
+      "originalPrice": "原价 *",
+      "salePrice": "优惠价",
+      "salePriceHint": "开启后，生效期内按优惠价销售；结束或关闭后自动恢复原价。",
+      "saleAmount": "优惠价",
+      "saleAmountPlaceholder": "请输入低于原价的金额",
+      "saleDuration": "生效时间",
+      "saleStartsAt": "开始时间",
+      "saleEndsAt": "结束时间（不含）",
+      "saleTimezone": "时间按本店时区 {timeZone} 保存；生效区间为开始时间（含）至结束时间（不含）。",
+      "saleMode": {
+        "ongoing": "长期有效",
+        "scheduled": "指定时间"
+      },
+      "saleStatus": {
+        "not_configured": "待填写",
+        "disabled": "已关闭",
+        "scheduled": "待开始",
+        "active": "优惠中",
+        "ended": "已结束"
+      },
       "active": "在售",
       "stopped": "已停售",
       "pendingDelete": "待永久删除",

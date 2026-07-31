@@ -6,6 +6,10 @@ jest.mock("../lib/shipping-availability", () => {
   }
 })
 
+jest.mock("../lib/cart-pricing", () => ({
+  refreshCartPrices: jest.fn(),
+}))
+
 import middlewares, {
   prepareCompletedCartShipping,
   preparePaymentSessionCartShipping,
@@ -14,8 +18,10 @@ import {
   createShippingAvailabilityError,
   prepareCartShippingSnapshot,
 } from "../lib/shipping-availability"
+import { refreshCartPrices } from "../lib/cart-pricing"
 
 const mockedPrepare = jest.mocked(prepareCartShippingSnapshot)
+const mockedRefreshCartPrices = jest.mocked(refreshCartPrices)
 
 function createResponse() {
   const response = {
@@ -29,6 +35,7 @@ function createResponse() {
 describe("shipping availability HTTP guards", () => {
   beforeEach(() => {
     mockedPrepare.mockReset().mockResolvedValue({} as any)
+    mockedRefreshCartPrices.mockReset().mockResolvedValue({} as any)
   })
 
   it("reverse looks up and revalidates an existing payment collection for every provider session", async () => {
@@ -161,6 +168,12 @@ describe("shipping availability HTTP guards", () => {
 
     await guard(req, createResponse() as any, next)
     expect(next).toHaveBeenCalledTimes(1)
+    if (guard === prepareCompletedCartShipping) {
+      expect(mockedRefreshCartPrices).toHaveBeenCalledWith(
+        req.scope,
+        "cart_pickup"
+      )
+    }
   })
 
   it.each([

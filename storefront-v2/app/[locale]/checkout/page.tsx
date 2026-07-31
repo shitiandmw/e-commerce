@@ -24,6 +24,7 @@ import { StripePayment } from "@/components/checkout/stripe-payment"
 import { PaymentMethodSelector } from "@/components/checkout/payment-method-selector"
 import { DirectOrderPayment } from "@/components/checkout/direct-order-payment"
 import { WooShPayPayment } from "@/components/checkout/wooshpay-payment"
+import { PromoCodeForm } from "@/components/cart/promo-code-form"
 
 /* step definitions */
 const steps: { key: Step; labelKey: string; num: number }[] = [
@@ -99,7 +100,7 @@ function StepIndicator({ current, t }: { current: Step; t: (key: string) => stri
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { cart } = useCart()
+  const { cart, priceChanged } = useCart()
   const items = cart?.items ?? []
   const checkout = useCheckout()
   const { step, form, updateField, loading, error } = checkout
@@ -107,7 +108,9 @@ export default function CheckoutPage() {
 
   const t = useTranslations()
 
-  const subtotal = cart?.item_total ?? 0
+  const discountTotal = cart?.item_discount_total ?? cart?.discount_total ?? 0
+  const discountedItemTotal = cart?.item_total ?? 0
+  const subtotal = cart?.original_item_total ?? discountedItemTotal + discountTotal
   const selectedShippingOption = checkout.shippingOptions.find((opt) => opt.id === checkout.selectedShippingId) ?? null
   const appliedShippingId = cart?.shipping_methods?.[0]?.shipping_option_id ?? null
   const appliedShippingCost = cart?.shipping_total ?? 0
@@ -123,8 +126,8 @@ export default function CheckoutPage() {
       : previewShippingCost
   const hasShipping = shippingCost !== null
   const baseTotal = appliedShippingId
-    ? (cart?.total ?? subtotal + appliedShippingCost) - appliedShippingCost
-    : (cart?.total ?? subtotal)
+    ? (cart?.total ?? discountedItemTotal + appliedShippingCost) - appliedShippingCost
+    : (cart?.total ?? discountedItemTotal)
   const total = baseTotal + (shippingCost ?? 0)
   const itemCount = items.reduce((s, i) => s + i.quantity, 0)
   const currencyCode = cart?.currency_code || "usd"
@@ -181,6 +184,12 @@ export default function CheckoutPage() {
       </div>
 
       <div className="mx-auto max-w-6xl px-4 py-8 lg:py-12 lg:px-6">
+        {priceChanged && (
+          <div className="mb-6 flex items-start gap-3 border border-gold/40 bg-gold/5 p-4 text-sm text-foreground">
+            <AlertTriangle className="mt-0.5 size-4 shrink-0 text-gold" />
+            <span>{t("cart_price_updated")}</span>
+          </div>
+        )}
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
           {/* left: form area */}
           <div className="flex-1 min-w-0">
@@ -620,10 +629,20 @@ export default function CheckoutPage() {
                         {item.variant_title && (
                           <p className="text-[0.625rem] text-muted-foreground mt-0.5">{item.variant_title}</p>
                         )}
+                        {item.compare_at_unit_price != null &&
+                          item.compare_at_unit_price > item.unit_price && (
+                            <p className="text-[0.625rem] text-muted-foreground line-through mt-1">
+                              {fmtPrice(item.compare_at_unit_price * item.quantity)}
+                            </p>
+                          )}
                         <p className="text-xs text-gold mt-1">{fmtPrice(item.total)}</p>
                       </div>
                     </div>
                   ))}
+                </div>
+
+                <div className="border-t border-border/30 mt-4 pt-4">
+                  <PromoCodeForm />
                 </div>
 
                 {/* totals */}
@@ -632,6 +651,12 @@ export default function CheckoutPage() {
                     <span className="text-muted-foreground">{t("subtotal")}</span>
                     <span className="text-foreground">{fmtPrice(subtotal)}</span>
                   </div>
+                  {discountTotal > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">{t("promo_discount")}</span>
+                      <span className="text-gold">-{fmtPrice(discountTotal)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{t("shipping")}</span>
                     <span className={!hasShipping ? "text-muted-foreground" : shippingCost === 0 ? "text-gold" : "text-foreground"}>

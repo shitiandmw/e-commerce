@@ -10,6 +10,8 @@ import { RegisterCTA } from "@/components/home/register-cta"
 import { fetchContent } from "@/lib/medusa"
 import { fetchCollectionWithPrices } from "@/lib/data/collections"
 
+export const dynamic = "force-dynamic"
+
 interface BannerItem {
   id: string
   image_url: string

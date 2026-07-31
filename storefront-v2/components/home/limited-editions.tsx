@@ -62,7 +62,16 @@ export async function LimitedEditions({ products }: LimitedEditionsProps) {
                   <div className="absolute bottom-0 left-0 right-0 p-4">
                     <h3 className="mt-1 text-sm font-serif font-medium text-foreground">{product.title}</h3>
                     {product.price !== null ? (
-                      <p className="mt-2 text-gold font-bold text-sm">{formatPrice(product.price, product.currency_code)}</p>
+                      <div className="mt-2 flex flex-wrap items-baseline gap-2">
+                        <span className="text-gold font-bold text-sm">
+                          {formatPrice(product.price, product.currency_code)}
+                        </span>
+                        {product.original_price !== null && (
+                          <span className="text-[0.625rem] text-muted-foreground line-through">
+                            {formatPrice(product.original_price, product.currency_code)}
+                          </span>
+                        )}
+                      </div>
                     ) : (
                       <p className="mt-2 text-muted-foreground text-xs">{t("price_tbd")}</p>
                     )}

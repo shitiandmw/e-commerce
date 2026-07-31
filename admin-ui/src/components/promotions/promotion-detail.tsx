@@ -23,6 +23,7 @@ import {
   Pencil,
   Trash2,
   Percent,
+  Package,
   Calendar,
   Tag,
   Zap,
@@ -31,16 +32,29 @@ import {
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { format } from "date-fns"
+import { getPromotionDisplayStatus } from "@/lib/promotion-status"
+import {
+  getProductIdsFromTargetRules,
+  isEditableCoupon,
+  minorToMajorAmount,
+  percentageToDiscountRate,
+} from "@/lib/promotion-config"
+import { SelectedPromotionProducts } from "./selected-promotion-products"
 
 function getStatusInfo(promotion: Promotion, t: (key: string) => string) {
-  const now = new Date()
-  if (promotion.ends_at && new Date(promotion.ends_at) < now) {
-    return <Badge variant="destructive">{t("status.expired")}</Badge>
+  const status = getPromotionDisplayStatus(promotion)
+  switch (status) {
+    case "expired":
+      return <Badge variant="destructive">{t("status.expired")}</Badge>
+    case "scheduled":
+      return <Badge variant="warning">{t("status.scheduled")}</Badge>
+    case "draft":
+      return <Badge variant="secondary">{t("status.draft")}</Badge>
+    case "inactive":
+      return <Badge variant="outline">{t("status.inactive")}</Badge>
+    default:
+      return <Badge variant="success">{t("status.active")}</Badge>
   }
-  if (promotion.starts_at && new Date(promotion.starts_at) > now) {
-    return <Badge variant="warning">{t("status.scheduled")}</Badge>
-  }
-  return <Badge variant="success">{t("status.active")}</Badge>
 }
 
 function getTypeBadge(type: Promotion["type"], t: (key: string) => string) {
@@ -54,25 +68,69 @@ function getTypeBadge(type: Promotion["type"], t: (key: string) => string) {
   }
 }
 
-function formatDiscountValue(promotion: Promotion) {
+function formatDiscountValue(
+  promotion: Promotion,
+  t: (key: string, values?: Record<string, number | string>) => string
+) {
   const method = promotion.application_method
   if (!method) return "-"
   if (method.type === "percentage") {
-    return `${method.value}%`
+    return isEditableCoupon(promotion)
+      ? t("summary.rate", { value: percentageToDiscountRate(method.value) })
+      : `${method.value}%`
   }
   const currency = method.currency_code?.toUpperCase() || "USD"
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency,
-  }).format(method.value)
+  }).format(minorToMajorAmount(method.value, currency))
 }
 
-function formatTargetType(target: string, t: (key: string) => string) {
+function formatDiscountType(
+  type: string,
+  t: (key: string) => string
+) {
+  if (type === "percentage") return t("form.percentage")
+  if (type === "fixed") return t("form.fixedAmount")
+  return "-"
+}
+
+function formatAllocation(
+  promotion: Promotion,
+  t: (key: string) => string
+) {
+  const method = promotion.application_method
+  if (!method?.allocation) return "-"
+
+  if (method.target_type === "shipping_methods") {
+    return method.allocation === "each"
+      ? t("detail.shippingEach")
+      : t("detail.shippingTotal")
+  }
+
+  if (method.allocation === "each") {
+    return method.type === "fixed"
+      ? t("form.fixedPerItem")
+      : t("form.limitedItemDiscount")
+  }
+
+  return method.type === "fixed"
+    ? t("form.totalFixedDiscount")
+    : t("form.allEligibleItems")
+}
+
+function formatTargetType(
+  target: string,
+  selectedProductCount: number,
+  t: (key: string, values?: Record<string, number>) => string
+) {
   switch (target) {
     case "order":
       return t("form.entireOrder")
     case "items":
-      return t("form.specificItems")
+      return selectedProductCount > 0
+        ? t("summary.selectedProducts", { count: selectedProductCount })
+        : t("summary.allProducts")
     case "shipping_methods":
       return t("form.shippingMethods")
     default:
@@ -92,6 +150,10 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false)
 
   const promotion = data?.promotion
+  const editableCoupon = promotion ? isEditableCoupon(promotion) : false
+  const selectedProductIds = getProductIdsFromTargetRules(
+    promotion?.application_method?.target_rules
+  )
 
   const handleDelete = async () => {
     try {
@@ -149,33 +211,37 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-3 sm:gap-4">
           <Link href="/promotions">
             <Button variant="ghost" size="icon">
               <ArrowLeft className="h-4 w-4" />
             </Button>
           </Link>
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold tracking-tight font-mono">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <h1 className="break-all font-mono text-2xl font-bold tracking-tight sm:text-3xl">
                 {promotion.code}
               </h1>
               {getStatusInfo(promotion, t)}
-              {getTypeBadge(promotion.type, t)}
+              {!editableCoupon && (
+                <Badge variant="outline">{t("legacy.badge")}</Badge>
+              )}
             </div>
             <p className="text-muted-foreground mt-1">
               {promotion.is_automatic ? t("application.automaticPromotion") : t("application.manualCode")}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Link href={`/promotions/${promotionId}/edit`}>
-            <Button variant="outline">
-              <Pencil className="mr-2 h-4 w-4" />
-              {t("actions.edit")}
-            </Button>
-          </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          {editableCoupon && (
+            <Link href={`/promotions/${promotionId}/edit`}>
+              <Button variant="outline">
+                <Pencil className="mr-2 h-4 w-4" />
+                {t("actions.edit")}
+              </Button>
+            </Link>
+          )}
           <Button
             variant="destructive"
             onClick={() => setShowDeleteDialog(true)}
@@ -201,8 +267,11 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
                 <p className="text-sm font-medium text-muted-foreground mb-1">
                   {t("detail.promotionType")}
                 </p>
-                <p className="text-sm capitalize">
-                  {promotion.application_method?.type || "-"}
+                <p className="text-sm">
+                  {formatDiscountType(
+                    promotion.application_method?.type || "",
+                    t
+                  )}
                 </p>
               </div>
               <div>
@@ -210,32 +279,44 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
                   {t("detail.discountValue")}
                 </p>
                 <p className="text-lg font-semibold">
-                  {formatDiscountValue(promotion)}
+                  {formatDiscountValue(promotion, t)}
                 </p>
               </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">
-                  {t("detail.appliesTo")}
-                </p>
-                <p className="text-sm">
-                  {formatTargetType(
-                    promotion.application_method?.target_type || "-",
-                    t
-                  )}
-                </p>
-              </div>
-              {promotion.application_method?.allocation && (
+              {!editableCoupon && (
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">
+                    {t("detail.appliesTo")}
+                  </p>
+                  <p className="text-sm">
+                    {formatTargetType(
+                      promotion.application_method?.target_type || "-",
+                      selectedProductIds.length,
+                      t
+                    )}
+                  </p>
+                </div>
+              )}
+              {!editableCoupon && promotion.application_method?.allocation && (
                 <div>
                   <p className="text-sm font-medium text-muted-foreground mb-1">
                     {t("detail.allocation")}
                   </p>
-                  <p className="text-sm capitalize">
-                    {promotion.application_method.allocation}
-                  </p>
+                  <p className="text-sm">{formatAllocation(promotion, t)}</p>
                 </div>
               )}
             </div>
           </div>
+
+          {promotion.application_method?.target_type === "items" &&
+            selectedProductIds.length > 0 && (
+              <div className="rounded-lg border bg-card p-6 shadow-sm space-y-4">
+                <h2 className="text-lg font-semibold flex items-center gap-2">
+                  <Package className="h-5 w-5" />
+                  {t("detail.applicableProducts")}
+                </h2>
+                <SelectedPromotionProducts productIds={selectedProductIds} />
+              </div>
+            )}
 
           {/* Rules */}
           {promotion.rules && promotion.rules.length > 0 && (
@@ -271,18 +352,22 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
                 <span className="text-sm text-muted-foreground">{t("columns.status")}</span>
                 {getStatusInfo(promotion, t)}
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">{t("columns.type")}</span>
-                {getTypeBadge(promotion.type, t)}
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">
-                  {t("detail.automatic")}
-                </span>
-                <span className="text-sm font-medium">
-                  {promotion.is_automatic ? t("detail.yes") : t("detail.no")}
-                </span>
-              </div>
+              {!editableCoupon && (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">{t("columns.type")}</span>
+                    {getTypeBadge(promotion.type, t)}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">
+                      {t("detail.automatic")}
+                    </span>
+                    <span className="text-sm font-medium">
+                      {promotion.is_automatic ? t("detail.yes") : t("detail.no")}
+                    </span>
+                  </div>
+                </>
+              )}
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">{t("detail.created")}</span>
                 <span className="text-sm">
@@ -310,9 +395,9 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
                   {t("schedule.startDate")}
                 </p>
                 <p className="text-sm">
-                  {promotion.starts_at
+                  {promotion.campaign?.starts_at
                     ? format(
-                        new Date(promotion.starts_at),
+                        new Date(promotion.campaign.starts_at),
                         "MMM d, yyyy HH:mm"
                       )
                     : t("detail.notSet")}
@@ -323,9 +408,9 @@ export function PromotionDetail({ promotionId }: PromotionDetailProps) {
                   {t("schedule.endDate")}
                 </p>
                 <p className="text-sm">
-                  {promotion.ends_at
+                  {promotion.campaign?.ends_at
                     ? format(
-                        new Date(promotion.ends_at),
+                        new Date(promotion.campaign.ends_at),
                         "MMM d, yyyy HH:mm"
                       )
                     : t("detail.notSet")}

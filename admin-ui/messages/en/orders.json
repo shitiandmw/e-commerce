@@ -103,6 +103,8 @@
         "subtotal": "Subtotal",
         "shipping": "Shipping",
         "tax": "Tax",
+        "promotionCode": "Promotion code",
+        "automaticPromotion": "Automatic promotion",
         "discount": "Discount",
         "total": "Total"
       },

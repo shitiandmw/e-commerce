@@ -14,45 +14,50 @@ import {
 } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
 import { format } from "date-fns"
-
-function getTypeBadge(type: Promotion["type"], t: (key: string) => string) {
-  switch (type) {
-    case "standard":
-      return <Badge variant="secondary">{t("type.standard")}</Badge>
-    case "buyget":
-      return <Badge variant="warning">{t("type.buyget")}</Badge>
-    default:
-      return <Badge variant="outline">{type}</Badge>
-  }
-}
+import { getPromotionDisplayStatus } from "@/lib/promotion-status"
+import {
+  isEditableCoupon,
+  minorToMajorAmount,
+  percentageToDiscountRate,
+} from "@/lib/promotion-config"
 
 function getStatusInfo(promotion: Promotion, t: (key: string) => string) {
-  const now = new Date()
-  if (promotion.ends_at && new Date(promotion.ends_at) < now) {
-    return <Badge variant="destructive">{t("status.expired")}</Badge>
+  const status = getPromotionDisplayStatus(promotion)
+  switch (status) {
+    case "expired":
+      return <Badge variant="destructive">{t("status.expired")}</Badge>
+    case "scheduled":
+      return <Badge variant="warning">{t("status.scheduled")}</Badge>
+    case "draft":
+      return <Badge variant="secondary">{t("status.draft")}</Badge>
+    case "inactive":
+      return <Badge variant="outline">{t("status.inactive")}</Badge>
+    default:
+      return <Badge variant="success">{t("status.active")}</Badge>
   }
-  if (promotion.starts_at && new Date(promotion.starts_at) > now) {
-    return <Badge variant="warning">{t("status.scheduled")}</Badge>
-  }
-  return <Badge variant="success">{t("status.active")}</Badge>
 }
 
-function formatDiscount(promotion: Promotion) {
+function formatDiscount(
+  promotion: Promotion,
+  t: (key: string, values?: Record<string, number | string>) => string
+) {
   const method = promotion.application_method
   if (!method) return "-"
   if (method.type === "percentage") {
-    return `${method.value}%`
+    return t("summary.rate", {
+      value: percentageToDiscountRate(method.value),
+    })
   }
   const currency = method.currency_code?.toUpperCase() || "USD"
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency,
-  }).format(method.value)
+  }).format(minorToMajorAmount(method.value, currency))
 }
 
 export function getPromotionColumns(
   onDelete: (promotion: Promotion) => void,
-  t: (key: string) => string
+  t: (key: string, values?: Record<string, number | string>) => string
 ): ColumnDef<Promotion>[] {
   return [
     {
@@ -67,40 +72,34 @@ export function getPromotionColumns(
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      cell: ({ row }) => (
-        <Link
-          href={`/promotions/${row.original.id}`}
-          className="font-medium font-mono hover:underline"
-        >
-          {row.original.code}
-        </Link>
-      ),
-    },
-    {
-      accessorKey: "type",
-      header: t("columns.type"),
-      cell: ({ row }) => getTypeBadge(row.original.type, t),
+      cell: ({ row }) => {
+        const promotion = row.original
+        return (
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href={`/promotions/${promotion.id}`}
+              className="font-medium font-mono hover:underline"
+            >
+              {promotion.code}
+            </Link>
+            {!isEditableCoupon(promotion) && (
+              <Badge variant="outline">{t("legacy.badge")}</Badge>
+            )}
+          </div>
+        )
+      },
     },
     {
       id: "discount",
       header: t("columns.discount"),
       cell: ({ row }) => (
-        <span className="text-sm">{formatDiscount(row.original)}</span>
+        <span className="text-sm">{formatDiscount(row.original, t)}</span>
       ),
     },
     {
       id: "status",
       header: t("columns.status"),
       cell: ({ row }) => getStatusInfo(row.original, t),
-    },
-    {
-      id: "automatic",
-      header: t("columns.automatic"),
-      cell: ({ row }) => (
-        <span className="text-sm text-muted-foreground">
-          {row.original.is_automatic ? t("detail.yes") : t("detail.no")}
-        </span>
-      ),
     },
     {
       accessorKey: "created_at",
@@ -139,12 +138,14 @@ export function getPromotionColumns(
                   {t("actions.view")}
                 </DropdownMenuItem>
               </Link>
-              <Link href={`/promotions/${promotion.id}/edit`}>
-                <DropdownMenuItem>
-                  <Pencil className="mr-2 h-4 w-4" />
-                  {t("actions.edit")}
-                </DropdownMenuItem>
-              </Link>
+              {isEditableCoupon(promotion) && (
+                <Link href={`/promotions/${promotion.id}/edit`}>
+                  <DropdownMenuItem>
+                    <Pencil className="mr-2 h-4 w-4" />
+                    {t("actions.edit")}
+                  </DropdownMenuItem>
+                </Link>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 destructive

@@ -121,8 +121,15 @@ function CollectionProductCard({ product }: { product: CollectionProductWithPric
         </h3>
         <div className="mt-3 flex items-center justify-between gap-2">
           {product.price !== null ? (
-            <span className="text-gold font-bold">
-              {formatPrice(product.price, product.currency_code)}
+            <span className="flex flex-wrap items-baseline gap-2">
+              <span className="text-gold font-bold">
+                {formatPrice(product.price, product.currency_code)}
+              </span>
+              {product.original_price !== null && (
+                <span className="text-xs text-muted-foreground line-through">
+                  {formatPrice(product.original_price, product.currency_code)}
+                </span>
+              )}
             </span>
           ) : (
             <span className="text-muted-foreground text-sm">{t("price_tbd")}</span>

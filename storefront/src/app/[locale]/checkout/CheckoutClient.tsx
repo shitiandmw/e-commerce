@@ -11,6 +11,11 @@ import {
   applyPromoCode as applyPromo, removePromoCode as removePromo,
   initPaymentSessions, completeCart, removeCartId,
 } from "@/lib/cart"
+import {
+  getManualPromotionCodes,
+  hasPromotionCode,
+  normalizePromotionCode,
+} from "@/lib/promotion"
 
 const EMPTY_ADDRESS: CartAddress = {
   first_name: "", last_name: "", phone: "",
@@ -195,7 +200,7 @@ export default function CheckoutClient() {
       try {
         const c = await getOrCreateCart()
         setCart(c)
-        if (c.promotions?.length) setAppliedCodes(c.promotions.map(p => p.code))
+        setAppliedCodes(getManualPromotionCodes(c.promotions))
         if (c.shipping_address) { setAddress(c.shipping_address); setAddressConfirmed(true) }
         const customer = await getCustomer()
         if (customer?.email) setEmail(customer.email)
@@ -264,23 +269,45 @@ export default function CheckoutClient() {
   }
 
   const handleApplyPromo = async () => {
-    if (!promoCode.trim()) return
+    const normalizedCode = normalizePromotionCode(promoCode)
+    if (!normalizedCode) return
+    if (hasPromotionCode(cart?.promotions, normalizedCode)) {
+      setPromoError("该优惠码已应用")
+      return
+    }
     setPromoLoading(true); setPromoError("")
     try {
-      const updated = await applyPromo(promoCode.trim())
+      const updated = await applyPromo(normalizedCode)
       setCart(updated)
-      setAppliedCodes(updated.promotions?.map(p => p.code) || [...appliedCodes, promoCode.trim()])
+      setAppliedCodes(getManualPromotionCodes(updated.promotions))
+
+      if (!hasPromotionCode(updated.promotions, normalizedCode)) {
+        setPromoError("优惠码尚未启用或不满足当前订单的使用条件")
+        return
+      }
+
       setPromoCode("")
-    } catch { setPromoError("优惠码无效或已过期") }
-    setPromoLoading(false)
+    } catch {
+      setPromoError("优惠码无效或已过期")
+    } finally {
+      setPromoLoading(false)
+    }
   }
 
   const handleRemovePromo = async (code: string) => {
+    setPromoLoading(true); setPromoError("")
     try {
       const updated = await removePromo(code)
       setCart(updated)
-      setAppliedCodes(updated.promotions?.map(p => p.code) || appliedCodes.filter(c => c !== code))
-    } catch (e) { console.error("Remove promo error:", e) }
+      setAppliedCodes(getManualPromotionCodes(updated.promotions))
+      if (hasPromotionCode(updated.promotions, code)) {
+        setPromoError("优惠码移除失败，请重试")
+      }
+    } catch {
+      setPromoError("优惠码移除失败，请重试")
+    } finally {
+      setPromoLoading(false)
+    }
   }
 
   const handleUseSavedAddress = (addr: CartAddress) => {

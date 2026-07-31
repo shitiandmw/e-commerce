@@ -3,17 +3,27 @@
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import { Link } from "@/i18n/navigation"
-import { Minus, Plus, X, ShoppingBag, ArrowRight, Truck, Shield, RotateCcw, Loader2 } from "lucide-react"
-import { useCart, selectTotalItems, selectTotalPrice, getCartProductName, getCartProductImage } from "@/lib/cart-store"
+import { Minus, Plus, X, ShoppingBag, ArrowRight, Truck, Shield, RotateCcw, Loader2, AlertTriangle } from "lucide-react"
+import { useCart, selectTotalItems, getCartProductName, getCartProductImage } from "@/lib/cart-store"
 import { useTranslations, useLocale } from "next-intl"
 import type { CartLineItem } from "@/lib/cart"
 import type { MedusaProduct } from "@/lib/data/products"
 import { getMedusaPrice, getMedusaImages } from "@/lib/data/products"
 import { formatPrice } from "@/lib/format"
 import { fetchCartRecommendedProducts } from "@/lib/data/cart-recommendations"
+import { PromoCodeForm } from "@/components/cart/promo-code-form"
+import { SaleCountdown } from "@/components/product/sale-countdown"
 
-function CartItemRow({ item, currencyCode }: { item: CartLineItem; currencyCode?: string }) {
-  const { updateItem, removeItem, loading } = useCart()
+function CartItemRow({
+  item,
+  currencyCode,
+  pricingRefreshedAt,
+}: {
+  item: CartLineItem
+  currencyCode?: string
+  pricingRefreshedAt?: string
+}) {
+  const { updateItem, removeItem, refreshPrices, loading } = useCart()
   const t = useTranslations()
   const productName = getCartProductName(item)
   const productImage = getCartProductImage(item)
@@ -50,39 +60,61 @@ function CartItemRow({ item, currencyCode }: { item: CartLineItem; currencyCode?
           </button>
         </div>
 
-        <div className="flex items-end justify-between mt-auto pt-3">
-          <div className="flex items-center border border-border/50">
-            <button
-              onClick={() => updateItem(item.id, item.quantity - 1)}
-              disabled={loading}
-              className="flex items-center justify-center size-8 text-foreground/60 hover:text-gold hover:bg-secondary/30 transition-colors disabled:opacity-50"
-              aria-label={t("decrease_quantity")}
-            >
-              <Minus className="size-3" />
-            </button>
-            <span className="flex items-center justify-center w-10 h-8 text-xs font-medium text-foreground border-x border-border/50">
-              {item.quantity}
-            </span>
-            <button
-              onClick={() => updateItem(item.id, item.quantity + 1)}
-              disabled={loading}
-              className="flex items-center justify-center size-8 text-foreground/60 hover:text-gold hover:bg-secondary/30 transition-colors disabled:opacity-50"
-              aria-label={t("increase_quantity")}
-            >
-              <Plus className="size-3" />
-            </button>
-          </div>
+        <div className="mt-auto pt-3">
+          <div className="flex items-end justify-between gap-3">
+            <div className="flex items-center border border-border/50">
+              <button
+                onClick={() => updateItem(item.id, item.quantity - 1)}
+                disabled={loading}
+                className="flex items-center justify-center size-8 text-foreground/60 hover:text-gold hover:bg-secondary/30 transition-colors disabled:opacity-50"
+                aria-label={t("decrease_quantity")}
+              >
+                <Minus className="size-3" />
+              </button>
+              <span className="flex items-center justify-center w-10 h-8 text-xs font-medium text-foreground border-x border-border/50">
+                {item.quantity}
+              </span>
+              <button
+                onClick={() => updateItem(item.id, item.quantity + 1)}
+                disabled={loading}
+                className="flex items-center justify-center size-8 text-foreground/60 hover:text-gold hover:bg-secondary/30 transition-colors disabled:opacity-50"
+                aria-label={t("increase_quantity")}
+              >
+                <Plus className="size-3" />
+              </button>
+            </div>
 
-          <div className="text-right">
-            {item.quantity > 1 && (
-              <p className="text-[0.625rem] text-muted-foreground">
-                {formatPrice(item.unit_price, currencyCode)} x {item.quantity}
+            <div className="text-right">
+              {item.compare_at_unit_price != null &&
+                item.compare_at_unit_price > item.unit_price && (
+                  <p className="text-[0.625rem] text-muted-foreground line-through">
+                    {formatPrice(
+                      item.compare_at_unit_price * item.quantity,
+                      currencyCode
+                    )}
+                  </p>
+                )}
+              {item.quantity > 1 && (
+                <p className="text-[0.625rem] text-muted-foreground">
+                  {formatPrice(item.unit_price, currencyCode)} x {item.quantity}
+                </p>
+              )}
+              <p className="text-gold font-bold">
+                {formatPrice(item.total, currencyCode)}
               </p>
-            )}
-            <p className="text-gold font-bold">
-              {formatPrice(item.total, currencyCode)}
-            </p>
+            </div>
           </div>
+          {item.sale_ends_at && pricingRefreshedAt && (
+            <div className="mt-1.5 flex justify-end">
+              <SaleCountdown
+                status="active"
+                endsAt={item.sale_ends_at}
+                serverTime={pricingRefreshedAt}
+                compact
+                onExpire={() => void refreshPrices().catch(() => {})}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -110,16 +142,16 @@ function EmptyCart() {
   )
 }
 
-function RecommendedProducts() {
+function RecommendedProducts({ regionId }: { regionId?: string }) {
   const t = useTranslations()
   const locale = useLocale()
   const [products, setProducts] = useState<MedusaProduct[]>([])
 
   useEffect(() => {
-    fetchCartRecommendedProducts(locale)
+    fetchCartRecommendedProducts(locale, regionId)
       .then(setProducts)
       .catch(() => {})
-  }, [locale])
+  }, [locale, regionId])
 
   if (products.length === 0) return null
 
@@ -153,10 +185,22 @@ function RecommendedProducts() {
   )
 }
 export default function CartPage() {
-  const { cart, loading, initCart, clear } = useCart()
+  const {
+    cart,
+    loading,
+    initialized,
+    error,
+    initCart,
+    refreshPrices,
+    clear,
+    priceChanged,
+    acknowledgePriceChange,
+  } = useCart()
   const t = useTranslations()
   const itemCount = useCart(selectTotalItems)
-  const subtotal = useCart(selectTotalPrice)
+  const discountTotal = cart?.item_discount_total ?? cart?.discount_total ?? 0
+  const discountedItemTotal = cart?.item_total ?? cart?.total ?? 0
+  const subtotal = cart?.original_item_total ?? discountedItemTotal + discountTotal
   const currencyCode = cart?.currency_code
   const items = cart?.items ?? []
   const freeShippingThreshold = 200000 // in cents ($2000)
@@ -164,13 +208,33 @@ export default function CartPage() {
   const shippingRemaining = Math.max(freeShippingThreshold - subtotal, 0)
 
   useEffect(() => {
-    initCart()
-  }, [initCart])
+    if (!cart?.id) return
+    void refreshPrices().catch(() => {})
+  }, [cart?.id, refreshPrices])
 
-  if (loading && !cart) {
+  if ((!initialized || loading) && !cart) {
     return (
       <div className="mx-auto max-w-5xl px-4 py-24 lg:px-6 flex items-center justify-center">
         <Loader2 className="size-6 animate-spin text-gold" />
+      </div>
+    )
+  }
+
+  if (error && !cart) {
+    return (
+      <div className="mx-auto max-w-5xl px-4 py-24 lg:px-6">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <AlertTriangle className="size-6 text-gold" />
+          <p className="text-sm text-muted-foreground">{t("operation_failed_retry")}</p>
+          <button
+            type="button"
+            onClick={() => void initCart().catch(() => {})}
+            disabled={loading}
+            className="border border-border px-5 py-2 text-sm text-foreground hover:border-gold disabled:opacity-50"
+          >
+            {t("retry")}
+          </button>
+        </div>
       </div>
     )
   }
@@ -179,7 +243,7 @@ export default function CartPage() {
     return (
       <div className="mx-auto max-w-5xl px-4 py-12 lg:px-6">
         <EmptyCart />
-        <RecommendedProducts />
+        <RecommendedProducts regionId={cart?.region_id} />
       </div>
     )
   }
@@ -191,6 +255,36 @@ export default function CartPage() {
         <span className="text-border">/</span>
         <span className="text-foreground">{t("cart")} ({itemCount})</span>
       </nav>
+
+      {error && (
+        <div className="mb-6 flex items-center gap-3 border border-destructive/40 bg-destructive/5 p-4 text-sm text-foreground">
+          <AlertTriangle className="size-4 shrink-0 text-destructive" />
+          <span className="flex-1">{t("operation_failed_retry")}</span>
+          <button
+            type="button"
+            onClick={() => void refreshPrices().catch(() => {})}
+            disabled={loading}
+            className="text-sm text-gold hover:text-gold-light disabled:opacity-50"
+          >
+            {t("retry")}
+          </button>
+        </div>
+      )}
+
+      {priceChanged && (
+        <div className="mb-6 flex items-start gap-3 border border-gold/40 bg-gold/5 p-4 text-sm text-foreground">
+          <AlertTriangle className="mt-0.5 size-4 shrink-0 text-gold" />
+          <span className="flex-1">{t("cart_price_updated")}</span>
+          <button
+            type="button"
+            onClick={acknowledgePriceChange}
+            className="text-muted-foreground hover:text-foreground"
+            aria-label={t("dismiss")}
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+      )}
 
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
         <div className="flex-1 min-w-0">
@@ -221,7 +315,12 @@ export default function CartPage() {
 
           <div>
             {items.map((item) => (
-              <CartItemRow key={item.id} item={item} currencyCode={currencyCode} />
+              <CartItemRow
+                key={item.id}
+                item={item}
+                currencyCode={currencyCode}
+                pricingRefreshedAt={cart?.pricing_refreshed_at}
+              />
             ))}
           </div>
         </div>
@@ -235,6 +334,12 @@ export default function CartPage() {
                 <span className="text-muted-foreground">{t("subtotal")} ({itemCount} {t("items")})</span>
                 <span className="text-foreground">{formatPrice(subtotal, currencyCode)}</span>
               </div>
+              {discountTotal > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{t("promo_discount")}</span>
+                  <span className="text-gold">-{formatPrice(discountTotal, currencyCode)}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-muted-foreground">{t("shipping")}</span>
                 <span className={subtotal >= freeShippingThreshold ? "text-gold" : "text-foreground"}>
@@ -246,21 +351,12 @@ export default function CartPage() {
             <div className="border-t border-border/30 mt-4 pt-4">
               <div className="flex justify-between items-baseline">
                 <span className="text-sm text-foreground">{t("total")}</span>
-                <span className="text-xl font-bold text-gold">{formatPrice(subtotal, currencyCode)}</span>
+                <span className="text-xl font-bold text-gold">{formatPrice(discountedItemTotal, currencyCode)}</span>
               </div>
             </div>
 
             <div className="mt-5">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder={t("promo_code")}
-                  className="flex-1 h-9 bg-background border border-border/50 px-3 text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-gold/50 transition-colors"
-                />
-                <button className="h-9 px-4 text-xs font-medium bg-secondary text-foreground/70 hover:text-gold border border-border/50 hover:border-gold/30 transition-colors">
-                  {t("apply")}
-                </button>
-              </div>
+              <PromoCodeForm />
             </div>
 
             <Link
@@ -289,7 +385,7 @@ export default function CartPage() {
         </div>
       </div>
 
-      <RecommendedProducts />
+      <RecommendedProducts regionId={cart?.region_id} />
     </div>
   )
 }

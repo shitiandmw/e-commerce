@@ -1,5 +1,9 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { Modules } from "@medusajs/framework/utils"
+import {
+  getClaimablePromotionCodes,
+  normalizePromotionCode,
+} from "../../../../lib/promotion-availability"
 
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const query = req.scope.resolve("query")
@@ -68,9 +72,20 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     { locale },
   )
 
-  const popups = (allPopups || [])
+  const enabledPopups = (allPopups || [])
     .filter((p: any) => p.is_enabled)
     .sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0))
+  const claimableCouponCodes = await getClaimablePromotionCodes(
+    req.scope,
+    enabledPopups
+      .filter((popup: any) => popup.popup_type === "coupon" && popup.coupon_code)
+      .map((popup: any) => popup.coupon_code)
+  )
+  const popups = enabledPopups.filter((popup: any) => {
+    if (popup.popup_type !== "coupon") return true
+    if (!popup.coupon_code) return false
+    return claimableCouponCodes.has(normalizePromotionCode(popup.coupon_code))
+  })
 
   // Fetch curated collections with tabs and items
   const { data: allCollections } = await query.graph(

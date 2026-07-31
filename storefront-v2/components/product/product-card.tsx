@@ -128,8 +128,15 @@ function MedusaProductCard({
         )}
         <div className="mt-3 flex items-center justify-between">
           {priceInfo ? (
-            <span className="text-gold font-bold">
-              {formatPrice(priceInfo.amount, priceInfo.currency_code)}
+            <span className="flex flex-wrap items-baseline gap-2">
+              <span className="text-gold font-bold">
+                {formatPrice(priceInfo.amount, priceInfo.currency_code)}
+              </span>
+              {priceInfo.original_amount !== undefined && (
+                <span className="text-xs text-muted-foreground line-through">
+                  {formatPrice(priceInfo.original_amount, priceInfo.currency_code)}
+                </span>
+              )}
             </span>
           ) : (
             <span className="text-muted-foreground font-bold">{t("price_tbd")}</span>

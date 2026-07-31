@@ -8,7 +8,7 @@ import {
 
 const CART_RECOMMENDATION_LIMIT = 4
 const CART_RECOMMENDATION_FIELDS =
-  "id,title,handle,thumbnail,*variants,*variants.prices,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata,*brand"
+  "id,title,handle,thumbnail,*variants,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata,*brand"
 const PRODUCT_INVENTORY_CANDIDATE_FIELDS =
   "id,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata"
 
@@ -23,6 +23,7 @@ async function requestProducts<T>(
 
 export async function fetchCartRecommendedProducts(
   locale: string,
+  regionId?: string,
   request: typeof fetch = fetch,
 ): Promise<MedusaProduct[]> {
   const selection = await loadPrioritizedProductSelection({
@@ -42,6 +43,7 @@ export async function fetchCartRecommendedProducts(
         fields: CART_RECOMMENDATION_FIELDS,
         locale,
       })
+      if (regionId) params.set("region_id", regionId)
       ids.forEach((id) => params.append("id[]", id))
       return requestProducts<{ products?: MedusaProduct[] }>(params, request)
         .then((data) => data.products ?? [])

@@ -4,6 +4,7 @@ import {
   isProductOutOfStock,
   prioritizeInStockItems,
 } from "@/lib/product-availability"
+import { getRegion } from "@/lib/region"
 
 const MEDUSA_BACKEND_URL =
   process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
@@ -61,6 +62,11 @@ interface ProductVariant {
   inventory_quantity?: number | null
   manage_inventory?: boolean | null
   metadata?: Record<string, unknown> | null
+  calculated_price?: {
+    calculated_amount: number
+    original_amount: number
+    currency_code: string
+  } | null
 }
 
 interface StoreProduct {
@@ -83,12 +89,14 @@ export interface CollectionProductWithPrice {
   handle: string
   thumbnail: string | null
   price: number | null
+  original_price: number | null
   currency_code: string
   isOutOfStock: boolean
 }
 
 interface CollectionProductData {
   price: number | null
+  original_price: number | null
   currency_code: string
   isOutOfStock: boolean
 }
@@ -119,14 +127,16 @@ export async function fetchProductPrices(
   if (productIds.length === 0) return priceMap
 
   try {
+    const region = await getRegion()
     const url = new URL(`${MEDUSA_BACKEND_URL}/store/products`)
     for (const id of productIds) {
       url.searchParams.append("id[]", id)
     }
     url.searchParams.set(
       "fields",
-      "id,*variants.prices,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata",
+      "id,*variants.prices,*variants.calculated_price,*variants.inventory_quantity,*variants.manage_inventory,*variants.metadata",
     )
+    if (region.id) url.searchParams.set("region_id", region.id)
 
     const headers: Record<string, string> = {}
     if (PUBLISHABLE_KEY) {
@@ -138,23 +148,37 @@ export async function fetchProductPrices(
 
     const res = await fetch(url.toString(), {
       headers,
-      next: { revalidate: 30 },
+      cache: "no-store",
     })
     if (!res.ok) return priceMap
 
     const data: StoreProductsResponse = await res.json()
     for (const product of data?.products ?? []) {
       const sellableVariants = getSellableVariants(product.variants)
-      const cheapest = sellableVariants
+      const cheapestCalculated = sellableVariants
+        .map((variant) => variant.calculated_price)
+        .filter((price): price is NonNullable<typeof price> =>
+          Boolean(price && Number.isFinite(price.calculated_amount))
+        )
+        .sort((a, b) => a.calculated_amount - b.calculated_amount)[0]
+      const cheapestRaw = sellableVariants
         .flatMap((v) => v.prices ?? [])
-        .filter((p) => p.currency_code === "usd")
+        .filter((p) => p.currency_code === region.currency_code)
         .sort((a, b) => a.amount - b.amount)[0]
         || sellableVariants
           .flatMap((v) => v.prices ?? [])
           .sort((a, b) => a.amount - b.amount)[0]
       priceMap.set(product.id, {
-        price: cheapest?.amount ?? null,
-        currency_code: cheapest?.currency_code ?? "usd",
+        price: cheapestCalculated?.calculated_amount ?? cheapestRaw?.amount ?? null,
+        original_price:
+          cheapestCalculated &&
+          cheapestCalculated.original_amount > cheapestCalculated.calculated_amount
+            ? cheapestCalculated.original_amount
+            : null,
+        currency_code:
+          cheapestCalculated?.currency_code ||
+          cheapestRaw?.currency_code ||
+          region.currency_code,
         isOutOfStock: isProductOutOfStock(product),
       })
     }
@@ -192,6 +216,7 @@ export async function fetchCollectionWithPrices(
         handle: item.product!.handle,
         thumbnail: item.product!.thumbnail,
         price: priceInfo?.price ?? null,
+        original_price: priceInfo?.original_price ?? null,
         currency_code: priceInfo?.currency_code ?? "usd",
         isOutOfStock: priceInfo?.isOutOfStock ?? false,
       }

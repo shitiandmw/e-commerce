@@ -19,6 +19,8 @@ export interface ApplicationMethod {
   target_type: "items" | "shipping_methods" | "order"
   allocation?: "each" | "across"
   max_quantity?: number | null
+  buy_rules_min_quantity?: number | null
+  apply_to_quantity?: number | null
   currency_code?: string | null
   target_rules?: PromotionRule[]
   buy_rules?: PromotionRule[]
@@ -29,16 +31,17 @@ export interface Promotion {
   code: string
   type: "standard" | "buyget"
   is_automatic: boolean
-  status?: string
+  status?: "draft" | "active" | "inactive"
   campaign_id?: string | null
   campaign?: {
     id: string
     name: string
+    campaign_identifier?: string
+    starts_at?: string | null
+    ends_at?: string | null
   } | null
   application_method?: ApplicationMethod | null
   rules?: PromotionRule[]
-  starts_at?: string | null
-  ends_at?: string | null
   created_at: string
   updated_at: string
 }
@@ -56,29 +59,63 @@ export interface PromotionsQueryParams {
   q?: string
   order?: string
   code?: string[]
-  type?: string[]
 }
 
 // Hooks
 export function usePromotions(params: PromotionsQueryParams = {}) {
-  const { offset = 0, limit = 20, q, order, type } = params
+  const { offset = 0, limit = 20, q, order } = params
 
   const queryParams = new URLSearchParams()
   queryParams.set("offset", String(offset))
   queryParams.set("limit", String(limit))
   if (q) queryParams.set("q", q)
   if (order) queryParams.set("order", order)
-  if (type && type.length > 0) {
-    type.forEach((t) => queryParams.append("type[]", t))
-  }
   queryParams.set("fields", "+application_method,+rules,+campaign")
 
   return useQuery<PromotionsResponse>({
-    queryKey: ["promotions", { offset, limit, q, order, type }],
+    queryKey: ["promotions", { offset, limit, q, order }],
     queryFn: () =>
       adminFetch<PromotionsResponse>(
         `/admin/promotions?${queryParams.toString()}`
       ),
+  })
+}
+
+export interface CampaignPayload {
+  name?: string
+  campaign_identifier?: string
+  starts_at?: string | null
+  ends_at?: string | null
+}
+
+export function useCreateCampaign() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: CampaignPayload & { name: string; campaign_identifier: string }) =>
+      adminFetch<{ campaign: NonNullable<Promotion["campaign"]> }>(
+        "/admin/campaigns",
+        { method: "POST", body: data }
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["promotions"] })
+    },
+  })
+}
+
+export function useUpdateCampaign(id: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: CampaignPayload) =>
+      adminFetch<{ campaign: NonNullable<Promotion["campaign"]> }>(
+        `/admin/campaigns/${id}`,
+        { method: "POST", body: data }
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["promotions"] })
+      queryClient.invalidateQueries({ queryKey: ["promotion"] })
+    },
   })
 }
 
@@ -114,6 +151,37 @@ export function useUpdatePromotion(id: string) {
   return useMutation({
     mutationFn: (data: Record<string, unknown>) =>
       adminFetch<{ promotion: Promotion }>(`/admin/promotions/${id}`, {
+        method: "POST",
+        body: data,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["promotions"] })
+      queryClient.invalidateQueries({ queryKey: ["promotion", id] })
+    },
+  })
+}
+
+export interface PromotionTargetRulesBatchPayload {
+  create?: Array<{
+    attribute: string
+    operator: string
+    values: string[]
+  }>
+  update?: Array<{
+    id: string
+    attribute: string
+    operator: string
+    values: string[]
+  }>
+  delete?: string[]
+}
+
+export function useBatchPromotionTargetRules(id: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: PromotionTargetRulesBatchPayload) =>
+      adminFetch(`/admin/promotions/${id}/target-rules/batch`, {
         method: "POST",
         body: data,
       }),

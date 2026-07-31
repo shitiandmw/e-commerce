@@ -23,6 +23,8 @@ export interface CartLineItem {
   subtitle?: string | null
   quantity: number
   unit_price: number
+  compare_at_unit_price?: number | null
+  sale_ends_at?: string | null
   total: number
   variant_id: string
   variant?: {
@@ -109,13 +111,16 @@ export interface Cart {
   shipping_total?: number
   discount_total?: number
   item_total?: number
+  item_discount_total?: number
+  original_item_total?: number
   currency_code?: string
   region_id?: string
   email?: string
   shipping_address?: CartAddress | null
   billing_address?: CartAddress | null
   shipping_methods?: { shipping_option_id: string; amount: number; name?: string }[]
-  promotions?: { code: string }[]
+  promotions?: { code: string; is_automatic?: boolean }[]
+  pricing_refreshed_at?: string
 }
 
 export interface RegionCountry {
@@ -184,18 +189,7 @@ export async function getRegions(): Promise<Region[]> {
   return regions || []
 }
 
-export async function getOrCreateCart(): Promise<Cart> {
-  const cartId = getCartId()
-  if (cartId) {
-    try {
-      const { cart } = await apiFetch<{ cart: Cart }>(
-        `/api/cart/${cartId}?${FIELDS}`
-      )
-      return cart
-    } catch {
-      removeCartId()
-    }
-  }
+async function createCart(): Promise<Cart> {
   const { regions } = await apiFetch<{ regions: { id: string }[] }>("/api/regions")
   const regionId = regions?.[0]?.id
   const { cart } = await apiFetch<{ cart: Cart }>("/api/cart", {
@@ -204,6 +198,59 @@ export async function getOrCreateCart(): Promise<Cart> {
   })
   setCartId(cart.id)
   return cart
+}
+
+async function loadOrCreateCart(): Promise<Cart> {
+  const cartId = getCartId()
+  if (cartId) {
+    try {
+      const { cart } = await apiFetch<{ cart: Cart }>(
+        `/api/cart/${cartId}?${FIELDS}`
+      )
+      return cart
+    } catch (error) {
+      if (!(error instanceof CartApiError) || error.status !== 404) {
+        throw error
+      }
+      if (getCartId() === cartId) removeCartId()
+    }
+  }
+  return createCart()
+}
+
+let getOrCreateCartPromise: Promise<Cart> | null = null
+
+export function getOrCreateCart(): Promise<Cart> {
+  if (getOrCreateCartPromise) return getOrCreateCartPromise
+
+  const promise = loadOrCreateCart().finally(() => {
+    if (getOrCreateCartPromise === promise) getOrCreateCartPromise = null
+  })
+  getOrCreateCartPromise = promise
+  return promise
+}
+
+let refreshPricesRequest: { cartId: string; promise: Promise<Cart> } | null = null
+
+export function refreshCartPrices(): Promise<Cart> {
+  const cartId = getCartId()
+  if (!cartId) return Promise.reject(new Error("No cart found"))
+  if (refreshPricesRequest?.cartId === cartId) {
+    return refreshPricesRequest.promise
+  }
+
+  const request = {
+    cartId,
+    promise: apiFetch<{ cart: Cart }>(
+      `/api/cart/${cartId}/refresh-prices?${FIELDS}`,
+      { method: "POST" }
+    ).then(({ cart }) => cart),
+  }
+  refreshPricesRequest = request
+  request.promise.finally(() => {
+    if (refreshPricesRequest === request) refreshPricesRequest = null
+  }).catch(() => {})
+  return request.promise
 }
 
 export async function addToCart(variantId: string, quantity: number = 1): Promise<Cart> {

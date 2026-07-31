@@ -45,6 +45,7 @@ export default async function CollectionPage({ params }: PageProps) {
         handle: item.product!.handle,
         thumbnail: item.product!.thumbnail,
         price: priceInfo?.price ?? null,
+        original_price: priceInfo?.original_price ?? null,
         currency_code: priceInfo?.currency_code ?? "usd",
         isOutOfStock: priceInfo?.isOutOfStock ?? false,
       }

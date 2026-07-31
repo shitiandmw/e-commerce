@@ -25,6 +25,7 @@ import {
   isVariantOutOfStock,
 } from "@/lib/product-availability"
 import { RestockRequestButton } from "@/components/product/restock-request-button"
+import { SaleCountdown } from "@/components/product/sale-countdown"
 
 export function ProductDetailContent({
   product,
@@ -87,7 +88,14 @@ export function ProductDetailContent({
     if (v) {
       // Prefer calculated_price (populated when region_id was passed)
       if (v.calculated_price?.calculated_amount != null) {
-        return { amount: v.calculated_price.calculated_amount, currency_code: v.calculated_price.currency_code }
+        return {
+          amount: v.calculated_price.calculated_amount,
+          currency_code: v.calculated_price.currency_code,
+          original_amount:
+            v.calculated_price.original_amount > v.calculated_price.calculated_amount
+              ? v.calculated_price.original_amount
+              : undefined,
+        }
       }
       if (v.prices?.length) {
         const usd = v.prices.find((p) => p.currency_code === "usd")
@@ -101,7 +109,14 @@ export function ProductDetailContent({
       .filter((cp): cp is NonNullable<typeof cp> => !!cp && cp.calculated_amount != null)
     if (calcPrices?.length) {
       const cheapest = calcPrices.sort((a, b) => a.calculated_amount - b.calculated_amount)[0]
-      return { amount: cheapest.calculated_amount, currency_code: cheapest.currency_code }
+      return {
+        amount: cheapest.calculated_amount,
+        currency_code: cheapest.currency_code,
+        original_amount:
+          cheapest.original_amount > cheapest.calculated_amount
+            ? cheapest.original_amount
+            : undefined,
+      }
     }
     // Fallback: cheapest raw price in USD
     const allPrices = sellableVariants.flatMap((vr) => vr.prices ?? [])
@@ -110,6 +125,19 @@ export function ProductDetailContent({
     const cheapest = allPrices.sort((a, b) => a.amount - b.amount)[0]
     return cheapest ? { amount: cheapest.amount, currency_code: cheapest.currency_code } : null
   }, [selectedVariant, sellableVariants])
+
+  const selectedSalePrice = selectedVariant
+    ? product.sale_prices?.find(
+        (salePrice) => salePrice.variant_id === selectedVariant.id
+      )
+    : undefined
+  const selectedSaleIsApplied = Boolean(
+    selectedSalePrice?.status === "active" &&
+    variantPrice?.original_amount !== undefined &&
+    selectedSalePrice.amount === variantPrice.amount &&
+    selectedSalePrice.currency_code.toLowerCase() ===
+      variantPrice.currency_code.toLowerCase()
+  )
 
   // Inventory
   const inventory = selectedVariant?.inventory_quantity
@@ -247,7 +275,26 @@ export function ProductDetailContent({
                 ) : (
                   <span className="text-3xl font-bold text-muted-foreground">{t("price_tbd")}</span>
                 )}
+                {variantPrice?.original_amount !== undefined && (
+                  <span className="text-base text-muted-foreground line-through">
+                    {formatPrice(
+                      variantPrice.original_amount,
+                      variantPrice.currency_code
+                    )}
+                  </span>
+                )}
               </div>
+              {product.sale_price_server_time && selectedSalePrice && (
+                selectedSalePrice.status === "scheduled" || selectedSaleIsApplied
+              ) && (
+                <SaleCountdown
+                  status={selectedSalePrice.status}
+                  startsAt={selectedSalePrice.starts_at}
+                  endsAt={selectedSalePrice.ends_at}
+                  serverTime={product.sale_price_server_time}
+                  onExpire={() => router.refresh()}
+                />
+              )}
               {packSize && (
                 <p className="mt-1.5 text-xs text-muted-foreground">{t("pack_unit", { size: packSize })}</p>
               )}

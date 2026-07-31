@@ -22,7 +22,7 @@ export function LayoutShell({
   const initCart = useCart((s) => s.initCart)
 
   useEffect(() => {
-    initCart()
+    void initCart().catch(() => {})
   }, [initCart])
 
   if (isCheckout) {

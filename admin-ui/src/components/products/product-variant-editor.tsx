@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 import {
   createEditorKey,
   getConfigurationErrors,
@@ -24,12 +25,24 @@ import {
   type EditorVariant,
   type ProductVariantConfiguration,
 } from "@/lib/product-variant-config"
+import { getCurrencyFractionDigits } from "@/lib/promotion-config"
+import { isoToStoreDatetimeLocal, STORE_TIME_ZONE } from "@/lib/store-time"
 
 type Props = {
   value: ProductVariantConfiguration
   onChange: (value: ProductVariantConfiguration) => void
   productTitle: string
   mode: "create" | "edit"
+}
+
+function getSaleStatus(variant: EditorVariant) {
+  if (!variant.sale_enabled) return "disabled"
+  if (variant.sale_price === null) return "not_configured"
+  if (variant.sale_mode === "ongoing") return "active"
+  const now = isoToStoreDatetimeLocal(new Date().toISOString())
+  if (variant.sale_starts_at && now < variant.sale_starts_at) return "scheduled"
+  if (variant.sale_ends_at && now >= variant.sale_ends_at) return "ended"
+  return "active"
 }
 
 export function ProductVariantEditor({
@@ -357,6 +370,7 @@ export function ProductVariantEditor({
                 </div>
 
                 {!pendingDelete && (
+                  <>
                   <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     {value.options.map((option) => (
                       <div key={option.key} className="space-y-2">
@@ -384,11 +398,11 @@ export function ProductVariantEditor({
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>{t("form.variantPrice")}</Label>
+                      <Label>{t("variantEditor.originalPrice")}</Label>
                       <Input
                         type="number"
                         min="0"
-                        step="0.01"
+                        step={10 ** -getCurrencyFractionDigits(variant.currency_code)}
                         value={variant.price}
                         onChange={(event) =>
                           updateVariant(variant.key, { price: Number(event.target.value) })
@@ -437,6 +451,117 @@ export function ProductVariantEditor({
                       {t("form.manageInventory")}
                     </label>
                   </div>
+                  <div className="space-y-4 border-t pt-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <Label htmlFor={`sale-enabled-${variant.key}`}>
+                          {t("variantEditor.salePrice")}
+                        </Label>
+                        {variant.sale_enabled && (
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {t("variantEditor.salePriceHint")}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {variant.sale_enabled && (
+                          <Badge variant={
+                            getSaleStatus(variant) === "active"
+                              ? "default"
+                              : "outline"
+                          }>
+                            {t(`variantEditor.saleStatus.${getSaleStatus(variant)}`)}
+                          </Badge>
+                        )}
+                        <Switch
+                          id={`sale-enabled-${variant.key}`}
+                          checked={variant.sale_enabled}
+                          onCheckedChange={(checked) =>
+                            updateVariant(variant.key, { sale_enabled: checked })
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    {variant.sale_enabled && (
+                      <div className="space-y-4">
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          <div className="space-y-2">
+                            <Label>{t("variantEditor.saleAmount")}</Label>
+                            <Input
+                              type="number"
+                              min="0"
+                              step={10 ** -getCurrencyFractionDigits(variant.currency_code)}
+                              value={variant.sale_price ?? ""}
+                              placeholder={t("variantEditor.saleAmountPlaceholder")}
+                              onChange={(event) =>
+                                updateVariant(variant.key, {
+                                  sale_price:
+                                    event.target.value === ""
+                                      ? null
+                                      : Number(event.target.value),
+                                })
+                              }
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>{t("variantEditor.saleDuration")}</Label>
+                            <div className="grid h-10 grid-cols-2 border p-0.5">
+                              {(["ongoing", "scheduled"] as const).map((saleMode) => (
+                                <button
+                                  key={saleMode}
+                                  type="button"
+                                  onClick={() =>
+                                    updateVariant(variant.key, { sale_mode: saleMode })
+                                  }
+                                  className={
+                                    variant.sale_mode === saleMode
+                                      ? "bg-primary px-3 text-sm text-primary-foreground"
+                                      : "px-3 text-sm text-muted-foreground hover:text-foreground"
+                                  }
+                                >
+                                  {t(`variantEditor.saleMode.${saleMode}`)}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {variant.sale_mode === "scheduled" && (
+                          <div className="grid gap-3 sm:grid-cols-2">
+                            <div className="space-y-2">
+                              <Label>{t("variantEditor.saleStartsAt")}</Label>
+                              <Input
+                                type="datetime-local"
+                                value={variant.sale_starts_at}
+                                onChange={(event) =>
+                                  updateVariant(variant.key, {
+                                    sale_starts_at: event.target.value,
+                                  })
+                                }
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label>{t("variantEditor.saleEndsAt")}</Label>
+                              <Input
+                                type="datetime-local"
+                                value={variant.sale_ends_at}
+                                onChange={(event) =>
+                                  updateVariant(variant.key, {
+                                    sale_ends_at: event.target.value,
+                                  })
+                                }
+                              />
+                            </div>
+                            <p className="text-xs text-muted-foreground sm:col-span-2">
+                              {t("variantEditor.saleTimezone", { timeZone: STORE_TIME_ZONE })}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  </>
                 )}
               </div>
             )

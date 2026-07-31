@@ -28,6 +28,7 @@ import {
   getShippingMethodName,
   isPickupOrder,
 } from "@/lib/order-delivery"
+import { getOrderPromotionDisplays } from "@/lib/order-promotions"
 import {
   CancelOrderDialog,
   CompleteOrderDialog,
@@ -199,6 +200,13 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
   const pickupOrder = isPickupOrder(order, shippingOptions)
   const shippingMethodName = getShippingMethodName(order, shippingOptions)
   const deliverySnapshot = getOrderDeliverySnapshot(order)
+  const promotionDisplays = getOrderPromotionDisplays(order)
+  const manualPromotionDisplays = promotionDisplays.filter(
+    (promotion) => !promotion.is_automatic
+  )
+  const automaticPromotionDisplays = promotionDisplays.filter(
+    (promotion) => promotion.is_automatic
+  )
   const canFulfill = !pickupOrder &&
     order.status !== "canceled" &&
     order.fulfillment_status !== "fulfilled" &&
@@ -445,6 +453,72 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                       <span>
                         {formatCurrency(order.tax_total, order.currency_code)}
                       </span>
+                    </div>
+                  )}
+                  {manualPromotionDisplays.length > 0 && (
+                    <div className="flex items-start justify-between gap-4 text-sm">
+                      <span className="text-muted-foreground">
+                        {t("detail.summary.promotionCode")}
+                      </span>
+                      <div className="flex flex-wrap justify-end gap-1.5">
+                        {manualPromotionDisplays.map((promotion) => (
+                          promotion.promotion_id ? (
+                            <Link
+                              key={promotion.code}
+                              href={`/promotions/${promotion.promotion_id}`}
+                              className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            >
+                              <Badge
+                                variant="outline"
+                                className="font-mono hover:border-primary/60 hover:bg-muted"
+                              >
+                                {promotion.code}
+                              </Badge>
+                            </Link>
+                          ) : (
+                            <Badge
+                              key={promotion.code}
+                              variant="outline"
+                              className="font-mono"
+                            >
+                              {promotion.code}
+                            </Badge>
+                          )
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {automaticPromotionDisplays.length > 0 && (
+                    <div className="flex items-start justify-between gap-4 text-sm">
+                      <span className="text-muted-foreground">
+                        {t("detail.summary.automaticPromotion")}
+                      </span>
+                      <div className="flex flex-wrap justify-end gap-1.5">
+                        {automaticPromotionDisplays.map((promotion) => (
+                          promotion.promotion_id ? (
+                            <Link
+                              key={promotion.code}
+                              href={`/promotions/${promotion.promotion_id}`}
+                              className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            >
+                              <Badge
+                                variant="secondary"
+                                className="font-mono hover:bg-muted"
+                              >
+                                {promotion.code}
+                              </Badge>
+                            </Link>
+                          ) : (
+                            <Badge
+                              key={promotion.code}
+                              variant="secondary"
+                              className="font-mono"
+                            >
+                              {promotion.code}
+                            </Badge>
+                          )
+                        ))}
+                      </div>
                     </div>
                   )}
                   {order.discount_total > 0 && (

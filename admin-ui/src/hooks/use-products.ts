@@ -133,23 +133,64 @@ export interface ProductVariantConfigurationPayload {
   }>
 }
 
+export type ProductSaleMode = "ongoing" | "scheduled"
+export type ProductSaleStatus =
+  | "not_configured"
+  | "disabled"
+  | "scheduled"
+  | "active"
+  | "ended"
+
+export interface ProductSalePrice {
+  variant_id: string
+  enabled: boolean
+  mode: ProductSaleMode
+  amount: number | null
+  currency_code: string
+  starts_at: string | null
+  ends_at: string | null
+  status: ProductSaleStatus
+}
+
+export interface ProductSalePricesResponse {
+  sale_prices: ProductSalePrice[]
+}
+
+export interface ProductSalePricesPayload {
+  configurations: Array<Omit<ProductSalePrice, "status">>
+}
+
 export interface ProductsQueryParams {
   offset?: number
   limit?: number
   q?: string
+  id?: string[]
   status?: string[]
   order?: string
   fields?: string
+  enabled?: boolean
 }
 
 // Hooks
 export function useProducts(params: ProductsQueryParams = {}) {
-  const { offset = 0, limit = 20, q, status, order, fields } = params
+  const {
+    offset = 0,
+    limit = 20,
+    q,
+    id,
+    status,
+    order,
+    fields,
+    enabled = true,
+  } = params
 
   const queryParams = new URLSearchParams()
   queryParams.set("offset", String(offset))
   queryParams.set("limit", String(limit))
   if (q) queryParams.set("q", q)
+  if (id && id.length > 0) {
+    id.forEach((productId) => queryParams.append("id[]", productId))
+  }
   if (status && status.length > 0) {
     status.forEach((s) => queryParams.append("status[]", s))
   }
@@ -161,9 +202,10 @@ export function useProducts(params: ProductsQueryParams = {}) {
   )
 
   return useQuery<ProductsResponse>({
-    queryKey: ["products", { offset, limit, q, status, order, fields }],
+    queryKey: ["products", { offset, limit, q, id, status, order, fields }],
     queryFn: () =>
       adminFetch<ProductsResponse>(`/admin/products?${queryParams.toString()}`),
+    enabled,
   })
 }
 
@@ -233,6 +275,39 @@ export function useSyncProductVariantConfiguration(productId: string) {
       queryClient.invalidateQueries({ queryKey: ["product", productId] })
       queryClient.invalidateQueries({ queryKey: ["inventory-items"] })
       queryClient.invalidateQueries({ queryKey: ["inventory-product-links"] })
+    },
+  })
+}
+
+export function useProductSalePrices(productId: string) {
+  return useQuery<ProductSalePricesResponse>({
+    queryKey: ["product-sale-prices", productId],
+    queryFn: () => adminFetch<ProductSalePricesResponse>(
+      `/admin/products/${productId}/sale-prices`
+    ),
+    enabled: !!productId,
+  })
+}
+
+export function useSyncProductSalePrices() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      productId,
+      payload,
+    }: {
+      productId: string
+      payload: ProductSalePricesPayload
+    }) => adminFetch<ProductSalePricesResponse>(
+      `/admin/products/${productId}/sale-prices`,
+      { method: "POST", body: payload }
+    ),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["product-sale-prices", variables.productId],
+      })
+      queryClient.invalidateQueries({ queryKey: ["product", variables.productId] })
+      queryClient.invalidateQueries({ queryKey: ["products"] })
     },
   })
 }

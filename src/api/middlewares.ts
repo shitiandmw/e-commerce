@@ -8,7 +8,7 @@ import {
   authenticate,
   errorHandler,
 } from "@medusajs/framework/http"
-import { PolicyOperation } from "@medusajs/framework/utils"
+import { MedusaError, PolicyOperation } from "@medusajs/framework/utils"
 import { AdminGetOrdersParams } from "@medusajs/medusa/api/admin/orders/validators"
 import { listTransformQueryConfig as adminOrdersListTransformQueryConfig } from "@medusajs/medusa/api/admin/orders/query-config"
 import { AdminGetInventoryItemsParams } from "@medusajs/medusa/api/admin/inventory-items/validators"
@@ -113,6 +113,7 @@ import {
 import { initSocketIO, setContainer } from "../lib/socket-io"
 import { PostAdminProductShippingOptions } from "./admin/products/[id]/shipping-options/validators"
 import { PostAdminProductVariantConfiguration } from "./admin/products/[id]/variant-configuration/validators"
+import { PostAdminProductSalePrices } from "./admin/products/[id]/sale-prices/validators"
 import { PostAdminShippingOptionPickupLocation } from "./admin/shipping-options/[id]/pickup-location/validators"
 import { PostAdminShippingOptionConfiguration } from "./admin/shipping-options/[id]/configuration/validators"
 import { PostStoreRemoveIncompatibleItems } from "./store/carts/[id]/shipping-availability/validators"
@@ -129,6 +130,13 @@ import {
   assertVariantIsSellable,
   sendProductVariantConfigurationError,
 } from "../lib/product-variant-configuration"
+import {
+  getPromotionCodePolicyError,
+  normalizePromotionCodes,
+} from "../lib/promotion-code-policy"
+import { StoreGetCartsCart } from "@medusajs/medusa/api/store/carts/validators"
+import { retrieveTransformQueryConfig as storeCartRetrieveTransformQueryConfig } from "@medusajs/medusa/api/store/carts/query-config"
+import { refreshCartPrices } from "../lib/cart-pricing"
 
 export const GetBrandsSchema = createFindParams().merge(z.object({ q: z.string().optional() }))
 export const GetTagsSchema = createFindParams()
@@ -240,6 +248,7 @@ export const prepareCompletedCartShipping = async (
   _res: MedusaResponse,
   next: MedusaNextFunction
 ) => {
+  await refreshCartPrices(req.scope, req.params.id)
   await assertCartVariantsAreSellable(req.scope, req.params.id)
   await prepareCartShippingSnapshot(req.scope, req.params.id)
   return next()
@@ -252,6 +261,38 @@ const rejectStoppedVariantLineItem = async (
 ) => {
   const variantId = (req.body as { variant_id?: string } | undefined)?.variant_id
   if (variantId) await assertVariantIsSellable(req.scope, variantId)
+  return next()
+}
+
+const enforceSingleManualPromotion = async (
+  req: MedusaRequest,
+  _res: MedusaResponse,
+  next: MedusaNextFunction
+) => {
+  const requestedCodes = normalizePromotionCodes((req.body as any)?.promo_codes)
+  const requestError = getPromotionCodePolicyError(requestedCodes)
+  if (requestError) {
+    throw new MedusaError(MedusaError.Types.INVALID_DATA, requestError)
+  }
+  if (requestedCodes.length === 0) return next()
+
+  const query = req.scope.resolve("query")
+  const { data } = await query.graph({
+    entity: "cart",
+    fields: ["id", "promotions.code", "promotions.is_automatic"],
+    filters: { id: req.params.id },
+  })
+  const cart = data?.[0] as {
+    promotions?: Array<{ code?: string; is_automatic?: boolean }>
+  } | undefined
+  const policyError = getPromotionCodePolicyError(
+    requestedCodes,
+    cart?.promotions
+  )
+  if (policyError) {
+    throw new MedusaError(MedusaError.Types.INVALID_DATA, policyError)
+  }
+
   return next()
 }
 
@@ -291,6 +332,19 @@ export default defineMiddlewares({
       middlewares: [
         authenticate("user", ["bearer", "session"]),
         validateAndTransformBody(PostAdminProductVariantConfiguration),
+      ],
+    },
+    {
+      matcher: "/admin/products/:id/sale-prices",
+      method: "GET",
+      middlewares: [authenticate("user", ["bearer", "session"])],
+    },
+    {
+      matcher: "/admin/products/:id/sale-prices",
+      method: "POST",
+      middlewares: [
+        authenticate("user", ["bearer", "session"]),
+        validateAndTransformBody(PostAdminProductSalePrices),
       ],
     },
     {
@@ -334,6 +388,21 @@ export default defineMiddlewares({
       matcher: "/store/carts/:id/complete",
       method: "POST",
       middlewares: [prepareCompletedCartShipping],
+    },
+    {
+      matcher: "/store/carts/:id/refresh-prices",
+      method: "POST",
+      middlewares: [
+        validateAndTransformQuery(
+          StoreGetCartsCart,
+          storeCartRetrieveTransformQueryConfig
+        ),
+      ],
+    },
+    {
+      matcher: "/store/carts/:id/promotions",
+      method: "POST",
+      middlewares: [enforceSingleManualPromotion],
     },
     {
       matcher: "/store/carts/:id/line-items",

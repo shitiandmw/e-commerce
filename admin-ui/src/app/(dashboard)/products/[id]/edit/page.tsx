@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { useProduct } from "@/hooks/use-products"
+import { useProduct, useProductSalePrices } from "@/hooks/use-products"
 import { ProductForm } from "@/components/products/product-form"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
@@ -25,8 +25,19 @@ export default function EditProductPage({
   const productId = params.id
   const returnTo = getProductReturnTo(searchParams?.from)
   const { data, isLoading, isError, error } = useProduct(productId)
+  const {
+    data: salePriceData,
+    isLoading: isLoadingSalePrices,
+    isError: isSalePricesError,
+    error: salePricesError,
+  } = useProductSalePrices(productId)
+  const loadError = error instanceof Error
+    ? error
+    : salePricesError instanceof Error
+      ? salePricesError
+      : null
 
-  if (isLoading) {
+  if (isLoading || isLoadingSalePrices) {
     return (
       <div className="space-y-8">
         <div className="flex items-center gap-4">
@@ -49,7 +60,7 @@ export default function EditProductPage({
     )
   }
 
-  if (isError || !data?.product) {
+  if (isError || isSalePricesError || !data?.product || !salePriceData) {
     return (
       <div className="space-y-6">
         <Link href={returnTo}>
@@ -60,14 +71,19 @@ export default function EditProductPage({
         </Link>
         <div className="rounded-lg border bg-card p-8 text-center">
           <p className="text-destructive">
-            {error instanceof Error
-              ? error.message
-              : t("productNotFound")}
+            {loadError?.message || t("productNotFound")}
           </p>
         </div>
       </div>
     )
   }
 
-  return <ProductForm product={data.product} mode="edit" returnTo={returnTo} />
+  return (
+    <ProductForm
+      product={data.product}
+      salePrices={salePriceData.sale_prices}
+      mode="edit"
+      returnTo={returnTo}
+    />
+  )
 }

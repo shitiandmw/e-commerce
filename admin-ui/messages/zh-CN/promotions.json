@@ -1,11 +1,11 @@
 {
   "promotions": {
-    "title": "促销管理",
-    "description": "管理促销折扣和优惠活动",
-    "addPromotion": "添加促销",
-    "createPromotion": "创建促销",
-    "editPromotion": "编辑促销",
-    "createSubtitle": "设置新的折扣促销",
+    "title": "优惠码管理",
+    "description": "创建和管理结算时使用的商品优惠码",
+    "addPromotion": "添加优惠码",
+    "createPromotion": "创建优惠码",
+    "editPromotion": "编辑优惠码",
+    "createSubtitle": "设置新的结算优惠码",
     "editing": "正在编辑 {code}",
     "saveChanges": "保存更改",
     "saving": "保存中...",
@@ -20,7 +20,7 @@
     "unknownError": "未知错误",
 
     "columns": {
-      "code": "促销码",
+      "code": "优惠码",
       "type": "类型",
       "discount": "折扣",
       "status": "状态",
@@ -36,6 +36,8 @@
 
     "status": {
       "active": "生效中",
+      "draft": "草稿",
+      "inactive": "已停用",
       "expired": "已过期",
       "scheduled": "待生效"
     },
@@ -49,14 +51,18 @@
 
     "form": {
       "basicInfo": "基本信息",
-      "code": "促销码 *",
+      "code": "优惠码 *",
       "codePlaceholder": "例如 SUMMER20",
       "codeRequired": "促销码为必填项",
       "codeFormat": "促销码只能包含字母、数字、短横线和下划线",
       "promotionType": "促销类型",
       "applicationMode": "应用方式",
       "discountConfig": "折扣配置",
-      "discountType": "折扣类型",
+      "discountType": "优惠方式",
+      "rateDiscount": "按折扣优惠",
+      "fixedDiscount": "固定金额立减",
+      "discountRate": "折扣（折）*",
+      "fixedValue": "立减金额 *",
       "percentage": "百分比",
       "fixedAmount": "固定金额",
       "discountValue": "折扣值 *",
@@ -65,15 +71,76 @@
       "appliesTo": "适用范围",
       "entireOrder": "整单",
       "specificItems": "指定商品",
+      "allItems": "全部商品",
       "shippingMethods": "配送方式",
       "allocation": "分配方式",
       "none": "无",
       "eachItem": "每件商品",
-      "acrossItems": "按比例分摊"
+      "acrossItems": "按比例分摊",
+      "maxQuantity": "每项最多折扣数量",
+      "discountTarget": "优惠对象",
+      "orderTarget": "订单金额",
+      "productsTarget": "商品",
+      "shippingTarget": "配送费",
+      "productScope": "商品范围",
+      "allProducts": "全部商品",
+      "selectedProducts": "指定商品",
+      "calculationMode": "优惠计算方式",
+      "totalFixedDiscount": "符合条件的商品合计减固定金额",
+      "fixedPerItem": "每件符合条件的商品减固定金额",
+      "allEligibleItems": "全部符合条件的商品享受优惠",
+      "limitedItemDiscount": "按件优惠并限制优惠数量",
+      "maxDiscountedQuantity": "每单最多优惠数量"
+    },
+
+    "productPicker": {
+      "title": "选择促销商品",
+      "description": "选择参与本次优惠的商品，默认包含商品的全部规格。",
+      "searchPlaceholder": "搜索商品名称...",
+      "product": "商品",
+      "variants": "适用规格",
+      "status": "状态",
+      "published": "在售",
+      "variantCount": "{count} 个规格",
+      "selectedCount": "已选择 {count} 个商品",
+      "selectProduct": "选择商品 {title}",
+      "confirm": "确认添加",
+      "noResults": "没有找到符合条件的在售商品",
+      "loadError": "商品加载失败，请重试"
+    },
+
+    "selectedProducts": {
+      "count": "已选 {count} 个商品",
+      "allVariantsHint": "每个商品的全部当前及未来规格都会参与优惠。",
+      "add": "添加商品",
+      "remove": "移除",
+      "empty": "尚未选择商品",
+      "required": "请至少选择一个商品",
+      "allVariants": "全部规格（当前 {count} 个）",
+      "unavailable": "商品已删除或不可用",
+      "notPublished": "未上架"
+    },
+
+    "summary": {
+      "title": "促销摘要",
+      "sentence": "优惠码 {code}：商品{discount}，{timing}。",
+      "codePlaceholder": "待填写",
+      "order": "订单金额",
+      "shipping": "配送费",
+      "allProducts": "全部商品",
+      "selectedProducts": "指定的 {count} 个商品",
+      "rate": "{value} 折",
+      "percentage": "优惠 {value}%",
+      "fixed": "优惠 {value} {currency}",
+      "draft": "保存为草稿",
+      "inactive": "保持停用",
+      "scheduled": "按设置时间生效",
+      "immediate": "立即生效"
     },
 
     "schedule": {
       "title": "时间设置",
+      "status": "活动状态",
       "startDate": "开始日期",
       "endDate": "结束日期"
     },
@@ -81,9 +148,11 @@
     "detail": {
       "promotionDetails": "促销详情",
       "discountValue": "折扣值",
-      "promotionType": "促销类型",
+      "promotionType": "优惠类型",
       "appliesTo": "适用范围",
-      "allocation": "分配方式",
+      "allocation": "优惠计算方式",
+      "shippingTotal": "符合条件的配送费合计享受优惠",
+      "shippingEach": "每项符合条件的配送费分别享受优惠",
       "automatic": "是否自动",
       "yes": "是",
       "no": "否",
@@ -100,20 +169,27 @@
       "noRules": "暂无规则。",
       "targetRules": "目标规则",
       "noTargetRules": "暂无目标规则。",
+      "applicableProducts": "适用商品",
       "attribute": "属性",
       "operator": "运算符",
       "values": "值"
     },
 
+    "legacy": {
+      "badge": "旧版促销",
+      "readOnlyTitle": "该促销使用旧版规则",
+      "readOnlyDescription": "新版优惠码只支持手动整单折扣或固定立减。此促销可继续查看、停用或删除，但不能使用新版表单编辑。"
+    },
+
     "table": {
       "errorLoading": "加载促销失败",
-      "noPromotions": "暂无促销活动。创建您的第一个促销开始使用。",
-      "showing": "显示第 {from} 至 {to} 条，共 {total} 条促销",
+      "noPromotions": "暂无优惠码。创建第一个优惠码开始使用。",
+      "showing": "显示第 {from} 至 {to} 条，共 {total} 个优惠码",
       "page": "第 {current} 页，共 {total} 页",
       "search": "搜索促销码...",
       "allTypes": "所有类型",
       "filterByType": "按类型筛选",
-      "noResults": "没有匹配的促销活动。"
+      "noResults": "没有匹配的优惠码。"
     },
 
     "actions": {

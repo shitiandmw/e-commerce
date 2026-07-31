@@ -162,7 +162,7 @@ function isAuthError(error: unknown): boolean {
 }
 
 export function useCheckout(): UseCheckoutReturn {
-  const { cart, initCart } = useCart()
+  const { cart, initCart, refreshPrices } = useCart()
   const locale = useLocale()
   const t = useTranslations()
   const [step, setStep] = useState<Step>("shipping")
@@ -219,6 +219,7 @@ export function useCheckout(): UseCheckoutReturn {
     let cancelled = false
     async function loadShippingOptions() {
       setLoading(true)
+      setError(null)
       try {
         if (getToken()) {
           try {
@@ -231,6 +232,8 @@ export function useCheckout(): UseCheckoutReturn {
         if (cancelled) return
         await initCart()
         if (cancelled) return
+        await refreshPrices()
+        if (cancelled) return
         const availability = await getShippingAvailability()
         const options = availability.shipping_options
         if (cancelled) return
@@ -239,7 +242,10 @@ export function useCheckout(): UseCheckoutReturn {
           prev && options.some((option) => option.id === prev) ? prev : null
         ))
       } catch {
-        if (!cancelled) setShippingOptions([])
+        if (!cancelled) {
+          setShippingOptions([])
+          setError(t("operation_failed_retry"))
+        }
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -247,7 +253,7 @@ export function useCheckout(): UseCheckoutReturn {
 
     loadShippingOptions()
     return () => { cancelled = true }
-  }, [initCart])
+  }, [initCart, refreshPrices, t])
 
   useEffect(() => {
     if (selectedShippingId || !appliedShippingId || shippingOptions.length === 0) return
