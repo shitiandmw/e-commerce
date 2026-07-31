@@ -22,6 +22,8 @@
     "connected": "已连接",
     "disconnected": "未连接",
     "search": "搜索会话...",
+    "loadMore": "加载更多",
+    "loadingMore": "正在加载...",
     "uploadImage": "添加图片",
     "imageMessage": "客服图片",
     "pendingImage": "待发送图片",

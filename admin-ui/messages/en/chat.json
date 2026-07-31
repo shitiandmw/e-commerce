@@ -22,6 +22,8 @@
     "connected": "Connected",
     "disconnected": "Disconnected",
     "search": "Search conversations...",
+    "loadMore": "Load more",
+    "loadingMore": "Loading...",
     "uploadImage": "Add image",
     "imageMessage": "Support image",
     "pendingImage": "Pending image",

@@ -1,7 +1,8 @@
 "use client"
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { adminFetch } from "@/lib/admin-api"
+import { getNextConversationOffset } from "@/lib/chat-conversations"
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -62,16 +63,18 @@ export type SendChatMessageInput =
 
 // ─── Data Hooks ──────────────────────────────────────────
 
-export function useConversations(params: { offset?: number; limit?: number; status?: string; q?: string } = {}) {
-  const { offset = 0, limit = 50, status, q } = params
-  return useQuery<ConversationsResponse>({
-    queryKey: ["conversations", { offset, limit, status, q }],
-    queryFn: () => {
-      const query: Record<string, string> = { offset: String(offset), limit: String(limit) }
+export function useConversations(params: { limit?: number; status?: string; q?: string } = {}) {
+  const { limit = 50, status, q } = params
+  return useInfiniteQuery<ConversationsResponse>({
+    queryKey: ["conversations", { limit, status, q }],
+    initialPageParam: 0,
+    queryFn: ({ pageParam }) => {
+      const query: Record<string, string> = { offset: String(pageParam), limit: String(limit) }
       if (status) query.status = status
       if (q) query.q = q
       return adminFetch<ConversationsResponse>("/admin/chat/conversations", { params: query })
     },
+    getNextPageParam: getNextConversationOffset,
     refetchInterval: 10000,
   })
 }

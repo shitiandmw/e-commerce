@@ -6,7 +6,9 @@ import { cn } from "@/lib/utils"
 import { useConversations, Conversation } from "@/hooks/use-chat"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Search, User, Globe } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { formatConversationReference } from "@/lib/chat-conversations"
+import { Search, User, Globe, Loader2 } from "lucide-react"
 
 interface ConversationListProps {
   selectedId: string | null
@@ -17,9 +19,15 @@ export function ConversationList({ selectedId, onSelect }: ConversationListProps
   const t = useTranslations("chat")
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined)
   const [search, setSearch] = useState("")
-  const { data, isLoading } = useConversations({ status: statusFilter, q: search || undefined })
+  const {
+    data,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useConversations({ status: statusFilter, q: search || undefined })
 
-  const conversations = data?.conversations ?? []
+  const conversations = data?.pages.flatMap((page) => page.conversations) ?? []
 
   return (
     <div className="flex w-80 flex-col border-r">
@@ -70,6 +78,21 @@ export function ConversationList({ selectedId, onSelect }: ConversationListProps
             />
           ))
         )}
+        {hasNextPage && (
+          <div className="p-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="w-full"
+              disabled={isFetchingNextPage}
+              onClick={() => fetchNextPage()}
+            >
+              {isFetchingNextPage && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isFetchingNextPage ? t("loadingMore") : t("loadMore")}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -86,7 +109,8 @@ function ConversationItem({
 }) {
   const t = useTranslations("chat")
   const isCustomer = !!conv.customer_id
-  const label = isCustomer ? conv.customer_id : conv.visitor_id
+  const identity = isCustomer ? conv.customer_id : conv.visitor_id
+  const reference = formatConversationReference(identity)
   const timeStr = conv.last_message_at
     ? new Date(conv.last_message_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
     : ""
@@ -104,8 +128,13 @@ function ConversationItem({
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between">
-          <span className="truncate text-sm font-medium">
-            {isCustomer ? t("customer") : t("visitor")}
+          <span className="flex min-w-0 items-baseline gap-1.5" title={identity || undefined}>
+            <span className="shrink-0 text-sm font-medium">
+              {isCustomer ? t("customer") : t("visitor")}
+            </span>
+            {reference && (
+              <span className="truncate text-xs text-muted-foreground">{reference}</span>
+            )}
           </span>
           <span className="shrink-0 text-xs text-muted-foreground">{timeStr}</span>
         </div>

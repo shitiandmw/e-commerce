@@ -28,6 +28,8 @@
     "src/lib/promotion-status.test.ts",
     "src/lib/order-promotions.ts",
     "src/lib/order-promotions.test.ts",
+    "src/lib/chat-conversations.ts",
+    "src/lib/chat-conversations.test.ts",
     "src/hooks/use-shipping-form-state.ts",
     "src/hooks/use-shipping-form-state.test.tsx"
   ],
