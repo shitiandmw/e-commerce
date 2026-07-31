@@ -450,84 +450,84 @@ export function ProductDetailContent({
               )}
             </div>
 
+            {/* Product Specifications */}
+            {hasSpecs && (
+              <div className="mt-12 grid grid-cols-2 gap-x-8 gap-y-3 border-b border-border/20 pb-8 text-sm">
+                {origin && (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-muted-foreground">{t("spec_origin")}</span>
+                    <span className="text-foreground font-medium">{origin}</span>
+                  </div>
+                )}
+                {wrapper && (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-muted-foreground">{t("spec_wrapper")}</span>
+                    <span className="text-foreground font-medium">{wrapper}</span>
+                  </div>
+                )}
+                {binder && (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-muted-foreground">{t("spec_binder")}</span>
+                    <span className="text-foreground font-medium">{binder}</span>
+                  </div>
+                )}
+                {filler && (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-muted-foreground">{t("spec_filler")}</span>
+                    <span className="text-foreground font-medium">{filler}</span>
+                  </div>
+                )}
+                {strength && (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-muted-foreground">{t("spec_strength")}</span>
+                    <span className="text-foreground font-medium">{strength}</span>
+                  </div>
+                )}
+                {cigarLength && (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-muted-foreground">{t("spec_length")}</span>
+                    <span className="text-foreground font-medium">{cigarLength}</span>
+                  </div>
+                )}
+                {ringGauge && (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-muted-foreground">{t("spec_ring_gauge")}</span>
+                    <span className="text-foreground font-medium">{ringGauge}</span>
+                  </div>
+                )}
+                {packSize && (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-muted-foreground">{t("spec_packaging")}</span>
+                    <span className="text-foreground font-medium">{t("pack_unit", { size: packSize })}</span>
+                  </div>
+                )}
+                {customAttributes.map((attr) => (
+                  <div key={attr.key} className="flex flex-col gap-1">
+                    <span className="text-muted-foreground">{attr.key}</span>
+                    <span className="text-foreground font-medium">{attr.value}</span>
+                  </div>
+                ))}
+                {attributeTags.length > 0 && (
+                  <div className="col-span-2 flex flex-col gap-2">
+                    <span className="text-muted-foreground">{t("spec_tags")}</span>
+                    <div className="flex flex-wrap gap-2">
+                      {attributeTags.map((tag) => (
+                        <ProductTagChip
+                          key={tag.id}
+                          tag={tag}
+                          variant="attribute"
+                          className="px-3 py-1.5 text-xs"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
           </div>
 
         </div>
-
-        {/* Product Specifications */}
-        {hasSpecs && (
-          <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-3 border-b border-border/20 pb-8 text-sm">
-            {origin && (
-              <div className="flex flex-col gap-1">
-                <span className="text-muted-foreground">{t("spec_origin")}</span>
-                <span className="text-foreground font-medium">{origin}</span>
-              </div>
-            )}
-            {wrapper && (
-              <div className="flex flex-col gap-1">
-                <span className="text-muted-foreground">{t("spec_wrapper")}</span>
-                <span className="text-foreground font-medium">{wrapper}</span>
-              </div>
-            )}
-            {binder && (
-              <div className="flex flex-col gap-1">
-                <span className="text-muted-foreground">{t("spec_binder")}</span>
-                <span className="text-foreground font-medium">{binder}</span>
-              </div>
-            )}
-            {filler && (
-              <div className="flex flex-col gap-1">
-                <span className="text-muted-foreground">{t("spec_filler")}</span>
-                <span className="text-foreground font-medium">{filler}</span>
-              </div>
-            )}
-            {strength && (
-              <div className="flex flex-col gap-1">
-                <span className="text-muted-foreground">{t("spec_strength")}</span>
-                <span className="text-foreground font-medium">{strength}</span>
-              </div>
-            )}
-            {cigarLength && (
-              <div className="flex flex-col gap-1">
-                <span className="text-muted-foreground">{t("spec_length")}</span>
-                <span className="text-foreground font-medium">{cigarLength}</span>
-              </div>
-            )}
-            {ringGauge && (
-              <div className="flex flex-col gap-1">
-                <span className="text-muted-foreground">{t("spec_ring_gauge")}</span>
-                <span className="text-foreground font-medium">{ringGauge}</span>
-              </div>
-            )}
-            {packSize && (
-              <div className="flex flex-col gap-1">
-                <span className="text-muted-foreground">{t("spec_packaging")}</span>
-                <span className="text-foreground font-medium">{t("pack_unit", { size: packSize })}</span>
-              </div>
-            )}
-            {customAttributes.map((attr) => (
-              <div key={attr.key} className="flex flex-col gap-1">
-                <span className="text-muted-foreground">{attr.key}</span>
-                <span className="text-foreground font-medium">{attr.value}</span>
-              </div>
-            ))}
-            {attributeTags.length > 0 && (
-              <div className="col-span-2 md:col-span-4 flex flex-col gap-2">
-                <span className="text-muted-foreground">{t("spec_tags")}</span>
-                <div className="flex flex-wrap gap-2">
-                  {attributeTags.map((tag) => (
-                    <ProductTagChip
-                      key={tag.id}
-                      tag={tag}
-                      variant="attribute"
-                      className="px-3 py-1.5 text-xs"
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
 
         {/* Brand Story Banner */}
         {displayBrandName && (
